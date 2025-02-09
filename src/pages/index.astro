@@ -1,0 +1,22 @@
+---
+import { default as Layout } from "@/src/layouts/non-auth-layout.astro";
+import { Waitlist } from "@clerk/astro/components";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/astro/components";
+const user = await Astro.locals.currentUser();
+
+if (user) {
+    return Astro.redirect("/dashboard");
+}
+---
+
+<Layout title="活動管理アプリ">
+    <h1>大阪公立大学合氣道部 活動管理アプリ</h1>
+    <hr />
+    <SignedIn>
+        <a href="/dashboard">ダッシュボードへ</a>
+    </SignedIn>
+    <SignedOut>
+        <SignInButton />
+        <Waitlist />
+    </SignedOut>
+</Layout>

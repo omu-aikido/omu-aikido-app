@@ -1,0 +1,19 @@
+---
+import Baselayout from "./baselayout.astro";
+const textLinks: { label: string; href: string }[] = [];
+
+interface Props {
+    title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<Baselayout
+    pagename={title}
+    homelink="/"
+    title="大阪公立大学合氣道部"
+    textLinks={textLinks}
+>
+    <slot />
+</Baselayout>

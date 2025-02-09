@@ -1,0 +1,83 @@
+---
+import Icon from "./Icon.astro";
+---
+
+<footer>
+    <div class="group" style="text-align: center;">
+        <p>
+            © OMU Aikido Club All Rights Reserved.<br />
+            〒599-8531 大阪府堺市中区学園町1番1号 大阪公立大学合氣道部
+        </p>
+    </div>
+
+    <div class="socials">
+        <a
+            href="https://twitter.com/fudaiaiki"
+            aria-label="旧府大合氣道部 Twitter"
+            ><Icon icon="twitter-logo" /><span class="social-text">
+                旧府大Twitter</span
+            ></a
+        >
+        <a
+            href="https://twitter.com/new_ocuaikido"
+            aria-label="旧市大合気道サークル Twitter"
+            ><Icon icon="twitter-logo" /><span class="social-text">
+                旧市大Twitter</span
+            ></a
+        >
+        <a href="https://instagram.com/hamudaiaikidoubu" aria-label="Instagram"
+            ><Icon icon="instagram-logo" /><span class="social-text">
+                Instagram</span
+            ></a
+        >
+        <a href="https://github.com/omu-aikido" aria-label="GitHub"
+            ><Icon icon="github-logo" /><span class="social-text">
+                GitHub</span
+            ></a
+        >
+    </div>
+</footer>
+
+<style>
+    footer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background-color: rgb(var(--surface0));
+        color: rgb(var(--subtext1));
+    }
+    footer .group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+    footer .socials {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+    footer .socials a {
+        color: rgb(var(--subtext1));
+        text-decoration: none;
+        margin: 0 1rem;
+        display: flex;
+        align-items: center;
+    }
+    footer .socials a:hover {
+        color: rgb(var(--mauve));
+    }
+    @media (max-width: 815px) {
+        footer .socials a {
+            transform: scale(1.5);
+        }
+        footer .socials .social-text {
+            display: none;
+        }
+    }
+</style>

@@ -1,0 +1,90 @@
+/* Global rgb(variables */
+@import url('https://unpkg.com/@catppuccin/palette/css/catppuccin.css');
+
+:root {
+  --text: var(--ctp-latte-text-rgb);
+  --subtext1: var(--ctp-latte-subtext1-rgb);
+  --subtext0: var(--ctp-latte-subtext0-rgb);
+  --overlay2: var(--ctp-latte-overlay2-rgb);
+  --overlay1: var(--ctp-latte-overlay1-rgb);
+  --overlay0: var(--ctp-latte-overlay0-rgb);
+  --surface2: var(--ctp-latte-surface2-rgb);
+  --surface1: var(--ctp-latte-surface1-rgb);
+  --surface0: var(--ctp-latte-surface0-rgb);
+  --base: var(--ctp-latte-base-rgb);
+  --mantle: var(--ctp-latte-mantle-rgb);
+  --crust: var(--ctp-latte-crust-rgb);
+  --shadow: var(--overlay1);
+
+  --rosewater: var(--ctp-latte-rosewater-rgb);
+  --flamingo: var(--ctp-latte-flamingo-rgb);
+  --pink: var(--ctp-latte-pink-rgb);
+  --mauve: var(--ctp-latte-mauve-rgb);
+  --red: var(--ctp-latte-red-rgb);
+  --maroon: var(--ctp-latte-maroon-rgb);
+  --peach: var(--ctp-latte-peach-rgb);
+  --yellow: var(--ctp-latte-yellow-rgb);
+  --green: var(--ctp-latte-green-rgb);
+  --teal: var(--ctp-latte-teal-rgb);
+  --sky: var(--ctp-latte-sky-rgb);
+  --sapphire: var(--ctp-latte-sapphire-rgb);
+  --blue: var(--ctp-latte-blue-rgb);
+  --lavender: var(--ctp-latte-lavender-rgb);
+
+  --gradient: linear-gradient(
+    to right,
+    rgb(var(--mauve)),
+    rgb(var(--pink))
+  );
+  --gradient-alt: linear-gradient(
+    to right,
+    rgb(var(--pink)),
+    rgb(var(--mauve))
+  );
+  /* Transitions */
+  --theme-transition: 0.2s ease-in-out;
+}
+
+:root.theme-dark {
+  --text: var(--ctp-macchiato-text-rgb);
+  --subtext1: var(--ctp-macchiato-subtext1-rgb);
+  --subtext0: var(--ctp-macchiato-subtext0-rgb);
+  --overlay2: var(--ctp-macchiato-overlay2-rgb);
+  --overlay1: var(--ctp-macchiato-overlay1-rgb);
+  --overlay0: var(--ctp-macchiato-overlay0-rgb);
+  --surface2: var(--ctp-macchiato-surface2-rgb);
+  --surface1: var(--ctp-macchiato-surface1-rgb);
+  --surface0: var(--ctp-macchiato-surface0-rgb);
+  --base: var(--ctp-macchiato-base-rgb);
+  --mantle: var(--ctp-macchiato-mantle-rgb);
+  --crust: var(--ctp-macchiato-crust-rgb);
+  --shadow: var(--surface2);
+
+  --rosewater: var(--ctp-macchiato-rosewater-rgb);
+  --flamingo: var(--ctp-macchiato-flamingo-rgb);
+  --pink: var(--ctp-macchiato-pink-rgb);
+  --mauve: var(--ctp-macchiato-mauve-rgb);
+  --red: var(--ctp-macchiato-red-rgb);
+  --maroon: var(--ctp-macchiato-maroon-rgb);
+  --peach: var(--ctp-macchiato-peach-rgb);
+  --yellow: var(--ctp-macchiato-yellow-rgb);
+  --green: var(--ctp-macchiato-green-rgb);
+  --teal: var(--ctp-macchiato-teal-rgb);
+  --sky: var(--ctp-macchiato-sky-rgb);
+  --sapphire: var(--ctp-macchiato-sapphire-rgb);
+  --blue: var(--ctp-macchiato-blue-rgb);
+  --lavender: var(--ctp-macchiato-lavender-rgb);
+
+  --gradient: linear-gradient(
+    to right,
+    rgb(var(--mauve)),
+    rgb(var(--pink))
+  );
+  --gradient-alt: linear-gradient(
+    to right,
+    rgb(var(--pink)),
+    rgb(var(--mauve))
+  );
+  /* Transitions */
+  --theme-transition: 0.2s ease-in-out;
+}

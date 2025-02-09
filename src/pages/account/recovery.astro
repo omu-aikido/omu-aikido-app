@@ -1,0 +1,104 @@
+---
+import { grade, year } from "@/src/utils";
+import { Role } from "@/src/class";
+import { default as Layout } from "@/src/layouts/auth-layout.astro";
+
+const user = await Astro.locals.currentUser();
+
+if (!user) {
+    return Astro.redirect("/sign-in");
+}
+
+import * as query from "@/src/lib/query/profile";
+
+if (Astro.request.method == "POST") {
+    let data = await Astro.request.formData();
+    let grade = data.get("grade") as unknown as number;
+    let getGradeAt = data.get("getGradeAt") as unknown as Date;
+    let joinedAt = data.get("joinedAt") as unknown as number;
+    let year = data.get("year") as string;
+
+    const result = await query.updateProfile({
+        id: user.id,
+        grade: grade,
+        getGradeAt: getGradeAt,
+        joinedAt: joinedAt,
+        year: year,
+        role: "member",
+    });
+    if (result instanceof Error) {
+        return new Response(result.message, { status: 500 });
+    } else {
+        return Astro.redirect("/account");
+    }
+}
+---
+
+<Layout title="大阪公立大学合氣道部 - プロフィール登録">
+    <h1>セットアップ</h1>
+    <form id="setup-form" class="setup-form" method="POST">
+        <label for="grade">
+            所持級段位
+            <span style="color:rgb(var(--maroon))">*</span>
+        </label>
+        <select id="grade" name="grade" required>
+            {grade.map((g) => <option value={g.grade}>{g.name}</option>)}
+        </select>
+
+        <label> 級段位取得日 </label>
+        <input type="date" id="getGradeAt" name="getGradeAt" />
+
+        <label for="joinedAt">
+            入部年度
+            <span style="color:rgb(var(--maroon))">*</span>
+        </label>
+        <input
+            type="number"
+            id="joinedAt"
+            name="joinedAt"
+            placeholder="4桁の数字"
+            required
+            value={new Date().getFullYear()}
+        />
+        <label for="year">
+            学年
+            <span style="color:rgb(var(--maroon))">*</span>
+        </label>
+        <select id="year" name="year" required>
+            {year.map((y) => <option value={y.year}>{y.name}</option>)}
+        </select>
+        <button type="submit">登録</button>
+    </form>
+</Layout>
+
+<style>
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    .signup-form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-radius: 8px;
+        padding: 1em;
+        box-shadow: 0 0 8px 4px rgb(var(--shadow) / 0.3);
+    }
+
+    .name-fields {
+        display: flex;
+        gap: 1rem;
+    }
+    .name-fields input {
+        width: 80%;
+    }
+
+    .loading {
+        margin-top: 1rem;
+        font-size: 1rem;
+        color: rgb(var(--subtext1));
+    }
+</style>

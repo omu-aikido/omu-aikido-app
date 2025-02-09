@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "omu-aikido-app",
+  "compatibility_date": "2025-01-09",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "pages_build_output_dir": "./dist",
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "NODE_VERSION": "22.13.0"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "fe1f330c5dda4e83a0fd6d2dbeef3d79"
+    }
+  ]
+}

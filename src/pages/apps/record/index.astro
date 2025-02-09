@@ -1,0 +1,142 @@
+---
+import { default as Layout } from "@/src/layouts/auth-layout.astro";
+import { getProfile } from "@/src/lib/query/profile";
+import {
+    userActivity,
+    createActivity,
+    inputActivity,
+} from "@/src/lib/query/activity";
+import { translateGrade, timeForNextGrade } from "@/src/utils";
+import { getAllActivities } from "@/src/lib/query/activity";
+
+const user = await Astro.locals.currentUser();
+
+if (!user) {
+    return Astro.redirect("/sign-in");
+}
+const userProfile = await getProfile({ userId: user.id });
+if (userProfile instanceof Response) {
+    return Astro.redirect("/account/recovery");
+}
+
+const now = new Date();
+const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+const activities = await userActivity({
+    userId: user.id,
+    start: startOfMonth,
+    end: endOfMonth,
+});
+const activityFromPreviousGrade = await userActivity({
+    userId: user.id,
+    start: new Date(userProfile.getGradeAt),
+    end: new Date(),
+});
+const grade = userProfile.grade;
+const nextGrade = timeForNextGrade(grade);
+const needToNextGrade = nextGrade - activityFromPreviousGrade.length;
+
+if (Astro.request.method == "POST") {
+    let data = await Astro.request.formData();
+    let date = data.get("date") as unknown as Date;
+    let dataParsed = new Date(date).toISOString().split("T")[0];
+    let period = data.get("period") as unknown as number;
+
+    const actData: typeof inputActivity = {
+        date: dataParsed,
+        id: user.id, // バックエンドで生成するのでなんでもいい
+        userId: user.id,
+        period: period,
+    };
+    const result = await createActivity({
+        userId: user.id,
+        activity: actData,
+    });
+
+    if (result instanceof Error) {
+        return new Response(result.message, { status: 500 });
+    } else {
+        return Astro.redirect("/apps/record");
+    }
+}
+---
+
+<Layout title="きろく">
+    <h1>きろく</h1>
+
+    <h2>
+        {translateGrade(grade >= 0 ? grade - 2 : grade - 1)}
+        {grade >= 0 ? "昇級" : "昇段"}まで
+    </h2>
+    <p>{needToNextGrade} / {nextGrade} 日</p>
+
+    <hr />
+    <h2>追加</h2>
+
+    <form id="activity-form" class="activity-form" method="POST">
+        <label for="date">
+            日付
+            <span style="color:rgb(var(--maroon))">*</span>
+        </label>
+        <input
+            type="date"
+            id="date"
+            name="date"
+            value=`${(new Date()).toISOString().split('T')[0]}`
+            required
+        />
+
+        <label for="period">
+            稽古時間
+            <span style="color:rgb(var(--maroon))">*</span>
+        </label>
+        <input type="number" id="period" name="period" value="1.5" required />
+        <br />
+        <button type="submit">追加</button>
+    </form>
+
+    <hr />
+    <h2>稽古履歴</h2>
+    <a href="/apps/record/list">全ての稽古履歴</a>
+    <table>
+        <thead>
+            <tr>
+                <th>日付</th>
+                <th>稽古時間</th>
+            </tr>
+        </thead>
+        <tbody>
+            {
+                activities.length === 0 ? (
+                    <tr>
+                        <td>履歴はありません</td>
+                        <td>追加しましょう!</td>
+                    </tr>
+                ) : (
+                    activities.map((activity) => (
+                        <tr>
+                            <td>
+                                {new Date(activity.date).toLocaleDateString(
+                                    "ja-JP"
+                                )}
+                            </td>
+                            <td>{activity.period}</td>
+                        </tr>
+                    ))
+                )
+            }
+        </tbody>
+    </table>
+</Layout>
+
+<style>
+    .activity-form {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        gap: 1rem;
+        align-items: center;
+    }
+    .activity-form button {
+        grid-column: span 2;
+    }
+</style>

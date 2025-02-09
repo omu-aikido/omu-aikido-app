@@ -1,0 +1,17 @@
+---
+import { default as Layout } from "@/src/layouts/auth-layout.astro";
+import Grid from "@/src/components/ui/grid.astro";
+import AppIcon from "@/src/components/ui/app-icon.astro";
+import { APPS } from "@/src/const";
+---
+
+<Layout title="アプリ一覧">
+    <h1>アプリ</h1>
+    <Grid variant="offset">
+        {
+            APPS.map((app) => (
+                <AppIcon title={app.name} id={app.path} desc={app.desc} />
+            ))
+        }
+    </Grid>
+</Layout>

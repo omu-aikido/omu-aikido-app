@@ -1,0 +1,27 @@
+---
+import Baselayout from "./baselayout.astro";
+import "@/src/styles/global.css";
+import { APP_NAME } from "@/src/const";
+
+/** Main menu items */
+let textLinks: { label: string; href: string }[] = [
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Apps", href: "/apps" },
+    { label: "Account", href: "/account" },
+];
+
+interface Props {
+    title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<Baselayout
+    pagename=`${APP_NAME} - ${title}`
+    homelink="/"
+    title={APP_NAME}
+    textLinks={textLinks}
+>
+    <slot />
+</Baselayout>

@@ -1,0 +1,103 @@
+---
+import { Image } from "astro:assets";
+interface Props {
+    image: any;
+    alt: string | null;
+    href?: string;
+    filter?:
+        | "blur"
+        | "grayscale"
+        | "fade"
+        | "invert"
+        | "dim"
+        | "bright"
+        | "none";
+}
+
+const { filter, alt, href, image } = Astro.props;
+---
+
+<a href={href}>
+    <text-over-image filter={filter}>
+        <div class="text-over-image">
+            <div class="text">
+                <slot />
+            </div>
+            <Image
+                src={image}
+                alt={alt}
+                class:list="image"
+                draggable="false"
+                width={100}
+                height={100}
+                loading="eager"
+                style="pointer-events: none;user-select: none;"
+            />
+        </div>
+    </text-over-image>
+</a>
+<style>
+    .text-over-image {
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-radius: 1.5rem;
+        transition: all 0.3s ease;
+        user-select: none;
+    }
+
+    .text-over-image:hover {
+        border-radius: 2rem;
+        transform: scale(1.02);
+    }
+
+    .text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+        text-shadow: 2px 2px 4px rgb(var(--base) / 0.7);
+        text-align: center;
+        color: rgb(var(--text));
+    }
+    .image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 1.5rem;
+        transition: all 0.3s ease;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    [filter="blur"] img {
+        filter: blur(4px);
+    }
+    [filter="grayscale"] img {
+        filter: grayscale(100%);
+    }
+    [filter="fade"] img {
+        opacity: 0.5;
+    }
+    [filter="invert"] img {
+        filter: invert(100%);
+    }
+    [filter="dim"] img {
+        filter: brightness(50%);
+    }
+    [filter="bright"] img {
+        filter: brightness(150%);
+    }
+    [filter="none"] img {
+        filter: none;
+    }
+</style>
+<script>
+    class TextOverImage extends HTMLElement {
+        constructor() {
+            super();
+        }
+    }
+    customElements.define("text-over-image", TextOverImage);
+</script>

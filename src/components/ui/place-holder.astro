@@ -1,0 +1,77 @@
+---
+interface Props {
+    title: string;
+    description: string;
+}
+const { title, description } = Astro.props;
+---
+
+<div class="placeholder">
+    <div class="content">
+        <h1>{title}</h1>
+        <p>{description}</p>
+    </div>
+    <div class="background"></div>
+</div>
+<style>
+    .placeholder {
+        background: linear-gradient(
+                to right,
+                rgb(var(--surface0) / 0.7),
+                rgb(var(--surface1) / 0.7)
+            )
+            0% center/200%;
+        animation: box_color 7s linear infinite;
+        padding: 20px;
+        text-align: center;
+        border-radius: 8px;
+        transition: transform 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+    .background {
+        border: 1.4px solid transparent;
+        border-radius: 8px;
+        background: linear-gradient(
+                120deg,
+                rgb(var(--sapphire)),
+                rgb(var(--maroon)),
+                rgb(var(--blue))
+            )
+            0% center/200%;
+        animation: box_color 7s linear infinite;
+        animation: rolate 2s linear infinite;
+        -webkit-mask:
+            linear-gradient(#fff 0 0) padding-box,
+            linear-gradient(#fff 0 0) border-box;
+        -webkit-mask-composite: destination-out;
+        mask:
+            linear-gradient(#fff 0 0) padding-box,
+            linear-gradient(#fff 0 0) border-box;
+        mask-composite: exclude;
+        overflow: visible;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 0;
+    }
+    @keyframes rolate {
+        0% {
+            background-position-x: 200%;
+        }
+    }
+    .placeholder:hover {
+        transform: scale(1.02);
+    }
+    .placeholder h1 {
+        color: rgb(var(--subtext1));
+        font-size: 28px;
+        margin-bottom: 12px;
+    }
+    .placeholder p {
+        font-size: 18px;
+        color: rgb(var(--subtext0));
+    }
+</style>

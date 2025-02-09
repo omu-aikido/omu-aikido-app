@@ -1,0 +1,173 @@
+---
+import { default as Layout } from "@/src/layouts/auth-layout.astro";
+import { getProfile } from "@/src/lib/query/profile";
+import {
+    userActivity,
+    deleteActivity,
+    updateActivity,
+    createActivity,
+    inputActivity,
+} from "@/src/lib/query/activity";
+
+const user = await Astro.locals.currentUser();
+
+if (!user) {
+    return Astro.redirect("/sign-in");
+}
+
+// POSTリクエスト処理（削除アクション）
+if (Astro.request.method === "POST") {
+    const formData = await Astro.request.formData();
+    const deleteId = formData.get("deleteId") as string;
+    if (deleteId) {
+        await deleteActivity({ userId: user.id, id: deleteId });
+        return Astro.redirect(Astro.url.pathname);
+    }
+}
+
+const startParam = Astro.url.searchParams.get("start");
+const endParam = Astro.url.searchParams.get("end");
+// 追加: resetパラメータがあればクエリを削除してリダイレクト
+if (Astro.url.searchParams.get("reset")) {
+    return Astro.redirect(Astro.url.pathname);
+}
+
+const startValue = startParam ? new Date(startParam) : undefined;
+const endValue = endParam ? new Date(endParam) : undefined;
+
+const activities = (
+    await userActivity({
+        userId: user.id,
+        start: startValue,
+        end: endValue,
+    })
+).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+---
+
+<Layout title="稽古記録 一覧">
+    <h1>一覧</h1>
+
+    <!-- フィルター用フィールド -->
+    <form id="filter-form" class="filter-form" method="GET">
+        <label for="start">開始日</label>
+        <input
+            type="date"
+            id="start"
+            name="start"
+            value={startValue ? startValue.toISOString().split("T")[0] : ""}
+        />
+        <label for="end">終了日</label>
+        <input
+            type="date"
+            id="end"
+            name="end"
+            value={endValue ? endValue.toISOString().split("T")[0] : ""}
+        />
+        <!-- 変更: type="reset"からtype="submit"に変更しリセット用パラメータを送信 -->
+        <button type="submit" name="reset" value="true" class="reset_button"
+            >リセット</button
+        >
+        <button type="submit" class="submit_button">フィルター</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>日付</th>
+                <th>稽古時間</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {
+                activities.length === 0 ? (
+                    <tr>
+                        <td>履歴はありません</td>
+                        <td>追加しましょう!</td>
+                        <td />
+                    </tr>
+                ) : (
+                    activities.map((activity) => (
+                        <tr>
+                            <td>
+                                {new Date(activity.date).toLocaleDateString(
+                                    "ja-JP"
+                                )}
+                            </td>
+                            <td>{activity.period}</td>
+                            <td>
+                                <button
+                                    type="button"
+                                    class="edit-btn"
+                                    onclick={`window.location.href='/apps/record/edit/${activity.id}'`}
+                                >
+                                    編集
+                                </button>
+
+                                <form
+                                    method="POST"
+                                    style="display:inline-block;"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="deleteId"
+                                        value={activity.id}
+                                    />
+                                    <button
+                                        type="submit"
+                                        class="delete-btn"
+                                        onclick="return confirm('本当に削除しますか？');"
+                                    >
+                                        削除
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    ))
+                )
+            }
+        </tbody>
+    </table>
+</Layout>
+<style>
+    .filter-form {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        gap: 1rem;
+        align-items: center;
+    }
+    .filter-form .reset_button {
+        width: 150px;
+        background-color: rgb(var(--maroon) / 0.6);
+    }
+    .filter-form .reset_button:hover {
+        background-color: rgb(var(--red));
+    }
+    .filter-form .submit_button {
+        margin-left: 50px;
+        width: 150px;
+    }
+
+    .edit-btn {
+        margin-right: 8px;
+        padding: 6px 12px;
+        background-color: rgb(var(--blue));
+        color: rgb(var(--crust));
+        text-decoration: none;
+        border-radius: 4px;
+    }
+    .edit-btn:hover {
+        background-color: rgb(var(--sapphire));
+    }
+    .delete-btn {
+        margin-right: 8px;
+        padding: 6px 12px;
+        background-color: rgb(var(--red));
+        color: rgb(var(--crust));
+        text-decoration: none;
+        border-radius: 4px;
+    }
+    .delete-btn:hover {
+        background-color: rgb(var(--red) / 0.8);
+    }
+</style>
