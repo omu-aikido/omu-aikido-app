@@ -31,5 +31,7 @@ export default defineConfig({
         "/signup": "https://accounts.omu-aikido.com/sign-up",
         "/sign-in": "https://accounts.omu-aikido.com/sign-in",
         "/sign-up": "https://accounts.omu-aikido.com/sign-up",
+        "/terms-of-service": "https://omu-aikido.com/terms-of-service",
+        "/privacy-policy": "https://omu-aikido.com/privacy-policy",
     },
 });
