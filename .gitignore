@@ -22,6 +22,9 @@ pnpm-debug.log*
 .env
 .env.production
 .env.local
+.dev.vars
+.dev.vars.preview
+.dev.vars.production
 
 # macOS-specific files
 .DS_Store
@@ -31,4 +34,3 @@ dump.sql
 local.db
 local.db-shm
 local.db-wal
-.dev.vars
