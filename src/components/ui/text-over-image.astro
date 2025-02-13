@@ -57,9 +57,14 @@ const { filter, alt, href, image } = Astro.props;
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 1;
-        text-shadow: 2px 2px 4px rgb(var(--base) / 0.7);
+        text-shadow:
+            3px 3px 0 rgb(var(--text)),
+            -1px -1px 0 rgb(var(--text)),
+            1px -1px 0 rgb(var(--text)),
+            -1px 1px 0 rgb(var(--text)),
+            1px 1px 0 rgb(var(--text));
         text-align: center;
-        color: rgb(var(--text));
+        color: rgb(var(--crust));
     }
     .image {
         width: 100%;
