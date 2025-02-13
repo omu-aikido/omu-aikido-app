@@ -13,17 +13,6 @@ export function GET(request: Request) {
     const endParam = searchParams.get("end");
     const isLong = searchParams.get("long") === "true";
 
-    console.log(
-        "host",
-        host,
-        "start",
-        startParam,
-        "end",
-        endParam,
-        "long",
-        isLong
-    );
-
     const startDate = startParam ? new Date(startParam) : null;
     const endDate = endParam ? new Date(endParam) : null;
     const today = new Date();
