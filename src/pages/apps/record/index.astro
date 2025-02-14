@@ -90,7 +90,14 @@ if (Astro.request.method == "POST") {
             稽古時間
             <span style="color:rgb(var(--maroon))">*</span>
         </label>
-        <input type="number" id="period" name="period" value="1.5" required />
+        <input
+            type="number"
+            id="period"
+            name="period"
+            value="1.5"
+            step="0.5"
+            required
+        />
         <br />
         <button type="submit">追加</button>
     </form>
