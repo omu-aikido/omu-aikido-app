@@ -20,7 +20,6 @@
     "@libsql/client": "^0.14.0",
     "apexcharts": "^4.3.0",
     "astro": "^5.2.5",
-    "astro-sheet-loader": "^1.0.5",
     "drizzle-orm": "^0.39.1",
     "drizzle-zod": "^0.7.0",
     "svix": "^1.45.1",

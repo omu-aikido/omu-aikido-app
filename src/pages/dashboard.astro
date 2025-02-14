@@ -1,13 +1,9 @@
 ---
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
 import { getProfile } from "@/src/lib/query/profile";
-import {
-    userActivity,
-    createActivity,
-    inputActivity,
-} from "@/src/lib/query/activity";
-import { translateGrade, timeForNextGrade } from "@/src/utils";
-import { getAllActivities } from "@/src/lib/query/activity";
+import { createActivity, inputActivity } from "@/src/lib/query/activity";
+
+import NewsReader from "@/src/components/ui/news-reader.astro";
 
 const user = await Astro.locals.currentUser();
 
@@ -49,6 +45,9 @@ import { APPS } from "@/src/const";
 ---
 
 <Layout title="ダッシュボード">
+    <h2>おしらせ</h2>
+    <NewsReader content="short" path="news" />
+    <hr />
     <h2>追加</h2>
 
     <form id="activity-form" class="activity-form" method="POST">

@@ -1,0 +1,123 @@
+---
+import { undefined } from "astro:schema";
+
+interface Props {
+    content: "long" | "short";
+    path: string | undefined;
+}
+const { content, path: rawPath } = Astro.props;
+const path = rawPath || "news";
+---
+
+<astro-news-reader content={`${content}`} path={path}>
+    {content === "short" ? <a href={`/${path}`}>全て見る>>></a> : ""}
+</astro-news-reader>
+
+<script>
+    class NewsReader extends HTMLElement {
+        constructor() {
+            super();
+        }
+        connectedCallback() {
+            const isLong = this.getAttribute("content") === "long";
+            const path = this.getAttribute("path") || "news";
+            const container = this.ownerDocument.createElement("div");
+            container.className = "news-container";
+            fetch("/api/utils/news" + `${isLong ? "?long=true" : ""}`)
+                .then((res) => res.json())
+                .then((data: unknown) => {
+                    const newsData = data as any[];
+                    newsData.forEach((item, index) => {
+                        try {
+                            const newsItem =
+                                this.ownerDocument.createElement("div");
+                            newsItem.className = "newsItem";
+                            // 長いモードなら data 属性を付与
+                            if (isLong) {
+                                newsItem.dataset.id = index.toString();
+                            }
+                            const updatedAt = new Date(
+                                item.updatedAt
+                            ).toLocaleDateString();
+
+                            const titleColor = item.priority
+                                ? item.priority === "Caution"
+                                    ? "maroon"
+                                    : item.priority === "High"
+                                      ? "flamingo"
+                                      : item.priority === "Medium"
+                                        ? "yellow"
+                                        : item.priority === "Low"
+                                          ? "green"
+                                          : "inherit"
+                                : "inherit";
+
+                            newsItem.innerHTML = `
+                                <h3 class="newsTitle" style="color: rgb(var(--${titleColor}))">
+                                    ${item.title}
+                                    <small class="newsUpdate" style="color: rgb(var(--subtext0)); font-size: 0.6em; float: right;"> 更新日: ${updatedAt}</small>
+                                </h3>
+                                ${item.summary ? `<p class="newsDesc" style="padding-left: 1rem; margin-block: 0 ;">${item.summary}</p>` : ""}
+                            `;
+                            if (isLong) {
+                                newsItem.innerHTML += `
+                                    <details>
+                                        <p class="newsbody">${item.body}</p>
+                                    </details>
+                                `;
+                                newsItem.innerHTML += `<hr />`;
+                                container.appendChild(newsItem);
+                            } else {
+                                const newsItemContainer =
+                                    this.ownerDocument.createElement("div");
+                                newsItemContainer.className =
+                                    "newsItemContainer";
+                                newsItemContainer.appendChild(newsItem);
+                                const detailLink =
+                                    this.ownerDocument.createElement("a");
+                                detailLink.textContent = "詳細";
+                                detailLink.href = `/${path}?id=${index}`;
+                                newsItemContainer.appendChild(detailLink);
+                                container.appendChild(newsItemContainer);
+                            }
+                        } catch (e) {
+                            console.error("Error processing item:", e);
+                        }
+                    });
+
+                    // コンテナをDOMに追加
+                    this.appendChild(container);
+
+                    // 長いモードの場合、対象のニュースを探してスクロール＆展開
+                    if (isLong) {
+                        requestAnimationFrame(() => {
+                            const params = new URLSearchParams(
+                                window.location.search
+                            );
+                            const selectedId = params.get("id");
+                            if (selectedId) {
+                                const targetItem = container.querySelector(
+                                    `[data-id="${selectedId}"]`
+                                );
+                                if (targetItem) {
+                                    const detailsEl =
+                                        targetItem.querySelector("details");
+                                    if (detailsEl) detailsEl.open = true;
+                                    targetItem.scrollIntoView({
+                                        behavior: "smooth",
+                                        block: "center",
+                                    });
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching news:", error);
+                    this.innerHTML = "<p>Error loading news.</p>";
+                });
+        }
+    }
+
+    customElements.define("astro-news-reader", NewsReader);
+</script>
