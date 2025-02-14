@@ -21,7 +21,10 @@ const path = rawPath || "news";
             const path = this.getAttribute("path") || "news";
             const container = this.ownerDocument.createElement("div");
             container.className = "news-container";
-            fetch("/api/utils/news" + `${isLong ? "?long=true" : ""}`)
+            fetch(
+                "https://app.omu-aikido.com/api/utils/news" +
+                    `${isLong ? "?long=true" : ""}`
+            )
                 .then((res) => res.json())
                 .then((data: unknown) => {
                     const newsData = data as any[];
