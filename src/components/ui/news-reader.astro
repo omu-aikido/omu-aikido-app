@@ -7,9 +7,12 @@ const { content, path: rawPath } = Astro.props;
 const path = rawPath || "news";
 ---
 
-<astro-news-reader content={`${content}`} path={path}>
-    {content === "short" ? <a href={`/${path}`}>全て見る>>></a> : ""}
-</astro-news-reader>
+<div id="news-block">
+    <h2>お知らせ</h2>
+    <astro-news-reader content={`${content}`} path={path}>
+        {content === "short" ? <a href={`/${path}`}>全て見る>>></a> : ""}
+    </astro-news-reader>
+</div>
 
 <script>
     class NewsReader extends HTMLElement {
@@ -22,12 +25,21 @@ const path = rawPath || "news";
             const container = this.ownerDocument.createElement("div");
             container.className = "news-container";
             fetch(
-                "https://app.omu-aikido.com/api/utils/news" +
+                "https://api.omu-aikido.com/app/news" +
                     `${isLong ? "?long=true" : ""}`
             )
                 .then((res) => res.json())
                 .then((data: unknown) => {
                     const newsData = data as any[];
+                    if (newsData.length === 0) {
+                        const newsBlock = this.closest("#news-block");
+                        if (newsBlock instanceof HTMLElement) {
+                            newsBlock.style.display = "none";
+                        } else {
+                            this.style.display = "none";
+                        }
+                        return;
+                    }
                     newsData.forEach((item, index) => {
                         try {
                             const newsItem =
