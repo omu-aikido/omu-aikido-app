@@ -9,9 +9,18 @@ const path = rawPath || "news";
 ---
 
 <div id="news-block">
-    <h2>お知らせ</h2>
+    <h2>
+        お知らせ {
+            content === "short" ? (
+                <small style="font-size: 0.6em;">
+                    <a href={`/${path}`}>全て見る>>></a>
+                </small>
+            ) : (
+                ""
+            )
+        }
+    </h2>
     <astro-news-reader content={`${content}`} path={path} source={`${source}`}>
-        {content === "short" ? <a href={`/${path}`}>全て見る>>></a> : ""}
     </astro-news-reader>
 </div>
 
@@ -52,17 +61,17 @@ const path = rawPath || "news";
                                 newsItem.dataset.id = index.toString();
                             }
                             const updatedAt = new Date(
-                                item.updatedAt
+                                item.timestamp
                             ).toLocaleDateString();
 
-                            const titleColor = item.priority
-                                ? item.priority === "Caution"
+                            const titleColor = item.importance
+                                ? item.importance === "Caution"
                                     ? "maroon"
-                                    : item.priority === "High"
+                                    : item.importance === "High"
                                       ? "flamingo"
-                                      : item.priority === "Medium"
+                                      : item.importance === "Medium"
                                         ? "yellow"
-                                        : item.priority === "Low"
+                                        : item.importance === "Low"
                                           ? "green"
                                           : "inherit"
                                 : "inherit";
