@@ -2,14 +2,15 @@
 interface Props {
     content: "long" | "short";
     path: string | undefined;
+    source: string;
 }
-const { content, path: rawPath } = Astro.props;
+const { content, path: rawPath, source } = Astro.props;
 const path = rawPath || "news";
 ---
 
 <div id="news-block">
     <h2>お知らせ</h2>
-    <astro-news-reader content={`${content}`} path={path}>
+    <astro-news-reader content={`${content}`} path={path} source={`${source}`}>
         {content === "short" ? <a href={`/${path}`}>全て見る>>></a> : ""}
     </astro-news-reader>
 </div>
@@ -22,10 +23,11 @@ const path = rawPath || "news";
         connectedCallback() {
             const isLong = this.getAttribute("content") === "long";
             const path = this.getAttribute("path") || "news";
+            const source = this.getAttribute("source") || "news";
             const container = this.ownerDocument.createElement("div");
             container.className = "news-container";
             fetch(
-                "https://api.omu-aikido.com/app/news" +
+                `https://api.omu-aikido.com/${source}` +
                     `${isLong ? "?long=true" : ""}`
             )
                 .then((res) => res.json())

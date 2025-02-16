@@ -5,8 +5,7 @@ import ProgressCircle from "../components/ui/progress-circle.astro";
 ---
 
 <Layout title="お知らせ">
-    <h1>おしらせ</h1>
-    <NewsReader content="long" server:defer path="news">
+    <NewsReader server:defer content="long" path="news" source="app/news">
         <ProgressCircle title="Loading" slot="fallback" />
     </NewsReader>
 </Layout>
