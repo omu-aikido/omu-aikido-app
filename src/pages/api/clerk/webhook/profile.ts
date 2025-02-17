@@ -1,6 +1,6 @@
 import { Webhook } from "svix";
 import { db } from "@/src/lib/drizzle";
-import { activity } from "@/./db/schema";
+import { activity } from "db/schema";
 import { eq } from "drizzle-orm";
 
 export async function POST(context: any) {

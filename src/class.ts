@@ -1,21 +1,17 @@
-import type { RoleType } from "./type";
+import { z } from "zod";
 
 export class Role {
     constructor(
-        public role: RoleType,
-        public roleJa: string,
-        public roleEn: string
+        // roleType から取得
+        public role: string,
+        public ja: string
     ) {}
 
-    static readonly ADMIN = new Role("admin", "管理者", "Admin");
-    static readonly CAPTAIN = new Role("captain", "主将", "Captain");
-    static readonly VICE_CAPTAIN = new Role(
-        "vice-captain",
-        "副主将",
-        "Vice Captain"
-    );
-    static readonly TREASURER = new Role("treasurer", "会計", "Treasurer");
-    static readonly MEMBER = new Role("member", "部員", "Member");
+    static readonly ADMIN = new Role("admin", "管理者");
+    static readonly CAPTAIN = new Role("captain", "主将");
+    static readonly VICE_CAPTAIN = new Role("vice-captain", "副主将");
+    static readonly TREASURER = new Role("treasurer", "会計");
+    static readonly MEMBER = new Role("member", "部員");
 
     static readonly ALL = [
         Role.ADMIN,
@@ -47,10 +43,16 @@ export class Role {
     }
 
     isManagement(): boolean {
-        return (
-            this.role === "admin" ||
-            this.role === "captain" ||
-            this.role === "vice-captain"
-        );
+        return this !== Role.MEMBER;
+    }
+
+    static type() {
+        return z.enum([
+            "admin",
+            "captain",
+            "vice-captain",
+            "treasurer",
+            "member",
+        ]);
     }
 }
