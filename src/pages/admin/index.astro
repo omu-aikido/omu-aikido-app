@@ -1,0 +1,13 @@
+---
+import { default as Layout } from "@/src/layouts/auth-layout.astro";
+import Grid from "@/src/components/ui/grid.astro";
+import AppIcon from "@/src/components/ui/app-icon.astro";
+---
+
+<Layout title="管理画面">
+    <h1>管理画面</h1>
+    <Grid variant="offset">
+        <AppIcon title="ユーザー管理" id="account" desc="ユーザーの管理画面" />
+        <AppIcon title="記録管理" id="record" desc="アプリの管理画面" />
+    </Grid>
+</Layout>
