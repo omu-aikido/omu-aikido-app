@@ -1,5 +1,6 @@
 ---
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
+import { deleteUser } from "@/src/lib/query/admin/clerk";
 
 const currentUser = Astro.locals.auth().userId;
 
@@ -30,6 +31,11 @@ if (Astro.request.method == "POST") {
     const year = data.get("year") as string;
     const role = data.get("role") as string;
 
+    if (data.get("_action") === "deleteUser") {
+        await deleteUser(userId);
+        return Astro.redirect("/admin/account");
+    }
+
     const result = await profile.updateProfile({
         applicateBy: currentUser,
         id: userId,
@@ -52,14 +58,6 @@ if (Astro.request.method == "POST") {
         <p>
             {userAccount.last_name}
             {userAccount.first_name}
-            <span style="color:rgb(var(--overlay1)); font-size: 1.3rem;">
-                {
-                    userAccount.email_addresses.find(
-                        (email) =>
-                            email.id === userAccount.primary_email_address_id
-                    )?.email_address
-                }
-            </span>
         </p>
     </h2>
     <h3>プロフィール</h3>
@@ -130,6 +128,18 @@ if (Astro.request.method == "POST") {
             }
         </select>
         <button type="submit">保存</button>
+    </form>
+
+    <hr />
+    <h3 style="color: rgb(var(--red))">Danger Zone</h3>
+    <form method="POST" onsubmit="return confirm('本当に削除しますか？');">
+        <input type="hidden" name="_action" value="deleteUser" />
+        <button
+            type="submit"
+            style="color: rgb(var(--crust)); background-color: rgb(var(--red))"
+        >
+            削除
+        </button>
     </form>
 </Layout>
 
