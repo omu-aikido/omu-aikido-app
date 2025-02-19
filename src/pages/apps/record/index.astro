@@ -34,12 +34,15 @@ const activityFromPreviousGrade = await userActivity({
 });
 const grade = userProfile.grade;
 const nextGrade = timeForNextGrade(grade);
-const needToNextGrade =
-    nextGrade -
-    activityFromPreviousGrade
-        .map((act) => act.period)
-        .reduce((a, b) => a + b, 0) /
-        1.5;
+const needToNextGrade = parseInt(
+    `${
+        nextGrade -
+        activityFromPreviousGrade
+            .map((act) => act.period)
+            .reduce((a, b) => a + b, 0) /
+            1.5
+    }`
+);
 
 if (Astro.request.method == "POST") {
     let data = await Astro.request.formData();
