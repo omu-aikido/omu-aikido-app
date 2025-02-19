@@ -4,7 +4,7 @@ import type { Account } from "@/src/type";
 import { listUser } from "@/src/lib/query/admin/clerk";
 import { getRole } from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
-
+import * as record from "@/src/lib/query/admin/activity";
 import { translateGrade, timeForNextGrade } from "@/src/utils";
 
 const user = await Astro.locals.currentUser();
@@ -22,24 +22,29 @@ const users_info = users
     .sort((a: Account, b: Account) => {
         return Role.compare(a.public_metadata.role, b.public_metadata.role);
     })
-    .map(async (user: Account) => {
+    .map(async (mapuser: Account) => {
         return {
-            id: user.id,
-            name: `${user.last_name} ${user.first_name}`,
+            id: mapuser.id,
+            name: `${mapuser.last_name} ${mapuser.first_name}`,
             grade: translateGrade(
-                user.public_metadata.grade as unknown as number
+                mapuser.public_metadata.grade as unknown as number
             ),
             timeForNextGrade: timeForNextGrade(
-                user.public_metadata.grade as unknown as number
+                mapuser.public_metadata.grade as unknown as number
             ),
-            trainFromPreGrade:
-                (await record.getTrainings({ userId: user.id }))
-                    .map((record) => record.period)
-                    .reduce((a, b) => a + b, 0) / 1.5,
+            trainFromPreGrade: parseInt(
+                `${
+                    (
+                        await record.getTrainings({
+                            userId: mapuser.id,
+                        })
+                    )
+                        .map((record) => record.period)
+                        .reduce((a, b) => a + b, 0) / 1.5
+                }`
+            ),
         };
     });
-
-import * as record from "@/src/lib/query/admin/activity";
 ---
 
 <Layout title="管理者メニュー">

@@ -23,8 +23,8 @@ export async function getUserAllActivities(input: { userId: string }) {
 // 特定のユーザーの特定の期間のアクティビティを取得する
 export async function getUserActivities(input: {
     userId: string;
-    start: Date | undefined;
-    end: Date | undefined;
+    start: Date | null;
+    end: Date | null;
 }) {
     // 1970-01-01T00:00:00.000Z ~ 2100-12-31T23:59:59.999Zまでのデータを取得
     const start = input.start

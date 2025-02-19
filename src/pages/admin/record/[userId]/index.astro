@@ -27,8 +27,8 @@ if (Astro.url.searchParams.get("reset")) {
     return Astro.redirect(Astro.url.pathname);
 }
 
-const startValue = startParam ? new Date(startParam) : undefined;
-const endValue = endParam ? new Date(endParam) : undefined;
+const startValue = startParam ? new Date(startParam) : null;
+const endValue = endParam ? new Date(endParam) : null;
 
 const activities = (
     await getUserActivities({
@@ -38,10 +38,31 @@ const activities = (
     })
 ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-const trainCount =
-    (await getTrainings({ userId: userId }))
-        .map((record) => record.period)
-        .reduce((a, b) => a + b, 0) / 1.5;
+const trainCount = parseInt(
+    `${
+        (
+            await getTrainings({
+                userId: userId,
+            })
+        )
+            .map((record) => record.period)
+            .reduce((a, b) => a + b, 0) / 1.5
+    }`
+);
+
+const totalTrains = parseInt(
+    `${
+        (
+            await getUserActivities({
+                userId: userId,
+                start: null,
+                end: null,
+            })
+        )
+            .map((record) => record.period)
+            .reduce((a, b) => a + b, 0) / 1.5
+    }`
+);
 ---
 
 <Layout title="稽古記録 一覧">
@@ -58,6 +79,9 @@ const trainCount =
     </p>
     <p>
         次の級段位まで: {trainCount}/{timeForNextGrade(userProfile.grade)}回
+    </p>
+    <p>
+        累計稽古回数: {totalTrains}回
     </p>
 
     <details title="フィルター">
