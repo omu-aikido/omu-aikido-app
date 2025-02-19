@@ -5,6 +5,7 @@ import cloudflare from "@astrojs/cloudflare";
 
 import clerk from "@clerk/astro";
 import { jaJP } from "@clerk/localizations";
+import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
@@ -24,6 +25,7 @@ export default defineConfig({
         clerk({
             localization: jaJP,
         }),
+        sitemap(),
     ],
 
     redirects: {
