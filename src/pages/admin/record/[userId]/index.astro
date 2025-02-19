@@ -1,0 +1,167 @@
+---
+import { default as Layout } from "@/src/layouts/auth-layout.astro";
+import {
+    getTrainings,
+    getUserActivities,
+} from "@/src/lib/query/admin/activity";
+import { getUser } from "@/src/lib/query/admin/clerk";
+import { getProfile } from "@/src/lib/query/profile";
+import { translateGrade, timeForNextGrade } from "@/src/utils";
+
+const { userId } = Astro.params;
+
+if (!userId) {
+    return Astro.redirect("/admin/record");
+}
+
+const userAccount = await getUser(userId);
+const userProfile = await getProfile({ userId: userId });
+if (!userAccount || !userProfile || userProfile instanceof Response) {
+    return Astro.redirect("/admin/record");
+}
+
+const startParam = Astro.url.searchParams.get("start");
+const endParam = Astro.url.searchParams.get("end");
+// 追加: resetパラメータがあればクエリを削除してリダイレクト
+if (Astro.url.searchParams.get("reset")) {
+    return Astro.redirect(Astro.url.pathname);
+}
+
+const startValue = startParam ? new Date(startParam) : null;
+const endValue = endParam ? new Date(endParam) : null;
+
+const activities = (
+    await getUserActivities({
+        userId: userId,
+        start: startValue,
+        end: endValue,
+    })
+).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+const trainCount = parseInt(
+    `${
+        (
+            await getTrainings({
+                userId: userId,
+            })
+        )
+            .map((record) => record.period)
+            .reduce((a, b) => a + b, 0) / 1.5
+    }`
+);
+
+const totalTrains = parseInt(
+    `${
+        (
+            await getUserActivities({
+                userId: userId,
+                start: null,
+                end: null,
+            })
+        )
+            .map((record) => record.period)
+            .reduce((a, b) => a + b, 0) / 1.5
+    }`
+);
+---
+
+<Layout title="稽古記録 一覧">
+    <h4>
+        {userAccount.last_name}
+        {userAccount.first_name}
+        の稽古記録
+    </h4>
+    <p>
+        現在の級段位: {translateGrade(userProfile.grade)}
+    </p>
+    <p>
+        取得日: {new Date(userProfile.getGradeAt).toLocaleDateString("ja-JP")}
+    </p>
+    <p>
+        次の級段位まで: {trainCount}/{timeForNextGrade(userProfile.grade)}回
+    </p>
+    <p>
+        累計稽古回数: {totalTrains}回
+    </p>
+
+    <details title="フィルター">
+        <summary>フィルター</summary>
+        <form id="filter-form" class="filter-form" method="GET">
+            <label for="start">開始日</label>
+            <input
+                type="date"
+                id="start"
+                name="start"
+                value={startValue ? startValue.toISOString().split("T")[0] : ""}
+            />
+            <label for="end">終了日</label>
+            <input
+                type="date"
+                id="end"
+                name="end"
+                value={endValue ? endValue.toISOString().split("T")[0] : ""}
+            />
+            <!-- 変更: type="reset"からtype="submit"に変更しリセット用パラメータを送信 -->
+            <button type="submit" name="reset" value="true" class="reset_button"
+                >リセット</button
+            >
+            <button type="submit" class="submit_button">フィルター</button>
+        </form>
+    </details>
+    <hr />
+    <table>
+        <thead>
+            <tr>
+                <th>日付</th>
+                <th>稽古時間</th>
+                <th>編集日</th>
+            </tr>
+        </thead>
+        <tbody>
+            {
+                activities.length === 0 ? (
+                    <tr>
+                        <td>履歴はありません</td>
+                        <td />
+                    </tr>
+                ) : (
+                    activities.map((activity) => (
+                        <tr>
+                            <td>
+                                {new Date(activity.date).toLocaleDateString(
+                                    "ja-JP"
+                                )}
+                            </td>
+                            <td>{activity.period}</td>
+                            <td>
+                                {activity.updatedAt &&
+                                    new Date(activity.updatedAt).toLocaleString(
+                                        "ja-JP"
+                                    )}
+                            </td>
+                        </tr>
+                    ))
+                )
+            }
+        </tbody>
+    </table>
+</Layout>
+<style>
+    .filter-form {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        gap: 1rem;
+        align-items: center;
+    }
+    .filter-form .reset_button {
+        width: 150px;
+        background-color: rgb(var(--maroon) / 0.6);
+    }
+    .filter-form .reset_button:hover {
+        background-color: rgb(var(--red));
+    }
+    .filter-form .submit_button {
+        margin-left: 50px;
+        width: 150px;
+    }
+</style>

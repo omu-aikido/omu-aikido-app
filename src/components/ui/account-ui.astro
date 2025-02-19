@@ -1,7 +1,34 @@
 ---
 import Modal from "./modal.astro";
 import ThemeToggle from "./ThemeToggle.astro";
-import { APPS } from "../../const";
+import { APPS } from "@/src/const";
+
+import { getProfile, getRole } from "@/src/lib/query/profile";
+
+const user = await Astro.locals.currentUser();
+
+if (!user) {
+    return Astro.redirect("/sign-in");
+}
+const userProfile = await getProfile({ userId: user.id });
+if (userProfile instanceof Response) {
+    return Astro.redirect("/account/recovery");
+}
+
+const role = await getRole({ userId: user.id });
+
+if (!role) {
+    return Astro.redirect("/account/recovery");
+}
+
+if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
+    APPS.push({
+        name: "管理者メニュー",
+        path: "/admin",
+        desc: "管理者メニューに移動します。",
+    });
+}
+
 import {
     SignedIn,
     SignedOut,

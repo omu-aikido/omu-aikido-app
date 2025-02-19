@@ -2,8 +2,6 @@
 import { grade } from "@/src/utils";
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
 
-import * as profile from "@/src/lib/query/profile";
-
 const user = await Astro.locals.currentUser();
 
 if (!user) {

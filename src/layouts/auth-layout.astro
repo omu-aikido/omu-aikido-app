@@ -6,6 +6,7 @@ import Modal from "../components/ui/modal.astro";
 
 import "@/src/styles/global.css";
 import { APP_NAME } from "@/src/const";
+import { getRole } from "@/src/lib/query/profile";
 
 /** Main menu items */
 let textLinks: { label: string; href: string }[] = [
@@ -13,6 +14,19 @@ let textLinks: { label: string; href: string }[] = [
     { label: "Apps", href: "/apps" },
     { label: "Account", href: "/account" },
 ];
+
+const user = await Astro.locals.currentUser();
+if (!user) {
+    return Astro.redirect("/sign-in");
+}
+const role = await getRole({ userId: user.id });
+if (!role) {
+    return Astro.redirect("/account/recovery");
+}
+
+if (role.isManagement() && !textLinks.some((link) => link.label === "Admin")) {
+    textLinks.push({ label: "Admin", href: "/admin" });
+}
 
 interface Props {
     title: string;
@@ -76,7 +90,7 @@ const { title } = Astro.props;
                 </nav>
             )
         }
-        <AccountUi server:defer />
+        <AccountUi />
     </header>
     <div class="container">
         <main>

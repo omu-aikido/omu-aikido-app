@@ -20,8 +20,6 @@ if (userProfile instanceof Response) {
 
 const role = await profile.getRole({ userId: user.id });
 
-const isNotMember = role !== Role.MEMBER;
-
 if (Astro.request.method == "POST") {
     let data = await Astro.request.formData();
     let grade = data.get("grade") as unknown as number;
@@ -117,22 +115,6 @@ if (Astro.request.method == "POST") {
                 <button type="submit">登録</button>
             </form>
         </UserProfile.Page>
-        {
-            isNotMember ? (
-                <UserProfile.Link label="管理者" url="/account/management">
-                    <svg
-                        slot="label-icon"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 512 512"
-                        fill="currentColor"
-                    >
-                        <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z" />
-                    </svg>
-                </UserProfile.Link>
-            ) : (
-                ""
-            )
-        }
     </UserProfile>
     <style>
         tr {

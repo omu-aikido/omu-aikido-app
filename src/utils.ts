@@ -33,12 +33,14 @@ export const grade = [
     },
 ];
 
-export function translateGrade(grade_value: number): string {
-    const grade_data = grade.find((g) => g.grade === grade_value);
+export function translateGrade(grade_value: any): string {
+    const grade_value_number = parseInt(grade_value);
+    const grade_data = grade.find((g) => g.grade === grade_value_number);
     return grade_data ? grade_data.name : "不明";
 }
 
-export function timeForNextGrade(grade_value: number): number {
+export function timeForNextGrade(grade_value: any): number {
+    grade_value = parseInt(grade_value);
     switch (grade_value) {
         case 0:
             return 30;
@@ -89,3 +91,8 @@ export const year = [
         year: "d2",
     },
 ];
+
+export function translateYear(year_value: string): string {
+    const year_data = year.find((y) => y.year === year_value);
+    return year_data ? year_data.name : "不明";
+}

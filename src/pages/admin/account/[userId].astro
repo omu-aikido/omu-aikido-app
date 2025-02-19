@@ -1,0 +1,173 @@
+---
+import { default as Layout } from "@/src/layouts/auth-layout.astro";
+import { deleteUser } from "@/src/lib/query/admin/clerk";
+
+const currentUser = Astro.locals.auth().userId;
+
+// [userId]を取得
+const { userId } = Astro.params;
+
+if (!currentUser || !userId) {
+    return Astro.redirect("/admin/account");
+}
+
+import { getProfile } from "@/src/lib/query/profile";
+import * as profile from "@/src/lib/query/admin/profile";
+import { grade, year } from "@/src/utils";
+import { Role } from "@/src/class";
+import { getUser } from "@/src/lib/query/admin/clerk";
+
+const userAccount = (await getUser(userId))!;
+const userProfile = await getProfile({ userId: userId });
+if (!userProfile || userProfile instanceof Response) {
+    return Astro.redirect("/admin");
+}
+
+if (Astro.request.method == "POST") {
+    const data = await Astro.request.formData();
+    const grade = data.get("grade") as unknown as number;
+    const getGradeAt = data.get("getGradeAt") as unknown as Date;
+    const joinedAt = data.get("joinedAt") as unknown as number;
+    const year = data.get("year") as string;
+    const role = data.get("role") as string;
+
+    if (data.get("_action") === "deleteUser") {
+        await deleteUser(userId);
+        return Astro.redirect("/admin/account");
+    }
+
+    const result = await profile.updateProfile({
+        applicateBy: currentUser,
+        id: userId,
+        grade: grade,
+        getGradeAt: getGradeAt,
+        joinedAt: joinedAt,
+        year: year,
+        role: role,
+    });
+
+    if (result instanceof Response) {
+        return Astro.redirect("/admin/account");
+    }
+}
+---
+
+<Layout title="アカウント編集">
+    <h2>
+        <img src={userAccount.image_url} alt="" />
+        <p>
+            {userAccount.last_name}
+            {userAccount.first_name}
+        </p>
+    </h2>
+    <h3>プロフィール</h3>
+    <form id="user-form" class="user-form" method="POST">
+        <label for="grade">
+            所持級段位
+            <span style="color:rgb(var(--maroon))">*</span>
+        </label>
+        <select id="grade" name="grade" required>
+            {
+                grade.map((g) => (
+                    <option
+                        value={g.grade}
+                        selected={g.grade === userProfile.grade}
+                    >
+                        {g.name}
+                    </option>
+                ))
+            }
+        </select>
+
+        <label> 級段位取得日 </label>
+        <input
+            type="date"
+            id="getGradeAt"
+            name="getGradeAt"
+            value=`${(new Date(userProfile.getGradeAt)).toISOString().split('T')[0]}`
+        />
+        <label for="joinedAt">
+            入部年度
+            <span style="color:rgb(var(--maroon))">*</span>
+        </label>
+        <input
+            type="number"
+            id="joinedAt"
+            name="joinedAt"
+            placeholder="4桁の数字"
+            required
+            value={userProfile.joinedAt}
+        />
+        <label for="year">
+            学年
+            <span style="color:rgb(var(--maroon))">*</span>
+        </label>
+        <select id="year" name="year" value={userProfile.year} required>
+            {
+                year.map((y) => (
+                    <option
+                        value={y.year}
+                        selected={y.year === userProfile.year}
+                    >
+                        {y.name}
+                    </option>
+                ))
+            }
+        </select>
+        <label for="role">役職</label>
+        <select id="role" name="role" value={userProfile.role} required>
+            {
+                Role.ALL.map((r) => (
+                    <option
+                        value={r.toString()}
+                        selected={r === Role.fromString(userProfile.role)}
+                    >
+                        {r.ja}
+                    </option>
+                ))
+            }
+        </select>
+        <button type="submit">保存</button>
+    </form>
+
+    <hr />
+    <h3 style="color: rgb(var(--red))">Danger Zone</h3>
+    <form method="POST" onsubmit="return confirm('本当に削除しますか？');">
+        <input type="hidden" name="_action" value="deleteUser" />
+        <button
+            type="submit"
+            style="color: rgb(var(--crust)); background-color: rgb(var(--red))"
+        >
+            削除
+        </button>
+    </form>
+</Layout>
+
+<style>
+    form {
+        max-width: 25rem;
+        margin: auto;
+    }
+    .user-form {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        gap: 1rem;
+        align-items: center;
+    }
+    .user-form button {
+        grid-column: span 2;
+    }
+
+    img {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+    }
+
+    h2 {
+        display: grid;
+        grid-template-columns: 2rem 1fr 1fr;
+        gap: 1rem;
+        align-items: center;
+    }
+</style>
