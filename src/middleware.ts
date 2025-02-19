@@ -24,8 +24,4 @@ export const onRequest = clerkMiddleware((auth, context) => {
             }
         });
     }
-    if (isAdminRoute(context.request) && !has({ permission: "org:admin" })) {
-        // Add logic to run if the user does not have the required permissions; for example, redirecting to the sign-in page
-        return redirectToSignIn();
-    }
 });

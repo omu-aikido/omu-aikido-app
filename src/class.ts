@@ -55,4 +55,11 @@ export class Role {
             "member",
         ]);
     }
+
+    // ソート用
+    static compare(a: any, b: any): number {
+        const roleA = Role.fromString(a) ?? Role.MEMBER;
+        const roleB = Role.fromString(b) ?? Role.MEMBER;
+        return Role.ALL.indexOf(roleA) - Role.ALL.indexOf(roleB);
+    }
 }

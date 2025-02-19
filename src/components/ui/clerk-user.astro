@@ -1,224 +1,117 @@
 ---
 interface Props {
-    id: string;
+    query: string;
 }
 
-const { id } = Astro.props;
+const { query } = Astro.props;
 
-import "../../styles/global.css";
-import * as profile from "@/src/lib/query/profile";
-import { grade, year } from "@/src/utils";
+import type { Account } from "@/src/type";
+import { listUser, searchAccounts } from "@/src/lib/query/admin/clerk";
+import { getRole } from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
 
-const userProfile = await profile.getProfile({ userId: id });
-if (!userProfile || userProfile instanceof Response) {
-    return Astro.redirect("/admin");
+import { translateYear, translateGrade } from "@/src/utils";
+
+const user = await Astro.locals.currentUser();
+if (!user) {
+    return Astro.redirect("/sign-in");
+}
+const role = await getRole({ userId: user.id });
+if (!role || !role.isManagement()) {
+    return Astro.redirect("/dashboard");
 }
 
-if (Astro.request.method == "POST") {
-    const data = await Astro.request.formData();
-    const grade = data.get("grade") as unknown as number;
-    const getGradeAt = data.get("getGradeAt") as unknown as Date;
-    const joinedAt = data.get("joinedAt") as unknown as number;
-    const year = data.get("year") as string;
-    const role = data.get("role") as string;
+const found = await searchAccounts({
+    query: query,
+});
 
-    const result = await profile.updateProfile({
-        id: id,
-        grade: grade,
-        getGradeAt: getGradeAt,
-        joinedAt: joinedAt,
-        year: year,
-        role: role,
-    });
-
-    if (result instanceof Response) {
-        return Astro.redirect("/account/management");
-    }
-}
+const users = await listUser();
 ---
 
-<user-modal>
-    <span id="open-modal-btn" class="open-modal-btn"><slot /></span>
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span id="close-modal-btn" class="close-btn">×</span>
-            <div class="modal-content-inner">
-                <form id="user-form" class="user-form" method="POST">
-                    <label for="grade">
-                        所持級段位
-                        <span style="color:rgb(var(--maroon))">*</span>
-                    </label>
-                    <select id="grade" name="grade" required>
-                        {
-                            grade.map((g) => (
-                                <option
-                                    value={g.grade}
-                                    selected={g.grade === userProfile.grade}
-                                >
-                                    {g.name}
-                                </option>
-                            ))
-                        }
-                    </select>
-
-                    <label> 級段位取得日 </label>
-                    <input
-                        type="date"
-                        id="getGradeAt"
-                        name="getGradeAt"
-                        value=`${(new Date(userProfile.getGradeAt)).toISOString().split('T')[0]}`
-                    />
-
-                    <label for="joinedAt">
-                        入部年度
-                        <span style="color:rgb(var(--maroon))">*</span>
-                    </label>
-                    <input
-                        type="number"
-                        id="joinedAt"
-                        name="joinedAt"
-                        placeholder="4桁の数字"
-                        required
-                        value={userProfile.joinedAt}
-                    />
-                    <label for="year">
-                        学年
-                        <span style="color:rgb(var(--maroon))">*</span>
-                    </label>
-                    <select
-                        id="year"
-                        name="year"
-                        value={userProfile.year}
-                        required
-                    >
-                        {
-                            year.map((y) => (
-                                <option
-                                    value={y.year}
-                                    selected={y.year === userProfile.year}
-                                >
-                                    {y.name}
-                                </option>
-                            ))
-                        }
-                    </select>
-                    <label for="role">役職</label>
-                    <select
-                        id="role"
-                        name="role"
-                        value={userProfile.role}
-                        required
-                    >
-                        {
-                            Role.ALL.map((r) => (
-                                <option
-                                    value={r.toString()}
-                                    selected={
-                                        r === Role.fromString(userProfile.role)
-                                    }
-                                >
-                                    {r.ja}
-                                </option>
-                            ))
-                        }
-                    </select>
-                    <button type="submit">保存</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</user-modal>
-
-<script>
-    class Modal extends HTMLElement {
-        constructor() {
-            super();
-            const modal = this.querySelector(".modal") as HTMLElement;
-            const openBtn = this.querySelector(".open-modal-btn");
-            const closeBtn = this.querySelector(".close-btn");
-
-            function setupModalListeners() {
-                openBtn?.addEventListener("click", () => {
-                    if (modal) {
-                        modal.style.display = "flex";
-                        setTimeout(() => {
-                            modal.classList.add("show");
-                        }, 10);
-                    }
-                });
-
-                closeBtn?.addEventListener("click", () => {
-                    if (modal) {
-                        modal.classList.remove("show");
-                        setTimeout(() => {
-                            modal.style.display = "none";
-                        }, 300);
-                    }
-                });
-
-                // モーダル外クリックで閉じる
-                modal?.addEventListener("click", (e) => {
-                    if (e.target === modal) {
-                        modal.classList.remove("show");
-                        setTimeout(() => {
-                            modal.style.display = "none";
-                        }, 300);
-                    }
-                });
-            }
-
-            // 初期設定
-            setupModalListeners();
-
-            // ページ遷移後も実行されるように
-            document.addEventListener("astro:page-load", setupModalListeners);
-        }
-    }
-    customElements.define("user-modal", Modal);
-</script>
+{
+    found
+        ? found
+              .sort(
+                  // SORT by Role
+                  (a: Account, b: Account) => {
+                      return Role.compare(
+                          a.public_metadata.role,
+                          b.public_metadata.role
+                      );
+                  }
+              )
+              .map((user: Account) => (
+                  <div class="account_prof">
+                      <img src={user.image_url} alt="" />
+                      <p>{Role.fromString(user.public_metadata.role)?.ja}</p>
+                      <p>
+                          {user.last_name} {user.first_name}
+                      </p>
+                      <p>{translateYear(user.public_metadata.year)}</p>
+                      <p>
+                          {translateGrade(
+                              user.public_metadata.grade as unknown as number
+                          )}
+                      </p>
+                      <a href={`/admin/account/${user.id}`}>編集</a>
+                  </div>
+              ))
+        : users
+              .sort(
+                  // SORT by Role
+                  (a: Account, b: Account) => {
+                      return Role.compare(
+                          a.public_metadata.role,
+                          b.public_metadata.role
+                      );
+                  }
+              )
+              .map((user: Account) => (
+                  <div class="account_prof">
+                      <img src={user.image_url} alt="" />
+                      <p>{Role.fromString(user.public_metadata.role)?.ja}</p>
+                      <p>
+                          {user.last_name} {user.first_name}
+                      </p>
+                      <p>{translateYear(user.public_metadata.year)}</p>
+                      <p>
+                          {translateGrade(
+                              user.public_metadata.grade as unknown as number
+                          )}
+                      </p>
+                      <a href={`/admin/account/${user.id}`}>編集</a>
+                  </div>
+              ))
+}
 
 <style>
-    /* id modal を浮遊させて表示する*/
-    .modal {
-        position: fixed;
-        left: 50%;
-        top: 50%;
-        background-color: rgb(0 0 0 / 0.3);
-        backdrop-filter: blur(3px);
-        transform: translate(-50%, -50%);
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
+    .account_prof {
+        /* Display account row like an Excel table row */
+        display: grid;
         align-items: center;
-        z-index: 9999;
+        grid-template-columns: 3rem 1fr 2fr 1fr 1fr 1fr;
+        padding: 0.5rem 1rem;
+        margin-top: 0.3rem;
+        border-bottom: 1px solid rgb(var(--shadow));
+        transition:
+            background 0.3s ease,
+            transform 0.15s ease;
+        border-radius: 0.3em;
     }
 
-    .modal-content {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 3rem;
+    .account_prof:hover {
+        background: rgb(var(--crust) / 0.5);
+        border: 1px solid rgb(var(--shadow));
+        transform: translateY(-0.2rem);
     }
 
-    .modal-content-inner {
-        background-color: rgb(var(--crust) / 0.5);
-        padding: 1rem;
-        min-width: 20rem;
-        border-radius: 1rem;
-        box-shadow: 0px 0px 0px 2px rgb(var(--mauve));
+    .account_prof img {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
     }
 
-    .user-form {
-        display: flex;
-        flex-direction: column;
-    }
-
-    span#close-modal-btn {
-        cursor: pointer;
-        width: 1rem;
-        height: 1rem;
-        margin-top: -1rem;
-        margin-left: -1rem;
+    a {
+        margin-bottom: 0;
     }
 </style>
