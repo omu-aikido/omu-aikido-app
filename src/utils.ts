@@ -39,7 +39,8 @@ export function translateGrade(grade_value: any): string {
     return grade_data ? grade_data.name : "不明";
 }
 
-export function timeForNextGrade(grade_value: number): number {
+export function timeForNextGrade(grade_value: any): number {
+    grade_value = parseInt(grade_value);
     switch (grade_value) {
         case 0:
             return 30;

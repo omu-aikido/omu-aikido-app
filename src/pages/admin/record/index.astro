@@ -1,3 +1,75 @@
 ---
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
+import type { Account } from "@/src/type";
+import { listUser } from "@/src/lib/query/admin/clerk";
+import { getRole } from "@/src/lib/query/profile";
+import { Role } from "@/src/class";
+
+import { translateGrade, timeForNextGrade } from "@/src/utils";
+
+const user = await Astro.locals.currentUser();
+if (!user) {
+    return Astro.redirect("/sign-in");
+}
+const role = await getRole({ userId: user.id });
+if (!role || !role.isManagement()) {
+    return Astro.redirect("/dashboard");
+}
+
+const users = await listUser();
+
+const users_info = users
+    .sort((a: Account, b: Account) => {
+        return Role.compare(a.public_metadata.role, b.public_metadata.role);
+    })
+    .map(async (user: Account) => {
+        return {
+            id: user.id,
+            name: `${user.last_name} ${user.first_name}`,
+            grade: translateGrade(
+                user.public_metadata.grade as unknown as number
+            ),
+            timeForNextGrade: timeForNextGrade(
+                user.public_metadata.grade as unknown as number
+            ),
+            trainFromPreGrade:
+                (await record.getTrainings({ userId: user.id }))
+                    .map((record) => record.period)
+                    .reduce((a, b) => a + b, 0) / 1.5,
+        };
+    });
+
+import * as record from "@/src/lib/query/admin/activity";
 ---
+
+<Layout title="管理者メニュー">
+    <table>
+        <thead>
+            <tr>
+                <th>氏名</th>
+                <th>級段位</th>
+                <th>受験資格</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {
+                users_info.map(async (user) => (
+                    <tr>
+                        <td>{(await user).name}</td>
+                        <td>{(await user).grade}</td>
+                        <td>
+                            {(await user).trainFromPreGrade}/
+                            {(await user).timeForNextGrade}
+                        </td>
+                        <td>
+                            <a href={`/admin/record/${(await user).id}`}>
+                                詳細
+                            </a>
+                        </td>
+                    </tr>
+                ))
+            }
+        </tbody>
+    </table>
+</Layout>

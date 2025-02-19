@@ -23,17 +23,24 @@ export async function getUserAllActivities(input: { userId: string }) {
 // 特定のユーザーの特定の期間のアクティビティを取得する
 export async function getUserActivities(input: {
     userId: string;
-    startDate: Date;
-    endDate: Date;
+    start: Date | undefined;
+    end: Date | undefined;
 }) {
+    // 1970-01-01T00:00:00.000Z ~ 2100-12-31T23:59:59.999Zまでのデータを取得
+    const start = input.start
+        ? input.start.toISOString()
+        : new Date(0).toISOString();
+    const end = input.end
+        ? input.end.toISOString()
+        : new Date(4102444799999).toISOString();
     const activities = await db
         .select()
         .from(activity)
         .where(
             and(
                 eq(activity.userId, input.userId),
-                gte(activity.date, input.startDate.toISOString()),
-                lte(activity.date, input.endDate.toISOString())
+                gte(activity.date, start),
+                lte(activity.date, end)
             )
         );
     return activities;
