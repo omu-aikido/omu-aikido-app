@@ -50,7 +50,7 @@ export async function getUserActivities(input: {
 export async function getTrainings(input: { userId: string }) {
     const user = await accounts.getProfile({ userId: input.userId });
     if (user instanceof Response) {
-        throw new Error("Failed to fetch user profile.");
+        return [];
     }
     const date = new Date(user.getGradeAt);
     const today = new Date();

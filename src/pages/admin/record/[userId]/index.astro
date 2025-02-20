@@ -16,7 +16,7 @@ if (!userId) {
 
 const userAccount = await getUser(userId);
 const userProfile = await getProfile({ userId: userId });
-if (!userAccount || !userProfile || userProfile instanceof Response) {
+if (!userAccount || userProfile instanceof Response) {
     return Astro.redirect("/admin/record");
 }
 

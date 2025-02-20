@@ -19,8 +19,8 @@ export const onRequest = clerkMiddleware((auth, context) => {
         return redirectToSignIn();
     } else if (userId) {
         profile.getProfile({ userId: userId }).then((userProfile) => {
-            if (!userProfile) {
-                return context.redirect("/account/setup");
+            if (userProfile instanceof Response) {
+                return userProfile;
             }
         });
     }

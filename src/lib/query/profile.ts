@@ -6,9 +6,8 @@ import type { Account, Profile } from "@/src/type";
 export async function getProfile(input: {
     userId: string;
 }): Promise<Profile | Response> {
-
     console.log(
-        "Running on" +
+        "Running on " +
             (`${import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY}`.startsWith(
                 "pk_test_"
             )
@@ -37,20 +36,35 @@ export async function getProfile(input: {
         user = parsedUser;
     } catch (error) {
         console.error(error);
-        return Response.redirect("/account/recovery", 303);
+        return new Response("Missing Correct User Schema", {
+            status: 303,
+            headers: {
+                Location: "/account/recovery",
+            },
+        });
     }
 
     if (Object.keys(user.public_metadata).length === 0) {
         console.log("No profile found.");
-        return Response.redirect("/account/setup", 303);
+        return new Response("No Profile Found", {
+            status: 303,
+            headers: {
+                Location: "/account/setup",
+            },
+        });
     }
 
     try {
-        const parsedProfile = profile.parse(user.public_metadata); // 修正: 引数にuser.public_metadataを渡す
+        const parsedProfile = profile.parse(user.public_metadata);
         return parsedProfile;
     } catch (error) {
         console.error(error);
-        return Response.redirect("/account/recovery", 303);
+        return new Response("Something Went Wrong with Loading Profile", {
+            status: 303,
+            headers: {
+                Location: "/account/recovery",
+            },
+        });
     }
 }
 
@@ -154,8 +168,7 @@ export async function updateProfile(input: {
 export async function getRole(input: { userId: string }): Promise<Role | null> {
     const result = await getProfile({ userId: input.userId });
     if (result instanceof Response) {
-        const errorMessage = await result.text();
-        throw new Error(errorMessage);
+        return null;
     }
     const meta = profile.parse(result);
     return Role.fromString(meta.role);

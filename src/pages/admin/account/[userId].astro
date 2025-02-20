@@ -19,8 +19,8 @@ import { getUser } from "@/src/lib/query/admin/clerk";
 
 const userAccount = (await getUser(userId))!;
 const userProfile = await getProfile({ userId: userId });
-if (!userProfile || userProfile instanceof Response) {
-    return Astro.redirect("/admin");
+if (userProfile instanceof Response) {
+    return userProfile;
 }
 
 if (Astro.request.method == "POST") {
