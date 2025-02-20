@@ -12,7 +12,7 @@ if (!user) {
 import * as query from "@/src/lib/query/profile";
 
 const userProfile = await query.getProfile({ userId: user.id });
-if (userProfile) {
+if (!(userProfile instanceof Response)) {
     return Astro.redirect("/account");
 }
 
