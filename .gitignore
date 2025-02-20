@@ -21,9 +21,9 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
-.env.local
+.env.development
 .dev.vars
-.dev.vars.preview
+.dev.vars.development
 .dev.vars.production
 
 # macOS-specific files
