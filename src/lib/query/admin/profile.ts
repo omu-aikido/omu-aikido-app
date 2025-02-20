@@ -51,7 +51,5 @@ export async function updateProfile(input: {
         body,
     });
 
-    console.log(response);
-
     return response as unknown as Response;
 }
