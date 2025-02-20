@@ -21,6 +21,8 @@ export async function getProfile(input: {
     });
 
     const json = await response.json();
+    console.log(import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY);
+    console.log(json);
     let user: Account;
     try {
         const parsedUser = clerkUserSchema.parse(json);
