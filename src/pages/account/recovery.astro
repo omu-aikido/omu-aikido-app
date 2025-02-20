@@ -1,7 +1,7 @@
 ---
 import { grade, year } from "@/src/utils";
 import { Role } from "@/src/class";
-import { default as Layout } from "@/src/layouts/auth-layout.astro";
+import { default as Layout } from "@/src/layouts/non-auth-layout.astro";
 
 const user = await Astro.locals.currentUser();
 
@@ -10,6 +10,11 @@ if (!user) {
 }
 
 import * as query from "@/src/lib/query/profile";
+
+const userProfile = await query.getProfile({ userId: user.id });
+if (userProfile) {
+    return Astro.redirect("/account");
+}
 
 if (Astro.request.method == "POST") {
     let data = await Astro.request.formData();
