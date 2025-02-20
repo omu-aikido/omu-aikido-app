@@ -99,6 +99,7 @@ export async function createProfile(input: {
     // Construct headers with secret key from environment.
     const headers = {
         Authorization: `Bearer ${import.meta.env.CLERK_SECRET_KEY}`,
+        "Content-Type": "application/json",
     };
 
     const body = JSON.stringify({
@@ -114,7 +115,7 @@ export async function createProfile(input: {
         body,
     });
 
-    return response as unknown as Response;
+    return response;
 }
 
 export async function updateProfile(input: {
