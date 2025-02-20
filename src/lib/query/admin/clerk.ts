@@ -83,8 +83,6 @@ export async function deleteUser(userId: string): Promise<Response> {
         .where(eq(activity.userId, userId))
         .execute();
 
-    console.log(activities);
-
     // Build Clerk API URL with query parameters.
     const url = new URL(`https://api.clerk.com/v1/users/${userId}`);
 

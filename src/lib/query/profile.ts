@@ -26,17 +26,14 @@ export async function getProfile(input: {
         const parsedUser = clerkUserSchema.parse(json);
         user = parsedUser;
     } catch (error) {
-        console.log(error);
-        return new Response(null, {
-            status: 303,
-            headers: { Location: "/account/recovery" },
+        return new Response("ユーザーデータの形式が正しくありません。", {
+            status: 400,
         });
     }
 
     if (Object.keys(user.public_metadata).length === 0) {
-        return new Response(null, {
-            status: 303,
-            headers: { Location: "/account/setup" },
+        return new Response("ユーザープロファイルが設定されていません。", {
+            status: 400,
         });
     }
 
@@ -44,9 +41,8 @@ export async function getProfile(input: {
         const parsedProfile = profile.parse(user.public_metadata); // 修正: 引数にuser.public_metadataを渡す
         return parsedProfile;
     } catch (e) {
-        return new Response(null, {
-            status: 303,
-            headers: { Location: "/account/recovery" },
+        return new Response("プロフィールのパースに失敗しました。", {
+            status: 400,
         });
     }
 }
@@ -58,7 +54,9 @@ export async function createProfile(input: {
     joinedAt: number;
     year: string;
 }): Promise<Response> {
-    if (await getProfile({ userId: input.id })) {
+    // 既に有効なプロフィールがある場合はエラーとする。
+    const existingProfile = await getProfile({ userId: input.id });
+    if (!(existingProfile instanceof Response)) {
         throw new Error("User already exists.");
     }
 
@@ -143,13 +141,15 @@ export async function updateProfile(input: {
         body,
     });
 
-    console.log(response);
-
     return response as unknown as Response;
 }
 
 export async function getRole(input: { userId: string }): Promise<Role | null> {
-    const user = await getProfile({ userId: input.userId });
-    const meta = profile.parse(user);
+    const result = await getProfile({ userId: input.userId });
+    if (result instanceof Response) {
+        const errorMessage = await result.text();
+        throw new Error(errorMessage);
+    }
+    const meta = profile.parse(result);
     return Role.fromString(meta.role);
 }

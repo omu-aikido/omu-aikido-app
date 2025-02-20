@@ -13,7 +13,7 @@ import { grade, year } from "@/src/utils";
 import { Role } from "@/src/class";
 
 const userProfile = await profile.getProfile({ userId: user.id });
-console.log(userProfile);
+
 if (userProfile instanceof Response) {
     return Astro.redirect("/account/recovery");
 }
