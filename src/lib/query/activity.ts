@@ -16,8 +16,8 @@ export async function getAllActivities(input: { applicateBy: string }) {
         userId: input.applicateBy,
     });
 
-    if (applicateBy instanceof Error) {
-        throw new Error("User not found");
+    if (applicateBy instanceof Response) {
+        return applicateBy;
     }
     if (
         !(applicateBy instanceof Object) ||
