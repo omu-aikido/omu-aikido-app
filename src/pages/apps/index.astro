@@ -4,6 +4,7 @@ import Grid from "@/src/components/ui/grid.astro";
 import AppIcon from "@/src/components/ui/app-icon.astro";
 import { APPS } from "@/src/const";
 import { getProfile, getRole } from "@/src/lib/query/profile";
+import { Role } from "@/src/class";
 const user = await Astro.locals.currentUser();
 
 if (!user) {
@@ -11,14 +12,11 @@ if (!user) {
 }
 const userProfile = await getProfile({ userId: user.id });
 if (userProfile instanceof Response) {
-    return Astro.redirect("/account/recovery");
+    return userProfile;
 }
 
-const role = await getRole({ userId: user.id });
+const role = (await getRole({ userId: user.id })) as Role;
 
-if (!role) {
-    return Astro.redirect("/account/recovery");
-}
 if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
     APPS.push({
         name: "管理者メニュー",

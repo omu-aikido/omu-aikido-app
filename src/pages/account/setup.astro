@@ -10,11 +10,6 @@ if (!user) {
 
 import * as query from "@/src/lib/query/profile";
 
-const userProfile = await query.getProfile({ userId: user.id });
-if (userProfile) {
-    return Astro.redirect("/account");
-}
-
 if (Astro.request.method == "POST") {
     let data = await Astro.request.formData();
     let grade = data.get("grade") as unknown as number;

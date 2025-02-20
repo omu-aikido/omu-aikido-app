@@ -1,4 +1,5 @@
 ---
+import type { Role } from "@/src/class";
 import Modal from "./modal.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 import { APPS } from "@/src/const";
@@ -10,16 +11,13 @@ const user = await Astro.locals.currentUser();
 if (!user) {
     return Astro.redirect("/sign-in");
 }
+
 const userProfile = await getProfile({ userId: user.id });
 if (userProfile instanceof Response) {
-    return Astro.redirect("/account/recovery");
+    return userProfile;
 }
 
-const role = await getRole({ userId: user.id });
-
-if (!role) {
-    return Astro.redirect("/account/recovery");
-}
+const role = (await getRole({ userId: user.id })) as Role;
 
 if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
     APPS.push({
