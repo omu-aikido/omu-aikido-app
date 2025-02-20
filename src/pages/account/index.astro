@@ -15,7 +15,7 @@ import { Role } from "@/src/class";
 const userProfile = await profile.getProfile({ userId: user.id });
 
 if (userProfile instanceof Response) {
-    return Astro.redirect("/account/recovery");
+    return userProfile;
 }
 
 const role = await profile.getRole({ userId: user.id });

@@ -6,6 +6,16 @@ import type { Account, Profile } from "@/src/type";
 export async function getProfile(input: {
     userId: string;
 }): Promise<Profile | Response> {
+
+    console.log(
+        "Running on" +
+            (`${import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY}`.startsWith(
+                "pk_test_"
+            )
+                ? "Development"
+                : "Production") +
+            " Environment."
+    );
     // Build Clerk API URL with query parameters.
     const url = new URL("https://api.clerk.com/v1/users" + `/${input.userId}`);
 
@@ -26,24 +36,21 @@ export async function getProfile(input: {
         const parsedUser = clerkUserSchema.parse(json);
         user = parsedUser;
     } catch (error) {
-        return new Response("ユーザーデータの形式が正しくありません。", {
-            status: 400,
-        });
+        console.error(error);
+        return Response.redirect("/account/recovery", 303);
     }
 
     if (Object.keys(user.public_metadata).length === 0) {
-        return new Response("ユーザープロファイルが設定されていません。", {
-            status: 400,
-        });
+        console.log("No profile found.");
+        return Response.redirect("/account/setup", 303);
     }
 
     try {
         const parsedProfile = profile.parse(user.public_metadata); // 修正: 引数にuser.public_metadataを渡す
         return parsedProfile;
-    } catch (e) {
-        return new Response("プロフィールのパースに失敗しました。", {
-            status: 400,
-        });
+    } catch (error) {
+        console.error(error);
+        return Response.redirect("/account/recovery", 303);
     }
 }
 

@@ -16,7 +16,7 @@ if (!user) {
 }
 const userProfile = await getProfile({ userId: user.id });
 if (userProfile instanceof Response) {
-    return Astro.redirect("/account/recovery");
+    return userProfile;
 }
 
 const now = new Date();

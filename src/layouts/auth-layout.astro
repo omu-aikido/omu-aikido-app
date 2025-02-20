@@ -7,6 +7,7 @@ import Modal from "../components/ui/modal.astro";
 import "@/src/styles/global.css";
 import { APP_NAME } from "@/src/const";
 import { getRole } from "@/src/lib/query/profile";
+import type { Role } from "@/src/class";
 
 /** Main menu items */
 let textLinks: { label: string; href: string }[] = [
@@ -19,10 +20,7 @@ const user = await Astro.locals.currentUser();
 if (!user) {
     return Astro.redirect("/sign-in");
 }
-const role = await getRole({ userId: user.id });
-if (!role) {
-    return Astro.redirect("/account/recovery");
-}
+const role = (await getRole({ userId: user.id })) as Role;
 
 if (role.isManagement() && !textLinks.some((link) => link.label === "Admin")) {
     textLinks.push({ label: "Admin", href: "/admin" });
