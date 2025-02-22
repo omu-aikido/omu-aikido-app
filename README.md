@@ -10,41 +10,41 @@ Astro.jsを使用して開発されています。
 - [x] ユーザー登録
 - [x] ログイン
 - [x] 稽古の記録・閲覧・編集
-- [ ] 管理者による稽古の集計などの機能
-- [ ] 稽古の記録を元にしたグラフの表示
-- [ ] 役職別機能
+- [-] 役職別機能
+    - [-] 管理者
+        - [x] 稽古の集計などの機能
     - [ ] 会計:精算機能 ……?
+- [ ] 稽古の記録を元にしたグラフの表示
 
-## 開発環境
+## 主な使用技術
+- **[npm](https://www.npmjs.com)**  
+    パッケージ管理
 
-### 依存 （2025-02-09時点）
+- **[Astro.js](https://astro.build)**  
+    フレームワーク
 
-#### Dependencies
+- **[GitHub](https://github.com)**  
+    ソースコード管理
 
-- @astrojs/check: ^0.9.4
-- @astrojs/cloudflare: ^12.2.1
-- @catppuccin/palette: ^1.7.1
-- @clerk/astro: ^2.1.19
-- @clerk/localizations: ^3.10.4
-- @clerk/themes: ^2.2.16
-- @libsql/client: ^0.14.0
-- apexcharts: ^4.3.0
-- astro: ^5.2.5
-- drizzle-orm: ^0.39.1
-- drizzle-zod: ^0.7.0
-- svix: ^1.45.1
-- ts-ics: ^1.6.6
-- uuid: ^11.0.5
+- **[Catppuccin](https://catppuccin.com)**  
+    カラーパレット
 
-#### DevDependencies
+- **[Clerk](https://clerk.com)**  
+    認証
 
-- @cloudflare/workers-types: ^4.20250204.0
-- drizzle-kit: ^0.30.4
-- wrangler: ^3.107.3
+- **[Turso](https://turso.tech)**  
+    libSQLデータベース
 
-#### その他
+- **[Drizzle](https://orm.drizzle.team)**  
+    ORM
 
-- Turso version v0.97.2
+- **[ts-ics](https://github.com/Neuvernetzung/ts-ics)**  
+    iCalendar生成
+
+- **[CloudFlare Pages](https://pages.cloudflare.com)**  
+    ホスティング
+
+その他、使用しているパッケージ等は`package.json`に記載されています。
 
 ### ローカルでの開発方法
 
@@ -52,10 +52,20 @@ Astro.jsを使用して開発されています。
 
 - \*.db // データベースファイル (SQLite3)
     - `turso dev --db *.db` で`http://127.0.0.1:8080`にlibSqlサーバを起動します
-- .env
-- .env.local
+- .env.development
 - .env.production
-- .dev.vars // cloudflare pages用の環境変数
+- .dev.vars.development
+- .dev.vars.production
+
+環境変数に必要な情報は
+
+- PUBLIC_CLERK_PUBLISHABLE_KEY
+- CLERK_SECRET_KEY
+- TURSO_DATABASE_URL
+- TURSO_AUTH_TOKEN
+
+です。
+
 
 ```bash
 $ npx astro dev # ローカルサーバを起動します
@@ -63,6 +73,19 @@ $ npx astro build # ビルドします
 $ npx astro preview # プレビューします
 ```
 
-`preview`されるのは本番環境と同じ環境です。環境変数の設定に注意してください。
+## 注意
 
-各種ツールのガイドを参考にしてください。
+- 本番環境以外のブランチでも、`wrangler deploy`を行うと、本番環境の環境変数が使われるため、注意してください。
+
+- CloudFlare上でのビルドは、libSQL関連のパッケージで実行時エラーが発生するため、ローカルでビルドしてアップロードする必要があります。
+
+その他、各種ツールのガイドを参考にしてください。
+
+## ライセンス
+Copyright [2025] [[omu-aikido](https://github.com/omu-aikido)]
+
+Apache License Version 2.0（「本ライセンス」）に基づいてライセンスされます。あなたがこのファイルを使用するためには、本ライセンスに従わなければなりません。本ライセンスのコピーは下記の場所から入手できます。
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+適用される法律または書面での同意によって命じられない限り、本ライセンスに基づいて頒布されるソフトウェアは、明示黙示を問わず、いかなる保証も条件もなしに「現状のまま」頒布されます。本ライセンスでの権利と制限を規定した文言については、本ライセンスを参照してください。 
