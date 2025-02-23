@@ -1,31 +1,12 @@
 ---
-import type { Role } from "@/src/class";
+interface Props {
+    apps: { name: string; path: string; desc: string }[];
+}
+
+const { apps } = Astro.props;
+
 import Modal from "./modal.astro";
 import ThemeToggle from "./ThemeToggle.astro";
-import { APPS } from "@/src/const";
-
-import { getProfile, getRole } from "@/src/lib/query/profile";
-
-const user = await Astro.locals.currentUser();
-
-if (!user) {
-    return Astro.redirect("/sign-in");
-}
-
-const userProfile = await getProfile({ userId: user.id });
-if (userProfile instanceof Response) {
-    return userProfile;
-}
-
-const role = (await getRole({ userId: user.id })) as Role;
-
-if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
-    APPS.push({
-        name: "管理者メニュー",
-        path: "/admin",
-        desc: "管理者メニューに移動します。",
-    });
-}
 
 import {
     SignedIn,
@@ -61,7 +42,7 @@ import {
             </div>
             <hr />
             {
-                APPS.map((app) => (
+                apps.map((app) => (
                     <div class="account_button, link">
                         <a href={app.path}>{app.name}</a>
                     </div>
