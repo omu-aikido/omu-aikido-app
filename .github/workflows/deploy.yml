@@ -38,4 +38,4 @@ jobs:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   command: |
-                      pages deploy .dist --project-name=omu-aikido-app
+                      pages deploy dist --project-name=omu-aikido-app
