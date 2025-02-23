@@ -31,7 +31,6 @@ jobs:
                   echo "TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}" >> .env
             - name: Build
               run: npm run build --remote
-            - uses: actions/checkout@v4
             - name: Deploy
               uses: cloudflare/wrangler-action@v3
               with:
