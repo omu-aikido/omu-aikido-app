@@ -7,6 +7,7 @@ const isProtectedRoute = createRouteMatcher([
     "/dashboard(.*)",
     "/app(.*)",
     "/account(.*)",
+    "/admin(.*)",
 ]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
@@ -21,6 +22,12 @@ export const onRequest = clerkMiddleware((auth, context) => {
         profile.getProfile({ userId: userId }).then((userProfile) => {
             if (userProfile instanceof Response) {
                 return userProfile;
+            }
+            if (
+                Role.fromString(userProfile.role)?.isManagement() &&
+                isAdminRoute(context.request)
+            ) {
+                context.redirect("/dashboard");
             }
         });
     }

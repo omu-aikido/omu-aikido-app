@@ -2,7 +2,7 @@
 import Baselayout from "./baselayout.astro";
 import Footer from "@/src/components/root/footer.astro";
 import Modal from "@/src/components/ui/modal.astro";
-import ThemeToggle from "@/src/components/ui/ThemeToggle.astro";
+import AccountUi from "@/src/components/ui/account-ui.astro";
 const textLinks: { label: string; href: string }[] = [];
 
 import { APPS } from "@/src/const";
@@ -69,30 +69,7 @@ const { title } = Astro.props;
                 </nav>
             )
         }
-        <Modal position="right" icon="  ⵗ  ">
-            <div class="account_prof_name">
-                <a href="/signin">
-                    <span>未ログイン</span>
-                </a>
-            </div>
-            <hr />
-            <div class="account_prof">
-                {
-                    APPS.map((app) => (
-                        <div class="account_button, link">
-                            <a href={app.path}>{app.name}</a>
-                        </div>
-                    ))
-                }
-            </div>
-            <hr />
-            <div
-                style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; align-content: center;"
-            >
-                <span>ダークモード</span>
-                <ThemeToggle />
-            </div>
-        </Modal>
+        <AccountUi apps={APPS} />
     </header>
     <div class="container">
         <main>

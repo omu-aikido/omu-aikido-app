@@ -8,6 +8,7 @@ import "@/src/styles/global.css";
 import { APP_NAME } from "@/src/const";
 import { getRole } from "@/src/lib/query/profile";
 import type { Role } from "@/src/class";
+import { APPS } from "@/src/const";
 
 /** Main menu items */
 let textLinks: { label: string; href: string }[] = [
@@ -32,6 +33,14 @@ interface Props {
 
 const homelink = "/dashboard";
 const { title } = Astro.props;
+
+if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
+    APPS.push({
+        name: "管理者メニュー",
+        path: "/admin",
+        desc: "管理者メニューに移動します。",
+    });
+}
 ---
 
 <Baselayout pagename=`${APP_NAME} - ${title}`>
@@ -88,7 +97,7 @@ const { title } = Astro.props;
                 </nav>
             )
         }
-        <AccountUi />
+        <AccountUi apps={APPS} />
     </header>
     <div class="container">
         <main>
