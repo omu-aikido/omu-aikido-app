@@ -1,12 +1,14 @@
 name: Preview on Cloudflare Pages
 
 on:
-    push:
-        branches-ignore: [master]
-    workflow_dispatch:
-
+    pull_request:
+        types:
+          - closed
+        branches:
+          - 'preview'
 jobs:
     deploy:
+        if: github.event.pull_request.merged == true
         runs-on: ubuntu-latest
         environment: preview
         name: Deploy
