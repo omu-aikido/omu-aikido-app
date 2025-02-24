@@ -1,11 +1,9 @@
 name: Preview on Cloudflare Pages
 
 on:
-    pull_request:
-        types:
-          - closed
-        branches:
-          - 'preview'
+  push:
+    branches: [preview]
+
 jobs:
     deploy:
         if: github.event.pull_request.merged == true
