@@ -1,5 +1,8 @@
 # 活動記録アプリ Beta
 
+[![Preview on Cloudflare Pages](https://github.com/omu-aikido/omu-aikido-app/actions/workflows/preview.yml/badge.svg)](https://github.com/omu-aikido/omu-aikido-app/actions/workflows/preview.yml)
+[![Deploy to Cloudflare Pages](https://github.com/omu-aikido/omu-aikido-app/actions/workflows/deploy.yml/badge.svg)](https://github.com/omu-aikido/omu-aikido-app/actions/workflows/deploy.yml)
+
 ## 概要
 
 活動記録アプリ Betaは、部活動の稽古を記録するためのフルスタックWebアプリです。
@@ -10,8 +13,8 @@ Astro.jsを使用して開発されています。
 - [x] ユーザー登録
 - [x] ログイン
 - [x] 稽古の記録・閲覧・編集
-- [-] 役職別機能
-    - [-] 管理者
+- [ ] 役職別機能
+    - [ ] 管理者
         - [x] 稽古の集計などの機能
     - [ ] 会計:精算機能 ……?
 - [ ] 稽古の記録を元にしたグラフの表示
@@ -82,10 +85,10 @@ $ npx astro preview # プレビューします
 その他、各種ツールのガイドを参考にしてください。
 
 ## ライセンス
-Copyright [2025] [[omu-aikido](https://github.com/omu-aikido)]
+Copyright 2025 [omu-aikido](https://github.com/omu-aikido)
 
 Apache License Version 2.0（「本ライセンス」）に基づいてライセンスされます。あなたがこのファイルを使用するためには、本ライセンスに従わなければなりません。本ライセンスのコピーは下記の場所から入手できます。
 
-    http://www.apache.org/licenses/LICENSE-2.0
+[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
 適用される法律または書面での同意によって命じられない限り、本ライセンスに基づいて頒布されるソフトウェアは、明示黙示を問わず、いかなる保証も条件もなしに「現状のまま」頒布されます。本ライセンスでの権利と制限を規定した文言については、本ライセンスを参照してください。 
