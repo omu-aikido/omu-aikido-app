@@ -9,6 +9,7 @@ import { APP_NAME } from "@/src/const";
 import { getRole } from "@/src/lib/query/profile";
 import type { Role } from "@/src/class";
 import { APPS } from "@/src/const";
+import Head from "@/src/components/root/app-head.astro";
 
 /** Main menu items */
 let textLinks: { label: string; href: string }[] = [
@@ -43,12 +44,43 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
 }
 ---
 
-<Baselayout pagename=`${APP_NAME} - ${title}`>
-    <header>
-        <nav class="mobile-menu">
+<Baselayout>
+    <Head title=`${APP_NAME} - ${title}` />
+    <body>
+        <header>
+            <nav class="mobile-menu">
+                {
+                    textLinks.length > 0 && (
+                        <Modal position="left" icon="  ☰  ">
+                            {textLinks.map((link) => (
+                                <a
+                                    href={link.href}
+                                    aria-current={
+                                        link.href === "/"
+                                            ? Astro.url.pathname === "/"
+                                                ? "page"
+                                                : undefined
+                                            : Astro.url.pathname.startsWith(
+                                                    link.href
+                                                )
+                                              ? "page"
+                                              : undefined
+                                    }
+                                    class="modal-inner-content"
+                                >
+                                    {link.label}
+                                </a>
+                            ))}
+                        </Modal>
+                    )
+                }
+            </nav>
+            <h2>
+                <a href={homelink}>{title}</a>
+            </h2>
             {
                 textLinks.length > 0 && (
-                    <Modal position="left" icon="  ☰  ">
+                    <nav class="links">
                         {textLinks.map((link) => (
                             <a
                                 href={link.href}
@@ -63,48 +95,22 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
                                           ? "page"
                                           : undefined
                                 }
-                                class="modal-inner-content"
                             >
                                 {link.label}
                             </a>
                         ))}
-                    </Modal>
+                    </nav>
                 )
             }
-        </nav>
-        <h2>
-            <a href={homelink}>{title}</a>
-        </h2>
-        {
-            textLinks.length > 0 && (
-                <nav class="links">
-                    {textLinks.map((link) => (
-                        <a
-                            href={link.href}
-                            aria-current={
-                                link.href === "/"
-                                    ? Astro.url.pathname === "/"
-                                        ? "page"
-                                        : undefined
-                                    : Astro.url.pathname.startsWith(link.href)
-                                      ? "page"
-                                      : undefined
-                            }
-                        >
-                            {link.label}
-                        </a>
-                    ))}
-                </nav>
-            )
-        }
-        <AccountUi apps={APPS} />
-    </header>
-    <div class="container">
-        <main>
-            <slot />
-        </main>
-    </div>
-    <Footer />
+            <AccountUi apps={APPS} />
+        </header>
+        <div class="container">
+            <main>
+                <slot />
+            </main>
+        </div>
+        <Footer />
+    </body>
 </Baselayout>
 
 <style>
