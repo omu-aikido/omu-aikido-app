@@ -1,0 +1,239 @@
+---
+import Baselayout from "./baselayout.astro";
+import Footer from "../components/root/footer.astro";
+import Modal from "../components/ui/modal.astro";
+import ThemeToggle from "../components/ui/ThemeToggle.astro";
+
+import { APPS } from "@/src/const";
+import { APP_NAME } from "@/src/const";
+interface Props {
+    title: string;
+}
+
+const homelink = "/";
+const { title } = Astro.props;
+
+export const prerender = true;
+---
+
+<Baselayout pagename=`${APP_NAME} - ${title}`>
+    <header>
+        <nav class="mobile-menu">
+            {
+                (
+                    <Modal position="left" icon="  ☰  ">
+                        {APPS.map((link) => (
+                            <a
+                                href={link.path}
+                                aria-current={
+                                    link.path === "/"
+                                        ? Astro.url.pathname === "/"
+                                            ? "page"
+                                            : undefined
+                                        : Astro.url.pathname.startsWith(
+                                                link.path
+                                            )
+                                          ? "page"
+                                          : undefined
+                                }
+                                class="modal-inner-content"
+                            >
+                                {link.name}
+                            </a>
+                        ))}
+
+                        <hr />
+
+                        <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; align-content: center;">
+                            <span>ダークモード</span>
+                            <ThemeToggle />
+                        </div>
+                    </Modal>
+                )
+            }
+        </nav>
+        <h2>
+            <a href={homelink}>{APP_NAME}</a>
+        </h2>
+        {
+            APPS.length > 0 && (
+                <nav class="links">
+                    {APPS.map((link) => (
+                        <a
+                            href={link.path}
+                            aria-current={
+                                link.path === "/"
+                                    ? Astro.url.pathname === "/"
+                                        ? "page"
+                                        : undefined
+                                    : Astro.url.pathname.startsWith(link.path)
+                                      ? "page"
+                                      : undefined
+                            }
+                        >
+                            {link.name}
+                        </a>
+                    ))}
+                </nav>
+            )
+        }
+        <div class="thema-toggle">
+            <ThemeToggle />
+        </div>
+    </header>
+    <div class="container">
+        <main>
+            <slot />
+        </main>
+    </div>
+    <Footer />
+</Baselayout>
+
+<style>
+    header {
+        margin: 0;
+        padding: 0 5%;
+        background-color: rgb(var(--base) / 0.85);
+        box-shadow: 0px 2px 15px -5px rgb(var(--mauve) / 0.5);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 5rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        color: rgb(var(--text));
+    }
+
+    header > h2 {
+        margin: 0;
+    }
+    header > h2 > a {
+        text-decoration: none;
+        color: rgb(var(--text));
+        margin: 0;
+        padding: 0;
+        font-size: 1.5rem;
+        transition: color 0.2s ease;
+    }
+
+    header > h2 > a:hover {
+        color: rgb(var(--mauve));
+    }
+
+    .links {
+        border-radius: 12px;
+        border: 1px solid rgb(var(--surface2) / 0.3);
+        padding: 4px;
+        background-color: rgb(var(--surface0) / 0.3);
+        backdrop-filter: blur(10px);
+        transition: all 0.2s ease;
+    }
+
+    .links:hover {
+        border-color: rgb(var(--mauve) / 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px -2px rgb(var(--mauve) / 0.15);
+    }
+
+    nav {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    nav > a {
+        color: rgb(var(--text));
+        text-decoration: none;
+        margin: 0;
+        padding: 0.3rem 1rem;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+
+    nav > a:hover:not([aria-current="page"]) {
+        background-color: rgb(var(--surface1) / 0.5);
+        transform: translateY(-1px);
+    }
+
+    .links > a[aria-current="page"] {
+        background-color: rgb(var(--mauve));
+        color: rgb(var(--base));
+    }
+
+    .mobile-menu {
+        display: none;
+    }
+
+    .modal-inner-content {
+        display: flex;
+        color: rgb(var(--subtext0));
+        backdrop-filter: blur(1px);
+        flex-direction: column;
+        margin: 8px 0;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 1px 1px 4px 2px rgb(var(--shadow) / 0.8);
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+        align-items: st retch;
+    }
+    .modal-inner-content:hover {
+        transform: translateY(-2px);
+        box-shadow: 0px 0px 4px 3px rgb(var(--mauve) / 0.4);
+    }
+    /* 現在のページならハイライト */
+    /* ボーダーをグラデーションにして光彩が周囲を回っているような雰囲気にする */
+    .modal-inner-content[aria-current="page"] {
+        box-shadow: 0px 0px 3px 2px rgb(var(--sapphire) / 0.4);
+    }
+
+    .modal-inner-content a {
+        color: rgb(var(--text));
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        transition:
+            background-color 0.2s ease,
+            color 0.2s ease;
+    }
+
+    .modal-inner-content a:hover {
+        background-color: rgb(var(--mauve) / 0.2);
+        color: rgb(var(--mauve));
+    }
+    @media (max-width: 815px) {
+        header {
+            height: 4rem;
+        }
+        header > h2 {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+        }
+        .mobile-menu {
+            display: flex;
+        }
+        .thema-toggle {
+            display: none;
+        }
+        .links {
+            display: none;
+        }
+        header > h2 {
+            margin: 0;
+        }
+        header > h2 > a {
+            font-size: 1.2rem;
+            padding: 0;
+        }
+        nav > a {
+            font-size: 1rem;
+            padding: 0.2rem 0.8rem;
+        }
+    }
+</style>
