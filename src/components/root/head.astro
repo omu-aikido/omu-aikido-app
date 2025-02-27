@@ -17,6 +17,11 @@ const { title } = Astro.props;
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
+    <script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        async
+        defer
+    ></script>
     <script is:inline>
         // This code is inlined in the head to make dark mode instant & blocking.
         const getThemePreference = () => {
