@@ -86,10 +86,12 @@ function formatEventDate(event: CalendarEvent): string {
         const startDate = event.start.toLocaleString("ja-JP", {
             month: "long",
             day: "numeric",
+            timeZone: "Asia/Tokyo",
         });
         const endDate = event.end.toLocaleString("ja-JP", {
             month: "long",
             day: "numeric",
+            timeZone: "Asia/Tokyo",
         });
         return `${startDate} ~ ${endDate}`;
     } else {
@@ -100,12 +102,14 @@ function formatEventDate(event: CalendarEvent): string {
             hour: "numeric",
             minute: "numeric",
             hour12: false,
+            timeZone: "Asia/Tokyo",
         });
         const endTime =
             event.end?.toLocaleString("ja-JP", {
                 hour: "numeric",
                 minute: "numeric",
                 hour12: false,
+                timeZone: "Asia/Tokyo",
             }) || "";
         return `${startDate} ~ ${endTime}`;
     }
@@ -123,7 +127,11 @@ function groupEventsByMonth(
     events: CalendarEvent[]
 ): Record<string, CalendarEvent[]> {
     return events.reduce((groups: Record<string, CalendarEvent[]>, event) => {
-        const yearMonth = `${event.start.getFullYear()}年${event.start.getMonth() + 1}月`;
+        const date = new Date(event.start);
+        const yearMonth = `${date.toLocaleString("ja-JP", { year: "numeric", timeZone: "Asia/Tokyo" })}年${date.toLocaleString(
+            "ja-JP",
+            { month: "numeric", timeZone: "Asia/Tokyo" }
+        )}月`;
         if (!groups[yearMonth]) groups[yearMonth] = [];
         groups[yearMonth].push(event);
         return groups;
@@ -147,7 +155,7 @@ const groupedEvents = groupEventsByMonth(sortedEvents);
                 <h2 class="month-header">{yearMonth}</h2>
                 {monthEvents.map((event) => (
                     <div
-                        class={`event ${event.start.toDateString() === now.toDateString() ? "today" : ""} ${event.start <= now && (!event.end || event.end >= now) ? "ongoing" : ""}`}
+                        class={`event ${event.start.toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" }) === now.toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" }) ? "today" : ""} ${event.start <= now && (!event.end || event.end >= now) ? "ongoing" : ""}`}
                     >
                         <div
                             class={`event-title ${getEventClass(event.summary)}`}
