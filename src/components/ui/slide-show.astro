@@ -142,13 +142,22 @@ const uniqueId = `slideshow-${Math.random().toString(36).substring(2, 9)}`;
             height: 12px;
             border-radius: 50%;
             border: none;
-            background-color: rgb(var(--text) / 0.2);
             cursor: pointer;
             transition: background-color 0.3s;
+            padding: 0;
+            margin: 0;
+            display: block;
+            box-sizing: border-box;
+            flex-shrink: 0; /* 縮小しないように */
+            appearance: none;
+            -webkit-appearance: none;
+            outline: none;
+            background-color: rgb(var(--crust) / 0.3); /* 半透明の白 */
+            box-shadow: 0 2px 4px rgb(var(--shadow) / 0.4); /* 影を追加 */
         }
 
         .indicator.active {
-            background-color: rgb(var(--text) / 0.5);
+            background-color: rgb(var(--base) / 0.8); /* アクティブ時は濃い白 */
         }
 
         /* モバイル対応スタイル */
