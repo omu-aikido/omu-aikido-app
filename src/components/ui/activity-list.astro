@@ -55,36 +55,9 @@ function generatePageUrl(newPage: number, newSortOrder?: string): string {
     }
     return url.toString();
 }
-
-// ソート順切り替え用のURLを生成
-function generateSortUrl(newSortOrder: "asc" | "desc"): string {
-    const url = new URL(baseUrl || Astro.request.url);
-    url.searchParams.set("sort", newSortOrder);
-    url.searchParams.set("page", "1"); // ソート順変更時は1ページ目に戻す
-    return url.toString();
-}
 ---
 
-<hr />
 <div class="activity-list-container" id="activity-list-container">
-    <div class="sort-controls">
-        <span>並び順:</span>
-        <a
-            href={generateSortUrl("desc")}
-            class={`sort-btn ${sortOrder === "desc" ? "active" : ""}`}
-            data-sort="desc"
-        >
-            新しい順
-        </a>
-        <a
-            href={generateSortUrl("asc")}
-            class={`sort-btn ${sortOrder === "asc" ? "active" : ""}`}
-            data-sort="asc"
-        >
-            古い順
-        </a>
-    </div>
-
     <table>
         <thead>
             <tr>
@@ -141,6 +114,7 @@ function generateSortUrl(newSortOrder: "asc" | "desc"): string {
                         aria-disabled={safePage <= 1}
                         data-page={safePage - 1}
                         data-astro-prefetch="load"
+                        data-astro-history="replace"
                     >
                         前へ
                     </a>
@@ -150,6 +124,7 @@ function generateSortUrl(newSortOrder: "asc" | "desc"): string {
                         aria-disabled={safePage >= totalPages}
                         data-page={safePage + 1}
                         data-astro-prefetch="load"
+                        data-astro-history="replace"
                     >
                         次へ
                     </a>
@@ -206,27 +181,6 @@ function generateSortUrl(newSortOrder: "asc" | "desc"): string {
                 await refreshActivityList();
             });
         });
-
-        // 削除フォームのイベント処理を設定
-        const deleteForms = container.querySelectorAll(".delete-form");
-        deleteForms.forEach((form) => {
-            form.addEventListener("submit", async (event) => {
-                event.preventDefault();
-
-                if (!confirm("本当に削除しますか？")) return;
-
-                const formData = new FormData(form as HTMLFormElement);
-
-                // 削除リクエストを送信
-                await fetch(window.location.pathname, {
-                    method: "POST",
-                    body: formData,
-                });
-
-                // リストを再取得
-                await refreshActivityList();
-            });
-        });
     }
 
     async function refreshActivityList() {
@@ -272,17 +226,6 @@ function generateSortUrl(newSortOrder: "asc" | "desc"): string {
     .edit-btn:hover {
         background-color: rgb(var(--sapphire));
     }
-    .delete-btn {
-        margin-right: 8px;
-        padding: 6px 12px;
-        background-color: rgb(var(--red));
-        color: rgb(var(--crust));
-        text-decoration: none;
-        border-radius: 4px;
-    }
-    .delete-btn:hover {
-        background-color: rgb(var(--red) / 0.8);
-    }
 
     /* ページネーションのスタイル */
     .pagination {
@@ -316,32 +259,5 @@ function generateSortUrl(newSortOrder: "asc" | "desc"): string {
     .pagination-info {
         font-size: 0.9rem;
         color: rgb(var(--text));
-    }
-
-    .sort-controls {
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .sort-btn {
-        padding: 0.3rem 0.8rem;
-        background-color: rgb(var(--surface0));
-        color: rgb(var(--text));
-        text-decoration: none;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        border: 1px solid rgb(var(--overlay0));
-    }
-
-    .sort-btn.active {
-        background-color: rgb(var(--blue));
-        color: rgb(var(--crust));
-        font-weight: 500;
-    }
-
-    .sort-btn:hover:not(.active) {
-        background-color: rgb(var(--surface1));
     }
 </style>
