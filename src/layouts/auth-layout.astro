@@ -152,11 +152,14 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
         background-color: rgb(var(--surface0) / 0.3);
         backdrop-filter: blur(10px);
         transition: all 0.2s ease;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     .links:hover {
         border-color: rgb(var(--mauve) / 0.5);
-        transform: translateY(-2px);
+        transform: translate(-50%, -2px);
         box-shadow: 0 4px 12px -2px rgb(var(--mauve) / 0.15);
     }
 
