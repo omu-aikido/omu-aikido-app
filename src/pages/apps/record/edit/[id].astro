@@ -1,7 +1,16 @@
 ---
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
-import { getProfile } from "@/src/lib/query/profile";
-import { getActivity, updateActivity } from "@/src/lib/query/activity";
+import {
+    getActivity,
+    updateActivity,
+    deleteActivity,
+} from "@/src/lib/query/activity";
+
+const prePage = new URL(Astro.url).searchParams.get("page");
+
+const redirectTo = prePage
+    ? `/apps/record/list?page=${prePage}`
+    : "/apps/record/list";
 
 const user = await Astro.locals.currentUser();
 if (!user) {
@@ -10,31 +19,41 @@ if (!user) {
 
 const { id } = Astro.params;
 if (!id) {
-    return Astro.redirect("/apps/record/list");
+    return Astro.redirect(redirectTo);
 }
 let activityData = await getActivity({ id: id });
 if (!activityData) {
-    return Astro.redirect("/apps/record/list");
+    return Astro.redirect(redirectTo);
 }
 
 if (Astro.request.method === "POST") {
     const formData = await Astro.request.formData();
-    const date = formData.get("date") as string;
-    const period = formData.get("period") as unknown as number;
+    const action = formData.get("action") as string;
 
-    await updateActivity({
-        userId: user.id,
-        activityId: id,
-        activityData: {
-            date,
-            id: activityData.id,
-            userId: activityData.userId,
-            period,
-            createAt: activityData.createAt,
-            updatedAt: new Date().toISOString(),
-        },
-    });
-    return Astro.redirect("/apps/record/list");
+    if (action === "delete") {
+        await deleteActivity({
+            userId: user.id,
+            id: id,
+        });
+        return Astro.redirect(redirectTo);
+    } else {
+        const date = formData.get("date") as string;
+        const period = formData.get("period") as unknown as number;
+
+        await updateActivity({
+            userId: user.id,
+            activityId: id,
+            activityData: {
+                date,
+                id: activityData.id,
+                userId: activityData.userId,
+                period,
+                createAt: activityData.createAt,
+                updatedAt: new Date().toISOString(),
+            },
+        });
+        return Astro.redirect(redirectTo);
+    }
 }
 ---
 
@@ -58,9 +77,20 @@ if (Astro.request.method === "POST") {
             step="0.5"
             required
         />
+        <input type="hidden" name="action" value="update" />
         <button type="submit" class="submit-btn">更新</button>
     </form>
-    <a href="/apps/record/list" class="cancel-btn">キャンセル</a>
+
+    <form
+        method="POST"
+        id="deleteForm"
+        onsubmit="return confirm('このアクティビティを削除してもよろしいですか？');"
+    >
+        <input type="hidden" name="action" value="delete" />
+        <button type="submit" class="delete-btn">削除する</button>
+    </form>
+
+    <a href={redirectTo} class="cancel-btn">キャンセル</a>
 </Layout>
 <style>
     form {
@@ -80,10 +110,25 @@ if (Astro.request.method === "POST") {
     .submit-btn:hover {
         background-color: rgb(var(--green));
     }
+    .delete-btn {
+        padding: 8px 16px;
+        background-color: rgb(var(--red));
+        color: rgb(var(--crust));
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 1rem;
+    }
+    .delete-btn:hover {
+        background-color: rgb(var(--maroon));
+    }
     .cancel-btn {
         display: inline-block;
         margin-top: 1rem;
         color: rgb(var(--overlay1));
         text-decoration: none;
+    }
+    #deleteForm {
+        margin-top: 1rem;
     }
 </style>
