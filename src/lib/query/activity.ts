@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { db } from "@/src/lib/drizzle";
 import { activity } from "@/./db/schema";
-import { eq, gte, lte, and } from "drizzle-orm";
+import { eq, gte, lte, and, asc, desc } from "drizzle-orm";
 
 import * as uuid from "uuid";
 
@@ -80,6 +80,20 @@ export async function userActivity(input: {
                 lte(activity.date, end)
             )
         );
+
+    return activityData;
+}
+
+export async function resentlyActivity(input: {
+    userId: string;
+    limit: number;
+}) {
+    const activityData = await db
+        .select()
+        .from(activity)
+        .where(eq(activity.userId, input.userId))
+        .orderBy(desc(activity.createAt))
+        .limit(input.limit);
 
     return activityData;
 }

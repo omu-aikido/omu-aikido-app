@@ -1,32 +1,13 @@
 ---
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
-import { getProfile } from "@/src/lib/query/profile";
-import {
-    userActivity,
-    deleteActivity,
-    updateActivity,
-    createActivity,
-    inputActivity,
-} from "@/src/lib/query/activity";
-
-const user = await Astro.locals.currentUser();
-
-if (!user) {
-    return Astro.redirect("/sign-in");
-}
-
-// POSTリクエスト処理（削除アクション）
-if (Astro.request.method === "POST") {
-    const formData = await Astro.request.formData();
-    const deleteId = formData.get("deleteId") as string;
-    if (deleteId) {
-        await deleteActivity({ userId: user.id, id: deleteId });
-        return Astro.redirect(Astro.url.pathname);
-    }
-}
+import ActivityList from "@/src/components/ui/activity-list.astro";
+import ProgressCircle from "@/src/components/ui/progress-circle.astro";
 
 const startParam = Astro.url.searchParams.get("start");
 const endParam = Astro.url.searchParams.get("end");
+const pageParam = Astro.url.searchParams.get("page");
+const currentPage = pageParam ? parseInt(pageParam) : 1;
+
 // 追加: resetパラメータがあればクエリを削除してリダイレクト
 if (Astro.url.searchParams.get("reset")) {
     return Astro.redirect(Astro.url.pathname);
@@ -35,13 +16,16 @@ if (Astro.url.searchParams.get("reset")) {
 const startValue = startParam ? new Date(startParam) : undefined;
 const endValue = endParam ? new Date(endParam) : undefined;
 
-const activities = (
-    await userActivity({
-        userId: user.id,
-        start: startValue,
-        end: endValue,
-    })
-).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+// 現在のベースURLを取得
+const currentUrl = Astro.url.toString();
+const sortOrder = Astro.url.searchParams.get("sort") as "asc" | "desc";
+
+// ソート順切り替え用のURLを生成
+function generateSortUrl(newSortOrder: "asc" | "desc"): string {
+    Astro.url.searchParams.set("sort", newSortOrder);
+    Astro.url.searchParams.set("page", "1"); // ソート順変更時は1ページ目に戻す
+    return Astro.url.toString();
+}
 ---
 
 <Layout title="稽古記録 一覧">
@@ -63,6 +47,8 @@ const activities = (
             name="end"
             value={endValue ? endValue.toISOString().split("T")[0] : ""}
         />
+        <!-- フィルター適用時にはpage=1に戻す -->
+        <input type="hidden" name="page" value="1" />
         <!-- 変更: type="reset"からtype="submit"に変更しリセット用パラメータを送信 -->
         <button type="submit" name="reset" value="true" class="reset_button"
             >リセット</button
@@ -70,65 +56,69 @@ const activities = (
         <button type="submit" class="submit_button">フィルター</button>
     </form>
 
-    <table>
-        <thead>
-            <tr>
-                <th>日付</th>
-                <th>稽古時間</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            {
-                activities.length === 0 ? (
-                    <tr>
-                        <td>履歴はありません</td>
-                        <td>追加しましょう!</td>
-                        <td />
-                    </tr>
-                ) : (
-                    activities.map((activity) => (
-                        <tr>
-                            <td>
-                                {new Date(activity.date).toLocaleDateString(
-                                    "ja-JP"
-                                )}
-                            </td>
-                            <td>{activity.period}</td>
-                            <td>
-                                <button
-                                    type="button"
-                                    class="edit-btn"
-                                    onclick={`window.location.href='/apps/record/edit/${activity.id}'`}
-                                >
-                                    編集
-                                </button>
+    <hr />
 
-                                <form
-                                    method="POST"
-                                    style="display:inline-block;"
-                                >
-                                    <input
-                                        type="hidden"
-                                        name="deleteId"
-                                        value={activity.id}
-                                    />
-                                    <button
-                                        type="submit"
-                                        class="delete-btn"
-                                        onclick="return confirm('本当に削除しますか？');"
-                                    >
-                                        削除
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    ))
-                )
-            }
-        </tbody>
-    </table>
+    <div class="sort-controls">
+        <span>並び順:</span>
+        <a
+            href={generateSortUrl("desc")}
+            class={`sort-btn ${sortOrder === "desc" ? "active" : ""}`}
+            data-sort="desc"
+            data-astro-history="replace"
+        >
+            新しい順
+        </a>
+        <a
+            href={generateSortUrl("asc")}
+            class={`sort-btn ${sortOrder === "asc" ? "active" : ""}`}
+            data-sort="asc"
+            data-astro-history="replace"
+        >
+            古い順
+        </a>
+    </div>
+
+    <ActivityList
+        startDate={startValue}
+        endDate={endValue}
+        page={currentPage}
+        baseUrl={currentUrl}
+        server:defer
+    >
+        <div slot="fallback">
+            <table class="placeholder-table">
+                <thead>
+                    <tr>
+                        <th>日付</th>
+                        <th>稽古時間</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        Array.from({ length: 8 }).map((_, i) => (
+                            <tr>
+                                <td>
+                                    <span class="ph-text">&nbsp;</span>
+                                </td>
+                                <td>
+                                    <span class="ph-text">&nbsp;</span>
+                                </td>
+                                <td>
+                                    <span class="ph-text">&nbsp;</span>
+                                </td>
+                            </tr>
+                        ))
+                    }
+                </tbody>
+            </table>
+        </div>
+    </ActivityList>
+
+    <hr />
+    <a href="/apps/record" class="button">←稽古記録ホームに戻る</a>
 </Layout>
+
 <style>
     .filter-form {
         display: grid;
@@ -169,5 +159,60 @@ const activities = (
     }
     .delete-btn:hover {
         background-color: rgb(var(--red) / 0.8);
+    }
+
+    .sort-controls {
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sort-btn {
+        padding: 0.3rem 0.8rem;
+        background-color: rgb(var(--surface0));
+        color: rgb(var(--text));
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        border: 1px solid rgb(var(--overlay0));
+    }
+
+    .sort-btn.active {
+        background-color: rgb(var(--blue));
+        color: rgb(var(--crust));
+        font-weight: 500;
+    }
+
+    .sort-btn:hover:not(.active) {
+        background-color: rgb(var(--surface1));
+    }
+
+    /* プレースホルダーテーブルのスタイル */
+    .ph-text {
+        display: inline-block;
+        width: 100%;
+        margin: 8px 4px;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(
+            90deg,
+            rgba(var(--overlay0) / 0.1) 0%,
+            rgba(var(--overlay0) / 0.3) 50%,
+            rgba(var(--overlay0) / 0.1) 100%
+        );
+        background-size: 200% 100%;
+        animation: shimmering 2s infinite linear;
+        border-radius: 4px;
+        height: 1.2em;
+    }
+
+    @keyframes shimmering {
+        0% {
+            background-position: 100% 0;
+        }
+        100% {
+            background-position: -100% 0;
+        }
     }
 </style>

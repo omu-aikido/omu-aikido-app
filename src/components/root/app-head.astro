@@ -3,6 +3,7 @@ interface Props {
     title: string;
 }
 const { title } = Astro.props;
+import { ClientRouter } from "astro:transitions";
 ---
 
 <head>
@@ -15,6 +16,7 @@ const { title } = Astro.props;
     />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <ClientRouter fallback="swap" />
     <title>{title}</title>
     <script is:inline>
         // This code is inlined in the head to make dark mode instant & blocking.

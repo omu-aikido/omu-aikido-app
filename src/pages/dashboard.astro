@@ -1,18 +1,24 @@
 ---
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
-import { getProfile, getRole } from "@/src/lib/query/profile";
-import { createActivity, inputActivity } from "@/src/lib/query/activity";
+import { getRole } from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
 import NewsReader from "@/src/components/ui/news-reader.astro";
+import { createActivity, inputActivity } from "@/src/lib/query/activity";
 
-const user = await Astro.locals.currentUser();
+import Grid from "@/src/components/ui/grid.astro";
+import AppIcon from "@/src/components/ui/app-icon.astro";
+import { APPS } from "@/src/const";
+import AddRecord from "@/src/components/ui/add-record.astro";
 
-if (!user) {
-    return Astro.redirect("/sign-in");
-}
-const userProfile = await getProfile({ userId: user.id });
-if (userProfile instanceof Response) {
-    return userProfile;
+const userId = Astro.locals.auth().userId!;
+const role = (await getRole({ userId })) as Role;
+
+if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
+    APPS.push({
+        name: "管理者メニュー",
+        path: "/admin",
+        desc: "管理者メニューに移動します。",
+    });
 }
 
 if (Astro.request.method == "POST") {
@@ -23,34 +29,18 @@ if (Astro.request.method == "POST") {
 
     const actData: typeof inputActivity = {
         date: dataParsed,
-        id: user.id, // バックエンドで生成するのでなんでもいい
-        userId: user.id,
+        id: userId, // バックエンドで生成するのでなんでもいい
+        userId,
         period: period,
     };
     const result = await createActivity({
-        userId: user.id,
+        userId,
         activity: actData,
     });
 
-    if (result instanceof Error) {
-        return new Response(result.message, { status: 500 });
-    } else {
+    if (result.rowsAffected === 1) {
         return Astro.redirect("/apps/record");
     }
-}
-
-import Grid from "@/src/components/ui/grid.astro";
-import AppIcon from "@/src/components/ui/app-icon.astro";
-import { APPS } from "@/src/const";
-const role = await getRole({ userId: user.id }) as Role;
-
-
-if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
-    APPS.push({
-        name: "管理者メニュー",
-        path: "/admin",
-        desc: "管理者メニューに移動します。",
-    });
 }
 ---
 
@@ -59,34 +49,8 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
     <hr />
     <h2>追加</h2>
 
-    <form id="activity-form" class="activity-form" method="POST">
-        <label for="date">
-            日付
-            <span style="color:rgb(var(--maroon))">*</span>
-        </label>
-        <input
-            type="date"
-            id="date"
-            name="date"
-            value=`${(new Date()).toISOString().split('T')[0]}`
-            required
-        />
+    <AddRecord server:defer />
 
-        <label for="period">
-            稽古時間
-            <span style="color:rgb(var(--maroon))">*</span>
-        </label>
-        <input
-            type="number"
-            id="period"
-            name="period"
-            value="1.5"
-            step="0.5"
-            required
-        />
-        <br />
-        <button type="submit">追加</button>
-    </form>
     <hr />
     <Grid variant="offset">
         {
@@ -96,15 +60,3 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
         }
     </Grid>
 </Layout>
-
-<style>
-    .activity-form {
-        display: grid;
-        grid-template-columns: 100px 1fr;
-        gap: 1rem;
-        align-items: center;
-    }
-    .activity-form button {
-        grid-column: span 2;
-    }
-</style>
