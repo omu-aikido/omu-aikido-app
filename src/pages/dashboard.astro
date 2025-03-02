@@ -9,6 +9,7 @@ import Grid from "@/src/components/ui/grid.astro";
 import AppIcon from "@/src/components/ui/app-icon.astro";
 import { APPS } from "@/src/const";
 import AddRecord from "@/src/components/ui/add-record.astro";
+import PhAddRecord from "@/src/components/ui/ph-add-record.astro";
 
 const userId = Astro.locals.auth().userId!;
 const role = (await getRole({ userId })) as Role;
@@ -49,7 +50,9 @@ if (Astro.request.method == "POST") {
     <hr />
     <h2>追加</h2>
 
-    <AddRecord server:defer />
+    <AddRecord server:defer>
+        <PhAddRecord slot="fallback" />
+    </AddRecord>
 
     <hr />
     <Grid variant="offset">

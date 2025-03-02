@@ -8,6 +8,7 @@ import {
 } from "@/src/lib/query/activity";
 import { translateGrade, timeForNextGrade } from "@/src/utils";
 import AddRecord from "@/src/components/ui/add-record.astro";
+import PhAddRecord from "@/src/components/ui/ph-add-record.astro";
 
 const user = await Astro.locals.currentUser();
 
@@ -85,7 +86,9 @@ if (Astro.request.method == "POST") {
     <hr />
     <h2>追加</h2>
 
-    <AddRecord server:defer />
+    <AddRecord server:defer>
+        <PhAddRecord slot="fallback" />
+    </AddRecord>
 
     <hr />
     <h2>今月の稽古履歴</h2>
