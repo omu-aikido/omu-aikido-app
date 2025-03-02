@@ -1,19 +1,23 @@
 ---
 import { userActivity } from "@/src/lib/query/activity";
 
+const userId = Astro.locals.auth().userId!;
+
 // Props型定義
 interface Props {
-    userId: string;
     startDate?: Date;
     endDate?: Date;
     page?: number;
     baseUrl?: string; // 親からのURLを受け取るように追加
 }
-import { deleteActivity } from "@/src/lib/query/activity";
 
 // Props取得
-const { userId, startDate, endDate, page = 1, baseUrl } = Astro.props;
+const { startDate, endDate, page = 1, baseUrl } = Astro.props;
 const itemsPerPage = 8;
+
+const sortOrder = new URL(baseUrl || Astro.request.url).searchParams.get(
+    "sort"
+) as "asc" | "desc";
 
 // クエリから活動履歴を取得
 const allActivities = (
@@ -22,7 +26,12 @@ const allActivities = (
         start: startDate,
         end: endDate,
     })
-).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+).sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    // sortOrderに応じてソート方向を変更
+    return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+});
 
 // ページング計算
 const totalItems = allActivities.length;
@@ -33,15 +42,49 @@ const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
 const activities = allActivities.slice(startIndex, endIndex);
 
 // 現在のURLから新しいページのURLを生成する関数を修正
-function generatePageUrl(newPage: number): string {
+function generatePageUrl(newPage: number, newSortOrder?: string): string {
     // baseUrlが提供されている場合はそれを使用、なければ現在のリクエストURL
     const url = new URL(baseUrl || Astro.request.url);
     url.searchParams.set("page", newPage.toString());
+    // ソート順が指定された場合は更新
+    if (newSortOrder) {
+        url.searchParams.set("sort", newSortOrder);
+    } else {
+        // 現在のソート順を維持
+        url.searchParams.set("sort", sortOrder);
+    }
+    return url.toString();
+}
+
+// ソート順切り替え用のURLを生成
+function generateSortUrl(newSortOrder: "asc" | "desc"): string {
+    const url = new URL(baseUrl || Astro.request.url);
+    url.searchParams.set("sort", newSortOrder);
+    url.searchParams.set("page", "1"); // ソート順変更時は1ページ目に戻す
     return url.toString();
 }
 ---
 
+<hr />
 <div class="activity-list-container" id="activity-list-container">
+    <div class="sort-controls">
+        <span>並び順:</span>
+        <a
+            href={generateSortUrl("desc")}
+            class={`sort-btn ${sortOrder === "desc" ? "active" : ""}`}
+            data-sort="desc"
+        >
+            新しい順
+        </a>
+        <a
+            href={generateSortUrl("asc")}
+            class={`sort-btn ${sortOrder === "asc" ? "active" : ""}`}
+            data-sort="asc"
+        >
+            古い順
+        </a>
+    </div>
+
     <table>
         <thead>
             <tr>
@@ -71,7 +114,7 @@ function generatePageUrl(newPage: number): string {
                                 <button
                                     type="button"
                                     class="edit-btn"
-                                    onclick={`window.location.href='/apps/record/edit/${activity.id}?page=${safePage}'`}
+                                    onclick={`window.location.href='/apps/record/edit/${activity.id}?page=${safePage}&sort=${sortOrder}'`}
                                 >
                                     編集
                                 </button>
@@ -97,6 +140,7 @@ function generatePageUrl(newPage: number): string {
                         class={`page-btn prev-page ${safePage <= 1 ? "disabled" : ""}`}
                         aria-disabled={safePage <= 1}
                         data-page={safePage - 1}
+                        data-astro-prefetch="load"
                     >
                         前へ
                     </a>
@@ -105,6 +149,7 @@ function generatePageUrl(newPage: number): string {
                         class={`page-btn next-page ${safePage >= totalPages ? "disabled" : ""}`}
                         aria-disabled={safePage >= totalPages}
                         data-page={safePage + 1}
+                        data-astro-prefetch="load"
                     >
                         次へ
                     </a>
@@ -137,6 +182,27 @@ function generatePageUrl(newPage: number): string {
                 window.history.pushState({}, "", url.toString());
 
                 // フラグメントを使って再読み込み (Server Islands機能を使う)
+                await refreshActivityList();
+            });
+        });
+
+        // ソート順ボタンのイベント設定
+        const sortButtons = container.querySelectorAll(".sort-btn");
+        sortButtons.forEach((button) => {
+            button.addEventListener("click", async (event) => {
+                event.preventDefault();
+
+                const sortOrder = (event.currentTarget as HTMLAnchorElement)
+                    .dataset.sort;
+                if (!sortOrder) return;
+
+                // URLパラメータを更新
+                const url = new URL(window.location.href);
+                url.searchParams.set("sort", sortOrder);
+                url.searchParams.set("page", "1"); // ソート順変更時は1ページ目に戻す
+                window.history.pushState({}, "", url.toString());
+
+                // リストを再取得
                 await refreshActivityList();
             });
         });
@@ -250,5 +316,32 @@ function generatePageUrl(newPage: number): string {
     .pagination-info {
         font-size: 0.9rem;
         color: rgb(var(--text));
+    }
+
+    .sort-controls {
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sort-btn {
+        padding: 0.3rem 0.8rem;
+        background-color: rgb(var(--surface0));
+        color: rgb(var(--text));
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        border: 1px solid rgb(var(--overlay0));
+    }
+
+    .sort-btn.active {
+        background-color: rgb(var(--blue));
+        color: rgb(var(--crust));
+        font-weight: 500;
+    }
+
+    .sort-btn:hover:not(.active) {
+        background-color: rgb(var(--surface1));
     }
 </style>

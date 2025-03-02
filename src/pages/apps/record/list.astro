@@ -3,12 +3,6 @@ import { default as Layout } from "@/src/layouts/auth-layout.astro";
 import ActivityList from "@/src/components/ui/activity-list.astro";
 import ProgressCircle from "@/src/components/ui/progress-circle.astro";
 
-const user = await Astro.locals.currentUser();
-
-if (!user) {
-    return Astro.redirect("/sign-in");
-}
-
 const startParam = Astro.url.searchParams.get("start");
 const endParam = Astro.url.searchParams.get("end");
 const pageParam = Astro.url.searchParams.get("page");
@@ -55,7 +49,6 @@ const currentUrl = Astro.url.toString();
     </form>
 
     <ActivityList
-        userId={user.id}
         startDate={startValue}
         endDate={endValue}
         page={currentPage}
@@ -64,6 +57,9 @@ const currentUrl = Astro.url.toString();
     >
         <ProgressCircle title="loading" slot="fallback" />
     </ActivityList>
+
+    <hr />
+    <a href="/apps/record" class="button">←稽古記録ホームに戻る</a>
 </Layout>
 
 <style>
