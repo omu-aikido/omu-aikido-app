@@ -7,7 +7,7 @@ import {
     inputActivity,
 } from "@/src/lib/query/activity";
 import { translateGrade, timeForNextGrade } from "@/src/utils";
-import { getAllActivities } from "@/src/lib/query/activity";
+import AddRecord from "@/src/components/ui/add-record.astro";
 
 const user = await Astro.locals.currentUser();
 
@@ -22,10 +22,14 @@ if (userProfile instanceof Response) {
 const now = new Date();
 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-const activities = await userActivity({
+const activities = (
+    await userActivity({
     userId: user.id,
     start: startOfMonth,
     end: endOfMonth,
+    })
+).sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
 });
 const activityFromPreviousGrade = await userActivity({
     userId: user.id,
@@ -61,10 +65,10 @@ if (Astro.request.method == "POST") {
         activity: actData,
     });
 
-    if (result instanceof Error) {
-        return new Response(result.message, { status: 500 });
-    } else {
+    if (result.rowsAffected == 1) {
         return Astro.redirect("/apps/record");
+    } else {
+        console.log("failed");
     }
 }
 ---
@@ -81,34 +85,7 @@ if (Astro.request.method == "POST") {
     <hr />
     <h2>追加</h2>
 
-    <form id="activity-form" class="activity-form" method="POST">
-        <label for="date">
-            日付
-            <span style="color:rgb(var(--maroon))">*</span>
-        </label>
-        <input
-            type="date"
-            id="date"
-            name="date"
-            value=`${(new Date()).toISOString().split('T')[0]}`
-            required
-        />
-
-        <label for="period">
-            稽古時間
-            <span style="color:rgb(var(--maroon))">*</span>
-        </label>
-        <input
-            type="number"
-            id="period"
-            name="period"
-            value="1.5"
-            step="0.5"
-            required
-        />
-        <br />
-        <button type="submit">追加</button>
-    </form>
+    <AddRecord server:defer />
 
     <hr />
     <h2>稽古履歴</h2>
@@ -143,15 +120,3 @@ if (Astro.request.method == "POST") {
         </tbody>
     </table>
 </Layout>
-
-<style>
-    .activity-form {
-        display: grid;
-        grid-template-columns: 100px 1fr;
-        gap: 1rem;
-        align-items: center;
-    }
-    .activity-form button {
-        grid-column: span 2;
-    }
-</style>
