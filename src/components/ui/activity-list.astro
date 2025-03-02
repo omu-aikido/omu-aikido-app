@@ -1,0 +1,254 @@
+---
+import { userActivity } from "@/src/lib/query/activity";
+
+// Props型定義
+interface Props {
+    userId: string;
+    startDate?: Date;
+    endDate?: Date;
+    page?: number;
+    baseUrl?: string; // 親からのURLを受け取るように追加
+}
+import { deleteActivity } from "@/src/lib/query/activity";
+
+// Props取得
+const { userId, startDate, endDate, page = 1, baseUrl } = Astro.props;
+const itemsPerPage = 8;
+
+// クエリから活動履歴を取得
+const allActivities = (
+    await userActivity({
+        userId: userId,
+        start: startDate,
+        end: endDate,
+    })
+).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+// ページング計算
+const totalItems = allActivities.length;
+const totalPages = Math.ceil(totalItems / itemsPerPage);
+const safePage = Math.max(1, Math.min(page, Math.max(1, totalPages)));
+const startIndex = (safePage - 1) * itemsPerPage;
+const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+const activities = allActivities.slice(startIndex, endIndex);
+
+// 現在のURLから新しいページのURLを生成する関数を修正
+function generatePageUrl(newPage: number): string {
+    // baseUrlが提供されている場合はそれを使用、なければ現在のリクエストURL
+    const url = new URL(baseUrl || Astro.request.url);
+    url.searchParams.set("page", newPage.toString());
+    return url.toString();
+}
+---
+
+<div class="activity-list-container" id="activity-list-container">
+    <table>
+        <thead>
+            <tr>
+                <th>日付</th>
+                <th>稽古時間</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {
+                activities.length === 0 ? (
+                    <tr>
+                        <td>履歴はありません</td>
+                        <td>追加しましょう!</td>
+                        <td />
+                    </tr>
+                ) : (
+                    activities.map((activity) => (
+                        <tr>
+                            <td>
+                                {new Date(activity.date).toLocaleDateString(
+                                    "ja-JP"
+                                )}
+                            </td>
+                            <td>{activity.period}</td>
+                            <td>
+                                <button
+                                    type="button"
+                                    class="edit-btn"
+                                    onclick={`window.location.href='/apps/record/edit/${activity.id}?page=${safePage}'`}
+                                >
+                                    編集
+                                </button>
+                            </td>
+                        </tr>
+                    ))
+                )
+            }
+        </tbody>
+    </table>
+
+    <!-- ページネーションUI -->
+    {
+        totalPages > 1 && (
+            <div class="pagination">
+                <div class="pagination-info">
+                    {totalItems}件中 {startIndex + 1}-{endIndex}件表示 (
+                    {safePage}/{totalPages}ページ)
+                </div>
+                <div class="pagination-controls">
+                    <a
+                        href={generatePageUrl(safePage - 1)}
+                        class={`page-btn prev-page ${safePage <= 1 ? "disabled" : ""}`}
+                        aria-disabled={safePage <= 1}
+                        data-page={safePage - 1}
+                    >
+                        前へ
+                    </a>
+                    <a
+                        href={generatePageUrl(safePage + 1)}
+                        class={`page-btn next-page ${safePage >= totalPages ? "disabled" : ""}`}
+                        aria-disabled={safePage >= totalPages}
+                        data-page={safePage + 1}
+                    >
+                        次へ
+                    </a>
+                </div>
+            </div>
+        )
+    }
+</div>
+
+<script>
+    function initPagination() {
+        const container = document.getElementById("activity-list-container");
+        if (!container) return;
+
+        // ページングボタンのイベント設定
+        const pageButtons = container.querySelectorAll(
+            ".page-btn:not(.disabled)"
+        );
+        pageButtons.forEach((button) => {
+            button.addEventListener("click", async (event) => {
+                event.preventDefault();
+
+                const pageNum = (event.currentTarget as HTMLAnchorElement)
+                    .dataset.page;
+                if (!pageNum) return;
+
+                // URLパラメータを更新（履歴も更新される）
+                const url = new URL(window.location.href);
+                url.searchParams.set("page", pageNum);
+                window.history.pushState({}, "", url.toString());
+
+                // フラグメントを使って再読み込み (Server Islands機能を使う)
+                await refreshActivityList();
+            });
+        });
+
+        // 削除フォームのイベント処理を設定
+        const deleteForms = container.querySelectorAll(".delete-form");
+        deleteForms.forEach((form) => {
+            form.addEventListener("submit", async (event) => {
+                event.preventDefault();
+
+                if (!confirm("本当に削除しますか？")) return;
+
+                const formData = new FormData(form as HTMLFormElement);
+
+                // 削除リクエストを送信
+                await fetch(window.location.pathname, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                // リストを再取得
+                await refreshActivityList();
+            });
+        });
+    }
+
+    async function refreshActivityList() {
+        try {
+            // 現在のURLからHTMLフラグメントを取得して更新
+            const response = await fetch(window.location.href);
+            const html = await response.text();
+
+            // レスポンスからactivity-listコンテナ部分だけを抽出
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const newContent = doc.getElementById("activity-list-container");
+
+            if (newContent) {
+                const currentContainer = document.getElementById(
+                    "activity-list-container"
+                );
+                if (currentContainer) {
+                    currentContainer.innerHTML = newContent.innerHTML;
+                    // 新しく追加された要素にイベントリスナーを設定
+                    initPagination();
+                }
+            }
+        } catch (error) {
+            console.error("リストの更新に失敗しました:", error);
+        }
+    }
+
+    // 初期化
+    document.addEventListener("DOMContentLoaded", initPagination);
+    document.addEventListener("astro:after-swap", initPagination);
+</script>
+
+<style>
+    .edit-btn {
+        margin-right: 8px;
+        padding: 6px 12px;
+        background-color: rgb(var(--blue));
+        color: rgb(var(--crust));
+        text-decoration: none;
+        border-radius: 4px;
+    }
+    .edit-btn:hover {
+        background-color: rgb(var(--sapphire));
+    }
+    .delete-btn {
+        margin-right: 8px;
+        padding: 6px 12px;
+        background-color: rgb(var(--red));
+        color: rgb(var(--crust));
+        text-decoration: none;
+        border-radius: 4px;
+    }
+    .delete-btn:hover {
+        background-color: rgb(var(--red) / 0.8);
+    }
+
+    /* ページネーションのスタイル */
+    .pagination {
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    .pagination-controls {
+        display: flex;
+        gap: 1rem;
+    }
+    .page-btn {
+        padding: 0.5rem 1.5rem;
+        background-color: rgb(var(--blue));
+        color: rgb(var(--crust));
+        text-decoration: none;
+        border-radius: 4px;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .page-btn:hover:not(.disabled) {
+        background-color: rgb(var(--sapphire));
+    }
+    .page-btn.disabled {
+        background-color: rgb(var(--overlay0));
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    .pagination-info {
+        font-size: 0.9rem;
+        color: rgb(var(--text));
+    }
+</style>
