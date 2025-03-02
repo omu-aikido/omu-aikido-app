@@ -24,9 +24,9 @@ const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 const activities = (
     await userActivity({
-    userId: user.id,
-    start: startOfMonth,
-    end: endOfMonth,
+        userId: user.id,
+        start: startOfMonth,
+        end: endOfMonth,
     })
 ).sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -88,7 +88,7 @@ if (Astro.request.method == "POST") {
     <AddRecord server:defer />
 
     <hr />
-    <h2>稽古履歴</h2>
+    <h2>今月の稽古履歴</h2>
     <a href="/apps/record/list">全ての稽古履歴</a>
     <table>
         <thead>
