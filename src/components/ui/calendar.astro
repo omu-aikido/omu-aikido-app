@@ -86,11 +86,13 @@ function formatEventDate(event: CalendarEvent): string {
         const startDate = event.start.toLocaleString("ja-JP", {
             month: "long",
             day: "numeric",
+            weekday: "short",
             timeZone: "Asia/Tokyo",
         });
         const endDate = event.end.toLocaleString("ja-JP", {
             month: "long",
             day: "numeric",
+            weekday: "short",
             timeZone: "Asia/Tokyo",
         });
         return `${startDate} ~ ${endDate}`;
@@ -99,6 +101,7 @@ function formatEventDate(event: CalendarEvent): string {
         const startDate = event.start.toLocaleString("ja-JP", {
             month: "long",
             day: "numeric",
+            weekday: "short",
             hour: "numeric",
             minute: "numeric",
             hour12: false,
