@@ -3,6 +3,8 @@ import { defineConfig } from "astro/config";
 
 import cloudflare from "@astrojs/cloudflare";
 
+import partytown from "@astrojs/partytown";
+
 import clerk from "@clerk/astro";
 import { jaJP } from "@clerk/localizations";
 import sitemap from "@astrojs/sitemap";
@@ -26,6 +28,7 @@ export default defineConfig({
             localization: jaJP,
         }),
         sitemap(),
+        partytown(),
     ],
 
     redirects: {
