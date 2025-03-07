@@ -21,6 +21,7 @@ import { ClientRouter } from "astro:transitions";
     <ClientRouter fallback="swap" />
     <title>{title}</title>
     <script
+        type="text/partytown"
         src="https://challenges.cloudflare.com/turnstile/v0/api.js"
         async
         defer></script>
@@ -69,8 +70,10 @@ import { ClientRouter } from "astro:transitions";
 </head>
 
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FFYSPH0R87"
-></script>
+<script
+    type="text/partytown"
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-FFYSPH0R87"></script>
 <script lang="js">
     window.dataLayer = window.dataLayer || [];
     function gtag() {
