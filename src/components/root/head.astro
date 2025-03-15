@@ -12,19 +12,13 @@ import { ClientRouter } from "astro:transitions";
     <meta name="generator" content={Astro.generator} />
     <meta
         name="description"
-        content="大阪公立大学で活動する天之武産合氣塾道場傘下の合気道部です。中百舌鳥キャンパスと杉本キャンパスの両方で、見学や体験を随時受け付けています。詳細な活動場所、日程、イベント情報をこちらでご確認ください！"
+        content="大阪公立大学合気道部のポータルサイトです。"
     />
-    <meta name="keywords" content="大阪公立大学, 天之武産合氣塾, 合気道部" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <link rel="canonical" href="https://omu-aikido.com" />
+    <link rel="canonical" href="https://app.omu-aikido.com" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <ClientRouter fallback="swap" />
     <title>{title}</title>
-    <script
-        type="text/partytown"
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-        async
-        defer></script>
     <script is:inline>
         // This code is inlined in the head to make dark mode instant & blocking.
         const getThemePreference = () => {
@@ -68,21 +62,6 @@ import { ClientRouter } from "astro:transitions";
         applyTheme();
     </script>
 </head>
-
-<!-- Google tag (gtag.js) -->
-<script
-    type="text/partytown"
-    async
-    src="https://www.googletagmanager.com/gtag/js?id=G-FFYSPH0R87"></script>
-<script lang="js">
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {
-        dataLayer.push(arguments);
-    }
-    gtag("js", new Date());
-
-    gtag("config", "G-FFYSPH0R87");
-</script>
 
 <style>
     body {
