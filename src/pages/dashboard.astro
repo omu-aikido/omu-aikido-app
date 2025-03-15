@@ -24,7 +24,7 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
 
 if (Astro.request.method == "POST") {
     let data = await Astro.request.formData();
-    let date = (data.get("date") as unknown as Date).setUTCHours(9, 0, 0, 0);
+    let date = data.get("date") as unknown as Date;
     let dataParsed = new Date(date).toISOString().split("T")[0];
     let period = data.get("period") as unknown as number;
 
