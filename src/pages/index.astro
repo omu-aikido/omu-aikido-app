@@ -1,7 +1,11 @@
 ---
 import { default as Layout } from "@/src/layouts/non-auth-layout.astro";
-import { Waitlist } from "@clerk/astro/components";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/astro/components";
+import {
+    SignedIn,
+    SignedOut,
+    SignInButton,
+    SignUpButton,
+} from "@clerk/astro/components";
 const user = await Astro.locals.currentUser();
 
 if (user) {
@@ -16,7 +20,11 @@ if (user) {
         <a href="/dashboard">ダッシュボードへ</a>
     </SignedIn>
     <SignedOut>
+        <p>ログインする</p>
         <SignInButton />
-        <Waitlist />
+        <p>
+            アカウントをお持ちでない方は、以下のボタンから新規登録してください。
+        </p>
+        <SignUpButton />
     </SignedOut>
 </Layout>
