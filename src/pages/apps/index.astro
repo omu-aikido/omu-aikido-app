@@ -1,0 +1,34 @@
+---
+import { default as Layout } from "@/src/layouts/auth-layout.astro";
+import Grid from "@/src/components/ui/grid.astro";
+import AppIcon from "@/src/components/ui/app-icon.astro";
+import { APPS } from "@/src/const";
+import { getRole } from "@/src/lib/query/profile";
+import { Role } from "@/src/class";
+const user = await Astro.locals.currentUser();
+
+if (!user) {
+    return Astro.redirect("/sign-in");
+}
+
+const role = (await getRole({ userId: user.id })) as Role;
+
+if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
+    APPS.push({
+        name: "管理者メニュー",
+        path: "/admin",
+        desc: "管理者メニューに移動します。",
+    });
+}
+---
+
+<Layout title="アプリ一覧">
+    <h1>アプリ</h1>
+    <Grid variant="offset">
+        {
+            APPS.map((app) => (
+                <AppIcon title={app.name} id={app.path} desc={app.desc} />
+            ))
+        }
+    </Grid>
+</Layout>

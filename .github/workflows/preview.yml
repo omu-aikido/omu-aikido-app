@@ -1,0 +1,41 @@
+name: Preview on Cloudflare Pages
+
+on:
+  push:
+    branches: [preview]
+
+jobs:
+    deploy:
+        if: github.event.pull_request.merged != true
+        runs-on: ubuntu-latest
+        environment: preview
+        name: Deploy
+        permissions:
+            contents: read
+            deployments: write
+        steps:
+            - name: Checkout your repository using git
+              uses: actions/checkout@v4
+            - name: Set up Node 22.13.0
+              uses: actions/setup-node@v2
+              with:
+                  node-version: "22.13.0"
+            - name: Install dependencies
+              run: npm install
+            - name: Add .env variables
+              run: |
+                  echo "" > .env
+                  echo "PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.PUBLIC_CLERK_PUBLISHABLE_KEY }}" >> .env
+                  echo "CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}" >> .env
+                  echo "TURSO_DATABASE_URL=${{ secrets.TURSO_DATABASE_URL }}" >> .env
+                  echo "TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}" >> .env
+                  cp .env .dev.vars
+            - name: Build
+              run: npm run build --remote
+            - name: Deploy
+              uses: cloudflare/wrangler-action@v3
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  command: |
+                      pages deploy dist --project-name=omu-aikido-app --branch=preview

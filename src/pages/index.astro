@@ -1,0 +1,30 @@
+---
+import { default as Layout } from "@/src/layouts/non-auth-layout.astro";
+import {
+    SignedIn,
+    SignedOut,
+    SignInButton,
+    SignUpButton,
+} from "@clerk/astro/components";
+const user = await Astro.locals.currentUser();
+
+if (user) {
+    return Astro.redirect("/dashboard");
+}
+---
+
+<Layout title="活動管理アプリ">
+    <h1>大阪公立大学合氣道部 活動管理アプリ</h1>
+    <hr />
+    <SignedIn>
+        <a href="/dashboard">ダッシュボードへ</a>
+    </SignedIn>
+    <SignedOut>
+        <p>ログインする</p>
+        <SignInButton />
+        <p>
+            アカウントをお持ちでない方は、以下のボタンから新規登録してください。
+        </p>
+        <SignUpButton />
+    </SignedOut>
+</Layout>

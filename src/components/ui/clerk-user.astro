@@ -1,0 +1,117 @@
+---
+interface Props {
+    query: string;
+}
+
+const { query } = Astro.props;
+
+import type { Account } from "@/src/type";
+import { listUser, searchAccounts } from "@/src/lib/query/admin/clerk";
+import { getRole } from "@/src/lib/query/profile";
+import { Role } from "@/src/class";
+
+import { translateYear, translateGrade } from "@/src/utils";
+
+const user = await Astro.locals.currentUser();
+if (!user) {
+    return Astro.redirect("/sign-in");
+}
+const role = await getRole({ userId: user.id });
+if (!role || !role.isManagement()) {
+    return Astro.redirect("/dashboard");
+}
+
+const found = await searchAccounts({
+    query: query,
+});
+
+const users = await listUser();
+---
+
+{
+    found
+        ? found
+              .sort(
+                  // SORT by Role
+                  (a: Account, b: Account) => {
+                      return Role.compare(
+                          a.public_metadata.role,
+                          b.public_metadata.role
+                      );
+                  }
+              )
+              .map((user: Account) => (
+                  <div class="account_prof">
+                      <img src={user.image_url} alt="" />
+                      <p>{Role.fromString(user.public_metadata.role)?.ja}</p>
+                      <p>
+                          {user.last_name} {user.first_name}
+                      </p>
+                      <p>{translateYear(user.public_metadata.year)}</p>
+                      <p>
+                          {translateGrade(
+                              user.public_metadata.grade as unknown as number
+                          )}
+                      </p>
+                      <a href={`/admin/account/${user.id}`}>編集</a>
+                  </div>
+              ))
+        : users
+              .sort(
+                  // SORT by Role
+                  (a: Account, b: Account) => {
+                      return Role.compare(
+                          a.public_metadata.role,
+                          b.public_metadata.role
+                      );
+                  }
+              )
+              .map((user: Account) => (
+                  <div class="account_prof">
+                      <img src={user.image_url} alt="" />
+                      <p>{Role.fromString(user.public_metadata.role)?.ja}</p>
+                      <p>
+                          {user.last_name} {user.first_name}
+                      </p>
+                      <p>{translateYear(user.public_metadata.year)}</p>
+                      <p>
+                          {translateGrade(
+                              user.public_metadata.grade as unknown as number
+                          )}
+                      </p>
+                      <a href={`/admin/account/${user.id}`}>編集</a>
+                  </div>
+              ))
+}
+
+<style>
+    .account_prof {
+        /* Display account row like an Excel table row */
+        display: grid;
+        align-items: center;
+        grid-template-columns: 3rem 1fr 2fr 1fr 1fr 1fr;
+        padding: 0.5rem 1rem;
+        margin-top: 0.3rem;
+        border-bottom: 1px solid rgb(var(--shadow));
+        transition:
+            background 0.3s ease,
+            transform 0.15s ease;
+        border-radius: 0.3em;
+    }
+
+    .account_prof:hover {
+        background: rgb(var(--crust) / 0.5);
+        border: 1px solid rgb(var(--shadow));
+        transform: translateY(-0.2rem);
+    }
+
+    .account_prof img {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+    }
+
+    a {
+        margin-bottom: 0;
+    }
+</style>

@@ -1,0 +1,137 @@
+---
+interface Props {
+    apps: { name: string; path: string; desc: string }[];
+}
+
+const { apps } = Astro.props;
+
+import Modal from "./modal.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+
+import {
+    SignedIn,
+    SignedOut,
+    UserButton,
+    SignInButton,
+} from "@clerk/astro/components";
+---
+
+<Modal position="right" icon="  ⵗ  ">
+    <div class="account_prof">
+        <SignedOut>
+            <SignInButton mode="modal" style="display: flex" />
+        </SignedOut>
+        <SignedIn>
+            <div class="account_prof_name">
+                <UserButton showName={true}>
+                    <UserButton.MenuItems>
+                        <UserButton.Link label="詳細設定" href="/account">
+                            <svg
+                                slot="label-icon"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 512 512"
+                                fill="currentColor"
+                            >
+                                <path
+                                    d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"
+                                ></path>
+                            </svg>
+                        </UserButton.Link>
+                    </UserButton.MenuItems>
+                </UserButton>
+            </div>
+            <hr />
+            {
+                apps.map((app) => (
+                    <div class="account_button, link">
+                        <a href={app.path}>{app.name}</a>
+                    </div>
+                ))
+            }
+        </SignedIn>
+        <hr />
+
+        <div
+            style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; align-content: center;"
+        >
+            <span>ダークモード</span>
+            <ThemeToggle />
+        </div>
+    </div>
+
+    <style>
+        a,
+        p,
+        span {
+            user-select: none;
+        }
+        .account_prof {
+            margin: 0;
+            padding: 0;
+        }
+
+        .account_prof_name {
+            border-radius: 8px;
+            user-select: none;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .account_prof_name span {
+            font-weight: bold;
+        }
+
+        div {
+            padding: 0.5rem;
+            border-radius: 8px;
+            user-select: none;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        div a {
+            border: none;
+            background-color: transparent;
+            color: rgb(var(--text));
+            transition: all 0.2s ease;
+            margin: 0;
+            padding: 0;
+            display: block; /* Make the link a block element */
+            width: 100%; /* Ensure it takes the full width */
+            user-select: none;
+        }
+
+        div .link:hover {
+            background-color: rgb(var(--overlay0) / 0.6);
+            cursor: pointer;
+        }
+
+        div .account_prof_name:hover {
+            background-color: rgb(var(--overlay0) / 0.6);
+            cursor: pointer;
+        }
+
+        .account_prof_name {
+            position: relative;
+        }
+
+        .account_prof_name button.cl-userButtonTrigger.cl-button {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+        }
+
+        div p {
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            padding: 0.2rem;
+            border-radius: 8px;
+        }
+    </style>
+</Modal>

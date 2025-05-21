@@ -1,0 +1,36 @@
+
+# build output
+**/dist/
+
+# generated types
+**/.astro/
+**/.xata/
+**/.xatarc
+**/drizzle/
+**/.wrangler/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables
+.env
+.env.production
+.env.development
+.dev.vars
+.dev.vars.development
+.dev.vars.production
+
+# macOS-specific files
+.DS_Store
+
+# Turso dev files
+dump.sql
+local.db
+local.db-shm
+local.db-wal

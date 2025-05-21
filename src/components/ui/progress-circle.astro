@@ -1,0 +1,145 @@
+---
+interface Props {
+    title: string;
+    inline?: string;
+}
+
+const { title } = Astro.props;
+const inline = Astro.props.inline === "true";
+---
+
+<div class={inline ? "inline" : "overlay"}>
+    <div class="center">
+        <h1>
+            {title}<span class="dots"
+                ><span>.</span><span>.</span><span>.</span></span
+            >
+        </h1>
+        <div class="progress-circle"></div>
+    </div>
+</div>
+
+<style>
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgb(var(--base) / 0.3);
+        backdrop-filter: blur(1.2px);
+        z-index: 1000;
+        pointer-events: all;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        margin: 1rem;
+    }
+
+    .inline {
+        position: relative;
+        background-color: transparent;
+        backdrop-filter: none;
+        z-index: auto;
+        pointer-events: none;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+        margin: 0;
+    }
+
+    .center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .overlay .center {
+        height: 100vh;
+    }
+
+    .inline .center {
+        height: auto;
+    }
+
+    .center h1 {
+        font-size: 2rem;
+        color: rgb(var(--sapphire));
+        margin-bottom: 1rem;
+    }
+
+    @media screen and (max-width: 815px) {
+        .center h1 {
+            font-size: 1.5rem;
+        }
+        .progress-circle {
+            width: 40px;
+            height: 40px;
+            border-width: 4px;
+        }
+        .overlay {
+            padding: 0.5rem;
+            margin: 0.5rem;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .center h1 {
+            font-size: 1.2rem;
+        }
+        .progress-circle {
+            width: 30px;
+            height: 30px;
+            border-width: 3px;
+        }
+    }
+
+    .progress-circle {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgb(var(--text) / 0.2);
+        border-radius: 50%;
+        border-top-color: rgb(var(--sapphire));
+        animation: spin 0.9s ease-in-out infinite;
+    }
+
+    .dots span {
+        display: inline-block;
+        animation: bounce 1.2s infinite;
+    }
+
+    .dots span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .dots span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes bounce {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        20% {
+            transform: translateY(-0.25em);
+        }
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+</style>

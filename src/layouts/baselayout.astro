@@ -1,0 +1,384 @@
+---
+import "../styles/global.css";
+---
+
+<html lang="ja">
+    <slot />
+</html>
+
+<style is:global>
+    html {
+        background-color: rgb(var(--base));
+        color: rgb(var(--text));
+        font-family: "Inter", sans-serif;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+        user-select: none;
+    }
+    body {
+        /* display: flex; */
+        flex-direction: column;
+        min-height: 100vh;
+        line-height: 1.6;
+    }
+
+    main {
+        flex: 1;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .container {
+        max-width: 1000px;
+        min-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
+        min-height: 85vh;
+        margin-top: 3rem;
+    }
+    hr {
+        display: block;
+
+        margin-block: 1.5em;
+        margin-inline: auto;
+        border: none;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgb(var(--overlay0) / 0.7),
+            transparent
+        );
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    a {
+        margin: 0;
+        padding: 0;
+    }
+    h1 {
+        font-size: 2rem;
+        margin-top: 1.5rem;
+    }
+    h2 {
+        font-size: 1.75rem;
+        margin-top: 1.25rem;
+    }
+    h3 {
+        font-size: 1.5rem;
+        margin-top: 1rem;
+        color: rgb(var(--mauve));
+    }
+    h4,
+    h5,
+    h6 {
+        font-size: 1.25rem;
+        margin-top: 0.75rem;
+        color: rgb(var(--text));
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+
+    p {
+        margin-block: 0.75rem;
+        line-height: 1.8;
+    }
+    a {
+        color: rgb(var(--blue));
+        text-decoration: none;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    a:visited {
+        color: rgb(var(--green));
+    }
+    a:hover {
+        color: rgb(var(--sapphire));
+        text-decoration: none;
+    }
+
+    pre {
+        background-color: rgb(var(--mantle));
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        overflow-x: auto;
+        box-shadow: 0 4px 6px rgb(var(--shadow) / 0.1);
+        margin: 1.5rem 0;
+    }
+    code {
+        font-family: "Fira Code", monospace;
+        font-size: 0.95rem;
+        color: rgb(var(--text));
+    }
+
+    blockquote {
+        margin: 1.5rem 0;
+        padding: 1rem 1.5rem;
+        border-left: 4px solid rgb(var(--blue));
+        background-color: rgb(var(--surface0) / 0.5);
+        border-radius: 0 0.5rem 0.5rem 0;
+    }
+
+    ul {
+        margin: 0.75rem 0 0.75rem 1.5rem;
+        padding-left: 1rem;
+    }
+    li {
+        margin: 0.5rem 0;
+    }
+
+    table {
+        border-collapse: collapse;
+        padding: 0 0.5rem;
+        width: 100%;
+        margin: 1.5rem auto;
+        background-color: rgb(var(--surface0) / 0.5);
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    th,
+    td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid rgb(var(--border) / 0.5);
+    }
+
+    th {
+        background-color: rgb(var(--surface1));
+        font-weight: 600;
+    }
+
+    tr:hover {
+        background-color: rgb(var(--surface1) / 0.5);
+    }
+
+    input,
+    select {
+        border: 2px solid rgb(var(--border));
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        margin: 0 0 0.5rem 0;
+        background-color: rgb(var(--surface0));
+        color: rgb(var(--text));
+        transition: all 0.2s ease;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
+    select:hover {
+        cursor: pointer;
+    }
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: rgb(var(--blue));
+        box-shadow: 0 0 0 3px rgb(var(--blue) / 0.2);
+    }
+    button {
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        margin: 0.5rem 0;
+        background-color: rgb(var(--blue));
+        color: rgb(var(--base));
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
+    }
+    button:hover {
+        background-color: rgb(var(--sapphire));
+        transform: translateY(-1px);
+    }
+    button:active {
+        transform: translateY(0);
+    }
+
+    ::selection {
+        background-color: rgb(var(--blue) / 0.2);
+        color: rgb(var(--text));
+    }
+
+    @media (max-width: 815px) {
+        th,
+        td {
+            font-size: 0.9em;
+            padding: 1em 0.75em;
+        }
+
+        table {
+            width: -webkit-fill-available;
+        }
+
+        .container {
+            min-width: min-content;
+            max-width: none;
+            margin: 2rem 1rem;
+            padding: 0;
+            min-height: 85vh;
+            margin-top: 3rem;
+        }
+    }
+</style>
+
+<style is:global>
+    .cl-userButtonBox {
+        box-sizing: border-box;
+        box-sizing: border-box;
+        display: flex;
+        flex-flow: row;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: start;
+        justify-content: flex-start;
+        gap: 0.5rem;
+        flex-direction: row-reverse;
+        -moz-box-align: center;
+        gap: 0.5rem;
+    }
+
+    .cl-userButtonTrigger.cl-button {
+        background-color: transparent;
+        width: 18rem;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    button.cl-button:hover,
+    button.cl-button:focus {
+        background-color: transparent;
+        box-shadow: none;
+    }
+
+    .cl-userButtonPopoverCard .cl-popoverBox .cl-userButton-popover {
+        color: rgb(var(--text));
+        background-color: rgb(var(--surface0));
+    }
+
+    .cl-userButtonPopoverMain,
+    .cl-userButtonPopoverFooter,
+    .cl-input {
+        color: rgb(var(--text));
+        background: none;
+        background-color: rgb(var(--surface0));
+    }
+
+    .cl-headerTitle,
+    .cl-userButtonOuterIdentifier {
+        color: rgb(var(--text));
+    }
+    .cl-profilePage label,
+    .cl-formFieldLabel {
+        color: rgb(var(--subtext1));
+    }
+    .cl-headerSubtitle,
+    .cl-footerActionText,
+    .cl-userButtonPopoverActionButton,
+    button.cl-userButtonPopoverCustomItemButton.cl-button.cl-userButtonPopoverCustomItemButton__custom-menutItem-0.cl-button__custom-menutItem-0 {
+        color: rgb(var(--overlay2));
+    }
+    .cl-userButtonPopoverActionButton.cl-button:hover,
+    button.cl-userButtonPopoverCustomItemButton.cl-button.cl-userButtonPopoverCustomItemButton__custom-menutItem-0.cl-button__custom-menutItem-0:hover {
+        background-color: rgb(var(--surface1) / 0.5);
+        color: rgb(var(--text));
+    }
+    .cl-formButtonPrimary.cl-button::after {
+        background: var(--gradient);
+    }
+    .cl-formButtonPrimary.cl-button:hover {
+        background: linear-gradient(
+            to right,
+            rgb(var(--sky)),
+            rgb(var(--teal))
+        );
+        transition: var(--transition);
+    }
+    .cl-card,
+    .cl-scrollBox,
+    .cl-footer {
+        background: none;
+        background-color: rgb(var(--base));
+    }
+
+    .cl-navbar {
+        background: none;
+        background-color: rgb(var(--mantle));
+        color: rgb(var(--text));
+    }
+    .cl-navbarMobileMenuRow,
+    .cl-navbarMobileMenuButton.cl-button,
+    .cl-actionCard {
+        background: none;
+        background-color: rgb(var(--surface0));
+        color: rgb(var(--text));
+    }
+
+    .cl-avatarImageActionsUpload.cl-button {
+        color: rgb(var(--text));
+        background-color: rgb(var(--surface2));
+    }
+
+    .cl-footerActionLink,
+    button.cl-menuButton,
+    .cl-profileSectionPrimaryButton.cl-button {
+        color: rgb(var(--sky));
+    }
+
+    .cl-cardBox h1 {
+        color: rgb(var(--text));
+    }
+
+    .cl-cardBox p,
+    .cl-userPreview span {
+        color: rgb(var(--subtext1));
+    }
+    .cl-badge {
+        background-color: rgb(var(--peach));
+        color: rgb(var(--crust));
+    }
+
+    .cl-navbar button {
+        color: rgb(var(--text));
+    }
+
+    .cl-formButtonReset.cl-button {
+        color: rgb(var(--text));
+        background-color: rgb(var(--surface2));
+    }
+    .cl-formButtonReset.cl-button:hover {
+        box-shadow: 0 0 0 2px rgb(var(--sky) / 0.4);
+    }
+
+    .cl-menuList.cl-menuList__connectedAccounts {
+        background-color: rgb(var(--surface0));
+    }
+    .cl-menuButton.cl-button.cl-menuButton__connectedAccounts.cl-button__connectedAccounts {
+        color: rgb(var(--text));
+    }
+</style>

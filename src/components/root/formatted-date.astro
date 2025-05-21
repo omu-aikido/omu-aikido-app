@@ -1,0 +1,28 @@
+---
+interface Props {
+    date: any;
+}
+
+const { date } = Astro.props;
+
+const parsedDate = (() => {
+    if (date instanceof Date) return date;
+    if (typeof date === "number") return new Date(date);
+    if (typeof date === "string") {
+        const num = Number(date);
+        return !isNaN(num) ? new Date(num) : new Date(date);
+    }
+    // 他の型の場合は文字列化して処理
+    return new Date(date.toString());
+})();
+---
+
+<time datetime={parsedDate.toISOString()}>
+    {
+        parsedDate.toLocaleDateString("ja-JP", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        })
+    }
+</time>
