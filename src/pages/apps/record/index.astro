@@ -77,12 +77,13 @@ if (Astro.request.method == "POST") {
 <Layout title="きろく">
     <h1>きろく</h1>
 
-    <h2>
-        {translateGrade(grade >= 0 ? grade - 2 : grade - 1)}
-        {grade >= 0 ? "昇級" : "昇段"}まで
-    </h2>
-    <p>{needToNextGrade} / {nextGrade} 日</p>
-
+    {   grade > 0 &&
+        <h2>
+            {translateGrade(grade >= 0 ? grade - 2 : grade - 1)}
+            {grade >= 0 ? "昇級" : "昇段"}まで
+        </h2>
+        <p>{needToNextGrade} / {nextGrade} 日</p>
+    }
     <hr />
     <h2>追加</h2>
 
