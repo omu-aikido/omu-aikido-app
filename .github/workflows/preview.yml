@@ -36,9 +36,8 @@ jobs:
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  environment: preview
                   command: |
-                      deploy --name record
+                      deploy --branch preview --name record
                   secrets: |
                       PUBLIC_CLERK_PUBLISHABLE_KEY
                       CLERK_SECRET_KEY
