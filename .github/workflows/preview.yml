@@ -29,7 +29,6 @@ jobs:
                   echo "CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}" >> .env
                   echo "TURSO_DATABASE_URL=${{ secrets.TURSO_DATABASE_URL }}" >> .env
                   echo "TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}" >> .env
-                  cp .env .dev.vars
             - name: Build
               run: npm run build --remote
             - name: Deploy
@@ -37,5 +36,16 @@ jobs:
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  environment: preview
                   command: |
-                      pages deploy dist --project-name=omu-aikido-app --branch=preview
+                      deploy --name record
+                  secrets: |
+                      PUBLIC_CLERCK_PUBLISHABLE_KEY
+                      CLERK_SECRET_KEY
+                      TURSO_DATABASE_URL
+                      TURSO_AUTH_TOKEN
+              env:
+                  PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.PUBLIC_CLERK_PUBLISHABLE_KEY }}
+                  CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+                  TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+                  TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
