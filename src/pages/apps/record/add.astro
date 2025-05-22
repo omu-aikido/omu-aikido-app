@@ -1,0 +1,88 @@
+---
+import { default as Layout } from "@/src/layouts/auth-layout.astro";
+import { getProfile } from "@/src/lib/query/profile";
+import { createActivity, inputActivity } from "@/src/lib/query/activity";
+
+const user = await Astro.locals.currentUser();
+
+if (!user) {
+    return Astro.redirect("/sign-in");
+}
+const userProfile = await getProfile({ userId: user.id });
+if (userProfile instanceof Response) {
+    return userProfile;
+}
+
+const date = new URL(Astro.request.url).searchParams.get("date");
+const period = new URL(Astro.request.url).searchParams.get("period");
+
+let isValidParams = false;
+
+if (!date || !period) {
+    isValidParams = false;
+}
+const parsedDate = date ? new Date(date) : null;
+const parsedPeriod = (period as unknown as Number)
+    ? (period as unknown as Number)
+    : null;
+
+if (!parsedDate || !parsedPeriod) {
+    isValidParams = false;
+} else {
+    isValidParams = true;
+}
+
+if (Astro.request.method == "POST" && isValidParams) {
+    let data = await Astro.request.formData();
+    let date = data.get("date") as unknown as Date;
+    let dataParsed = new Date(date).toISOString().split("T")[0];
+    let period = data.get("period") as unknown as number;
+
+    const actData: typeof inputActivity = {
+        date: dataParsed,
+        id: user.id, // バックエンドで生成するのでなんでもいい
+        userId: user.id,
+        period: period,
+    };
+    const result = await createActivity({
+        userId: user.id,
+        activity: actData,
+    });
+
+    if (result.rowsAffected == 1) {
+        return Astro.redirect("/apps/record");
+    } else {
+        console.log("failed");
+    }
+}
+---
+
+<Layout title="自動記録">
+    {
+        isValidParams && parsedDate ? (
+            <div class="flex flex-col items-center justify-center w-full h-full">
+                <h1 class="text-2xl font-bold">自動記録</h1>
+                <p class="text-gray-500">以下の内容で記録を追加しますか？</p>
+                <div class="mt-4">
+                    <p>日付: {parsedDate.toLocaleDateString("ja-JP")}</p>
+                    <p>稽古時間: {parsedPeriod}時間</p>
+                </div>
+                <form method="POST" class="mt-4">
+                    <input type="hidden" name="date" value={date} />
+                    <input type="hidden" name="period" value={period} />
+                    <button
+                        type="submit"
+                        class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+                    >
+                        記録する
+                    </button>
+                </form>
+            </div>
+        ) : (
+            <div class="flex flex-col items-center justify-center w-full h-full">
+                <h1 class="text-2xl font-bold">エラー</h1>
+                <p class="text-red-500">不正なパラメータです。</p>
+            </div>
+        )
+    }
+</Layout>

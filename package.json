@@ -2,8 +2,8 @@
   "name": "omu-aikido-record-app",
   "description": "Build a personal website, blog, or portfolio with Astro.",
   "dependencies": {
-    "@astrojs/cloudflare": "12.5.0",
     "@astrojs/check": "^0.9.4",
+    "@astrojs/cloudflare": "12.5.0",
     "@astrojs/partytown": "^2.1.4",
     "@astrojs/sitemap": "^3.3.0",
     "@catppuccin/palette": "^1.7.1",
@@ -11,14 +11,16 @@
     "@clerk/localizations": "^3.10.8",
     "@clerk/themes": "^2.2.20",
     "@libsql/client": "^0.14.0",
+    "@tailwindcss/vite": "^4.1.7",
     "apexcharts": "^4.5.0",
     "astro": "^5.7.4",
     "drizzle-orm": "^0.39.3",
     "drizzle-zod": "^0.7.0",
     "svix": "^1.61.0",
+    "tailwindcss": "^4.1.7",
     "ts-ics": "^1.6.7",
-    "uuid": "^11.1.0",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
@@ -31,7 +33,7 @@
     "cf-typegen": "wrangler types",
     "check": "astro build && tsc && wrangler deploy --dry-run",
     "deploy": "astro build && wrangler deploy",
-    "dev": "astro dev",
+    "dev": "astro build && wrangler dev",
     "preview": "astro build && wrangler dev"
   },
   "type": "module",

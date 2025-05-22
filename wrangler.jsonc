@@ -12,6 +12,12 @@
         "directory": "./dist",
         "binding": "ASSETS"
     },
+    "kv_namespaces": [
+        {
+            "binding": "USERID_CACHE",
+            "id": "7a5e01dd3bc54db19fb81146de14fc05"
+        }
+    ],
     "observability": {
         "enabled": true
     },
@@ -21,7 +27,6 @@
      * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
      */
     // "placement": { "mode": "smart" },
-
     /**
      * Bindings
      * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
