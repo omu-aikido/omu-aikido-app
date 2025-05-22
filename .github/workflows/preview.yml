@@ -1,8 +1,8 @@
 name: Preview on Cloudflare Pages
 
 on:
-  push:
-    branches: [preview]
+    push:
+        branches: [preview]
 
 jobs:
     deploy:
@@ -37,7 +37,7 @@ jobs:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   command: |
-                      deploy --name record
+                      deploy --name record-preview
                   secrets: |
                       PUBLIC_CLERK_PUBLISHABLE_KEY
                       CLERK_SECRET_KEY
