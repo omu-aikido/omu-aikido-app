@@ -4,24 +4,24 @@
  */
 {
     "$schema": "node_modules/wrangler/config-schema.json",
-    "name": "shrill-snow-f286",
+    "name": "record",
     "compatibility_date": "2025-04-01",
     "compatibility_flags": ["nodejs_compat"],
     "main": "./dist/_worker.js/index.js",
     "assets": {
         "directory": "./dist",
-        "binding": "ASSETS"
+        "binding": "ASSETS",
     },
     "kv_namespaces": [
         {
             "binding": "USERID_CACHE",
-            "id": "7a5e01dd3bc54db19fb81146de14fc05"
-        }
+            "id": "7a5e01dd3bc54db19fb81146de14fc05",
+        },
     ],
     "observability": {
-        "enabled": true
+        "enabled": true,
     },
-    "upload_source_maps": true
+    "upload_source_maps": true,
     /**
      * Smart Placement
      * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
