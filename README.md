@@ -78,6 +78,18 @@ $ npx astro build # ビルドします
 $ npx astro preview # プレビューします
 ```
 
+### tursoをローカルで使う
+
+Turso CLIをインストールすれば、以下の手順でローカルのlibSQLが使用可能になります。
+`migrations/0000_nasty_proemial_gods.sql` はテーブルの定義のみを行うSQL文です。
+機能追加により、データベースの構造が変化した場合などは、`turso db shell your-database .dump > dump.sql`するなどして全てをそのまま移行させるのがよいと思います。
+（レコードも全て持ってくるので、`cat hoge | sqlite3 local.db`の前に、テーブル定義のみを残すなどの修正をお勧めします。）
+
+```bash
+$ cat migrations/0000_nasty_proemial_gods.sql | sqlite3 local.db
+$ turso dev -f local.db
+```
+
 ## 注意
 
 - Cloudflare上でのビルドは、libSQL関連のパッケージで実行時エラーが発生する可能性があるため、ローカルでビルドしてからのアップロードを推奨します。
