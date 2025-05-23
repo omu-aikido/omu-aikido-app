@@ -23,6 +23,8 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@catppuccin/tailwindcss": "^0.1.6",
+    "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^22.15.21",
     "drizzle-kit": "^0.30.5",
     "wrangler": "^4.16.0"
@@ -33,7 +35,7 @@
     "cf-typegen": "wrangler types",
     "check": "astro build && tsc && wrangler deploy --dry-run",
     "deploy": "astro build && wrangler deploy",
-    "dev": "astro build && wrangler dev",
+    "dev": "astro dev --remote",
     "preview": "astro build && wrangler dev"
   },
   "type": "module",
