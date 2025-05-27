@@ -1,7 +1,14 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/astro/server";
 import * as profile from "@/src/lib/query/profile";
-import { grade, year } from "@/src/utils";
 import { Role } from "@/src/class";
+
+declare global {
+    namespace App {
+        interface Locals {
+            user: any; // Replace 'any' with your actual user profile type
+        }
+    }
+}
 
 const isProtectedRoute = createRouteMatcher([
     "/dashboard(.*)",
@@ -21,12 +28,16 @@ export const onRequest = clerkMiddleware((auth, context) => {
     } else if (userId) {
         profile.getProfile({ userId: userId }).then((userProfile) => {
             if (userProfile instanceof Response) {
-                return userProfile;
-            }
-            if (
+                if (userProfile.status === 404) {
+                    context.redirect("account/setup");
+                } else if (userProfile.status === 422) {
+                    context.redirect("account/recovery");
+                }
+            } else if (
                 Role.fromString(userProfile.role)?.isManagement() &&
                 isAdminRoute(context.request)
             ) {
+                context.locals.user = userProfile;
                 context.redirect("/dashboard");
             }
         });

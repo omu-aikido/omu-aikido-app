@@ -37,20 +37,14 @@ export async function getProfile(input: {
     } catch (error) {
         console.error(error);
         return new Response("Missing Correct User Schema", {
-            status: 303,
-            headers: {
-                Location: "/account/recovery",
-            },
+            status: 422,
         });
     }
 
     if (Object.keys(user.public_metadata).length === 0) {
         console.log("No profile found.");
         return new Response("No Profile Found", {
-            status: 303,
-            headers: {
-                Location: "/account/setup",
-            },
+            status: 404,
         });
     }
 
