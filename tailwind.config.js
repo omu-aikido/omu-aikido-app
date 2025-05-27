@@ -8,7 +8,6 @@ export default {
         require("@catppuccin/tailwindcss")({
             defaultFlavour: "latte",
         }),
-        require("@tailwindcss/typography"),
     ],
     darkMode: "class",
 };

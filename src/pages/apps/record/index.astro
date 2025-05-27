@@ -7,8 +7,10 @@ import {
     inputActivity,
 } from "@/src/lib/query/activity";
 import { translateGrade, timeForNextGrade } from "@/src/utils";
-import AddRecord from "@/src/components/ui/add-record.astro";
-import PhAddRecord from "@/src/components/ui/ph-add-record.astro";
+import ActivityForm from "@/src/components/ui/activity-form.astro";
+
+import RecentsPh from "@/src/components/ui/recents-ph.astro";
+import Recents from "@/src/components/ui/recents.astro";
 
 const user = await Astro.locals.currentUser();
 
@@ -48,30 +50,6 @@ const needToNextGrade = parseInt(
             1.5
     }`
 );
-
-if (Astro.request.method == "POST") {
-    let data = await Astro.request.formData();
-    let date = data.get("date") as unknown as Date;
-    let dataParsed = new Date(date).toISOString().split("T")[0];
-    let period = data.get("period") as unknown as number;
-
-    const actData: typeof inputActivity = {
-        date: dataParsed,
-        id: user.id, // バックエンドで生成するのでなんでもいい
-        userId: user.id,
-        period: period,
-    };
-    const result = await createActivity({
-        userId: user.id,
-        activity: actData,
-    });
-
-    if (result.rowsAffected == 1) {
-        return Astro.redirect("/apps/record");
-    } else {
-        console.log("failed");
-    }
-}
 ---
 
 <Layout title="きろく">
@@ -87,9 +65,10 @@ if (Astro.request.method == "POST") {
     <hr />
     <h2>追加</h2>
 
-    <AddRecord server:defer>
-        <PhAddRecord slot="fallback" />
-    </AddRecord>
+    <ActivityForm />
+    <Recents server:defer>
+        <RecentsPh slot="fallback" />
+    </Recents>
 
     <hr />
     <h2>今月の稽古履歴</h2>

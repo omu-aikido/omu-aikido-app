@@ -3,13 +3,12 @@ import { default as Layout } from "@/src/layouts/auth-layout.astro";
 import { getRole } from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
 import NewsReader from "@/src/components/ui/news-reader.astro";
-import { createActivity, inputActivity } from "@/src/lib/query/activity";
-
+import RecentsPh from "@/src/components/ui/recents-ph.astro";
+import Recents from "@/src/components/ui/recents.astro";
 import Grid from "@/src/components/ui/grid.astro";
 import AppIcon from "@/src/components/ui/app-icon.astro";
 import { APPS } from "@/src/const";
-import AddRecord from "@/src/components/ui/add-record.astro";
-import PhAddRecord from "@/src/components/ui/ph-add-record.astro";
+import ActivityForm from "../components/ui/activity-form.astro";
 
 const userId = Astro.locals.auth().userId!;
 const role = (await getRole({ userId })) as Role;
@@ -21,28 +20,6 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
         desc: "管理者メニューに移動します。",
     });
 }
-
-if (Astro.request.method == "POST") {
-    let data = await Astro.request.formData();
-    let date = data.get("date") as unknown as Date;
-    let dataParsed = new Date(date).toISOString().split("T")[0];
-    let period = data.get("period") as unknown as number;
-
-    const actData: typeof inputActivity = {
-        date: dataParsed,
-        id: userId, // バックエンドで生成するのでなんでもいい
-        userId,
-        period: period,
-    };
-    const result = await createActivity({
-        userId,
-        activity: actData,
-    });
-
-    if (result.rowsAffected === 1) {
-        return Astro.redirect("/apps/record");
-    }
-}
 ---
 
 <Layout title="ダッシュボード">
@@ -50,9 +27,10 @@ if (Astro.request.method == "POST") {
     <hr />
     <h2>追加</h2>
 
-    <AddRecord server:defer>
-        <PhAddRecord slot="fallback" />
-    </AddRecord>
+    <ActivityForm />
+    <Recents server:defer>
+        <RecentsPh slot="fallback" />
+    </Recents>
 
     <hr />
     <Grid variant="offset">

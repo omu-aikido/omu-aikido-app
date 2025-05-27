@@ -17,14 +17,12 @@
     "drizzle-orm": "^0.39.3",
     "drizzle-zod": "^0.7.0",
     "svix": "^1.61.0",
-    "tailwindcss": "^4.1.7",
+    "tailwind-variants": "^1.0.0",
     "ts-ics": "^1.6.7",
     "typescript": "5.8.3",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@catppuccin/tailwindcss": "^0.1.6",
-    "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^22.15.21",
     "drizzle-kit": "^0.30.5",
     "wrangler": "^4.16.0"
