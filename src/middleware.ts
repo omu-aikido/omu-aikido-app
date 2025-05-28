@@ -31,9 +31,9 @@ export const onRequest = clerkMiddleware((auth, context) => {
         profile.getProfile({ userId: userId }).then((userProfile) => {
             if (userProfile instanceof Response) {
                 if (userProfile.status === 404) {
-                    context.redirect("account/setup");
+                    context.redirect("/account/setup");
                 } else if (userProfile.status === 422) {
-                    context.redirect("account/recovery");
+                    context.redirect("/account/recovery");
                 }
             } else {
                 context.locals.user = userProfile;
