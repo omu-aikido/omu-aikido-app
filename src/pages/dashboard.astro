@@ -1,9 +1,9 @@
 ---
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
-import { getRole } from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
 import NewsReader from "@/src/components/ui/news-reader.astro";
 import { createActivity, inputActivity } from "@/src/lib/query/activity";
+import { getProfile } from "@/src/lib/query/profile";
 
 import Grid from "@/src/components/ui/grid.astro";
 import AppIcon from "@/src/components/ui/app-icon.astro";
@@ -12,9 +12,23 @@ import AddRecord from "@/src/components/ui/add-record.astro";
 import PhAddRecord from "@/src/components/ui/ph-add-record.astro";
 
 const userId = Astro.locals.auth().userId!;
-const role = (await getRole({ userId })) as Role;
+const profile = await getProfile({ userId });
+if (profile instanceof Response) {
+    switch (profile.status) {
+        case 422:
+            return Astro.redirect("/account/recovery");
+        case 404:
+            return Astro.redirect("/account/setup");
+    }
+    return Astro.redirect("/account");
+}
+const role = Role.fromString(profile.role);
 
-if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
+if (
+    role &&
+    role.isManagement() &&
+    !APPS.some((app) => app.name === "管理者メニュー")
+) {
     APPS.push({
         name: "管理者メニュー",
         path: "/admin",

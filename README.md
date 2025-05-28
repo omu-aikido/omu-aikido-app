@@ -1,62 +1,106 @@
-# Astro Starter Kit: Blog
+# 活動記録アプリ Beta
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/astro-blog-starter-template)
+[![Commit: a1a2ae3](https://img.shields.io/badge/Commit-a1a2ae3-blue)](https://github.com/omu-aikido/omu-aikido-app/commit/a1a2ae3b2b77112762632581e64010e11ee6358d)以降、Cloudflare PagesからWorkerに移行しました。
 
-![Astro Template Preview](https://github.com/withastro/astro/assets/2244813/ff10799f-a816-4703-b967-c78997e8323d)
+[![Preview Build on Cloudflare Worker](https://github.com/omu-aikido/omu-aikido-app/actions/workflows/preview.yml/badge.svg)](https://github.com/omu-aikido/omu-aikido-app/actions/workflows/preview.yml)
+[![Deploy to Cloudflare Worker](https://github.com/omu-aikido/omu-aikido-app/actions/workflows/deploy.yml/badge.svg)](https://github.com/omu-aikido/omu-aikido-app/actions/workflows/deploy.yml)
 
-<!-- dash-content-start -->
+## 概要
 
-Create a blog with Astro and deploy it on Cloudflare Workers as a [static website](https://developers.cloudflare.com/workers/static-assets/).
+活動記録アプリ Betaは、部活動の稽古を記録するためのフルスタックWebアプリです。
+Astro.jsを使用して開発されています。
 
-Features:
+## ロードマップ
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and OpenGraph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
+- [x] ユーザー登録
+- [x] ログイン
+- [x] 稽古の記録・閲覧・編集
+- [ ] 役職別機能
+    - [ ] 管理者
+        - [x] 稽古の集計などの機能
+    - [ ] 会計:精算機能 ……?
+- [ ] 稽古の記録を元にしたグラフの表示
 
-<!-- dash-content-end -->
+## 主な使用技術
+- **[npm](https://www.npmjs.com)**  
+    パッケージ管理
 
-## Getting Started
+- **[Astro.js](https://astro.build)**  
+    フレームワーク
 
-Outside of this repo, you can start a new project with this template using [C3](https://developers.cloudflare.com/pages/get-started/c3/) (the `create-cloudflare` CLI):
+- **[GitHub](https://github.com)**  
+    ソースコード管理
+
+- **[Catppuccin](https://catppuccin.com)**  
+    カラーパレット
+
+- **[Clerk](https://clerk.com)**  
+    認証
+
+- **[Turso](https://turso.tech)**  
+    libSQLデータベース
+
+- **[Drizzle](https://orm.drizzle.team)**  
+    ORM
+
+- **[ts-ics](https://github.com/Neuvernetzung/ts-ics)**  
+    iCalendar生成
+
+- **[Cloudflare Workers](https://workers.cloudflare.com)**  
+    ホスティング
+
+その他、使用しているパッケージ等は`package.json`に記載されています。
+
+### ローカルでの開発方法
+
+#### Requirements
+
+- \*.db // データベースファイル (SQLite3)
+    - `turso dev --db *.db` で`http://127.0.0.1:8080`にlibSqlサーバを起動します
+- .env.development
+- .env.production
+- .dev.vars.development
+- .dev.vars.production
+
+環境変数に必要な情報は
+
+- PUBLIC_CLERK_PUBLISHABLE_KEY
+- CLERK_SECRET_KEY
+- TURSO_DATABASE_URL
+- TURSO_AUTH_TOKEN
+
+です。
+
 
 ```bash
-npm create cloudflare@latest -- --template=cloudflare/templates/astro-blog-starter-template
+$ npx astro dev # ローカルサーバを起動します
+$ npx astro build # ビルドします
+$ npx astro preview # プレビューします
 ```
 
-A live public deployment of this template is available at [https://astro-blog-starter-template.templates.workers.dev](https://astro-blog-starter-template.templates.workers.dev)
+### tursoをローカルで使う
 
-## 🚀 Project Structure
+Turso CLIをインストールすれば、以下の手順でローカルのlibSQLが使用可能になります。
+`migrations/0000_nasty_proemial_gods.sql` はテーブルの定義のみを行うSQL文です。
+機能追加により、データベースの構造が変化した場合などは、`turso db shell your-database .dump > dump.sql`するなどして全てをそのまま移行させるのがよいと思います。
+（レコードも全て持ってくるので、`cat hoge | sqlite3 local.db`の前に、テーブル定義のみを残すなどの修正をお勧めします。）
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+```bash
+$ cat migrations/0000_nasty_proemial_gods.sql | sqlite3 local.db
+$ turso dev -f local.db
+```
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## 注意
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+- Cloudflare上でのビルドは、libSQL関連のパッケージで実行時エラーが発生する可能性があるため、ローカルでビルドしてからのアップロードを推奨します。
 
-Any static assets, like images, can be placed in the `public/` directory.
+その他、各種ツールのガイドを参考にしてください。
 
-## 🧞 Commands
+## ライセンス
+Copyright 2025 [omu-aikido](https://github.com/omu-aikido)
 
-All commands are run from the root of the project, from a terminal:
+Apache License Version 2.0（「本ライセンス」）に基づいてライセンスされます。あなたがこのファイルを使用するためには、本ライセンスに従わなければなりません。本ライセンスのコピーは下記の場所から入手できます。
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-| `npm run deploy`          | Deploy your production site to Cloudflare        |
+[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
-## 👀 Want to learn more?
-
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-
-## Credit
-
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+適用される法律または書面での同意によって命じられない限り、本ライセンスに基づいて頒布されるソフトウェアは、明示黙示を問わず、いかなる保証も条件もなしに「現状のまま」頒布されます。本ライセンスでの権利と制限を規定した文言については、本ライセンスを参照してください。 
