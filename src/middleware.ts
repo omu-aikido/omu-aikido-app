@@ -35,12 +35,12 @@ export const onRequest = clerkMiddleware((auth, context) => {
                 } else if (userProfile.status === 422) {
                     context.redirect("account/recovery");
                 }
-            } else if (
-                Role.fromString(userProfile.role)?.isManagement() &&
-                isAdminRoute(context.request)
-            ) {
+            } else {
                 context.locals.user = userProfile;
-                context.redirect("/dashboard");
+                const role = Role.fromString(userProfile.role);
+                if (isAdminRoute(context.request) && role && !role.isManagement()) {
+                    context.redirect("/dashboard");
+                }
             }
         });
     }
