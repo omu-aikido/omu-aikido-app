@@ -8,9 +8,20 @@ import Grid from "@/src/components/ui/grid.astro";
 import AppIcon from "@/src/components/ui/app-icon.astro";
 import { APPS } from "@/src/const";
 import ActivityForm from "@/src/components/ui/add-record.astro";
+import { getProfile } from "@/src/lib/query/profile";
 
 const userId = Astro.locals.auth().userId!;
-const role = Role.fromString(Astro.locals.user.role);
+const profile = await getProfile({ userId });
+if (profile instanceof Response) {
+    switch (profile.status) {
+        case 422:
+            return Astro.redirect("/account/recovery");
+        case 404:
+            return Astro.redirect("/account/setup");
+    }
+    return Astro.redirect("/account");
+}
+const role = Role.fromString(profile.role);
 
 if (
     role &&
