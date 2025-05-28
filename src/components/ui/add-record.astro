@@ -6,57 +6,51 @@ import { createActivity, inputActivity } from "@/src/lib/query/activity";
 import { resentlyActivity } from "@/src/lib/query/activity";
 import RecentsPh from "./recents-ph.astro";
 import ProgressCircle from "./progress-circle.astro";
+import { actions } from "astro:actions";
+import Notification from "./notification.astro";
 
-let state: "enable" | "disable" = "disable";
+let enable = true;
 await resentlyActivity({
     userId: userId,
     limit: 1,
 }).then((res) => {
     if (res instanceof Response) {
         console.error("Failed to fetch recent activities:", res.statusText);
-        state = "disable"; // データ取得に失敗した場合は無効
+        enable = false; // データ取得に失敗した場合は無効
     }
-    state = "enable"; // データ取得に成功した場合は有効
+    enable = true; // データ取得に成功した場合は有効
 });
 
-let sending = false;
-if (Astro.request.method == "POST") {
-    sending = true;
-    let data = await Astro.request.formData();
-    let date = data.get("date") as unknown as Date;
-    let dataParsed = new Date(date).toISOString().split("T")[0];
-    let period = data.get("period") as unknown as number;
-
-    const actData: typeof inputActivity = {
-        date: dataParsed,
-        id: userId, // バックエンドで生成するのでなんでもいい
-        userId,
-        period: period,
-    };
-    const result = await createActivity({
-        userId,
-        activity: actData,
-    });
-    if (result instanceof Response) {
-        sending = false;
-        state = "disable";
-        console.error("Failed to create activity:", result.statusText);
-    } else {
-        sending = false;
-        state = "enable";
-        console.log("Activity created successfully:", result);
-    }
-}
+const result = Astro.getActionResult(actions.record.add);
 ---
 
-{state === "disable" ? <ProgressCircle title="読み込み中" /> : null}
-{sending ? <ProgressCircle title="送信中" /> : null}
+{
+    result && !result.error && (
+        <Notification
+            title="記録の追加"
+            message="記録が正常に追加されました。"
+            type="success"
+            duration={3000}
+        />
+    )
+}
+{
+    result && result.error && (
+        <Notification
+            title="記録の追加"
+            message={`記録の追加に失敗しました: ${result.error.message}`}
+            type="error"
+            duration={5000}
+        />
+    )
+}
 
 <form
-    id="activity-form"
-    class="grid grid-cols-3 gap-4 items-center"
     method="POST"
+    action={actions.record.add}
+    class="grid grid-cols-3 gap-4 items-center"
 >
+    <input type="hidden" name="userId" class="hidden" value={userId} />
     <label for="date" class="text-sm font-medium">
         日付<span class={style.text.necessary()}>*</span>
     </label>
@@ -65,11 +59,9 @@ if (Astro.request.method == "POST") {
         id="date"
         name="date"
         value=`${(new Date()).toISOString().split('T')[0]}`
-        class={style.form.input({
-            disable: state !== "enable" || sending,
-        })}
+        class={style.form.input({})}
         required
-        disabled={state !== "enable" || sending ? "disabled" : undefined}
+        disabled={!enable}
     />
 
     <label for="period" class="text-sm font-medium">
@@ -82,21 +74,31 @@ if (Astro.request.method == "POST") {
         value="1.5"
         step="0.5"
         class={style.form.input({
-            disable: state !== "enable" || sending,
+            disable: !enable,
         })}
         required
-        disabled={state !== "enable" || sending ? "disabled" : undefined}
+        disabled={!enable}
     />
     <button
         type="submit"
         id="record-submit"
         class={style.form.button()}
-        disabled={state !== "enable" || sending ? "disabled" : undefined}
+        disabled={!enable}
     >
-        {sending ? <ProgressCircle title="送信中" inline="inline" /> : "追加"}
+        {!enable ? <ProgressCircle title="送信中" inline="inline" /> : "追加"}
     </button>
-</form>
 
-<Recents server:defer>
-    <RecentsPh slot="fallback" />
-</Recents>
+    <script>
+        const form = document.querySelector("form")!;
+        const button = document.getElementById(
+            "record-submit"
+        ) as HTMLButtonElement;
+        form.addEventListener("submit", (event) => {
+            event.preventDefault(); // フォームのデフォルト送信を防ぐ
+            button.textContent = "送信中...";
+            button.classList.add("text-slate-800", "dark:text-slate-100");
+            button.disabled = true;
+            form.submit(); // フォームを送信
+        });
+    </script>
+</form>

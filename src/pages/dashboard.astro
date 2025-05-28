@@ -8,7 +8,7 @@ import Recents from "@/src/components/ui/recents.astro";
 import Grid from "@/src/components/ui/grid.astro";
 import AppIcon from "@/src/components/ui/app-icon.astro";
 import { APPS } from "@/src/const";
-import ActivityForm from "../components/ui/activity-form.astro";
+import ActivityForm from "@/src/components/ui/add-record.astro";
 
 const userId = Astro.locals.auth().userId!;
 const role = (await getRole({ userId })) as Role;
