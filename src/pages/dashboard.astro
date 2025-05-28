@@ -1,6 +1,5 @@
 ---
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
-import { getRole } from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
 import NewsReader from "@/src/components/ui/news-reader.astro";
 import RecentsPh from "@/src/components/ui/recents-ph.astro";
@@ -11,9 +10,13 @@ import { APPS } from "@/src/const";
 import ActivityForm from "@/src/components/ui/add-record.astro";
 
 const userId = Astro.locals.auth().userId!;
-const role = (await getRole({ userId })) as Role;
+const role = Role.fromString(Astro.locals.user.role);
 
-if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
+if (
+    role &&
+    role.isManagement() &&
+    !APPS.some((app) => app.name === "管理者メニュー")
+) {
     APPS.push({
         name: "管理者メニュー",
         path: "/admin",

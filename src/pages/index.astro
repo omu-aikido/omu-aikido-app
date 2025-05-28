@@ -6,10 +6,21 @@ import {
     SignInButton,
     SignUpButton,
 } from "@clerk/astro/components";
+import { getProfile } from "@/src/lib/query/profile";
 const user = await Astro.locals.currentUser();
 
 if (user) {
-    return Astro.redirect("/dashboard");
+    const profile = await getProfile({ userId: user.id });
+    if (profile instanceof Response) {
+        switch (profile.status) {
+            case 422:
+                return Astro.redirect("/account/recovery");
+            case 404:
+                return Astro.redirect("/account/setup");
+        }
+    } else {
+        return Astro.redirect("/dashboard");
+    }
 }
 ---
 

@@ -1,11 +1,13 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/astro/server";
 import * as profile from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
+import { profile as userProfile } from "@/src/zod";
+import type { z } from "astro/zod";
 
 declare global {
     namespace App {
         interface Locals {
-            user: any; // Replace 'any' with your actual user profile type
+            user: z.infer<typeof userProfile>;
         }
     }
 }
