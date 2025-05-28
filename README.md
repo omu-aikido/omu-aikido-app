@@ -46,7 +46,7 @@ Astro.jsを使用して開発されています。
 - **[ts-ics](https://github.com/Neuvernetzung/ts-ics)**  
     iCalendar生成
 
-- **[CloudFlare Pages](https://pages.cloudflare.com)**  
+- **[Cloudflare Workers](https://workers.cloudflare.com)**  
     ホスティング
 
 その他、使用しているパッケージ等は`package.json`に記載されています。
