@@ -4,7 +4,7 @@
  */
 {
     "$schema": "node_modules/wrangler/config-schema.json",
-    "name": "record-preview",
+    "name": "record",
     "compatibility_date": "2025-04-01",
     "compatibility_flags": ["nodejs_compat"],
     "main": "./dist/_worker.js/index.js",
