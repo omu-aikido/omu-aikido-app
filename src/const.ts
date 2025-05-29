@@ -4,6 +4,11 @@ export const APPS: { name: string; path: string; desc: string }[] = [
         path: "/apps/record",
         desc: "稽古の記録をつける",
     },
+    {
+        name: "アカウント",
+        path: "/account",
+        desc: "アカウント設定を行う",
+    },
     // {
     //     name: "Waiting it...",
     //     path: "/apps/",
