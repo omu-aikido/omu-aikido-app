@@ -1,6 +1,5 @@
 ---
 import { resentlyActivity } from "@/src/lib/query/activity";
-import { style } from "@/src/styles/component";
 const userId = Astro.locals.auth().userId!;
 
 const recents = await resentlyActivity({ userId: userId, limit: 1 });

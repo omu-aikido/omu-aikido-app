@@ -1,22 +1,8 @@
 ---
 import { style } from "@/src/styles/component";
 const userId = Astro.locals.auth().userId!;
-import { resentlyActivity } from "@/src/lib/query/activity";
-import ProgressCircle from "./progress-circle.astro";
 import { actions } from "astro:actions";
 import Notification from "./notification.astro";
-
-let enable = true;
-await resentlyActivity({
-    userId: userId,
-    limit: 1,
-}).then((res) => {
-    if (res instanceof Response) {
-        console.error("Failed to fetch recent activities:", res.statusText);
-        enable = false; // データ取得に失敗した場合は無効
-    }
-    enable = true; // データ取得に成功した場合は有効
-});
 
 const result = Astro.getActionResult(actions.record.add);
 ---
@@ -58,7 +44,6 @@ const result = Astro.getActionResult(actions.record.add);
         value=`${(new Date()).toISOString().split('T')[0]}`
         class={style.form.input({})}
         required
-        disabled={!enable}
     />
 
     <label for="period" class="text-sm font-medium">
@@ -70,19 +55,11 @@ const result = Astro.getActionResult(actions.record.add);
         name="period"
         value="1.5"
         step="0.5"
-        class={style.form.input({
-            disable: !enable,
-        })}
+        class={style.form.input()}
         required
-        disabled={!enable}
     />
-    <button
-        type="submit"
-        id="record-submit"
-        class={style.form.button()}
-        disabled={!enable}
-    >
-        {!enable ? <ProgressCircle title="送信中" /> : "追加"}
+    <button type="submit" id="record-submit" class={style.form.button()}>
+        {"追加"}
     </button>
 
     <script>
