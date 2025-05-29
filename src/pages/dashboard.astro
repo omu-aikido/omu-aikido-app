@@ -7,6 +7,7 @@ import Grid from "@/src/components/ui/grid.astro";
 import AppIcon from "@/src/components/ui/app-icon.astro";
 import { APPS } from "@/src/const";
 import ActivityForm from "@/src/components/ui/add-record.astro";
+import ActivityFormPh from "@/src/components/ui/add-record-ph.astro";
 import { style } from "@/src/styles/component";
 import RecentsPh from "@/src/components/ui/recents-ph.astro";
 import Recents from "@/src/components/ui/recents.astro";
@@ -42,7 +43,9 @@ if (
     <hr />
     <h2 class={style.text.title()}>追加</h2>
 
-    <ActivityForm />
+    <ActivityForm server:defer>
+        <ActivityFormPh slot="fallback" />
+    </ActivityForm>
     <Recents server:defer>
         <RecentsPh slot="fallback" />
     </Recents>

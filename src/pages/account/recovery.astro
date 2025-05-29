@@ -132,7 +132,8 @@ const role = await getRole({ userId: user.id });
                     </select>
                 </div>
 
-                <input type="hidden" name="role" value={role?.ja} />
+                <input type="hidden" name="role" value={role?.toString()} />
+                <input type="hidden" name="id" value={user.id} />
 
                 <button
                     type="submit"

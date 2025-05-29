@@ -63,6 +63,12 @@ export const user = {
                     year: input.year,
                     role: input.role,
                 });
+                if (result instanceof Error) {
+                    throw new ActionError({
+                        code: "UNAUTHORIZED",
+                        message: "Failed to update profile",
+                    });
+                }
                 return { success: true };
             },
         }),

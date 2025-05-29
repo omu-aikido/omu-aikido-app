@@ -21,6 +21,9 @@ if (userProfile instanceof Response) {
 
 const role = await profile.getRole({ userId: user.id });
 const result = Astro.getActionResult(actions.user.profile.update);
+if (result && !result.error) {
+    Astro.redirect("/account#/status");
+}
 ---
 
 <Layout title="アカウント">
@@ -44,7 +47,7 @@ const result = Astro.getActionResult(actions.user.profile.update);
             />
         )
     }
-    <UserProfile appearance={{}}>
+    <UserProfile>
         <UserProfile.Page label="ステータス" url="status">
             <svg
                 slot="label-icon"
@@ -163,7 +166,8 @@ const result = Astro.getActionResult(actions.user.profile.update);
                     </select>
                 </div>
 
-                <input type="hidden" name="role" value={role?.ja} />
+                <input type="hidden" name="role" value={role?.toString()} />
+                <input type="hidden" name="id" value={user.id} />
 
                 <button
                     type="submit"

@@ -10,6 +10,7 @@ import type { Role } from "@/src/class";
 import { APPS } from "@/src/const";
 import Head from "@/src/components/root/head.astro";
 import { style } from "@/src/styles/component";
+import ProgressCircle from "@/src/components/ui/progress-circle.astro";
 
 /** Main menu items */
 let textLinks: { label: string; href: string }[] = [
@@ -97,9 +98,37 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
         </header>
         <div class="p-6 mx-auto max-w-5xl">
             <main class="min-h-[75vh] overflow-y-auto mb-auto">
+                <ProgressCircle
+                    title="Loading"
+                    id="loading-circle"
+                    class="hidden"
+                />
                 <slot />
             </main>
         </div>
         <Footer />
     </body>
 </Baselayout>
+
+<script>
+    function setupLoading() {
+        const loadingCircle = document.getElementById("loading-circle");
+        if (!loadingCircle) return;
+
+        document.addEventListener("astro:before-preparation", () => {
+            loadingCircle.classList.remove("hidden");
+            document.body.style.cursor = "wait";
+        });
+
+        document.addEventListener("astro:after-swap", () => {
+            loadingCircle.classList.add("hidden");
+            document.body.style.cursor = "default";
+        });
+    }
+
+    // 初回実行
+    setupLoading();
+
+    // 各ページ遷移後に再実行
+    document.addEventListener("astro:after-swap", setupLoading);
+</script>

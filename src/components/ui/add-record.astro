@@ -82,7 +82,7 @@ const result = Astro.getActionResult(actions.record.add);
         class={style.form.button()}
         disabled={!enable}
     >
-        {!enable ? <ProgressCircle title="送信中" inline="inline" /> : "追加"}
+        {!enable ? <ProgressCircle title="送信中" /> : "追加"}
     </button>
 
     <script>
