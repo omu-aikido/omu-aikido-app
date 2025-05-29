@@ -31,6 +31,7 @@ export const style = {
         navigation: {
             block: tv({
                 base: [
+                    "flex gap-2 items-center",
                     "p-2 my-2 rounded-lg backdrop-blur-lg",
                     "bg-slate-300/30 dark:bg-slate-700/30",
                 ],
@@ -39,7 +40,9 @@ export const style = {
                 base: [
                     "text-slate-800 dark:text-slate-200",
                     "bg-slate-400/60 dark:bg-slate-600/60",
-                    "hover:bg-slate-400/60 dark:hover:bg-slate-600/60",
+                    "hover:bg-slate-400/30 dark:hover:bg-slate-600/30",
+                    "rounded-lg px-4 py-2",
+                    "hover:scale-105 transition-transform",
                 ],
                 variants: {
                     active: {
@@ -72,7 +75,7 @@ export const style = {
             base: [
                 "bg-slate-300 dark:bg-slate-700",
                 "shadow-lg shadow-green-500/25 dark:shadow-emerald-400/20",
-                "fixed p-7 w-3/4 lg:w-1/4 h-11/12 transition-all duration-300 ease-out",
+                "fixed p-7 w-3/4 sm:w-5/12 md:w-2/5 lg:w-1/4 h-11/12 transition-all duration-300 ease-out",
                 "will-change-transform overflow-y-auto",
                 "pointer-events-auto overscroll-contain",
                 "hover:shadow-xl hover:shadow-green-500/30 dark:hover:shadow-emerald-400/25",

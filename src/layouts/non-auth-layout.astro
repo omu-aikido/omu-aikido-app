@@ -2,9 +2,9 @@
 import Head from "@/src/components/root/head.astro";
 import Baselayout from "./baselayout.astro";
 import Footer from "@/src/components/root/footer.astro";
-import Modal from "@/src/components/ui/modal.astro";
 import AccountUi from "@/src/components/ui/account-ui.astro";
 const textLinks: { label: string; href: string }[] = [];
+import { style } from "@/src/styles/component";
 
 import { APPS } from "@/src/const";
 const APP_NAME = "大阪公立大学合気道部";
@@ -18,15 +18,28 @@ const { title } = Astro.props;
 
 <Baselayout>
     <Head title=`${APP_NAME} - ${title}` />
-    <body>
-        <header>
-            <nav class="mobile-menu">
-                {
-                    textLinks.length > 0 && (
-                        <Modal position="left" icon="  ☰  ">
+    <body class="flex-col min-h-dvh">
+        <header
+            class="m-0 py-0 px-6 top-0 z-50 sticky bg-slate-200/70 dark:bg-slate-800/90 text-slate-900 dark:text-slate-200 flex justify-between items-center h-20"
+        >
+            <h2 class="">
+                <a
+                    class="items-center-safe justify-items-center"
+                    href={homelink}>{title}</a
+                >
+            </h2>
+            {
+                textLinks.length > 0 && (
+                    <div class="hidden sm:flex">
+                        <nav class={`${style.header.navigation.block()}`}>
                             {textLinks.map((link) => (
                                 <a
                                     href={link.href}
+                                    class={style.header.navigation.link({
+                                        active: Astro.url.pathname.startsWith(
+                                            link.href
+                                        ),
+                                    })}
                                     aria-current={
                                         link.href === "/"
                                             ? Astro.url.pathname === "/"
@@ -38,45 +51,17 @@ const { title } = Astro.props;
                                               ? "page"
                                               : undefined
                                     }
-                                    class="modal-inner-content"
                                 >
                                     {link.label}
                                 </a>
                             ))}
-                        </Modal>
-                    )
-                }
-            </nav>
-            <h2>
-                <a href={homelink}>{APP_NAME}</a>
-            </h2>
-            {
-                textLinks.length > 0 && (
-                    <nav class="links">
-                        {textLinks.map((link) => (
-                            <a
-                                href={link.href}
-                                aria-current={
-                                    link.href === "/"
-                                        ? Astro.url.pathname === "/"
-                                            ? "page"
-                                            : undefined
-                                        : Astro.url.pathname.startsWith(
-                                                link.href
-                                            )
-                                          ? "page"
-                                          : undefined
-                                }
-                            >
-                                {link.label}
-                            </a>
-                        ))}
-                    </nav>
+                        </nav>
+                    </div>
                 )
             }
             <AccountUi apps={APPS} />
         </header>
-        <div class="container">
+        <div class="p-6 md:mx-auto md:max-w-3xl">
             <main>
                 <slot />
             </main>
@@ -84,173 +69,3 @@ const { title } = Astro.props;
         <Footer />
     </body>
 </Baselayout>
-
-<style>
-    div {
-        padding: 0.5rem;
-        border-radius: 8px;
-        user-select: none;
-        cursor: pointer;
-        margin-bottom: 1rem;
-    }
-    div a {
-        border: none;
-        background-color: transparent;
-        color: rgb(var(--text));
-        transition: all 0.2s ease;
-        margin: 0;
-        padding: 0;
-        display: block; /* Make the link a block element */
-        width: 100%; /* Ensure it takes the full width */
-        user-select: none;
-    }
-
-    div .link:hover {
-        background-color: rgb(var(--overlay0) / 0.6);
-        cursor: pointer;
-    }
-
-    div p {
-        font-size: 0.9rem;
-        margin-bottom: 1rem;
-        padding: 0.2rem;
-        border-radius: 8px;
-    }
-    header {
-        margin: 0;
-        padding: 0 5%;
-        background-color: rgb(var(--base) / 0.85);
-        box-shadow: 0px 2px 15px -5px rgb(var(--mauve) / 0.5);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 5rem;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        color: rgb(var(--text));
-    }
-
-    header > h2 {
-        margin: 0;
-    }
-    header > h2 > a {
-        text-decoration: none;
-        color: rgb(var(--text));
-        margin: 0;
-        padding: 0;
-        font-size: 1.5rem;
-        transition: color 0.2s ease;
-    }
-
-    header > h2 > a:hover {
-        color: rgb(var(--mauve));
-    }
-
-    .links {
-        border-radius: 12px;
-        border: 1px solid rgb(var(--surface2) / 0.3);
-        padding: 4px;
-        background-color: rgb(var(--surface0) / 0.3);
-        backdrop-filter: blur(10px);
-        transition: all 0.2s ease;
-    }
-
-    .links:hover {
-        border-color: rgb(var(--mauve) / 0.5);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px -2px rgb(var(--mauve) / 0.15);
-    }
-
-    nav {
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    nav > a {
-        color: rgb(var(--text));
-        text-decoration: none;
-        margin: 0;
-        padding: 0.3rem 1rem;
-        border-radius: 8px;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        transition: all 0.2s ease;
-    }
-
-    nav > a:hover:not([aria-current="page"]) {
-        background-color: rgb(var(--surface1) / 0.5);
-        transform: translateY(-1px);
-    }
-
-    .links > a[aria-current="page"] {
-        background-color: rgb(var(--mauve));
-        color: rgb(var(--base));
-    }
-
-    .mobile-menu {
-        display: none;
-    }
-
-    .modal-inner-content {
-        display: flex;
-        color: rgb(var(--subtext0));
-        backdrop-filter: blur(1px);
-        flex-direction: column;
-        margin: 8px 0;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        box-shadow: 1px 1px 4px 2px rgb(var(--shadow) / 0.8);
-        transition:
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
-        align-items: st retch;
-    }
-    .modal-inner-content:hover {
-        transform: translateY(-2px);
-        box-shadow: 0px 0px 4px 3px rgb(var(--mauve) / 0.4);
-    }
-    /* 現在のページならハイライト */
-    /* ボーダーをグラデーションにして光彩が周囲を回っているような雰囲気にする */
-    .modal-inner-content[aria-current="page"] {
-        box-shadow: 0px 0px 3px 2px rgb(var(--sapphire) / 0.4);
-    }
-
-    .modal-inner-content a {
-        color: rgb(var(--text));
-        text-decoration: none;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        transition:
-            background-color 0.2s ease,
-            color 0.2s ease;
-    }
-
-    .modal-inner-content a:hover {
-        background-color: rgb(var(--mauve) / 0.2);
-        color: rgb(var(--mauve));
-    }
-    @media (max-width: 815px) {
-        header {
-            height: 4rem;
-        }
-        .mobile-menu {
-            display: flex;
-        }
-        .links {
-            display: none;
-        }
-        header > h2 {
-            margin: 0;
-        }
-        header > h2 > a {
-            font-size: 1.2rem;
-            padding: 0;
-        }
-        nav > a {
-            font-size: 1rem;
-            padding: 0.2rem 0.8rem;
-        }
-    }
-</style>

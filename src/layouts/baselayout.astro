@@ -4,138 +4,38 @@ import "@/src/styles/global.css";
 
 <html
     lang="ja"
-    class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200"
+    class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans scroll-smooth select-none overflow-x-hidden max-w-full"
 >
     <slot />
 </html>
 
 <style is:global>
-    html {
-        font-family: "Inter", sans-serif;
-        width: 100%;
-        max-width: 100%;
-        overflow-x: hidden;
-        scroll-behavior: smooth;
-        user-select: none;
-    }
-    body {
-        /* display: flex; */
-        flex-direction: column;
-        min-height: 100vh;
-        line-height: 1.6;
-    }
-
-    main {
-        flex: 1;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .container {
-        max-width: 1000px;
-        min-width: 800px;
-        margin: 2rem auto;
-        padding: 0 1.5rem;
-        min-height: 85vh;
-        margin-top: 3rem;
-    }
     hr {
         display: block;
-
         margin-block: 1.5em;
         margin-inline: auto;
-        border: none;
         height: 1px;
+        border: none;
+        background: linear-gradient(
+            to right,
+            transparent,
+            var(--color-slate-400),
+            transparent
+        );
     }
-
-    pre {
-        border-radius: 0.75rem;
-        padding: 1.25rem;
-        overflow-x: auto;
-        margin: 1.5rem 0;
-    }
-    code {
-        font-family: "Fira Code", monospace;
-        font-size: 0.95rem;
-    }
-
-    blockquote {
-        margin: 1.5rem 0;
-        padding: 1rem 1.5rem;
-        border-radius: 0 0.5rem 0.5rem 0;
-    }
-
-    ul {
-        margin: 0.75rem 0 0.75rem 1.5rem;
-        padding-left: 1rem;
-    }
-    li {
-        margin: 0.5rem 0;
-    }
-
-    table {
-        border-collapse: collapse;
-        padding: 0 0.5rem;
-        width: 100%;
-        margin: 1.5rem auto;
-        border-radius: 0.5rem;
-        overflow: hidden;
-    }
-
-    th,
-    td {
-        padding: 0.75rem 1rem;
-        text-align: left;
-    }
-
-    th {
-        font-weight: 600;
-    }
-
-    input,
-    select {
-        border-radius: 0.5rem;
-        padding: 0.75rem 1rem;
-        margin: 0 0 0.5rem 0;
-        transition: all 0.2s ease;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-    }
-    select:hover {
-        cursor: pointer;
-    }
-    input:focus,
-    select:focus {
-        outline: none;
-    }
-
-    @media (max-width: 815px) {
-        th,
-        td {
-            font-size: 0.9em;
-            padding: 1em 0.75em;
-        }
-
-        table {
-            width: -webkit-fill-available;
-        }
-
-        .container {
-            min-width: min-content;
-            max-width: none;
-            margin: 2rem 1rem;
-            padding: 0;
-            min-height: 85vh;
-            margin-top: 3rem;
+    @media (prefers-color-scheme: dark) {
+        hr {
+            display: block;
+            margin-block: 1.5em;
+            margin-inline: auto;
+            height: 1px;
+            border: none;
+            background: linear-gradient(
+                to right,
+                transparent,
+                var(--color-slate-600),
+                transparent
+            );
         }
     }
 </style>

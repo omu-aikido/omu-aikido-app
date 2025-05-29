@@ -2,7 +2,6 @@
 import Baselayout from "./baselayout.astro";
 import Footer from "../components/root/footer.astro";
 import AccountUi from "../components/ui/account-ui.astro";
-import Modal from "../components/ui/modal.astro";
 
 import "@/src/styles/global.css";
 import { APP_NAME } from "@/src/const";
@@ -10,7 +9,7 @@ import { getRole } from "@/src/lib/query/profile";
 import type { Role } from "@/src/class";
 import { APPS } from "@/src/const";
 import Head from "@/src/components/root/head.astro";
-import { style } from "../styles/component";
+import { style } from "@/src/styles/component";
 
 /** Main menu items */
 let textLinks: { label: string; href: string }[] = [
@@ -47,7 +46,7 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
 
 <Baselayout>
     <Head title=`${APP_NAME} - ${title}` />
-    <body>
+    <body class="flex-col min-h-dvh">
         <header
             class="m-0 py-0 px-6 top-0 z-50 sticky bg-slate-200/70 dark:bg-slate-800/90 text-slate-900 dark:text-slate-200 flex justify-between items-center h-20"
         >
@@ -59,7 +58,7 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
             </h2>
             {
                 textLinks.length > 0 && (
-                    <div class="hidden lg:flex">
+                    <div class="hidden sm:flex">
                         <nav class={`${style.header.navigation.block()}`}>
                             {textLinks.map((link) => (
                                 <a
@@ -90,7 +89,7 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
             }
             <AccountUi apps={APPS} />
         </header>
-        <div class="p-6 lg:mx-auto lg:max-w-3xl">
+        <div class="p-6 md:mx-auto md:max-w-3xl">
             <main>
                 <slot />
             </main>
@@ -100,23 +99,6 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
 </Baselayout>
 
 <style>
-    nav {
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    nav > a {
-        color: rgb(var(--text));
-        text-decoration: none;
-        margin: 0;
-        padding: 0.3rem 1rem;
-        border-radius: 8px;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        transition: all 0.2s ease;
-    }
-
     .mobile-menu {
         display: none;
     }
