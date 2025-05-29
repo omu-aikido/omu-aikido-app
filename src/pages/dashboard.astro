@@ -7,8 +7,9 @@ import Grid from "@/src/components/ui/grid.astro";
 import AppIcon from "@/src/components/ui/app-icon.astro";
 import { APPS } from "@/src/const";
 import ActivityForm from "@/src/components/ui/add-record.astro";
-import { getProfile } from "@/src/lib/query/profile";
 import { style } from "@/src/styles/component";
+import RecentsPh from "@/src/components/ui/recents-ph.astro";
+import Recents from "@/src/components/ui/recents.astro";
 
 const userId = Astro.locals.auth().userId!;
 const profile = await getProfile({ userId });

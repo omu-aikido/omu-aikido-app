@@ -8,6 +8,7 @@ import {
     SignIn,
 } from "@clerk/astro/components";
 import { getProfile } from "@/src/lib/query/profile";
+import { style } from "@/src/styles/component";
 const user = await Astro.locals.currentUser();
 
 if (user) {
