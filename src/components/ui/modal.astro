@@ -4,18 +4,23 @@ interface Props {
     icon?: string;
 }
 
+import { style } from "@/src/styles/component";
 const { position, icon } = Astro.props;
-
-import "../../styles/global.css";
 ---
 
 <astro-modal>
-    <span id="open-modal-btn" class="open-modal-btn">{icon}</span>
-    <div id="modal" class={`modal ${position}`}>
-        <div class="modal-content">
-            <span id="close-modal-btn" class="close-btn">×</span>
-            <span class="just-spacing" style="margin-top:1rem;">&nbsp;</span>
-            <div class="modal-content-inner">
+    <span id="open-modal-btn" class={style.modal.button()}>{icon} </span>
+    <div id="modal" class={`${style.modal.bg()} ${position}`}>
+        <div class={style.modal.content({ position })}>
+            <span
+                id="close-modal-btn"
+                class="cursor-pointer flex items-center justify-center text-xl h-8 w-8 rounded-xl outline-2 outline-slate-400/60 dark:outline-slate-500/60
+                transition-all duration-300 ease-out hover:bg-slate-400 dark:hover:bg-slate-600 hover:scale-110 hover:-rotate-3
+                active:scale-95 active:-rotate-1"
+                >×</span
+            >
+            <span class="block mt-4">&nbsp;</span>
+            <div class="flex flex-col">
                 <slot />
             </div>
         </div>
@@ -26,38 +31,70 @@ import "../../styles/global.css";
     class Modal extends HTMLElement {
         constructor() {
             super();
-            const modal = this.querySelector(".modal") as HTMLElement;
-            const openBtn = this.querySelector(".open-modal-btn");
-            const closeBtn = this.querySelector(".close-btn");
+            const modal = this.querySelector("#modal") as HTMLElement;
+            const openBtn = this.querySelector("#open-modal-btn");
+            const closeBtn = this.querySelector("#close-modal-btn");
 
             function setupModalListeners() {
                 openBtn?.addEventListener("click", () => {
                     if (modal) {
                         modal.style.display = "flex";
                         setTimeout(() => {
-                            modal.classList.add("show");
+                            modal.classList.add("opacity-100");
+
+                            // モーダルの内部コンテンツに適切なクラスを追加
+                            const modalContent = modal.querySelector("div");
+                            if (modalContent) {
+                                modalContent.classList.remove(
+                                    "translate-x-full",
+                                    "-translate-x-full"
+                                );
+                                modalContent.classList.add("translate-x-0");
+                            }
                         }, 10);
                     }
                 });
 
-                closeBtn?.addEventListener("click", () => {
-                    if (modal) {
-                        modal.classList.remove("show");
-                        setTimeout(() => {
-                            modal.style.display = "none";
-                        }, 300);
-                    }
-                });
+                closeBtn?.addEventListener("click", closeModal);
 
                 // モーダル外クリックで閉じる
                 modal?.addEventListener("click", (e) => {
                     if (e.target === modal) {
-                        modal.classList.remove("show");
+                        closeModal();
+                    }
+                });
+
+                // ESCキーでモーダルを閉じる
+                document.addEventListener("keydown", (e) => {
+                    if (
+                        e.key === "Escape" &&
+                        modal &&
+                        modal.style.display === "flex"
+                    ) {
+                        closeModal();
+                    }
+                });
+
+                function closeModal() {
+                    if (modal) {
+                        modal.classList.remove("opacity-100");
+
+                        // モーダルの内部コンテンツを元の位置に戻す
+                        const modalContent = modal.querySelector("div");
+                        const position = modal.classList.contains("right")
+                            ? "translate-x-full"
+                            : "-translate-x-full";
+
+                        if (modalContent) {
+                            modalContent.classList.remove("translate-x-0");
+                            modalContent.classList.add(position);
+                        }
+
                         setTimeout(() => {
                             modal.style.display = "none";
                         }, 300);
                     }
-                });
+                }
             }
 
             // 初期設定
@@ -69,136 +106,3 @@ import "../../styles/global.css";
     }
     customElements.define("astro-modal", Modal);
 </script>
-
-<style>
-    .open-modal-btn {
-        background-color: rgb(var(--surface0) / 0.85);
-        border-radius: 16px;
-        padding: 0.5rem;
-        font-size: 16px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition:
-            background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-            box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        outline: 1px solid rgb(var(--overlay1) / 0.6);
-        will-change: transform;
-        width: 1.5rem;
-        height: 1.5rem;
-    }
-    .open-modal-btn:hover {
-        background-color: rgb(var(--surface1) / 0.9);
-        transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 6px 16px rgb(var(--shadow) / 0.2);
-    }
-    .open-modal-btn:active {
-        transform: translateY(-1px) scale(0.98);
-    }
-    .open-modal-btn {
-        margin: 0 12px;
-    }
-    .account-shortcut {
-        position: relative;
-    }
-
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.35);
-        opacity: 0;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        align-items: center;
-        backdrop-filter: blur(3px);
-        will-change: opacity;
-    }
-
-    .modal.show {
-        opacity: 1;
-    }
-
-    .modal-content {
-        position: fixed;
-        padding: 28px;
-        width: 300px;
-        height: 95%;
-        background-color: rgb(var(--surface0) / 0.85);
-        backdrop-filter: blur(12px);
-        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        box-shadow:
-            0px 8px 32px rgb(var(--green) / 0.25),
-            0 0 0 1px rgb(var(--sapphire) / 0.2),
-            inset 0 0 0 1px rgb(var(--blue) / 0.1);
-        will-change: transform;
-        overflow-y: auto;
-        pointer-events: auto;
-        overscroll-behavior: contain;
-    }
-
-    .modal-content-inner {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .modal.right .modal-content {
-        right: 0;
-        transform: translateX(100%);
-        border-top-left-radius: 24px;
-        border-bottom-left-radius: 24px;
-    }
-
-    .modal.left .modal-content {
-        left: 0;
-        transform: translateX(-100%);
-        border-top-right-radius: 24px;
-        border-bottom-right-radius: 24px;
-    }
-
-    .modal.show .modal-content {
-        transform: translateX(0);
-    }
-
-    .close-btn {
-        cursor: pointer;
-        display: flex;
-        outline: solid 2px rgb(var(--overlay1) / 0.6);
-        padding: 4px;
-        border-radius: 10px;
-        height: 2rem;
-        width: 2rem;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        will-change: transform;
-    }
-
-    .close-btn:hover {
-        background-color: rgb(var(--surface1));
-        transform: scale(1.08) rotate(-4deg);
-        outline-color: rgb(var(--overlay2));
-    }
-
-    .close-btn:active {
-        transform: scale(0.95) rotate(-2deg);
-    }
-
-    @media (hover: hover) {
-        .modal-content:hover {
-            box-shadow: 0px 12px 40px rgb(var(--shadow) / 0.3);
-        }
-    }
-
-    @media (max-width: 815px) {
-        .modal-content {
-            height: 88%;
-        }
-    }
-</style>

@@ -5,6 +5,7 @@ import AppIcon from "@/src/components/ui/app-icon.astro";
 import { APPS } from "@/src/const";
 import { getRole } from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
+import { style } from "@/src/styles/component";
 const user = await Astro.locals.currentUser();
 
 if (!user) {
@@ -23,7 +24,7 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
 ---
 
 <Layout title="アプリ一覧">
-    <h1>アプリ</h1>
+    <h1 class={style.text.title()}>アプリ</h1>
     <Grid variant="offset">
         {
             APPS.map((app) => (

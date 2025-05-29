@@ -2,10 +2,11 @@
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
 import Grid from "@/src/components/ui/grid.astro";
 import AppIcon from "@/src/components/ui/app-icon.astro";
+import { style } from "@/src/styles/component";
 ---
 
 <Layout title="管理画面">
-    <h1>管理画面</h1>
+    <h1 class={style.text.title()}>管理画面</h1>
     <Grid variant="offset">
         <AppIcon
             title="ユーザー管理"
