@@ -7,8 +7,12 @@ import {
 import { getUser } from "@/src/lib/query/admin/clerk";
 import { getProfile } from "@/src/lib/query/profile";
 import { translateGrade, timeForNextGrade } from "@/src/utils";
-
+import { tv } from "tailwind-variants";
 const { userId } = Astro.params;
+
+const tablehead = tv({
+    base: "px-2 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300 bg-slate-200 dark:bg-slate-800/90 uppercase tracking-wider",
+});
 
 if (!userId) {
     return Astro.redirect("/admin/record");
@@ -235,21 +239,9 @@ const totalTrains = parseInt(
                     <table class="w-full">
                         <thead class="bg-slate-200 dark:bg-slate-00">
                             <tr>
-                                <th
-                                    class="px-2 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider"
-                                >
-                                    日付
-                                </th>
-                                <th
-                                    class="px-2 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider"
-                                >
-                                    稽古時間
-                                </th>
-                                <th
-                                    class="px-2 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider"
-                                >
-                                    編集日
-                                </th>
+                                <th class={tablehead()}> 日付 </th>
+                                <th class={tablehead()}> 稽古時間 </th>
+                                <th class={tablehead()}> 編集日 </th>
                             </tr>
                         </thead>
                         <tbody
