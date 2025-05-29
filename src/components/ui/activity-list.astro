@@ -1,6 +1,6 @@
 ---
 import { userActivity } from "@/src/lib/query/activity";
-
+import { style } from "@/src/styles/component";
 const userId = Astro.locals.auth().userId!;
 
 // Props型定義
@@ -57,33 +57,34 @@ function generatePageUrl(newPage: number, newSortOrder?: string): string {
 }
 ---
 
-<div class="activity-list-container" id="activity-list-container">
-    <table>
-        <thead>
-            <tr>
-                <th>日付</th>
-                <th>稽古時間</th>
-                <th>操作</th>
+<div id="activity-list-container" class={style.table.container()}>
+    <table class={style.table.table()}>
+        <thead class={style.table.thead.container()}>
+            <tr class={style.table.thead.tr()}>
+                <th class={style.table.thead.th()}>日付</th>
+                <th class={style.table.thead.th()}>稽古時間</th>
+                <th class={style.table.thead.th()}>操作</th>
             </tr>
         </thead>
         <tbody>
             {
                 activities.length === 0 ? (
-                    <tr>
-                        <td>履歴はありません</td>
-                        <td>追加しましょう!</td>
-                        <td />
+                    <tr class={style.table.tbody.tr()}>
+                        <td class={style.table.tbody.td()}>履歴はありません</td>
+                        <td class={style.table.tbody.td()}>追加しましょう!</td>
                     </tr>
                 ) : (
                     activities.map((activity) => (
-                        <tr>
-                            <td>
+                        <tr class={style.table.tbody.tr()}>
+                            <td class={style.table.tbody.td()}>
                                 {new Date(activity.date).toLocaleDateString(
                                     "ja-JP"
                                 )}
                             </td>
-                            <td>{activity.period}</td>
-                            <td>
+                            <td class={style.table.tbody.td()}>
+                                {activity.period}
+                            </td>
+                            <td class={style.table.tbody.td()}>
                                 <button
                                     type="button"
                                     class="edit-btn"
@@ -98,41 +99,46 @@ function generatePageUrl(newPage: number, newSortOrder?: string): string {
             }
         </tbody>
     </table>
-
-    <!-- ページネーションUI -->
-    {
-        totalPages > 1 && (
-            <div class="pagination">
-                <div class="pagination-info">
-                    {totalItems}件中 {startIndex + 1}-{endIndex}件表示 (
-                    {safePage}/{totalPages}ページ)
-                </div>
-                <div class="pagination-controls">
-                    <a
-                        href={generatePageUrl(safePage - 1)}
-                        class={`page-btn prev-page ${safePage <= 1 ? "disabled" : ""}`}
-                        aria-disabled={safePage <= 1}
-                        data-page={safePage - 1}
-                        data-astro-prefetch="load"
-                        data-astro-history="replace"
-                    >
-                        前へ
-                    </a>
-                    <a
-                        href={generatePageUrl(safePage + 1)}
-                        class={`page-btn next-page ${safePage >= totalPages ? "disabled" : ""}`}
-                        aria-disabled={safePage >= totalPages}
-                        data-page={safePage + 1}
-                        data-astro-prefetch="load"
-                        data-astro-history="replace"
-                    >
-                        次へ
-                    </a>
-                </div>
-            </div>
-        )
-    }
 </div>
+<!-- ページネーションUI -->
+{
+    totalPages >= 1 && (
+        <div class="mt-4 flex items-center justify-between">
+            <div class="pagination-info">
+                {totalItems}件中 {startIndex + 1}-{endIndex}件表示
+            </div>
+            {safePage}/{totalPages}
+            <div class="pagination-controls">
+                <a
+                    href={generatePageUrl(safePage - 1)}
+                    class={style.pagenation.button({
+                        type: "previous",
+                        disabled: safePage <= 1,
+                    })}
+                    aria-disabled={safePage <= 1}
+                    data-page={safePage - 1}
+                    data-astro-prefetch="load"
+                    data-astro-history="replace"
+                >
+                    前へ
+                </a>
+                <a
+                    href={generatePageUrl(safePage + 1)}
+                    class={style.pagenation.button({
+                        type: "next",
+                        disabled: safePage >= totalPages,
+                    })}
+                    aria-disabled={safePage >= totalPages}
+                    data-page={safePage + 1}
+                    data-astro-prefetch="load"
+                    data-astro-history="replace"
+                >
+                    次へ
+                </a>
+            </div>
+        </div>
+    )
+}
 
 <script>
     function initPagination() {
@@ -213,51 +219,3 @@ function generatePageUrl(newPage: number, newSortOrder?: string): string {
     document.addEventListener("DOMContentLoaded", initPagination);
     document.addEventListener("astro:after-swap", initPagination);
 </script>
-
-<style>
-    .edit-btn {
-        margin-right: 8px;
-        padding: 6px 12px;
-        background-color: rgb(var(--blue));
-        color: rgb(var(--crust));
-        text-decoration: none;
-        border-radius: 4px;
-    }
-    .edit-btn:hover {
-        background-color: rgb(var(--sapphire));
-    }
-
-    /* ページネーションのスタイル */
-    .pagination {
-        margin-top: 2rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
-    .pagination-controls {
-        display: flex;
-        gap: 1rem;
-    }
-    .page-btn {
-        padding: 0.5rem 1.5rem;
-        background-color: rgb(var(--blue));
-        color: rgb(var(--crust));
-        text-decoration: none;
-        border-radius: 4px;
-        display: inline-block;
-        cursor: pointer;
-    }
-    .page-btn:hover:not(.disabled) {
-        background-color: rgb(var(--sapphire));
-    }
-    .page-btn.disabled {
-        background-color: rgb(var(--overlay0));
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-    .pagination-info {
-        font-size: 0.9rem;
-        color: rgb(var(--text));
-    }
-</style>

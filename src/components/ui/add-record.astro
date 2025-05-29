@@ -1,56 +1,68 @@
 ---
-import { resentlyActivity } from "@/src/lib/query/activity";
-
+import { style } from "@/src/styles/component";
 const userId = Astro.locals.auth().userId!;
+import { resentlyActivity } from "@/src/lib/query/activity";
+import ProgressCircle from "./progress-circle.astro";
+import { actions } from "astro:actions";
+import Notification from "./notification.astro";
 
-const resents = await resentlyActivity({ userId: userId, limit: 1 });
-
-const relativeTime = () => {
-    const now = Date.now();
-    const diff = now - new Date(resents[0]!.createAt).getTime();
-    const secondsUnit = 1000;
-    const minutesUnit = 60 * secondsUnit;
-    const hoursUnit = 60 * minutesUnit;
-    const daysUnit = 24 * hoursUnit;
-    const weeksUnit = 7 * daysUnit;
-    const monthsUnit = 4 * weeksUnit;
-    const yearsUnit = 12 * monthsUnit;
-    let text = "";
-    if (diff < 60 * secondsUnit) {
-        text = "たった 今";
-    } else if (diff < 60 * minutesUnit) {
-        text = Math.floor(diff / minutesUnit) + "分前";
-    } else if (diff < 24 * hoursUnit) {
-        text = Math.floor(diff / hoursUnit) + "時間前";
-    } else if (diff < 7 * daysUnit) {
-        text = Math.floor(diff / daysUnit) + "日前";
-    } else if (diff < 4 * weeksUnit) {
-        text = Math.floor(diff / weeksUnit) + "週間前";
-    } else if (diff < 12 * monthsUnit) {
-        text = Math.floor(diff / monthsUnit) + "ヶ月前";
-    } else {
-        text = Math.floor(diff / yearsUnit) + "年前";
+let enable = true;
+await resentlyActivity({
+    userId: userId,
+    limit: 1,
+}).then((res) => {
+    if (res instanceof Response) {
+        console.error("Failed to fetch recent activities:", res.statusText);
+        enable = false; // データ取得に失敗した場合は無効
     }
-    return text;
-};
+    enable = true; // データ取得に成功した場合は有効
+});
+
+const result = Astro.getActionResult(actions.record.add);
 ---
 
-<form id="activity-form" class="activity-form" method="POST">
-    <label for="date">
-        日付
-        <span style="color:rgb(var(--maroon))">*</span>
+{
+    result && !result.error && (
+        <Notification
+            title="記録の追加"
+            message="記録が正常に追加されました。"
+            type="success"
+            duration={3000}
+        />
+    )
+}
+{
+    result && result.error && (
+        <Notification
+            title="記録の追加"
+            message={`記録の追加に失敗しました: ${result.error.message}`}
+            type="error"
+            duration={5000}
+        />
+    )
+}
+
+<form
+    method="POST"
+    action={actions.record.add}
+    class={style.form.container({})}
+>
+    <input type="hidden" name="userId" class="hidden" value={userId} />
+    <label for="date" class="text-sm font-medium">
+        日付<span class={style.text.necessary()}>*</span>
     </label>
     <input
         type="date"
         id="date"
         name="date"
         value=`${(new Date()).toISOString().split('T')[0]}`
+        class={style.form.input({})}
         required
+        disabled={!enable}
     />
 
-    <label for="period">
-        稽古時間
-        <span style="color:rgb(var(--maroon))">*</span>
+    <label for="period" class="text-sm font-medium">
+        稽古時間<span class={style.text.necessary()}>*</span>
     </label>
     <input
         type="number"
@@ -58,100 +70,44 @@ const relativeTime = () => {
         name="period"
         value="1.5"
         step="0.5"
+        class={style.form.input({
+            disable: !enable,
+        })}
         required
+        disabled={!enable}
     />
-    <button type="submit" id="record-submit">追加</button>
-</form>
+    <button
+        type="submit"
+        id="record-submit"
+        class={style.form.button()}
+        disabled={!enable}
+    >
+        {!enable ? <ProgressCircle title="送信中" inline="inline" /> : "追加"}
+    </button>
 
-{
-    resents.length > 0 && (
-        <div class="recent-card">
-            <h2 class="recent-card-title">
-                最近追加した項目:
-                <small
-                    id="relative-time"
-                    data-timestamp={new Date(resents[0].createAt).getTime()}
-                >
-                    {relativeTime()}
-                </small>
-            </h2>
-            <div class="recent-card-body">
-                <span class="recent-timestamp">
-                    追加日時:{" "}
-                    {new Date(resents[0].createAt).toLocaleString("ja-JP")}
-                </span>
-                <span class="recent-date">
-                    日付:{" "}
-                    {new Date(resents[0].date).toLocaleDateString("ja-JP")}
-                </span>
-                <span class="recent-period">{resents[0].period}時間</span>
-            </div>
-        </div>
-    )
-}
-
-<style>
-    .activity-form {
-        display: grid;
-        grid-template-columns: 100px 1fr;
-        gap: 1rem;
-        align-items: center;
-    }
-    .activity-form button {
-        grid-column: span 2;
-    }
-    .feedback-message {
-        background-color: rgb(var(--accent));
-        color: rgb(var(--text));
-        padding: 0.5rem;
-        border-radius: 0.25rem;
-        margin-bottom: 1rem;
-        text-align: center;
-    }
-    .hidden {
-        display: none;
-    }
-    .recent-card {
-        background-color: rgb(var(--surface1) / 0.8);
-        border: 1px solid rgb(var(--overlay0) / 0.9);
-        padding: 1rem;
-        border-radius: 0.5rem;
-        margin-top: 1rem;
-    }
-    .recent-card-title {
-        font-size: 1.2rem;
-        margin-bottom: 0.5rem;
-        color: rgb(var(--text));
-    }
-    .recent-card-body {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.9rem;
-        color: rgb(var(--subtext0));
-    }
-    .recent-card-body > span {
-        margin-right: 0.5rem;
-    }
-    h2.recent-card-title {
-        margin-top: 0;
-    }
-
-    @media (max-width: 815px) {
-        .recent-card-body {
-            flex-direction: column;
-        }
-    }
-</style>
-
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const form = document.getElementById("activity-form")!;
-        const subumitButton = document.getElementById("record-submit")!;
-
-        // フォーム送信時のフィードバック表示
-        form.addEventListener("submit", () => {
-            subumitButton.setAttribute("disabled", "true");
-            subumitButton.textContent = "送信中...";
+    <script>
+        const form = document.querySelector("form")!;
+        const button = document.getElementById(
+            "record-submit"
+        ) as HTMLButtonElement;
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            button.textContent = "送信中...";
+            button.classList.remove(
+                "bg-blue-600",
+                "hover:bg-blue-700",
+                "dark:bg-blue-500",
+                "dark:hover:bg-blue-600"
+            );
+            button.classList.add(
+                "text-slate-800",
+                "dark:text-slate-100",
+                "bg-slate-300",
+                "dark:bg-slate-600",
+                "cursor-pointer"
+            );
+            button.disabled = true;
+            form.submit();
         });
-    });
-</script>
+    </script>
+</form>

@@ -17,7 +17,7 @@
     "drizzle-orm": "^0.39.3",
     "drizzle-zod": "^0.7.0",
     "svix": "^1.61.0",
-    "tailwindcss": "^4.1.7",
+    "tailwind-variants": "^1.0.0",
     "ts-ics": "^1.6.7",
     "typescript": "5.8.3",
     "uuid": "^11.1.0"
@@ -33,7 +33,7 @@
     "cf-typegen": "wrangler types",
     "check": "astro build && tsc && wrangler deploy --dry-run",
     "deploy": "astro build && wrangler deploy",
-    "dev": "astro build && wrangler dev",
+    "dev": "astro dev --remote",
     "preview": "astro build && wrangler dev"
   },
   "type": "module",

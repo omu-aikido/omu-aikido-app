@@ -10,66 +10,62 @@ interface Props {
 const { title, id, desc } = Astro.props;
 ---
 
-<a href={`${id}`}>
-    <ul>
-        <li>
-            <h4 class="title">{title}</h4>
-            <p>{desc}</p>
-        </li>
-    </ul>
+<a href={`${id}`} class="group block touch-manipulation">
+    <div
+        class="relative overflow-hidden bg-white dark:bg-gray-800 rounded-xl hover:border hover:border-blue-400 shadow-md active:shadow-lg transition-all duration-200 ease-out active:scale-[0.98] border border-gray-200 dark:border-gray-700 min-h-[120px]"
+    >
+        <div
+            class="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 opacity-0 group-active:opacity-100 transition-opacity duration-200"
+        >
+        </div>
+        <div class="relative p-4 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md"
+                    >
+                        <svg
+                            class="w-5 h-5 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h4
+                        class="text-lg font-semibold text-gray-900 dark:text-white group-active:text-blue-600 dark:group-active:text-blue-400 transition-colors duration-200 leading-tight"
+                    >
+                        {title}
+                    </h4>
+                </div>
+            </div>
+            <p
+                class="text-gray-600 dark:text-gray-300 text-base leading-relaxed mb-5"
+            >
+                {desc}
+            </p>
+            <div
+                class="flex items-center text-blue-600 dark:text-blue-400 text-base font-medium"
+            >
+                詳細を見る
+                <svg
+                    class="w-5 h-5 ml-2 transform group-active:translate-x-1 transition-transform duration-200"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
 </a>
-<style>
-    ul {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-    }
-    ul li {
-        width: calc(50% - 1rem);
-        padding: 1rem;
-        background-color: rgb(var(--surface0));
-        border-radius: 12px;
-        transition:
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
-    }
-    ul li:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0px 0px 2px rgb(var(--sapphire) / 0.6);
-    }
-    ul li * {
-        text-decoration: none;
-        transition: color 0.2s ease;
-    }
-    ul li:first-child {
-        width: 100%;
-        margin-bottom: 1rem;
-        text-align: center;
-    }
-    ul li a {
-        display: block;
-        margin-bottom: 0;
-    }
-    .title {
-        margin: 0;
-    }
-
-    @media (max-width: 720px) {
-        ul {
-            gap: 0.5em;
-        }
-        ul li {
-            width: 100%;
-            text-align: center;
-        }
-        ul li:first-child {
-            margin-bottom: 0;
-        }
-        ul li:first-child .title {
-            font-size: 1.563em;
-        }
-    }
-</style>
