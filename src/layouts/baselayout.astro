@@ -39,3 +39,55 @@ import "@/src/styles/global.css";
         }
     }
 </style>
+
+<style is:global>
+    .cl-cardBox {
+        box-shadow: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .cl-headerTitle {
+            color: var(--color-slate-100);
+        }
+        .cl-headerSubtitle,
+        .cl-formFieldLabel {
+            color: var(--color-slate-300);
+        }
+        .cl-dividerText {
+            color: var(--color-slate-400);
+        }
+        #identifier-field,
+        .cl-socialButtons button,
+        .cl-formButtonPrimary,
+        .cl-menuButton,
+        .cl-navbar,
+        .cl-badge,
+        .cl-navbar :where(h1, button, a) {
+            background: var(--color-slate-700);
+            color: var(--color-slate-200);
+        }
+
+        .cl-formButtonPrimary:hover {
+            color: var(--color-slate-300);
+            background: var(--color-slate-600);
+        }
+
+        .cl-profileSectionPrimaryButton {
+            background: var(--color-slate-500);
+        }
+        .cl-button:hover,
+        .cl-profileSectionPrimaryButton:hover {
+            background: var(--color-slate-400);
+        }
+        .cl-card,
+        .cl-pageScrollBox,
+        .cl-pageScrollBox :where(h1, p, a, div),
+        .cl-footer {
+            color: var(--color-slate-300);
+            background: var(--color-slate-800);
+        }
+        .cl-menuItem {
+            border: none;
+        }
+    }
+</style>

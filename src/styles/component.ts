@@ -103,7 +103,9 @@ export const style = {
     },
 
     form: {
-        container: tv({}),
+        container: tv({
+            base: "grid grid-cols-3 gap-4 items-center",
+        }),
         input: tv({
             base: [
                 "col-span-2 px-3 py-2",
@@ -123,6 +125,15 @@ export const style = {
                 "hover:bg-emerald-400 dark:hover:bg-emerald-600",
                 "disabled:bg-slate-200 dark:disabled:bg-slate-700",
             ],
+            variants: {
+                type: {
+                    reset: "bg-red-300 dark:bg-red-700 hover:bg-red-400 dark:hover:bg-red-600",
+                },
+                span: {
+                    single: "col-span-1",
+                    double: "col-span-2",
+                },
+            },
         }),
         feedback: tv({}),
         recent: {
@@ -132,11 +143,90 @@ export const style = {
         },
     },
 
+    table: {
+        container: tv({
+            base: "overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700",
+        }),
+        table: tv({
+            base: "min-w-full divide-y divide-slate-200 dark:divide-slate-700",
+        }),
+        thead: {
+            container: tv({}),
+            tr: tv({}),
+            th: tv({
+                base: [
+                    "px-4 py-3 text-left text-slate-700 dark:text-slate-300 uppercase tracking-wider",
+                    "bg-slate-200 dark:bg-slate-800",
+                ],
+            }),
+        },
+        tbody: {
+            container: tv({}),
+            tr: tv({
+                base: [
+                    "hover:bg-slate-50/40 dark:hover:bg-slate-800/40",
+                    "transition-colors duration-200",
+                ],
+            }),
+            td: tv({
+                base: [
+                    "px-4 py-4 whitespace-nowrap text-slate-500 dark:text-slate-300",
+                ],
+            }),
+        },
+    },
+
+    sort: {
+        button: tv({
+            base: [
+                "px-4 py-2 rounded-md my-2 mx-1",
+                "bg-slate-200 dark:bg-slate-800",
+                "text-slate-700 dark:text-slate-300",
+                "hover:bg-slate-300 dark:hover:bg-slate-700",
+                "transition-colors duration-200",
+            ],
+            variants: {
+                active: {
+                    true: "bg-violet-400 dark:bg-violet-600 text-white hover:bg-violet-300 dark:hover:bg-violet-500",
+                },
+            },
+        }),
+    },
+    pagenation: {
+        button: tv({
+            base: [],
+            variants: {
+                type: {
+                    next: [
+                        "px-4 py-2 rounded-md my-2 mx-1",
+                        "bg-slate-200 dark:bg-slate-800",
+                        "text-slate-700 dark:text-slate-300",
+                        "hover:bg-slate-300 dark:hover:bg-slate-700",
+                        "transition-colors duration-200",
+                    ],
+                    previous: [
+                        "px-4 py-2 rounded-md my-2 mx-1",
+                        "bg-slate-200 dark:bg-slate-800",
+                        "text-slate-700 dark:text-slate-300",
+                        "hover:bg-slate-300 dark:hover:bg-slate-700",
+                        "transition-colors duration-200",
+                    ],
+                },
+                disabled: {
+                    true: "opacity-50 cursor-not-allowed",
+                },
+            },
+        }),
+    },
     text: {
-        title: tv({}),
+        title: tv({
+            base: "text-3xl mb-4 font-bold text-slate-800 dark:text-slate-200",
+        }),
         subtitle: tv({}),
         body: tv({}),
-        link: tv({}),
+        link: tv({
+            base: "text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline transition-colors duration-200",
+        }),
         highlight: tv({}),
         error: tv({}),
         success: tv({}),

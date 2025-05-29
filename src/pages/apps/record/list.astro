@@ -1,7 +1,7 @@
 ---
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
 import ActivityList from "@/src/components/ui/activity-list.astro";
-import ProgressCircle from "@/src/components/ui/progress-circle.astro";
+import { style } from "@/src/styles/component";
 
 const startParam = Astro.url.searchParams.get("start");
 const endParam = Astro.url.searchParams.get("end");
@@ -29,15 +29,16 @@ function generateSortUrl(newSortOrder: "asc" | "desc"): string {
 ---
 
 <Layout title="稽古記録 一覧">
-    <h1>一覧</h1>
+    <h1 class={style.text.title()}>一覧</h1>
 
     <!-- フィルター用フィールド -->
-    <form id="filter-form" class="filter-form" method="GET">
+    <form id="filter-form" class={style.form.container()} method="GET">
         <label for="start">開始日</label>
         <input
             type="date"
             id="start"
             name="start"
+            class={style.form.input()}
             value={startValue ? startValue.toISOString().split("T")[0] : ""}
         />
         <label for="end">終了日</label>
@@ -45,24 +46,36 @@ function generateSortUrl(newSortOrder: "asc" | "desc"): string {
             type="date"
             id="end"
             name="end"
+            class={style.form.input()}
             value={endValue ? endValue.toISOString().split("T")[0] : ""}
         />
-        <!-- フィルター適用時にはpage=1に戻す -->
-        <input type="hidden" name="page" value="1" />
-        <!-- 変更: type="reset"からtype="submit"に変更しリセット用パラメータを送信 -->
-        <button type="submit" name="reset" value="true" class="reset_button"
+        {/*フィルター適用時にはpage=1に戻す */}
+        <input
+            type="hidden"
+            name="page"
+            value="1"
+            class={style.form.button()}
+        />
+        {/* type="reset"からtype="submit"に変更しリセット用パラメータを送信 */}
+        <button
+            type="submit"
+            name="reset"
+            value="true"
+            class={style.form.button({ type: "reset", span: "single" })}
             >リセット</button
         >
-        <button type="submit" class="submit_button">フィルター</button>
+        <button type="submit" class={style.form.button({ span: "double" })}
+            >フィルター</button
+        >
     </form>
 
     <hr />
 
-    <div class="sort-controls">
+    <div class="mb-6">
         <span>並び順:</span>
         <a
             href={generateSortUrl("desc")}
-            class={`sort-btn ${sortOrder === "desc" ? "active" : ""}`}
+            class={style.sort.button({ active: sortOrder !== "asc" })}
             data-sort="desc"
             data-astro-history="replace"
         >
@@ -70,7 +83,7 @@ function generateSortUrl(newSortOrder: "asc" | "desc"): string {
         </a>
         <a
             href={generateSortUrl("asc")}
-            class={`sort-btn ${sortOrder === "asc" ? "active" : ""}`}
+            class={style.sort.button({ active: sortOrder === "asc" })}
             data-sort="asc"
             data-astro-history="replace"
         >
@@ -86,25 +99,25 @@ function generateSortUrl(newSortOrder: "asc" | "desc"): string {
         server:defer
     >
         <div slot="fallback">
-            <table class="placeholder-table">
-                <thead>
-                    <tr>
-                        <th>日付</th>
-                        <th>稽古時間</th>
-                        <th>操作</th>
+            <table class={style.table.container()}>
+                <thead class={style.table.thead.container()}>
+                    <tr class={style.table.thead.tr()}>
+                        <th class={style.table.thead.th()}>日付</th>
+                        <th class={style.table.thead.th()}>稽古時間</th>
+                        <th class={style.table.thead.th()}>操作</th>
                     </tr>
                 </thead>
                 <tbody>
                     {
                         Array.from({ length: 8 }).map((_, i) => (
-                            <tr>
-                                <td>
+                            <tr class={style.table.tbody.tr()}>
+                                <td class={style.table.tbody.td()}>
                                     <span class="ph-text">&nbsp;</span>
                                 </td>
-                                <td>
+                                <td class={style.table.tbody.td()}>
                                     <span class="ph-text">&nbsp;</span>
                                 </td>
-                                <td>
+                                <td class={style.table.tbody.td()}>
                                     <span class="ph-text">&nbsp;</span>
                                 </td>
                             </tr>
@@ -116,103 +129,6 @@ function generateSortUrl(newSortOrder: "asc" | "desc"): string {
     </ActivityList>
 
     <hr />
-    <a href="/apps/record" class="button">←稽古記録ホームに戻る</a>
+
+    <a href="/apps/record" class={style.text.link()}>←稽古記録ホームに戻る</a>
 </Layout>
-
-<style>
-    .filter-form {
-        display: grid;
-        grid-template-columns: 100px 1fr;
-        gap: 1rem;
-        align-items: center;
-    }
-    .filter-form .reset_button {
-        width: 150px;
-        background-color: rgb(var(--maroon) / 0.6);
-    }
-    .filter-form .reset_button:hover {
-        background-color: rgb(var(--red));
-    }
-    .filter-form .submit_button {
-        margin-left: 50px;
-        width: 150px;
-    }
-
-    .edit-btn {
-        margin-right: 8px;
-        padding: 6px 12px;
-        background-color: rgb(var(--blue));
-        color: rgb(var(--crust));
-        text-decoration: none;
-        border-radius: 4px;
-    }
-    .edit-btn:hover {
-        background-color: rgb(var(--sapphire));
-    }
-    .delete-btn {
-        margin-right: 8px;
-        padding: 6px 12px;
-        background-color: rgb(var(--red));
-        color: rgb(var(--crust));
-        text-decoration: none;
-        border-radius: 4px;
-    }
-    .delete-btn:hover {
-        background-color: rgb(var(--red) / 0.8);
-    }
-
-    .sort-controls {
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .sort-btn {
-        padding: 0.3rem 0.8rem;
-        background-color: rgb(var(--surface0));
-        color: rgb(var(--text));
-        text-decoration: none;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        border: 1px solid rgb(var(--overlay0));
-    }
-
-    .sort-btn.active {
-        background-color: rgb(var(--blue));
-        color: rgb(var(--crust));
-        font-weight: 500;
-    }
-
-    .sort-btn:hover:not(.active) {
-        background-color: rgb(var(--surface1));
-    }
-
-    /* プレースホルダーテーブルのスタイル */
-    .ph-text {
-        display: inline-block;
-        width: 100%;
-        margin: 8px 4px;
-        position: relative;
-        overflow: hidden;
-        background: linear-gradient(
-            90deg,
-            rgba(var(--overlay0) / 0.1) 0%,
-            rgba(var(--overlay0) / 0.3) 50%,
-            rgba(var(--overlay0) / 0.1) 100%
-        );
-        background-size: 200% 100%;
-        animation: shimmering 2s infinite linear;
-        border-radius: 4px;
-        height: 1.2em;
-    }
-
-    @keyframes shimmering {
-        0% {
-            background-position: 100% 0;
-        }
-        100% {
-            background-position: -100% 0;
-        }
-    }
-</style>

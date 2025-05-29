@@ -87,80 +87,19 @@ if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュ�
                     </div>
                 )
             }
-            <AccountUi apps={APPS} />
+            <AccountUi apps={APPS} server:defer>
+                <div class="flex items" slot="fallback">
+                    <span id="open-modal-btn" class={style.modal.button()}>
+                        ⵗ
+                    </span>
+                </div>
+            </AccountUi>
         </header>
-        <div class="p-6 md:mx-auto md:max-w-3xl">
-            <main>
+        <div class="p-6 mx-auto max-w-5xl">
+            <main class="min-h-[75vh] overflow-y-auto mb-auto">
                 <slot />
             </main>
         </div>
         <Footer />
     </body>
 </Baselayout>
-
-<style>
-    .mobile-menu {
-        display: none;
-    }
-
-    .modal-inner-content {
-        display: flex;
-        color: rgb(var(--subtext0));
-        backdrop-filter: blur(1px);
-        flex-direction: column;
-        margin: 8px 0;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        box-shadow: 1px 1px 4px 2px rgb(var(--shadow) / 0.8);
-        transition:
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
-        align-items: st retch;
-    }
-    .modal-inner-content:hover {
-        transform: translateY(-2px);
-        box-shadow: 0px 0px 4px 3px rgb(var(--mauve) / 0.4);
-    }
-    /* 現在のページならハイライト */
-    /* ボーダーをグラデーションにして光彩が周囲を回っているような雰囲気にする */
-    .modal-inner-content[aria-current="page"] {
-        box-shadow: 0px 0px 3px 2px rgb(var(--sapphire) / 0.4);
-    }
-
-    .modal-inner-content a {
-        color: rgb(var(--text));
-        text-decoration: none;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        transition:
-            background-color 0.2s ease,
-            color 0.2s ease;
-    }
-
-    .modal-inner-content a:hover {
-        background-color: rgb(var(--mauve) / 0.2);
-        color: rgb(var(--mauve));
-    }
-    @media (max-width: 815px) {
-        header {
-            height: 4rem;
-        }
-        .mobile-menu {
-            display: flex;
-        }
-        .links {
-            display: none;
-        }
-        header > h2 {
-            margin: 0;
-        }
-        header > h2 > a {
-            font-size: 1.2rem;
-            padding: 0;
-        }
-        nav > a {
-            font-size: 1rem;
-            padding: 0.2rem 0.8rem;
-        }
-    }
-</style>

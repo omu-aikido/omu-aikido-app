@@ -3,11 +3,10 @@ import { default as Layout } from "@/src/layouts/auth-layout.astro";
 import { getProfile } from "@/src/lib/query/profile";
 import {
     userActivity,
-    createActivity,
-    inputActivity,
 } from "@/src/lib/query/activity";
 import { translateGrade, timeForNextGrade } from "@/src/utils";
 import ActivityForm from "@/src/components/ui/add-record.astro";
+import { style } from "@/src/styles/component";
 
 import RecentsPh from "@/src/components/ui/recents-ph.astro";
 import Recents from "@/src/components/ui/recents.astro";
@@ -53,7 +52,7 @@ const needToNextGrade = parseInt(
 ---
 
 <Layout title="きろく">
-    <h1>きろく</h1>
+    <h1 class={style.text.title()}>きろく</h1>
 
     {   grade > 0 &&
         <h2>
@@ -70,36 +69,59 @@ const needToNextGrade = parseInt(
         <RecentsPh slot="fallback" />
     </Recents>
 
-    <hr />
-    <h2>今月の稽古履歴</h2>
-    <a href="/apps/record/list">全ての稽古履歴</a>
-    <table>
-        <thead>
-            <tr>
-                <th>日付</th>
-                <th>稽古時間</th>
-            </tr>
-        </thead>
-        <tbody>
-            {
-                activities.length === 0 ? (
+    <hr class="my-6 border-slate-200 dark:border-slate-700" />
+    
+    <div class="space-y-4">
+        <div class="flex flex-col items-baseline sm:flex-row sm:items-center sm:justify-between gap-2">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-white">今月の稽古履歴</h2>
+            <a 
+                href="/apps/record/list" 
+                class={style.text.link()}
+            >
+                全ての稽古履歴 >>
+            </a>
+        </div>
+
+        <div class={style.table.container()}>
+            <table class={style.table.table()}>
+                <thead class={style.table.thead.container()}>
                     <tr>
-                        <td>履歴はありません</td>
-                        <td>追加しましょう!</td>
+                        <th class={style.table.thead.th()}>
+                            日付
+                        </th>
+                        <th class={style.table.thead.th()}>
+                            稽古時間
+                        </th>
                     </tr>
-                ) : (
-                    activities.map((activity) => (
-                        <tr>
-                            <td>
-                                {new Date(activity.date).toLocaleDateString(
-                                    "ja-JP"
-                                )}
-                            </td>
-                            <td>{activity.period}</td>
-                        </tr>
-                    ))
-                )
-            }
-        </tbody>
-    </table>
+                </thead>
+                <tbody class={style.table.tbody.container()}>
+                    {
+                        activities.length === 0 ? (
+                            <tr class={style.table.tbody.tr()}>
+                                <td class={style.table.tbody.td()}>
+                                    履歴はありません
+                                </td>
+                                <td class={style.table.tbody.td()}>
+                                    追加しましょう!
+                                </td>
+                            </tr>
+                        ) : (
+                            activities.map((activity) => (
+                                <tr class={style.table.tbody.tr()}>
+                                    <td class={style.table.tbody.td()}>
+                                        {new Date(activity.date).toLocaleDateString(
+                                            "ja-JP"
+                                        )}
+                                    </td>
+                                    <td class={style.table.tbody.td()}>
+                                        {activity.period}時間
+                                    </td>
+                                </tr>
+                            ))
+                        )
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </Layout>

@@ -11,7 +11,12 @@ if (!user) {
     return Astro.redirect("/sign-in");
 }
 import { style } from "@/src/styles/component";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/astro/components";
+import {
+    SignedIn,
+    SignedOut,
+    SignInButton,
+    SignOutButton,
+} from "@clerk/astro/components";
 ---
 
 <Modal position="right" icon="  ⵗ  ">
@@ -38,6 +43,8 @@ import { SignedIn, SignedOut, SignInButton } from "@clerk/astro/components";
                     </div>
                 ))
             }
+            <hr />
+            <SignOutButton />
         </SignedIn>
     </div>
 </Modal>

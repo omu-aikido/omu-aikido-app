@@ -5,6 +5,7 @@ import {
     updateActivity,
     deleteActivity,
 } from "@/src/lib/query/activity";
+import { style } from "@/src/styles/component";
 
 const prePage = new URL(Astro.url).searchParams.get("page");
 
@@ -58,7 +59,7 @@ if (Astro.request.method === "POST") {
 ---
 
 <Layout title="編集">
-    <h1>アクティビティ編集</h1>
+    <h1 class={style.text.title()}>アクティビティ編集</h1>
     <form method="POST">
         <label for="date">日付</label>
         <input

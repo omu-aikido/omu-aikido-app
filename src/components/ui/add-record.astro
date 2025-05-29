@@ -48,7 +48,7 @@ const result = Astro.getActionResult(actions.record.add);
 <form
     method="POST"
     action={actions.record.add}
-    class="grid grid-cols-3 gap-4 items-center"
+    class={style.form.container({})}
 >
     <input type="hidden" name="userId" class="hidden" value={userId} />
     <label for="date" class="text-sm font-medium">

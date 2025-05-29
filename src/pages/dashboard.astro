@@ -9,6 +9,7 @@ import AppIcon from "@/src/components/ui/app-icon.astro";
 import { APPS } from "@/src/const";
 import ActivityForm from "@/src/components/ui/add-record.astro";
 import { getProfile } from "@/src/lib/query/profile";
+import { style } from "@/src/styles/component";
 
 const userId = Astro.locals.auth().userId!;
 const profile = await getProfile({ userId });
@@ -39,7 +40,7 @@ if (
 <Layout title="ダッシュボード">
     <NewsReader content="short" path="news" source="app/news" />
     <hr />
-    <h2>追加</h2>
+    <h2 class={style.text.title()}>追加</h2>
 
     <ActivityForm />
     <Recents server:defer>

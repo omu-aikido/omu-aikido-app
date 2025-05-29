@@ -44,7 +44,7 @@ if (Astro.request.method == "POST") {
 ---
 
 <Layout title="アカウントメニュー">
-    <UserProfile>
+    <UserProfile appearance={{}}>
         <UserProfile.Page label="ステータス" url="status">
             <svg
                 slot="label-icon"
@@ -57,76 +57,118 @@ if (Astro.request.method == "POST") {
                 ></path>
             </svg>
 
-            <h1>ステータス</h1>
-            <form id="setup-form" class="setup-form" method="POST">
-                <label for="grade">
-                    所持級段位
-                    <span style="color:rgb(var(--maroon))">*</span>
-                </label>
-                <select id="grade" name="grade" required>
-                    {
-                        grade.map((g) => (
-                            <option
-                                value={g.grade}
-                                selected={g.grade === userProfile.grade}
-                            >
-                                {g.name}
-                            </option>
-                        ))
-                    }
-                </select>
+            <h1
+                class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6"
+            >
+                ステータス
+            </h1>
+            <form
+                id="setup-form"
+                class="max-w-md mx-auto space-y-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-lg"
+                method="POST"
+            >
+                <div class="space-y-2">
+                    <label
+                        for="grade"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                        所持級段位
+                        <span class="text-red-600 dark:text-red-400 ml-1"
+                            >*</span
+                        >
+                    </label>
+                    <select
+                        id="grade"
+                        name="grade"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        {
+                            grade.map((g) => (
+                                <option
+                                    value={g.grade}
+                                    selected={g.grade === userProfile.grade}
+                                >
+                                    {g.name}
+                                </option>
+                            ))
+                        }
+                    </select>
+                </div>
 
-                <label> 級段位取得日 </label>
-                <input
-                    type="date"
-                    id="getGradeAt"
-                    name="getGradeAt"
-                    value=`${(new Date(userProfile.getGradeAt)).toISOString().split('T')[0]}`
-                />
+                <div class="space-y-2">
+                    <label
+                        for="getGradeAt"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >級段位取得日</label
+                    >
+                    <input
+                        type="date"
+                        id="getGradeAt"
+                        name="getGradeAt"
+                        value=`${(new Date(userProfile.getGradeAt)).toISOString().split('T')[0]}`
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
 
-                <label for="joinedAt">
-                    入部年度
-                    <span style="color:rgb(var(--maroon))">*</span>
-                </label>
-                <input
-                    type="number"
-                    id="joinedAt"
-                    name="joinedAt"
-                    placeholder="4桁の数字"
-                    required
-                    value={userProfile.joinedAt}
-                />
-                <label for="year">
-                    学年
-                    <span style="color:rgb(var(--maroon))">*</span>
-                </label>
-                <select id="year" name="year" value={userProfile.year} required>
-                    {
-                        year.map((y) => (
-                            <option
-                                value={y.year}
-                                selected={y.year === userProfile.year}
-                            >
-                                {y.name}
-                            </option>
-                        ))
-                    }
-                </select>
-                <button type="submit">登録</button>
+                <div class="space-y-2">
+                    <label
+                        for="joinedAt"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                        入部年度
+                        <span class="text-red-600 dark:text-red-400 ml-1"
+                            >*</span
+                        >
+                    </label>
+                    <input
+                        type="number"
+                        id="joinedAt"
+                        name="joinedAt"
+                        placeholder="4桁の数字"
+                        required
+                        value={userProfile.joinedAt}
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+
+                <div class="space-y-2">
+                    <label
+                        for="year"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                        学年
+                        <span class="text-red-600 dark:text-red-400 ml-1"
+                            >*</span
+                        >
+                    </label>
+                    <select
+                        id="year"
+                        name="year"
+                        value={userProfile.year}
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        {
+                            year.map((y) => (
+                                <option
+                                    value={y.year}
+                                    selected={y.year === userProfile.year}
+                                >
+                                    {y.name}
+                                </option>
+                            ))
+                        }
+                    </select>
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 font-medium transition-colors duration-200"
+                >
+                    登録
+                </button>
             </form>
         </UserProfile.Page>
     </UserProfile>
-    <style>
-        tr {
-            margin-left: 1rem;
-            margin-right: 1rem;
-        }
-
-        form {
-            display: grid;
-            grid-template-columns: 150px 1fr;
-            grid-gap: 1rem;
-            align-items: center;
-        }
-    </style>
 </Layout>
