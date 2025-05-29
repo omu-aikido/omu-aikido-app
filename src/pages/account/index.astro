@@ -1,7 +1,7 @@
 ---
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
 import { UserProfile } from "@clerk/astro/components";
-
+import Notification from "@/src/components/ui/notification.astro";
 const user = await Astro.locals.currentUser();
 
 if (!user) {
@@ -11,6 +11,7 @@ if (!user) {
 import * as profile from "@/src/lib/query/profile";
 import { grade, year } from "@/src/utils";
 import { Role } from "@/src/class";
+import { actions } from "astro:actions";
 
 const userProfile = await profile.getProfile({ userId: user.id });
 
@@ -19,31 +20,30 @@ if (userProfile instanceof Response) {
 }
 
 const role = await profile.getRole({ userId: user.id });
-
-if (Astro.request.method == "POST") {
-    let data = await Astro.request.formData();
-    let grade = data.get("grade") as unknown as number;
-    let getGradeAt = data.get("getGradeAt") as unknown as Date;
-    let joinedAt = data.get("joinedAt") as unknown as number;
-    let year = data.get("year") as string;
-
-    const result = await profile.updateProfile({
-        id: user.id,
-        grade: grade,
-        getGradeAt: getGradeAt,
-        joinedAt: joinedAt,
-        year: year,
-        role: role?.toString() ?? "member",
-    });
-    if (result instanceof Error) {
-        return new Response(result.message, { status: 500 });
-    } else {
-        return Astro.redirect("/account");
-    }
-}
+const result = Astro.getActionResult(actions.user.profile.update);
 ---
 
-<Layout title="アカウントメニュー">
+<Layout title="アカウント">
+    {
+        result && result.error && (
+            <Notification
+                title="プロフィール更新"
+                message={`プロフィールの更新に失敗しました。 ${result.error.message}`}
+                type="error"
+                duration={10000}
+            />
+        )
+    }
+    {
+        result && !result.error && (
+            <Notification
+                title="プロフィール更新"
+                message="プロフィールが正常に更新されました。"
+                type="success"
+                duration={3000}
+            />
+        )
+    }
     <UserProfile appearance={{}}>
         <UserProfile.Page label="ステータス" url="status">
             <svg
@@ -66,6 +66,7 @@ if (Astro.request.method == "POST") {
                 id="setup-form"
                 class="max-w-md mx-auto space-y-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-lg"
                 method="POST"
+                action={actions.user.profile.update}
             >
                 <div class="space-y-2">
                     <label
@@ -162,8 +163,11 @@ if (Astro.request.method == "POST") {
                     </select>
                 </div>
 
+                <input type="hidden" name="role" value={role?.ja} />
+
                 <button
                     type="submit"
+                    id="profile-form"
                     class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 font-medium transition-colors duration-200"
                 >
                     登録
@@ -172,3 +176,27 @@ if (Astro.request.method == "POST") {
         </UserProfile.Page>
     </UserProfile>
 </Layout>
+
+<script>
+    const form = document.querySelector("form")!;
+    const button = document.getElementById("profile-form") as HTMLButtonElement;
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        button.textContent = "送信中...";
+        button.classList.remove(
+            "bg-blue-600",
+            "hover:bg-blue-700",
+            "dark:bg-blue-500",
+            "dark:hover:bg-blue-600"
+        );
+        button.classList.add(
+            "text-slate-800",
+            "dark:text-slate-100",
+            "bg-slate-300",
+            "dark:bg-slate-600",
+            "cursor-pointer"
+        );
+        button.disabled = true;
+        form.submit();
+    });
+</script>

@@ -32,7 +32,7 @@ export const style = {
             block: tv({
                 base: [
                     "flex gap-2 items-center",
-                    "p-2 my-2 rounded-lg backdrop-blur-lg",
+                    "rounded-lg backdrop-blur-lg",
                     "bg-slate-300/30 dark:bg-slate-700/30",
                 ],
             }),

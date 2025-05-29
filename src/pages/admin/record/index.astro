@@ -6,7 +6,7 @@ import { getRole } from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
 import * as record from "@/src/lib/query/admin/activity";
 import { translateGrade, timeForNextGrade } from "@/src/utils";
-
+import { style } from "@/src/styles/component";
 const user = await Astro.locals.currentUser();
 if (!user) {
     return Astro.redirect("/sign-in");
@@ -48,33 +48,42 @@ const users_info = users
 ---
 
 <Layout title="管理者メニュー">
-    <table>
-        <thead>
-            <tr>
-                <th>氏名</th>
-                <th>級段位</th>
-                <th>受験資格</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {
-                users_info.map(async (user) => (
-                    <tr>
-                        <td>{(await user).name}</td>
-                        <td>{(await user).grade}</td>
-                        <td>
-                            {(await user).trainFromPreGrade}/
-                            {(await user).timeForNextGrade}
-                        </td>
-                        <td>
-                            <a href={`/admin/record/${(await user).id}`}>
-                                詳細
-                            </a>
-                        </td>
-                    </tr>
-                ))
-            }
-        </tbody>
-    </table>
+    <div class={style.table.container()}>
+        <table class={style.table.table()}>
+            <thead class={style.table.thead.container()}>
+                <tr class={style.table.thead.tr()}>
+                    <th class={style.table.thead.th()}>氏名</th>
+                    <th class={style.table.thead.th()}>級段位</th>
+                    <th class={style.table.thead.th()}>受験資格</th>
+                    <th class={style.table.thead.th()}></th>
+                </tr>
+            </thead>
+            <tbody class={style.table.tbody.container()}>
+                {
+                    users_info.map(async (user) => (
+                        <tr class={style.table.tbody.tr()}>
+                            <td class={style.table.tbody.td()}>
+                                {(await user).name}
+                            </td>
+                            <td class={style.table.tbody.td()}>
+                                {(await user).grade}
+                            </td>
+                            <td class={style.table.tbody.td()}>
+                                {(await user).trainFromPreGrade}/
+                                {(await user).timeForNextGrade}
+                            </td>
+                            <td class={style.table.tbody.td()}>
+                                <a
+                                    class="inline-block px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
+                                    href={`/admin/record/${(await user).id}`}
+                                >
+                                    詳細
+                                </a>
+                            </td>
+                        </tr>
+                    ))
+                }
+            </tbody>
+        </table>
+    </div>
 </Layout>

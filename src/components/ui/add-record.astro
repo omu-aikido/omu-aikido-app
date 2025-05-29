@@ -1,10 +1,7 @@
 ---
 import { style } from "@/src/styles/component";
 const userId = Astro.locals.auth().userId!;
-import Recents from "./recents.astro";
-import { createActivity, inputActivity } from "@/src/lib/query/activity";
 import { resentlyActivity } from "@/src/lib/query/activity";
-import RecentsPh from "./recents-ph.astro";
 import ProgressCircle from "./progress-circle.astro";
 import { actions } from "astro:actions";
 import Notification from "./notification.astro";
@@ -94,11 +91,23 @@ const result = Astro.getActionResult(actions.record.add);
             "record-submit"
         ) as HTMLButtonElement;
         form.addEventListener("submit", (event) => {
-            event.preventDefault(); // フォームのデフォルト送信を防ぐ
+            event.preventDefault();
             button.textContent = "送信中...";
-            button.classList.add("text-slate-800", "dark:text-slate-100");
+            button.classList.remove(
+                "bg-blue-600",
+                "hover:bg-blue-700",
+                "dark:bg-blue-500",
+                "dark:hover:bg-blue-600"
+            );
+            button.classList.add(
+                "text-slate-800",
+                "dark:text-slate-100",
+                "bg-slate-300",
+                "dark:bg-slate-600",
+                "cursor-pointer"
+            );
             button.disabled = true;
-            form.submit(); // フォームを送信
+            form.submit();
         });
     </script>
 </form>
