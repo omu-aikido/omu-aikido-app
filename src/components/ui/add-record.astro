@@ -93,12 +93,6 @@ const result = Astro.getActionResult(actions.record.add);
         form.addEventListener("submit", (event) => {
             event.preventDefault();
             button.textContent = "送信中...";
-            button.classList.remove(
-                "bg-blue-600",
-                "hover:bg-blue-700",
-                "dark:bg-blue-500",
-                "dark:hover:bg-blue-600"
-            );
             button.classList.add(
                 "text-slate-800",
                 "dark:text-slate-100",
