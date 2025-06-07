@@ -34,10 +34,40 @@ export async function searchAccounts(input: {
     return users;
 }
 
+export async function countUsers(): Promise<number> {
+    // Build Clerk API URL for counting users.
+    const url = new URL("https://api.clerk.com/v1/users/count");
+
+    // Construct headers with secret key from environment.
+    const headers = {
+        Authorization: `Bearer ${import.meta.env.CLERK_SECRET_KEY}`,
+    };
+
+    // Execute the GET request.
+    const response = await fetch(url.toString(), {
+        method: "GET",
+        headers,
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to count users. Status: " + response.status);
+    }
+
+    const data = (await response.json()) as {
+        object: "total_count";
+        total_count: number;
+    };
+    return data.total_count;
+}
+
 // list user
-export async function listUser(): Promise<Accounts> {
+export async function listUser(offset?: number): Promise<Accounts> {
     // Build Clerk API URL with query parameters.
     const url = new URL("https://api.clerk.com/v1/users");
+
+    if (offset) {
+        url.searchParams.append("offset", offset.toString());
+    }
 
     // Construct headers with secret key from environment.
     const headers = {

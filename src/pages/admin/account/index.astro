@@ -14,6 +14,7 @@ if (!role || !role.isManagement()) {
 }
 
 const query = Astro.url.searchParams.get("query") ?? "";
+const paging = Astro.url.searchParams.get("page") ?? "0";
 ---
 
 <Layout title="管理者メニュー">
@@ -33,5 +34,5 @@ const query = Astro.url.searchParams.get("query") ?? "";
     <p class="text-sm text-slate-500 dark:text-slate-400 mb-4 mt-0.5">
         * メールアドレス、ユーザー名、ユーザーID、姓名で検索できます
     </p>
-    <UserList query={query} />
+    <UserList query={query} paging={paging} />
 </Layout>

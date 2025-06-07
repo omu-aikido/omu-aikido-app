@@ -1,15 +1,19 @@
 ---
 interface Props {
     query: string;
+    paging: string;
 }
 
-const { query } = Astro.props;
+const { query, paging } = Astro.props;
 
 import type { Account } from "@/src/type";
-import { listUser, searchAccounts } from "@/src/lib/query/admin/clerk";
+import {
+    countUsers,
+    listUser,
+    searchAccounts,
+} from "@/src/lib/query/admin/clerk";
 import { getRole } from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
-import { style } from "@/src/styles/component";
 
 import { translateYear, translateGrade } from "@/src/utils";
 
@@ -26,7 +30,13 @@ const found = await searchAccounts({
     query: query,
 });
 
-const users = await listUser();
+const alluser = await countUsers();
+const users = await listUser(parseInt(paging) * 10);
+
+const pageingStatus = {
+    current: parseInt(paging),
+    total: Math.ceil(alluser / 10),
+};
 ---
 
 <div
@@ -127,3 +137,35 @@ const users = await listUser();
         </table>
     </div>
 </div>
+{
+    pageingStatus.total > 1 && (
+        <div class="flex gap-2 justify-center mt-4">
+            <nav class="inline-flex -space-x-px">
+                {/* 前へ */}
+                {pageingStatus.current > 0 && (
+                    <a
+                        href={`/admin/account?page=${pageingStatus.current - 1}`}
+                        class="m-2 px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-700"
+                    >
+                        前へ
+                    </a>
+                )}
+
+                {/* ページ番号 */}
+                <div class="m-2 px-3 py-2 text-sm font-medium rounded-lg text-slate-500 bg-slate-200 border border-slate-300 dark:bg-slate-600 dark:border-slate-700">
+                    {pageingStatus.current + 1 + "/" + pageingStatus.total}
+                </div>
+
+                {/* 次へ */}
+                {pageingStatus.current < pageingStatus.total - 1 && (
+                    <a
+                        href={`/admin/account?page=${pageingStatus.current + 1}`}
+                        class="m-2 px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-700"
+                    >
+                        次へ
+                    </a>
+                )}
+            </nav>
+        </div>
+    )
+}
