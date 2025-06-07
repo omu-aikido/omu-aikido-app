@@ -53,20 +53,29 @@ if (Astro.request.method == "POST") {
 ---
 
 <Layout title="アカウント編集">
-    <h2>
-        <img src={userAccount.image_url} alt="" />
+    <h2 class="flex items-center gap-4">
+        <img src={userAccount.image_url} alt="" class="w-8 h-8 rounded-full" />
         <p>
             {userAccount.last_name}
             {userAccount.first_name}
         </p>
     </h2>
     <h3>プロフィール</h3>
-    <form id="user-form" class="user-form" method="POST">
-        <label for="grade">
+    <form
+        id="user-form"
+        class="grid grid-cols-4 gap-4 items-center max-w-md mx-auto"
+        method="POST"
+    >
+        <label for="grade" class="col-span-1">
             所持級段位
-            <span style="color:rgb(var(--maroon))">*</span>
+            <span class="text-rose-600">*</span>
         </label>
-        <select id="grade" name="grade" required>
+        <select
+            id="grade"
+            name="grade"
+            required
+            class="col-span-3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
             {
                 grade.map((g) => (
                     <option
@@ -79,16 +88,17 @@ if (Astro.request.method == "POST") {
             }
         </select>
 
-        <label> 級段位取得日 </label>
+        <label class="col-span-1"> 級段位取得日 </label>
         <input
             type="date"
             id="getGradeAt"
             name="getGradeAt"
+            class="col-span-3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value=`${(new Date(userProfile.getGradeAt)).toISOString().split('T')[0]}`
         />
-        <label for="joinedAt">
+        <label for="joinedAt" class="col-span-1">
             入部年度
-            <span style="color:rgb(var(--maroon))">*</span>
+            <span class="text-rose-600">*</span>
         </label>
         <input
             type="number"
@@ -96,13 +106,20 @@ if (Astro.request.method == "POST") {
             name="joinedAt"
             placeholder="4桁の数字"
             required
+            class="col-span-3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={userProfile.joinedAt}
         />
-        <label for="year">
+        <label for="year" class="col-span-1">
             学年
-            <span style="color:rgb(var(--maroon))">*</span>
+            <span class="text-rose-600">*</span>
         </label>
-        <select id="year" name="year" value={userProfile.year} required>
+        <select
+            id="year"
+            name="year"
+            value={userProfile.year}
+            required
+            class="col-span-3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
             {
                 year.map((y) => (
                     <option
@@ -114,8 +131,14 @@ if (Astro.request.method == "POST") {
                 ))
             }
         </select>
-        <label for="role">役職</label>
-        <select id="role" name="role" value={userProfile.role} required>
+        <label for="role" class="col-span-1">役職</label>
+        <select
+            id="role"
+            name="role"
+            value={userProfile.role}
+            required
+            class="col-span-3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
             {
                 Role.ALL.map((r) => (
                     <option
@@ -127,47 +150,26 @@ if (Astro.request.method == "POST") {
                 ))
             }
         </select>
-        <button type="submit">保存</button>
+        <button
+            type="submit"
+            class="col-span-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+            >保存</button
+        >
     </form>
 
-    <hr />
-    <h3 style="color: rgb(var(--red))">Danger Zone</h3>
-    <form method="POST" onsubmit="return confirm('本当に削除しますか？');">
+    <hr class="my-6" />
+    <h3 class="text-red-500 mb-4">Danger Zone</h3>
+    <form
+        method="POST"
+        onsubmit="return confirm('本当に削除しますか？');"
+        class="max-w-md mx-auto"
+    >
         <input type="hidden" name="_action" value="deleteUser" />
         <button
             type="submit"
-            style="color: rgb(var(--crust)); background-color: rgb(var(--red))"
+            class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
         >
             削除
         </button>
     </form>
 </Layout>
-
-<style>
-    form {
-        max-width: 25rem;
-        margin: auto;
-    }
-    .user-form {
-        display: grid;
-        grid-template-columns: 100px 1fr;
-        gap: 1rem;
-        align-items: center;
-    }
-    .user-form button {
-        grid-column: span 2;
-    }
-
-    img {
-        width: 2rem;
-        height: 2rem;
-        border-radius: 50%;
-    }
-
-    h2 {
-        display: grid;
-        grid-template-columns: 2rem 1fr 1fr;
-        gap: 1rem;
-        align-items: center;
-    }
-</style>
