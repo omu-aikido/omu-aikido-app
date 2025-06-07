@@ -28,7 +28,7 @@ const pageingStatus = {
 
 const users_info = users
     .sort((a: Account, b: Account) => {
-        return Role.compare(a.public_metadata.rol1e, b.public_metadata.role);
+        return Role.compare(a.public_metadata.role, b.public_metadata.role);
     })
     .map(async (mapuser: Account) => {
         return {
