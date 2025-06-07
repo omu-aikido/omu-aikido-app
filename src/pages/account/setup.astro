@@ -142,10 +142,14 @@ const result = Astro.getActionResult(actions.user.profile.add);
     import { actions } from "astro:actions";
     import { navigate } from "astro:transitions/client";
     const form = document.querySelector("form")!;
-    const formData = new FormData(form);
+    // インプット/セレクタの列
+    const inputs = Array.from(
+        document.querySelectorAll("input, select")
+    ) as Array<HTMLInputElement | HTMLSelectElement>;
     const button = document.getElementById("profile-form") as HTMLButtonElement;
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
+        const formData = new FormData(form);
         button.textContent = "送信中...";
         button.classList.add(
             "text-slate-800",
@@ -155,6 +159,9 @@ const result = Astro.getActionResult(actions.user.profile.add);
             "cursor-pointer"
         );
         button.disabled = true;
+        inputs.forEach((input) => {
+            input.disabled = true;
+        });
         form.submit();
         const { error } = await actions.user.profile.add(formData);
         if (!error) {
