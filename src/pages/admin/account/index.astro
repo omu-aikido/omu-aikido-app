@@ -13,7 +13,7 @@ if (!role || !role.isManagement()) {
     return Astro.redirect("/dashboard");
 }
 
-const query = Astro.url.searchParams.get("query") ?? "";
+const query = Astro.url.searchParams.get("query");
 const paging = Astro.url.searchParams.get("page") ?? "0";
 ---
 

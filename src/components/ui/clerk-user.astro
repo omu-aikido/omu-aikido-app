@@ -1,6 +1,6 @@
 ---
 interface Props {
-    query: string;
+    query: string | null;
     paging: string;
 }
 
@@ -26,12 +26,15 @@ if (!role || !role.isManagement()) {
     return Astro.redirect("/dashboard");
 }
 
-const found = await searchAccounts({
-    query: query,
-});
-
 const alluser = await countUsers();
-const users = await listUser(parseInt(paging) * 10);
+const users = query
+    ? await searchAccounts({ query })
+    : await listUser(parseInt(paging) * 10);
+
+console.log(
+    paging,
+    users?.map((user: Account) => user.id)
+);
 
 const pageingStatus = {
     current: parseInt(paging),
@@ -77,61 +80,74 @@ const pageingStatus = {
                 class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
             >
                 {
-                    (found || users)
-                        .sort(
-                            // SORT by Role
-                            (a: Account, b: Account) => {
-                                return Role.compare(
-                                    a.public_metadata.role,
-                                    b.public_metadata.role
-                                );
-                            }
-                        )
-                        .map((user: Account) => (
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                                <td class="px-6 py-3 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <img
-                                            src={user.image_url}
-                                            alt={`${user.last_name} ${user.first_name}`}
-                                            class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
-                                        />
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                {user.last_name}{" "}
-                                                {user.first_name}
+                    users ? (
+                        users
+                            .sort(
+                                // SORT by Role
+                                (a: Account, b: Account) => {
+                                    return Role.compare(
+                                        a.public_metadata.role,
+                                        b.public_metadata.role
+                                    );
+                                }
+                            )
+                            .map((user: Account) => (
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                                    <td class="px-6 py-3 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img
+                                                src={user.image_url}
+                                                alt={`${user.last_name} ${user.first_name}`}
+                                                class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                                            />
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    {user.last_name}{" "}
+                                                    {user.first_name}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                        {
-                                            Role.fromString(
-                                                user.public_metadata.role
-                                            )?.ja
-                                        }
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                    {translateYear(user.public_metadata.year)}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                    {translateGrade(
-                                        user.public_metadata
-                                            .grade as unknown as number
-                                    )}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a
-                                        href={`/admin/account/${user.id}`}
-                                        class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200"
-                                    >
-                                        編集
-                                    </a>
-                                </td>
-                            </tr>
-                        ))
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                            {
+                                                Role.fromString(
+                                                    user.public_metadata.role
+                                                )?.ja
+                                            }
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                        {translateYear(
+                                            user.public_metadata.year
+                                        )}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                        {translateGrade(
+                                            user.public_metadata
+                                                .grade as unknown as number
+                                        )}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a
+                                            href={`/admin/account/${user.id}`}
+                                            class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200"
+                                        >
+                                            編集
+                                        </a>
+                                    </td>
+                                </tr>
+                            ))
+                    ) : (
+                        <tr>
+                            <td
+                                colspan="5"
+                                class="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
+                            >
+                                ユーザーが見つかりませんでした
+                            </td>
+                        </tr>
+                    )
                 }
             </tbody>
         </table>
