@@ -6,15 +6,6 @@ import type { Account, Profile } from "@/src/type";
 export async function getProfile(input: {
     userId: string;
 }): Promise<Profile | Response> {
-    console.log(
-        "Running on " +
-            (`${import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY}`.startsWith(
-                "pk_test_"
-            )
-                ? "Development"
-                : "Production") +
-            " Environment."
-    );
     // Build Clerk API URL with query parameters.
     const url = new URL("https://api.clerk.com/v1/users" + `/${input.userId}`);
 
@@ -42,7 +33,7 @@ export async function getProfile(input: {
     }
 
     if (Object.keys(user.public_metadata).length === 0) {
-        console.log("No profile found.");
+        console.error("No profile found.");
         return new Response("No Profile Found", {
             status: 404,
         });

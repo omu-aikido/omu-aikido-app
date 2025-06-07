@@ -31,11 +31,6 @@ const users = query
     ? await searchAccounts({ query })
     : await listUser(parseInt(paging) * 10);
 
-console.log(
-    paging,
-    users?.map((user: Account) => user.id)
-);
-
 const pageingStatus = {
     current: parseInt(paging),
     total: Math.ceil(alluser / 10),

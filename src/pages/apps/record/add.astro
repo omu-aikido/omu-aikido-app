@@ -52,7 +52,7 @@ if (Astro.request.method == "POST" && isValidParams) {
     if (result.rowsAffected == 1) {
         return Astro.redirect("/apps/record");
     } else {
-        console.log("failed");
+        console.error("failed");
     }
 }
 ---
