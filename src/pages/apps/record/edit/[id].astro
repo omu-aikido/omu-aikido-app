@@ -59,77 +59,79 @@ if (Astro.request.method === "POST") {
 ---
 
 <Layout title="編集">
-    <h1 class={style.text.title()}>アクティビティ編集</h1>
-    <form method="POST">
-        <label for="date">日付</label>
-        <input
-            type="date"
-            id="date"
-            name="date"
-            value={new Date(activityData.date).toISOString().split("T")[0]}
-            required
-        />
-        <label for="period">稽古時間</label>
-        <input
-            type="number"
-            id="period"
-            name="period"
-            value={activityData.period}
-            step="0.5"
-            required
-        />
-        <input type="hidden" name="action" value="update" />
-        <button type="submit" class="submit-btn">更新</button>
-    </form>
+    <div class="max-w-lg mx-auto p-4 sm:p-6">
+        <h1 class={`${style.text.title()} mb-6`}>アクティビティ編集</h1>
 
-    <form
-        method="POST"
-        id="deleteForm"
-        onsubmit="return confirm('このアクティビティを削除してもよろしいですか？');"
-    >
-        <input type="hidden" name="action" value="delete" />
-        <button type="submit" class="delete-btn">削除する</button>
-    </form>
+        <form
+            method="POST"
+            class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6 mb-4"
+        >
+            <div class="mb-4">
+                <label
+                    for="date"
+                    class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                >
+                    日付
+                </label>
+                <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    value={new Date(activityData.date)
+                        .toISOString()
+                        .split("T")[0]}
+                    required
+                    class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 transition-colors"
+                />
+            </div>
 
-    <a href={redirectTo} class="cancel-btn">キャンセル</a>
+            <div class="mb-6">
+                <label
+                    for="period"
+                    class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                >
+                    稽古時間
+                </label>
+                <input
+                    type="number"
+                    id="period"
+                    name="period"
+                    value={activityData.period}
+                    step="0.5"
+                    required
+                    class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 transition-colors"
+                />
+            </div>
+
+            <input type="hidden" name="action" value="update" />
+            <button
+                type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
+            >
+                更新
+            </button>
+        </form>
+
+        <form
+            method="POST"
+            id="deleteForm"
+            onsubmit="return confirm('このアクティビティを削除してもよろしいですか？');"
+            class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6 mb-4"
+        >
+            <input type="hidden" name="action" value="delete" />
+            <button
+                type="submit"
+                class="w-full bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 text-white font-medium py-2.5 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
+            >
+                削除する
+            </button>
+        </form>
+
+        <a
+            href={redirectTo}
+            class="block w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 font-medium py-2.5 px-4 rounded-md text-center transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 no-underline"
+        >
+            キャンセル
+        </a>
+    </div>
 </Layout>
-<style>
-    form {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        max-width: 400px;
-    }
-    .submit-btn {
-        padding: 8px 16px;
-        background-color: rgb(var(--sapphire));
-        color: rgb(var(--crust));
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .submit-btn:hover {
-        background-color: rgb(var(--green));
-    }
-    .delete-btn {
-        padding: 8px 16px;
-        background-color: rgb(var(--red));
-        color: rgb(var(--crust));
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-top: 1rem;
-    }
-    .delete-btn:hover {
-        background-color: rgb(var(--maroon));
-    }
-    .cancel-btn {
-        display: inline-block;
-        margin-top: 1rem;
-        color: rgb(var(--overlay1));
-        text-decoration: none;
-    }
-    #deleteForm {
-        margin-top: 1rem;
-    }
-</style>

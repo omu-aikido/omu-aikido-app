@@ -16,12 +16,9 @@ const input = tv({
 });
 
 const result = Astro.getActionResult(actions.user.profile.add);
-if (result && !result.error) {
-    Astro.redirect("/dashboard");
-}
 ---
 
-<Layout title="大阪公立大学合氣道部 - プロフィール登録">
+<Layout title="プロフィール登録">
     {
         result && result.error && (
             <Notification
@@ -45,7 +42,6 @@ if (result && !result.error) {
             <form
                 class="space-y-6 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md"
                 method="POST"
-                action={actions.user.profile.add}
             >
                 <div>
                     <input
@@ -143,10 +139,17 @@ if (result && !result.error) {
 </Layout>
 
 <script>
+    import { actions } from "astro:actions";
+    import { navigate } from "astro:transitions/client";
     const form = document.querySelector("form")!;
+    // インプット/セレクタの列
+    const inputs = Array.from(
+        document.querySelectorAll("input, select")
+    ) as Array<HTMLInputElement | HTMLSelectElement>;
     const button = document.getElementById("profile-form") as HTMLButtonElement;
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
+        const formData = new FormData(form);
         button.textContent = "送信中...";
         button.classList.add(
             "text-slate-800",
@@ -156,6 +159,17 @@ if (result && !result.error) {
             "cursor-pointer"
         );
         button.disabled = true;
+        inputs.forEach((input) => {
+            input.disabled = true;
+        });
         form.submit();
+        const { error } = await actions.user.profile.add(formData);
+        if (!error) {
+            {
+                /* ちょっと待って！ */
+            }
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            navigate("/dashboard");
+        }
     });
 </script>
