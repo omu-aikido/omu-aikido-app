@@ -32,5 +32,8 @@ pnpm-debug.log*
 # Turso dev files
 dump.sql
 local.db
-local.db-shm
-local.db-wal
+local.db*
+
+# Roo Ignore
+.roo.*.md
+.roo.*.mdx
