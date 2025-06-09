@@ -2,7 +2,6 @@ import { db } from "@/src/lib/drizzle";
 import { activity } from "@/./db/schema";
 import { eq } from "drizzle-orm";
 import { createClerkClient, type User } from "@clerk/astro/server";
-import { user } from "@/src/actions/user";
 
 export async function searchAccounts(input: {
     query: string;

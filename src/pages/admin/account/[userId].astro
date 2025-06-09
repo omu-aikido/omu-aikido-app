@@ -15,10 +15,11 @@ import * as profile from "@/src/lib/query/admin/profile";
 import { grade, year } from "@/src/utils";
 import { Role } from "@/src/class";
 import { getUser } from "@/src/lib/query/admin/clerk";
+import { getProfile } from "@/src/lib/query/profile";
 
 const userAccount = (await getUser(userId))!;
-const userProfile = Astro.locals.profile;
-if (!userProfile) {
+const userProfile = await getProfile({ userId });
+if (userProfile instanceof Response) {
     return Astro.redirect("/admin/account");
 }
 

@@ -43,7 +43,7 @@ const needToNextGrade = Math.max(
     0,
     Math.floor(nextGrade - activityFromPreviousGrade
         .map((record) => record.period)
-        .reduce((a, b) => a + b, 0))
+        .reduce((a, b) => a + b, 0) / 1.5)
 );
 ---
 

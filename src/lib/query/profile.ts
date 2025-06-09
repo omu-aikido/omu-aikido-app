@@ -22,8 +22,20 @@ export async function getProfile(input: {
         }
 
         try {
-            const parsedProfile = profile.parse(user.publicMetadata);
-            return parsedProfile;
+            const parsedProfile = profile.safeParse(user.publicMetadata);
+            if (!parsedProfile.success) {
+                console.error("Invalid profile format:", parsedProfile.error);
+                return new Response(
+                    "Something Went Wrong with Loading Profile",
+                    {
+                        status: 303,
+                        headers: {
+                            Location: "/account/recovery",
+                        },
+                    }
+                );
+            }
+            return parsedProfile.data as Profile;
         } catch (error) {
             console.error("Failed to parse profile:");
             return new Response("Something Went Wrong with Loading Profile", {
@@ -60,17 +72,15 @@ export async function createProfile(input: {
 
     const getGradeAtString = new Date(input.getGradeAt).toISOString();
 
-    const profile: Profile = {
-        grade: input.grade,
-        getGradeAt: getGradeAtString,
-        joinedAt: input.joinedAt,
-        year: input.year,
-        role: "member",
-    };
-
     try {
         await clerkClient.users.updateUserMetadata(input.id, {
-            publicMetadata: profile,
+            publicMetadata: profile.safeParse({
+                grade: input.grade,
+                getGradeAt: getGradeAtString,
+                joinedAt: input.joinedAt,
+                year: input.year,
+                role: "member",
+            }).data,
             privateMetadata: {},
         });
 
@@ -105,17 +115,16 @@ export async function updateProfile(input: {
         ? input.getGradeAt
         : new Date(year, 3, 1, 0, 0, 0, 0);
     const getGradeAtString = new Date(getGradeAtValidate).toISOString();
-    const profile = {
-        grade: input.grade,
-        getGradeAt: getGradeAtString,
-        joinedAt: input.joinedAt,
-        year: input.year,
-        role: input.role,
-    };
 
     try {
         await clerkClient.users.updateUserMetadata(input.id, {
-            publicMetadata: profile,
+            publicMetadata: profile.safeParse({
+                grade: input.grade,
+                getGradeAt: getGradeAtString,
+                joinedAt: input.joinedAt,
+                year: input.year,
+                role: input.role,
+            }).data,
             privateMetadata: {},
         });
 

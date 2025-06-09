@@ -12,7 +12,7 @@ const isProtectedRoute = createRouteMatcher([
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 
 export const onRequest = clerkMiddleware(async (auth, context, next) => {
-    const { has, redirectToSignIn, userId } = auth();
+    const { redirectToSignIn, userId } = auth();
 
     if (!userId && isProtectedRoute(context.request)) {
         // Add custom logic to run before redirecting
