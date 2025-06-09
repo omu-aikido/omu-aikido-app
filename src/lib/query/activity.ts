@@ -1,18 +1,18 @@
 import { z } from "zod";
 import { db } from "@/src/lib/drizzle";
 import { activity } from "@/./db/schema";
-import { eq, gte, lte, and, asc, desc } from "drizzle-orm";
+import { eq, gte, lte, and, desc } from "drizzle-orm";
 
 import * as uuid from "uuid";
 
-import * as accounts from "@/src/lib/query/profile";
+import { getProfile } from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
 
 export const selectActivity = activity.$inferSelect;
 export const inputActivity = activity.$inferInsert;
 
 export async function getAllActivities(input: { applicateBy: string }) {
-    const applicateBy = await accounts.getProfile({
+    const applicateBy = await getProfile({
         userId: input.applicateBy,
     });
 
@@ -157,7 +157,7 @@ export async function updateActivity(input: {
         })
         .parse(input);
 
-    const user = await accounts.getProfile({ userId: validatedInput.userId });
+    const user = await getProfile({ userId: validatedInput.userId });
     if (!user) {
         return null;
     }

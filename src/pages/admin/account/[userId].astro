@@ -11,16 +11,16 @@ if (!currentUser || !userId) {
     return Astro.redirect("/admin/account");
 }
 
-import { getProfile } from "@/src/lib/query/profile";
 import * as profile from "@/src/lib/query/admin/profile";
 import { grade, year } from "@/src/utils";
 import { Role } from "@/src/class";
 import { getUser } from "@/src/lib/query/admin/clerk";
+import { getProfile } from "@/src/lib/query/profile";
 
 const userAccount = (await getUser(userId))!;
-const userProfile = await getProfile({ userId: userId });
+const userProfile = await getProfile({ userId });
 if (userProfile instanceof Response) {
-    return userProfile;
+    return Astro.redirect("/admin/account");
 }
 
 if (Astro.request.method == "POST") {
@@ -54,10 +54,10 @@ if (Astro.request.method == "POST") {
 
 <Layout title="アカウント編集">
     <h2 class="flex items-center gap-4">
-        <img src={userAccount.image_url} alt="" class="w-8 h-8 rounded-full" />
+        <img src={userAccount.imageUrl} alt="" class="w-8 h-8 rounded-full" />
         <p>
-            {userAccount.last_name}
-            {userAccount.first_name}
+            {userAccount.lastName}
+            {userAccount.firstName}
         </p>
     </h2>
     <h3>プロフィール</h3>

@@ -67,20 +67,11 @@ const { title, message, type = "info", duration = 5000 } = Astro.props as Props;
 </astro-notify>
 
 <script>
-    interface NotificationOptions {
-        title: string;
-        message: string;
-        type?: "success" | "error" | "info";
-        duration?: number;
-    }
-
     class AstroNotify extends HTMLElement {
-        private notifications: HTMLElement[];
         private container: HTMLDivElement | null;
 
         constructor() {
             super();
-            this.notifications = [];
             this.container = null;
         }
 

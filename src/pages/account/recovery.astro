@@ -1,15 +1,14 @@
 ---
 import { grade } from "@/src/utils";
-import NonAuthLayout, {
-    default as Layout,
-} from "@/src/layouts/non-auth-layout.astro";
+import { default as Layout } from "@/src/layouts/non-auth-layout.astro";
 import { actions } from "astro:actions";
 import { tv } from "tailwind-variants";
 import Notification from "@/src/components/ui/notification.astro";
 import { getRole } from "@/src/lib/query/profile";
 const user = await Astro.locals.currentUser();
+const profile = Astro.locals.profile;
 
-if (!user) {
+if (!user || !profile) {
     return Astro.redirect("/sign-in");
 }
 const input = tv({
@@ -20,7 +19,7 @@ const result = Astro.getActionResult(actions.user.profile.update);
 if (result && !result.error) {
     Astro.redirect("/dashboard");
 }
-const role = await getRole({ userId: user.id });
+const role = getRole({ profile });
 ---
 
 <Layout title="リカバリ">

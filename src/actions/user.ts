@@ -49,6 +49,7 @@ export const user = {
             }),
             handler: async (input, context) => {
                 const userId = context.locals.auth().userId;
+                const role = context.locals.profile?.role;
                 if (!userId || userId !== input.id) {
                     throw new ActionError({
                         code: "UNAUTHORIZED",
@@ -61,7 +62,7 @@ export const user = {
                     getGradeAt: new Date(input.getGradeAt),
                     joinedAt: Number(input.joinedAt),
                     year: input.year,
-                    role: input.role,
+                    role: role || "member",
                 });
                 if (result instanceof Error) {
                     throw new ActionError({
