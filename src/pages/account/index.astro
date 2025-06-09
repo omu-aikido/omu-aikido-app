@@ -13,13 +13,11 @@ import { grade, year } from "@/src/utils";
 import { Role } from "@/src/class";
 import { actions } from "astro:actions";
 
-const userProfile = await profile.getProfile({ userId: user.id });
-
-if (userProfile instanceof Response) {
-    return userProfile;
+const userProfile = Astro.locals.profile;
+if (!userProfile) {
+    return Astro.redirect("/sign-in");
 }
-
-const role = await profile.getRole({ userId: user.id });
+const role = profile.getRole({ profile: userProfile });
 const result = Astro.getActionResult(actions.user.profile.update);
 if (result && !result.error) {
     Astro.redirect("/account#/status");

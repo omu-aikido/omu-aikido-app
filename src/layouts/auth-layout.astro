@@ -19,13 +19,17 @@ let textLinks: { label: string; href: string }[] = [
     { label: "Account", href: "/account" },
 ];
 
-const user = await Astro.locals.currentUser();
-if (!user) {
+const profile = Astro.locals.profile;
+if (!profile) {
     return Astro.redirect("/sign-in");
 }
-const role = (await getRole({ userId: user.id })) as Role;
+const role = getRole({ profile });
 
-if (role.isManagement() && !textLinks.some((link) => link.label === "Admin")) {
+if (
+    role &&
+    role.isManagement() &&
+    !textLinks.some((link) => link.label === "Admin")
+) {
     textLinks.push({ label: "Admin", href: "/admin" });
 }
 
@@ -36,7 +40,11 @@ interface Props {
 const homelink = "/dashboard";
 const { title } = Astro.props;
 
-if (role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
+if (
+    role &&
+    role.isManagement() &&
+    !APPS.some((app) => app.name === "管理者メニュー")
+) {
     APPS.push({
         name: "管理者メニュー",
         path: "/admin",

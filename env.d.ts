@@ -6,12 +6,6 @@ type ENV = {
     USERID_CACHE: KVNamespace;
 };
 
-// use a default runtime configuration (advanced mode).
-type Runtime = import("@astrojs/cloudflare").Runtime<ENV>;
-declare namespace App {
-    interface Locals extends Runtime {}
-}
-
 interface ImportMetaEnv {
     TURSO_DATABASE_URL: string;
     TURSO_AUTH_TOKEN: string;
@@ -20,4 +14,15 @@ interface ImportMetaEnv {
 
 interface ImportMeta {
     readonly env: ImportMetaEnv;
+}
+
+import type { Profile } from "@/src/type";
+type Runtime = import("@astrojs/cloudflare").Runtime<ENV>;
+
+declare global {
+    namespace App {
+        interface Locals extends Runtime {
+            profile: Profile | null;
+        }
+    }
 }

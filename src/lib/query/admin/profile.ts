@@ -1,4 +1,5 @@
-import { getRole } from "@/src/lib/query/profile";
+import { getProfile, getRole } from "@/src/lib/query/profile";
+import { createClerkClient } from "@clerk/astro/server";
 
 export async function updateProfile(input: {
     applicateBy: string;
@@ -9,7 +10,14 @@ export async function updateProfile(input: {
     year: string;
     role: string;
 }): Promise<Response> {
-    const applicated = await getRole({ userId: input.applicateBy });
+    const clerkClient = createClerkClient({
+        secretKey: import.meta.env.CLERK_SECRET_KEY,
+    });
+    const applicaterProfile = await getProfile({ userId: input.applicateBy });
+    if (applicaterProfile instanceof Response) {
+        throw new Error("Applicater profile not found.");
+    }
+    const applicated = getRole({ profile: applicaterProfile });
     if (!applicated || !applicated.isManagement()) {
         throw new Error("Unauthorized.");
     }
@@ -27,29 +35,22 @@ export async function updateProfile(input: {
         role: input.role,
     };
 
-    // Build Clerk API URL with query parameters.
-    const url = new URL(
-        "https://api.clerk.com/v1/users/" + input.id + "/metadata"
-    );
+    try {
+        await clerkClient.users.updateUserMetadata(input.id, {
+            publicMetadata: profile,
+            privateMetadata: {},
+        });
 
-    // Construct headers with secret key from environment.
-    const headers = {
-        Authorization: `Bearer ${import.meta.env.CLERK_SECRET_KEY}`,
-        "Content-Type": "application/json",
-    };
-
-    const body = JSON.stringify({
-        public_metadata: profile,
-        private_metadata: {},
-        unsafe_metadata: {},
-    });
-
-    // Execute the PATCH request.
-    const response = await fetch(url.toString(), {
-        method: "PATCH",
-        headers,
-        body,
-    });
-
-    return response as unknown as Response;
+        return new Response(JSON.stringify({ success: true }), {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+    } catch (error) {
+        console.error("Failed to update profile:");
+        return new Response("Failed to update profile", {
+            status: 500,
+        });
+    }
 }

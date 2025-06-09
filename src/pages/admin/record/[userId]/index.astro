@@ -5,7 +5,6 @@ import {
     getUserActivities,
 } from "@/src/lib/query/admin/activity";
 import { getUser } from "@/src/lib/query/admin/clerk";
-import { getProfile } from "@/src/lib/query/profile";
 import { translateGrade, timeForNextGrade } from "@/src/utils";
 import { tv } from "tailwind-variants";
 const { userId } = Astro.params;
@@ -19,8 +18,8 @@ if (!userId) {
 }
 
 const userAccount = await getUser(userId);
-const userProfile = await getProfile({ userId: userId });
-if (!userAccount || userProfile instanceof Response) {
+const userProfile = Astro.locals.profile;
+if (!userAccount || !userProfile) {
     return Astro.redirect("/admin/record");
 }
 
@@ -77,8 +76,8 @@ const totalTrains = parseInt(
             <h4
                 class="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-4"
             >
-                {userAccount.last_name}
-                {userAccount.first_name}
+                {userAccount.lastName}
+                {userAccount.firstName}
                 の稽古記録
             </h4>
             <!-- ヘッダー部分 -->

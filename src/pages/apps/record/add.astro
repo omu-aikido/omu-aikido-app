@@ -1,6 +1,5 @@
 ---
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
-import { getProfile } from "@/src/lib/query/profile";
 import { createActivity, inputActivity } from "@/src/lib/query/activity";
 
 const user = await Astro.locals.currentUser();
@@ -8,9 +7,9 @@ const user = await Astro.locals.currentUser();
 if (!user) {
     return Astro.redirect("/sign-in");
 }
-const userProfile = await getProfile({ userId: user.id });
-if (userProfile instanceof Response) {
-    return userProfile;
+const userProfile = Astro.locals.profile;
+if (!user || !userProfile) {
+    return Astro.redirect("/sign-in");
 }
 
 const date = new URL(Astro.request.url).searchParams.get("date");

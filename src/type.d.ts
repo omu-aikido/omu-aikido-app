@@ -40,6 +40,4 @@ export interface Cell {
     v: string | number | null;
 }
 
-export type Account = z.infer<typeof clerkUserSchema>;
-export type Accounts = z.infer<typeof clerkUsers>;
 export type Profile = z.infer<typeof profile>;

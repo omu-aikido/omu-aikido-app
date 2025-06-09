@@ -6,7 +6,6 @@ interface Props {
 
 const { query, paging } = Astro.props;
 
-import type { Account } from "@/src/type";
 import {
     countUsers,
     listUser,
@@ -16,12 +15,13 @@ import { getRole } from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
 
 import { translateYear, translateGrade } from "@/src/utils";
+import type { User } from "@clerk/astro/server";
 
-const user = await Astro.locals.currentUser();
-if (!user) {
-    return Astro.redirect("/sign-in");
+const profile = Astro.locals.profile;
+if (!profile) {
+    return Astro.redirect("/dashboard");
 }
-const role = await getRole({ userId: user.id });
+const role = getRole({ profile });
 if (!role || !role.isManagement()) {
     return Astro.redirect("/dashboard");
 }
@@ -79,49 +79,40 @@ const pageingStatus = {
                         users
                             .sort(
                                 // SORT by Role
-                                (a: Account, b: Account) => {
+                                (a: User, b: User) => {
                                     return Role.compare(
-                                        a.public_metadata.role,
-                                        b.public_metadata.role
+                                        a.publicMetadata.role,
+                                        b.publicMetadata.role
                                     );
                                 }
                             )
-                            .map((user: Account) => (
+                            .map((user: User) => (
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                                     <td class="px-6 py-3 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <img
-                                                src={user.image_url}
-                                                alt={`${user.last_name} ${user.first_name}`}
+                                                src={user.imageUrl}
+                                                alt={`${user.lastName} ${user.firstName}`}
                                                 class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
                                             />
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                    {user.last_name}{" "}
-                                                    {user.first_name}
+                                                    {user.lastName}{" "}
+                                                    {user.firstName}
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                            {
-                                                Role.fromString(
-                                                    user.public_metadata.role
-                                                )?.ja
-                                            }
+                                            {Role.fromString(profile.role)?.ja}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                        {translateYear(
-                                            user.public_metadata.year
-                                        )}
+                                        {translateYear(profile.year)}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                        {translateGrade(
-                                            user.public_metadata
-                                                .grade as unknown as number
-                                        )}
+                                        {translateGrade(profile.grade)}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <a
