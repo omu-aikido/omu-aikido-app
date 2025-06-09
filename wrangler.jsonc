@@ -8,16 +8,6 @@
     "compatibility_date": "2025-04-01",
     "compatibility_flags": ["nodejs_compat"],
     "main": "./dist/_worker.js/index.js",
-    "assets": {
-        "directory": "./dist",
-        "binding": "ASSETS",
-    },
-    "kv_namespaces": [
-        {
-            "binding": "USERID_CACHE",
-            "id": "7a5e01dd3bc54db19fb81146de14fc05",
-        },
-    ],
     "observability": {
         "enabled": true,
     },

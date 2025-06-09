@@ -24,18 +24,19 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
-    "drizzle-kit": "^0.30.5",
+    "drizzle-kit": "^0.31.1",
+    "prettier": "^3.5.3",
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript-eslint": "^8.33.1",
     "wrangler": "^4.16.0"
   },
   "scripts": {
     "astro": "astro",
-    "build": "astro build",
-    "cf-typegen": "wrangler types",
-    "check": "astro build && tsc && wrangler deploy --dry-run",
-    "deploy": "astro build && wrangler deploy",
     "dev": "astro dev --remote",
     "preview": "astro build && wrangler dev",
-    "lint": "astro check --tsc"
+    "build": "astro build",
+    "cf-typegen": "wrangler types",
+    "check": "astro build && astro check && tsc && wrangler deploy --dry-run"
   },
   "type": "module",
   "volta": {
