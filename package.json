@@ -34,7 +34,8 @@
     "check": "astro build && tsc && wrangler deploy --dry-run",
     "deploy": "astro build && wrangler deploy",
     "dev": "astro dev --remote",
-    "preview": "astro build && wrangler dev"
+    "preview": "astro build && wrangler dev",
+    "lint": "astro check --tsc"
   },
   "type": "module",
   "volta": {

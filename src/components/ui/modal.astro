@@ -104,5 +104,8 @@ const { position, icon } = Astro.props;
             document.addEventListener("astro:page-load", setupModalListeners);
         }
     }
-    customElements.define("astro-modal", Modal);
+
+    if (!customElements.get("astro-modal")) {
+        customElements.define("astro-modal", Modal);
+    }
 </script>

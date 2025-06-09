@@ -1,17 +1,17 @@
 ---
 import { default as Layout } from "@/src/layouts/auth-layout.astro";
-import type { Account } from "@/src/type";
+import type { User } from "@clerk/astro/server";
 import { countUsers, listUser } from "@/src/lib/query/admin/clerk";
 import { getRole } from "@/src/lib/query/profile";
 import { Role } from "@/src/class";
 import * as record from "@/src/lib/query/admin/activity";
 import { translateGrade, timeForNextGrade } from "@/src/utils";
 import { style } from "@/src/styles/component";
-const user = await Astro.locals.currentUser();
-if (!user) {
-    return Astro.redirect("/sign-in");
+const profile = Astro.locals.profile;
+if (!profile) {
+    return Astro.redirect("/dashboard");
 }
-const role = await getRole({ userId: user.id });
+const role = getRole({ profile });
 if (!role || !role.isManagement()) {
     return Astro.redirect("/dashboard");
 }
@@ -27,18 +27,18 @@ const pageingStatus = {
 };
 
 const users_info = users
-    .sort((a: Account, b: Account) => {
-        return Role.compare(a.public_metadata.role, b.public_metadata.role);
+    .sort((a: User, b: User) => {
+        return Role.compare(a.publicMetadata.role, b.publicMetadata.role);
     })
-    .map(async (mapuser: Account) => {
+    .map(async (mapuser: User) => {
         return {
             id: mapuser.id,
-            name: `${mapuser.last_name} ${mapuser.first_name}`,
+            name: `${mapuser.lastName} ${mapuser.firstName}`,
             grade: translateGrade(
-                mapuser.public_metadata.grade as unknown as number
+                mapuser.publicMetadata.grade as unknown as number
             ),
             timeForNextGrade: timeForNextGrade(
-                mapuser.public_metadata.grade as unknown as number
+                mapuser.publicMetadata.grade as unknown as number
             ),
             trainFromPreGrade: parseInt(
                 `${

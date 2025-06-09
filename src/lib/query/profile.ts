@@ -1,54 +1,54 @@
 import { Role } from "@/src/class";
-import { profile, clerkUserSchema } from "@/src/zod";
-import type { Account, Profile } from "@/src/type";
+import { profile } from "@/src/zod";
+import type { Profile } from "@/src/type";
+import { createClerkClient } from "@clerk/astro/server";
 
 // Validate user ID input and return the profile.
 export async function getProfile(input: {
     userId: string;
 }): Promise<Profile | Response> {
-    // Build Clerk API URL with query parameters.
-    const url = new URL("https://api.clerk.com/v1/users" + `/${input.userId}`);
-
-    // Construct headers with secret key from environment.
-    const headers = {
-        Authorization: `Bearer ${import.meta.env.CLERK_SECRET_KEY}`,
-    };
-
-    // Execute the GET request.
-    const response = await fetch(url.toString(), {
-        method: "GET",
-        headers,
+    const clerkClient = createClerkClient({
+        secretKey: import.meta.env.CLERK_SECRET_KEY,
     });
 
-    const json = await response.json();
-    let user: Account;
     try {
-        const parsedUser = clerkUserSchema.parse(json);
-        user = parsedUser;
+        const user = await clerkClient.users.getUser(input.userId);
+
+        if (Object.keys(user.publicMetadata).length === 0) {
+            console.error("No profile found.");
+            return new Response("No Profile Found", {
+                status: 404,
+            });
+        }
+
+        try {
+            const parsedProfile = profile.safeParse(user.publicMetadata);
+            if (!parsedProfile.success) {
+                console.error("Invalid profile format:", parsedProfile.error);
+                return new Response(
+                    "Something Went Wrong with Loading Profile",
+                    {
+                        status: 303,
+                        headers: {
+                            Location: "/account/recovery",
+                        },
+                    }
+                );
+            }
+            return parsedProfile.data as Profile;
+        } catch (error) {
+            console.error("Failed to parse profile:");
+            return new Response("Something Went Wrong with Loading Profile", {
+                status: 303,
+                headers: {
+                    Location: "/account/recovery",
+                },
+            });
+        }
     } catch (error) {
-        console.error(error);
+        console.error("Failed to get user:");
         return new Response("Missing Correct User Schema", {
             status: 422,
-        });
-    }
-
-    if (Object.keys(user.public_metadata).length === 0) {
-        console.error("No profile found.");
-        return new Response("No Profile Found", {
-            status: 404,
-        });
-    }
-
-    try {
-        const parsedProfile = profile.parse(user.public_metadata);
-        return parsedProfile;
-    } catch (error) {
-        console.error(error);
-        return new Response("Something Went Wrong with Loading Profile", {
-            status: 303,
-            headers: {
-                Location: "/account/recovery",
-            },
         });
     }
 }
@@ -60,6 +60,10 @@ export async function createProfile(input: {
     joinedAt: number;
     year: string;
 }): Promise<Response> {
+    const clerkClient = createClerkClient({
+        secretKey: import.meta.env.CLERK_SECRET_KEY,
+    });
+
     // 既に有効なプロフィールがある場合はエラーとする。
     const existingProfile = await getProfile({ userId: input.id });
     if (!(existingProfile instanceof Response)) {
@@ -68,39 +72,30 @@ export async function createProfile(input: {
 
     const getGradeAtString = new Date(input.getGradeAt).toISOString();
 
-    const profile: Profile = {
-        grade: input.grade,
-        getGradeAt: getGradeAtString,
-        joinedAt: input.joinedAt,
-        year: input.year,
-        role: "member",
-    };
+    try {
+        await clerkClient.users.updateUserMetadata(input.id, {
+            publicMetadata: profile.safeParse({
+                grade: input.grade,
+                getGradeAt: getGradeAtString,
+                joinedAt: input.joinedAt,
+                year: input.year,
+                role: "member",
+            }).data,
+            privateMetadata: {},
+        });
 
-    // Build Clerk API URL with query parameters.
-    const url = new URL(
-        "https://api.clerk.com/v1/users/" + input.id + "/metadata"
-    );
-
-    // Construct headers with secret key from environment.
-    const headers = {
-        Authorization: `Bearer ${import.meta.env.CLERK_SECRET_KEY}`,
-        "Content-Type": "application/json",
-    };
-
-    const body = JSON.stringify({
-        public_metadata: profile,
-        private_metadata: {},
-        unsafe_metadata: {},
-    });
-
-    // Execute the PATCH request.
-    const response = await fetch(url.toString(), {
-        method: "PATCH",
-        headers,
-        body,
-    });
-
-    return response;
+        return new Response(JSON.stringify({ success: true }), {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+    } catch (error) {
+        console.error("Failed to create profile:", error);
+        return new Response("Failed to create profile", {
+            status: 500,
+        });
+    }
 }
 
 export async function updateProfile(input: {
@@ -111,51 +106,42 @@ export async function updateProfile(input: {
     year: string;
     role: string;
 }): Promise<Response> {
+    const clerkClient = createClerkClient({
+        secretKey: import.meta.env.CLERK_SECRET_KEY,
+    });
+
     const year = new Date().getFullYear();
     const getGradeAtValidate = input.getGradeAt
         ? input.getGradeAt
         : new Date(year, 3, 1, 0, 0, 0, 0);
     const getGradeAtString = new Date(getGradeAtValidate).toISOString();
-    const profile = {
-        grade: input.grade,
-        getGradeAt: getGradeAtString,
-        joinedAt: input.joinedAt,
-        year: input.year,
-        role: input.role,
-    };
 
-    // Build Clerk API URL with query parameters.
-    const url = new URL(
-        "https://api.clerk.com/v1/users/" + input.id + "/metadata"
-    );
+    try {
+        await clerkClient.users.updateUserMetadata(input.id, {
+            publicMetadata: profile.safeParse({
+                grade: input.grade,
+                getGradeAt: getGradeAtString,
+                joinedAt: input.joinedAt,
+                year: input.year,
+                role: input.role,
+            }).data,
+            privateMetadata: {},
+        });
 
-    // Construct headers with secret key from environment.
-    const headers = {
-        Authorization: `Bearer ${import.meta.env.CLERK_SECRET_KEY}`,
-        "Content-Type": "application/json",
-    };
-
-    const body = JSON.stringify({
-        public_metadata: profile,
-        private_metadata: {},
-        unsafe_metadata: {},
-    });
-
-    // Execute the PATCH request.
-    const response = await fetch(url.toString(), {
-        method: "PATCH",
-        headers,
-        body,
-    });
-
-    return response as unknown as Response;
+        return new Response(JSON.stringify({ success: true }), {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+    } catch (error) {
+        console.error("Failed to update profile:", error);
+        return new Response("Failed to update profile", {
+            status: 500,
+        });
+    }
 }
 
-export async function getRole(input: { userId: string }): Promise<Role | null> {
-    const result = await getProfile({ userId: input.userId });
-    if (result instanceof Response) {
-        return null;
-    }
-    const meta = profile.parse(result);
-    return Role.fromString(meta.role);
+export function getRole(input: { profile: Profile }): Role | null {
+    return Role.fromString(input.profile.role);
 }
