@@ -12,7 +12,6 @@ import RecentsPh from "@/src/components/ui/recents-ph.astro";
 import Recents from "@/src/components/ui/recents.astro";
 
 const profile = Astro.locals.profile;
-console.log("profile", profile);
 if (!profile) {
     return Astro.redirect("/sign-in");
 }

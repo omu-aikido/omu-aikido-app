@@ -3,10 +3,6 @@ import { default as Layout } from "@/src/layouts/auth-layout.astro";
 import { createActivity, inputActivity } from "@/src/lib/query/activity";
 
 const user = await Astro.locals.currentUser();
-
-if (!user) {
-    return Astro.redirect("/sign-in");
-}
 const userProfile = Astro.locals.profile;
 if (!user || !userProfile) {
     return Astro.redirect("/sign-in");

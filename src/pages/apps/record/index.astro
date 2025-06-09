@@ -39,19 +39,12 @@ const activityFromPreviousGrade = await userActivity({
 });
 const grade = userProfile.grade;
 const nextGrade = timeForNextGrade(grade);
-const needToNextGrade = (nextGrade -
-        activityFromPreviousGrade
-            .map((act) => act.period)
-            .reduce((a, b) => a + b, 0) /
-            1.5 > 0 ) ? parseInt(
-    `${
-        nextGrade -
-        activityFromPreviousGrade
-            .map((act) => act.period)
-            .reduce((a, b) => a + b, 0) /
-            1.5
-    }`
-) : 0;
+const needToNextGrade = Math.max(
+    0,
+    Math.floor(nextGrade - activityFromPreviousGrade
+        .map((record) => record.period)
+        .reduce((a, b) => a + b, 0))
+);
 ---
 
 <Layout title="きろく">

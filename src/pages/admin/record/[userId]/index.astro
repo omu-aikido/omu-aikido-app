@@ -5,6 +5,8 @@ import {
     getUserActivities,
 } from "@/src/lib/query/admin/activity";
 import { getUser } from "@/src/lib/query/admin/clerk";
+import { getProfile } from "@/src/lib/query/profile";
+import { profile } from "@/src/zod";
 import { translateGrade, timeForNextGrade } from "@/src/utils";
 import { tv } from "tailwind-variants";
 const { userId } = Astro.params;
@@ -18,8 +20,8 @@ if (!userId) {
 }
 
 const userAccount = await getUser(userId);
-const userProfile = Astro.locals.profile;
-if (!userAccount || !userProfile) {
+const userProfile = await getProfile({ userId });
+if (!userAccount || userProfile instanceof Response) {
     return Astro.redirect("/admin/record");
 }
 
