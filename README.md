@@ -16,38 +16,39 @@ Astro.jsを使用して開発されています。
 - [x] ログイン
 - [x] 稽古の記録・閲覧・編集
 - [ ] 役職別機能
-    - [ ] 管理者
-        - [x] 稽古の集計などの機能
-    - [ ] 会計:精算機能 ……?
+  - [ ] 管理者
+    - [x] 稽古の集計などの機能
+  - [ ] 会計:精算機能 ……?
 - [ ] 稽古の記録を元にしたグラフの表示
 
 ## 主な使用技術
+
 - **[npm](https://www.npmjs.com)**  
-    パッケージ管理
+   パッケージ管理
 
 - **[Astro.js](https://astro.build)**  
-    フレームワーク
+   フレームワーク
 
 - **[GitHub](https://github.com)**  
-    ソースコード管理
+   ソースコード管理
 
 - **[Catppuccin](https://catppuccin.com)**  
-    カラーパレット
+   カラーパレット
 
 - **[Clerk](https://clerk.com)**  
-    認証
+   認証
 
 - **[Turso](https://turso.tech)**  
-    libSQLデータベース
+   libSQLデータベース
 
 - **[Drizzle](https://orm.drizzle.team)**  
-    ORM
+   ORM
 
 - **[ts-ics](https://github.com/Neuvernetzung/ts-ics)**  
-    iCalendar生成
+   iCalendar生成
 
 - **[Cloudflare Workers](https://workers.cloudflare.com)**  
-    ホスティング
+   ホスティング
 
 その他、使用しているパッケージ等は`package.json`に記載されています。
 
@@ -56,7 +57,7 @@ Astro.jsを使用して開発されています。
 #### Requirements
 
 - \*.db // データベースファイル (SQLite3)
-    - `turso dev --db *.db` で`http://127.0.0.1:8080`にlibSqlサーバを起動します
+  - `turso dev --db *.db` で`http://127.0.0.1:8080`にlibSqlサーバを起動します
 - .env.development
 - .env.production
 - .dev.vars.development
@@ -70,7 +71,6 @@ Astro.jsを使用して開発されています。
 - TURSO_AUTH_TOKEN
 
 です。
-
 
 ```bash
 $ npx astro dev # ローカルサーバを起動します
@@ -97,10 +97,11 @@ $ turso dev -f local.db
 その他、各種ツールのガイドを参考にしてください。
 
 ## ライセンス
+
 Copyright 2025 [omu-aikido](https://github.com/omu-aikido)
 
 Apache License Version 2.0（「本ライセンス」）に基づいてライセンスされます。あなたがこのファイルを使用するためには、本ライセンスに従わなければなりません。本ライセンスのコピーは下記の場所から入手できます。
 
 [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
-適用される法律または書面での同意によって命じられない限り、本ライセンスに基づいて頒布されるソフトウェアは、明示黙示を問わず、いかなる保証も条件もなしに「現状のまま」頒布されます。本ライセンスでの権利と制限を規定した文言については、本ライセンスを参照してください。 
+適用される法律または書面での同意によって命じられない限り、本ライセンスに基づいて頒布されるソフトウェアは、明示黙示を問わず、いかなる保証も条件もなしに「現状のまま」頒布されます。本ライセンスでの権利と制限を規定した文言については、本ライセンスを参照してください。

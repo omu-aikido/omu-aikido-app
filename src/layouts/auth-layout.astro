@@ -1,141 +1,122 @@
 ---
-import Baselayout from "./baselayout.astro";
-import Footer from "../components/root/footer.astro";
-import AccountUi from "../components/ui/account-ui.astro";
+import Baselayout from "./baselayout.astro"
+import Footer from "../components/root/footer.astro"
+import AccountUi from "../components/ui/account-ui.astro"
 
-import "@/src/styles/global.css";
-import { APP_NAME } from "@/src/const";
-import { getRole } from "@/src/lib/query/profile";
-import { APPS } from "@/src/const";
-import Head from "@/src/components/root/head.astro";
-import { style } from "@/src/styles/component";
-import ProgressCircle from "@/src/components/ui/progress-circle.astro";
+import "@/src/styles/global.css"
+import { APP_NAME } from "@/src/const"
+import { getRole } from "@/src/lib/query/profile"
+import { APPS } from "@/src/const"
+import Head from "@/src/components/root/head.astro"
+import { style } from "@/src/styles/component"
+import ProgressCircle from "@/src/components/ui/progress-circle.astro"
 
 /** Main menu items */
-let textLinks: { label: string; href: string }[] = [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Apps", href: "/apps" },
-    { label: "Account", href: "/account" },
-];
+const textLinks: { label: string; href: string }[] = [
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Apps", href: "/apps" },
+  { label: "Account", href: "/account" },
+]
 
-const profile = Astro.locals.profile;
+const profile = Astro.locals.profile
 if (!profile) {
-    return Astro.redirect("/sign-in");
+  return Astro.redirect("/sign-in")
 }
-const role = getRole({ profile });
+const role = getRole({ profile })
 
-if (
-    role &&
-    role.isManagement() &&
-    !textLinks.some((link) => link.label === "Admin")
-) {
-    textLinks.push({ label: "Admin", href: "/admin" });
+if (role && role.isManagement() && !textLinks.some((link) => link.label === "Admin")) {
+  textLinks.push({ label: "Admin", href: "/admin" })
 }
 
 interface Props {
-    title: string;
+  title: string
 }
 
-const homelink = "/dashboard";
-const { title } = Astro.props;
+const homelink = "/dashboard"
+const { title } = Astro.props
 
-if (
-    role &&
-    role.isManagement() &&
-    !APPS.some((app) => app.name === "管理者メニュー")
-) {
-    APPS.push({
-        name: "管理者メニュー",
-        path: "/admin",
-        desc: "管理者メニューに移動します。",
-    });
+if (role && role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
+  APPS.push({
+    name: "管理者メニュー",
+    path: "/admin",
+    desc: "管理者メニューに移動します。",
+  })
 }
 ---
 
 <Baselayout>
-    <Head title=`${APP_NAME} - ${title}` />
-    <body class="flex-col min-h-dvh">
-        <header
-            class="m-0 py-0 px-6 top-0 z-50 sticky bg-slate-200/70 dark:bg-slate-800/90 text-slate-900 dark:text-slate-200 flex justify-between items-center h-20"
+  <Head title=`${APP_NAME} - ${title}` />
+  <body class="flex-col min-h-dvh">
+    <header
+      class="m-0 py-0 px-6 top-0 z-50 sticky bg-slate-200/70 dark:bg-slate-800/90 text-slate-900 dark:text-slate-200 flex justify-between items-center h-20"
+    >
+      <h2 class="items-center-safe justify-items-center md:w-1/5">
+        <a class="items-center-safe justify-items-center text-xl font-bold" href={homelink}
+          >{title.slice(0, 8)}</a
         >
-            <h2 class="items-center-safe justify-items-center md:w-1/5">
+      </h2>
+      {
+        textLinks.length > 0 && (
+          <div class="hidden sm:flex">
+            <nav class={`${style.header.navigation.block()}`}>
+              {textLinks.map((link) => (
                 <a
-                    class="items-center-safe justify-items-center text-xl font-bold"
-                    href={homelink}>{title.slice(0, 8)}</a
+                  href={link.href}
+                  class={style.header.navigation.link({
+                    active: Astro.url.pathname.startsWith(link.href),
+                  })}
+                  aria-current={
+                    link.href === "/"
+                      ? Astro.url.pathname === "/"
+                        ? "page"
+                        : undefined
+                      : Astro.url.pathname.startsWith(link.href)
+                        ? "page"
+                        : undefined
+                  }
                 >
-            </h2>
-            {
-                textLinks.length > 0 && (
-                    <div class="hidden sm:flex">
-                        <nav class={`${style.header.navigation.block()}`}>
-                            {textLinks.map((link) => (
-                                <a
-                                    href={link.href}
-                                    class={style.header.navigation.link({
-                                        active: Astro.url.pathname.startsWith(
-                                            link.href
-                                        ),
-                                    })}
-                                    aria-current={
-                                        link.href === "/"
-                                            ? Astro.url.pathname === "/"
-                                                ? "page"
-                                                : undefined
-                                            : Astro.url.pathname.startsWith(
-                                                    link.href
-                                                )
-                                              ? "page"
-                                              : undefined
-                                    }
-                                >
-                                    {link.label}
-                                </a>
-                            ))}
-                        </nav>
-                    </div>
-                )
-            }
-            <AccountUi apps={APPS} server:defer>
-                <div class="flex items" slot="fallback">
-                    <span id="open-modal-btn" class={style.modal.button()}>
-                        ⵗ
-                    </span>
-                </div>
-            </AccountUi>
-        </header>
-        <div class="p-6 mx-auto max-w-5xl">
-            <main class="min-h-[75vh] overflow-y-auto mb-auto">
-                <ProgressCircle
-                    title="Loading"
-                    id="loading-circle"
-                    className="hidden"
-                />
-                <slot />
-            </main>
+                  {link.label}
+                </a>
+              ))}
+            </nav>
+          </div>
+        )
+      }
+      <AccountUi apps={APPS} server:defer>
+        <div class="flex items" slot="fallback">
+          <span id="open-modal-btn" class={style.modal.button()}> ⵗ </span>
         </div>
-        <Footer />
-    </body>
+      </AccountUi>
+    </header>
+    <div class="p-6 mx-auto max-w-5xl">
+      <main class="min-h-[75vh] overflow-y-auto mb-auto">
+        <ProgressCircle title="Loading" id="loading-circle" className="hidden" />
+        <slot />
+      </main>
+    </div>
+    <Footer />
+  </body>
 </Baselayout>
 
 <script>
-    function setupLoading() {
-        const loadingCircle = document.getElementById("loading-circle");
-        if (!loadingCircle) return;
+  function setupLoading() {
+    const loadingCircle = document.getElementById("loading-circle")
+    if (!loadingCircle) return
 
-        document.addEventListener("astro:before-preparation", () => {
-            loadingCircle.classList.remove("hidden");
-            document.body.style.cursor = "wait";
-        });
+    document.addEventListener("astro:before-preparation", () => {
+      loadingCircle.classList.remove("hidden")
+      document.body.style.cursor = "wait"
+    })
 
-        document.addEventListener("astro:after-swap", () => {
-            loadingCircle.classList.add("hidden");
-            document.body.style.cursor = "default";
-        });
-    }
+    document.addEventListener("astro:after-swap", () => {
+      loadingCircle.classList.add("hidden")
+      document.body.style.cursor = "default"
+    })
+  }
 
-    // 初回実行
-    setupLoading();
+  // 初回実行
+  setupLoading()
 
-    // 各ページ遷移後に再実行
-    document.addEventListener("astro:after-swap", setupLoading);
+  // 各ページ遷移後に再実行
+  document.addEventListener("astro:after-swap", setupLoading)
 </script>

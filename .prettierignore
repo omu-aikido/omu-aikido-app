@@ -1,0 +1,14 @@
+dist/
+node_modules/
+.astro/
+*.min.js
+*.min.css
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+wrangler.toml
+.env*
+*.log
+migrations/
+.github/
+.worker-configuration.d.ts

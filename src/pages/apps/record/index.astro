@@ -1,123 +1,111 @@
 ---
-import { default as Layout } from "@/src/layouts/auth-layout.astro";
-import {
-    userActivity,
-} from "@/src/lib/query/activity";
-import { translateGrade, timeForNextGrade } from "@/src/utils";
-import ActivityForm from "@/src/components/ui/add-record.astro";
-import { style } from "@/src/styles/component";
+import { default as Layout } from "@/src/layouts/auth-layout.astro"
+import { userActivity } from "@/src/lib/query/activity"
+import { translateGrade, timeForNextGrade } from "@/src/utils"
+import ActivityForm from "@/src/components/ui/add-record.astro"
+import { style } from "@/src/styles/component"
 
-import RecentsPh from "@/src/components/ui/recents-ph.astro";
-import Recents from "@/src/components/ui/recents.astro";
+import RecentsPh from "@/src/components/ui/recents-ph.astro"
+import Recents from "@/src/components/ui/recents.astro"
 
-const user = await Astro.locals.currentUser();
+const user = await Astro.locals.currentUser()
 
 if (!user) {
-    return Astro.redirect("/sign-in");
+  return Astro.redirect("/sign-in")
 }
-const userProfile = Astro.locals.profile;
+const userProfile = Astro.locals.profile
 if (!userProfile) {
-    return Astro.redirect("/sign-in");
+  return Astro.redirect("/sign-in")
 }
 
-const now = new Date();
-const start = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-const end = new Date();
+const now = new Date()
+const start = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+const end = new Date()
 const activities = (
-    await userActivity({
-        userId: user.id,
-        start: start,
-        end: end,
-    })
-).sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-});
-const activityFromPreviousGrade = await userActivity({
+  await userActivity({
     userId: user.id,
-    start: new Date(userProfile.getGradeAt),
-    end: new Date(),
-});
-const grade = userProfile.grade;
-const nextGrade = timeForNextGrade(grade);
+    start: start,
+    end: end,
+  })
+).sort((a, b) => {
+  return new Date(b.date).getTime() - new Date(a.date).getTime()
+})
+const activityFromPreviousGrade = await userActivity({
+  userId: user.id,
+  start: new Date(userProfile.getGradeAt),
+  end: new Date(),
+})
+const grade = userProfile.grade
+const nextGrade = timeForNextGrade(grade)
 const needToNextGrade = Math.max(
-    0,
-    Math.floor(nextGrade - activityFromPreviousGrade
-        .map((record) => record.period)
-        .reduce((a, b) => a + b, 0) / 1.5)
-);
+  0,
+  Math.floor(
+    nextGrade -
+      activityFromPreviousGrade.map((record) => record.period).reduce((a, b) => a + b, 0) / 1.5,
+  ),
+)
 ---
 
 <Layout title="きろく">
-    <h1 class={style.text.title()}>きろく</h1>
+  <h1 class={style.text.title()}>きろく</h1>
 
-    {   grade > 0 &&
+  {
+    grade > 0 && (
+      <>
         <h2>
-            {translateGrade(grade >= 0 ? grade - 2 : grade - 1)}
-            {grade >= 0 ? "昇級" : "昇段"}まで
+          {translateGrade(grade >= 0 ? grade - 2 : grade - 1)}
+          {grade >= 0 ? "昇級" : "昇段"}まで
         </h2>
-        <p>{needToNextGrade} / {nextGrade} 日</p>
-    }
-    <hr />
-    <h2>追加</h2>
+        <p>
+          {needToNextGrade} / {nextGrade} 日
+        </p>
+      </>
+    )
+  }
+  <hr />
+  <h2>追加</h2>
 
-    <ActivityForm />
-    <Recents server:defer>
-        <RecentsPh slot="fallback" />
-    </Recents>
+  <ActivityForm />
+  <Recents server:defer>
+    <RecentsPh slot="fallback" />
+  </Recents>
 
-    <hr class="my-6 border-slate-200 dark:border-slate-700" />
+  <hr class="my-6 border-slate-200 dark:border-slate-700" />
 
-    <div class="space-y-4">
-        <div class="flex flex-col items-baseline sm:flex-row sm:items-center sm:justify-between gap-2">
-            <h2 class="text-xl font-semibold text-slate-900 dark:text-white">今月の稽古履歴</h2>
-            <a
-                href="/apps/record/list"
-                class={style.text.link()}
-            >
-                全ての稽古履歴 >>
-            </a>
-        </div>
-
-        <div class={style.table.container()}>
-            <table class={style.table.table()}>
-                <thead class={style.table.thead.container()}>
-                    <tr>
-                        <th class={style.table.thead.th()}>
-                            日付
-                        </th>
-                        <th class={style.table.thead.th()}>
-                            稽古時間
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class={style.table.tbody.container()}>
-                    {
-                        activities.length === 0 ? (
-                            <tr class={style.table.tbody.tr()}>
-                                <td class={style.table.tbody.td()}>
-                                    履歴はありません
-                                </td>
-                                <td class={style.table.tbody.td()}>
-                                    追加しましょう!
-                                </td>
-                            </tr>
-                        ) : (
-                            activities.map((activity) => (
-                                <tr class={style.table.tbody.tr()}>
-                                    <td class={style.table.tbody.td()}>
-                                        {new Date(activity.date).toLocaleDateString(
-                                            "ja-JP"
-                                        )}
-                                    </td>
-                                    <td class={style.table.tbody.td()}>
-                                        {activity.period}時間
-                                    </td>
-                                </tr>
-                            ))
-                        )
-                    }
-                </tbody>
-            </table>
-        </div>
+  <div class="space-y-4">
+    <div class="flex flex-col items-baseline sm:flex-row sm:items-center sm:justify-between gap-2">
+      <h2 class="text-xl font-semibold text-slate-900 dark:text-white">今月の稽古履歴</h2>
+      <a href="/apps/record/list" class={style.text.link()}> 全ての稽古履歴 &gt;&gt; </a>
     </div>
+
+    <div class={style.table.container()}>
+      <table class={style.table.table()}>
+        <thead class={style.table.thead.container()}>
+          <tr>
+            <th class={style.table.thead.th()}> 日付 </th>
+            <th class={style.table.thead.th()}> 稽古時間 </th>
+          </tr>
+        </thead>
+        <tbody class={style.table.tbody.container()}>
+          {
+            activities.length === 0 ? (
+              <tr class={style.table.tbody.tr()}>
+                <td class={style.table.tbody.td()}>履歴はありません</td>
+                <td class={style.table.tbody.td()}>追加しましょう!</td>
+              </tr>
+            ) : (
+              activities.map((activity) => (
+                <tr class={style.table.tbody.tr()}>
+                  <td class={style.table.tbody.td()}>
+                    {new Date(activity.date).toLocaleDateString("ja-JP")}
+                  </td>
+                  <td class={style.table.tbody.td()}>{activity.period}時間</td>
+                </tr>
+              ))
+            )
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
 </Layout>
