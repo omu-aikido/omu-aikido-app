@@ -38,4 +38,9 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -m "ci: apply lint and format fixes" || echo "No changes to commit"
-          git push origin "HEAD:${GITHUB_REF##*/}"
+          # Use github.head_ref for the branch name during PR events
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git push origin "HEAD:refs/heads/${{ github.head_ref }}"
+          else
+            git push origin "HEAD:${GITHUB_REF##*/}"
+          fi
