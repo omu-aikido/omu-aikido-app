@@ -152,19 +152,27 @@ if (result && !result.error) {
 </Layout>
 
 <script>
-  const form = document.querySelector("form")!
-  const button = document.getElementById("profile-form") as HTMLButtonElement
-  form.addEventListener("submit", (event) => {
-    event.preventDefault()
-    button.textContent = "送信中..."
-    button.classList.add(
-      "text-slate-800",
-      "dark:text-slate-100",
-      "bg-slate-300",
-      "dark:bg-slate-600",
-      "cursor-pointer",
-    )
-    button.disabled = true
-    form.submit()
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("form")
+    const button = document.getElementById("profile-form") as HTMLButtonElement
+
+    if (!form || !button) {
+      console.error("Form or button element not found")
+      return
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault()
+      button.textContent = "送信中..."
+      button.classList.add(
+        "text-slate-800",
+        "dark:text-slate-100",
+        "bg-slate-300",
+        "dark:bg-slate-600",
+        "cursor-pointer",
+      )
+      button.disabled = true
+      form.submit()
+    })
   })
 </script>

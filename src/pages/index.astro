@@ -2,6 +2,13 @@
 import { default as Layout } from "@/src/layouts/non-auth-layout.astro"
 import { SignedIn, SignedOut, SignUpButton, SignIn } from "@clerk/astro/components"
 import { style } from "@/src/styles/component"
+
+const user = Astro.locals.auth()
+
+if (user) {
+  return Astro.redirect("/dashboard")
+}
+
 ---
 
 <Layout title="活動管理アプリ">
@@ -29,7 +36,7 @@ import { style } from "@/src/styles/component"
       <div class="space-y-6">
         <div class="text-center">
           <div class="mb-6 mx-auto flex flex-col items-center">
-            <SignIn />
+            <SignIn server:defer />
           </div>
         </div>
 
