@@ -1,8 +1,8 @@
 ---
-import { default as Layout } from "@/src/layouts/auth-layout.astro"
+import { default as Layout } from "@/src/layouts/layout.astro"
 import { Role } from "@/src/class"
-import NewsReader from "@/src/components/ui/news-reader.astro"
-import Grid from "@/src/components/ui/grid.astro"
+import NewsReader from "@/rr7/components/component/NewsReader"
+import Grid from "@/rr7/components/ui/Grid"
 import AppIcon from "@/src/components/ui/app-icon.astro"
 import { APPS } from "@/src/const"
 import ActivityForm from "@/src/components/ui/add-record.astro"
@@ -27,7 +27,7 @@ if (role && role.isManagement() && !APPS.some((app) => app.name === "管理者�
 ---
 
 <Layout title="ダッシュボード">
-  <NewsReader content="short" path="news" source="app/news" />
+  <NewsReader content="short" path="news" source="app/news" client:load />
   <hr />
   <h2 class={style.text.title()}>追加</h2>
 

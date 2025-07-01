@@ -1,11 +1,11 @@
 ---
-import { default as Layout } from "@/src/layouts/non-auth-layout.astro"
-import NewsReader from "../components/ui/news-reader.astro"
+import { default as Layout } from "@/src/layouts/layout.astro"
+import NewsReader from "@/rr7/components/component/NewsReader"
 import ProgressCircle from "../components/ui/progress-circle.astro"
 ---
 
 <Layout title="お知らせ">
-  <NewsReader server:defer content="long" path="news" source="app/news">
+  <NewsReader client:load content="long" path="news" source="app/news">
     <ProgressCircle title="Loading" slot="fallback" />
   </NewsReader>
 </Layout>

@@ -1,7 +1,31 @@
 import { Role } from "@/src/class"
 import { profile } from "@/src/zod"
 import type { Profile } from "@/src/type"
-import { createClerkClient } from "@clerk/astro/server"
+import { createClerkClient, type User } from "@clerk/astro/server"
+
+export async function getAccount(input: {
+  userId: string | undefined | null
+}): Promise<User | Response> {
+  const clerkClient = createClerkClient({
+    secretKey: import.meta.env.CLERK_SECRET_KEY,
+  })
+
+  if (!input.userId) {
+    return new Response("Missing User ID", {
+      status: 400,
+    })
+  }
+
+  const user = await clerkClient.users.getUser(input.userId)
+
+  if (Object.keys(user.publicMetadata).length === 0) {
+    return new Response("No Profile Found", {
+      status: 404,
+    })
+  }
+
+  return user
+}
 
 // Validate user ID input and return the profile.
 export async function getProfile(input: { userId: string }): Promise<Profile | Response> {

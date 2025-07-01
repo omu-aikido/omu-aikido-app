@@ -9,6 +9,7 @@ export default tseslint.config(
       "node_modules/",
       ".astro/",
       ".wrangler/",
+      ".react-router/",
       "worker-configuration.d.ts",
       "*.config.*",
       ".github/",

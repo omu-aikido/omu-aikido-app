@@ -1,33 +1,36 @@
-
 # build output
 **/dist/
 
 # generated types
 **/.astro/
-**/.xata/
-**/.xatarc
 **/drizzle/
+
+# Cloudflare
+.mf
+.wrangler
 **/.wrangler/
+.dev.vars*
 
 # dependencies
 node_modules/
+/node_modules/
+*.tsbuildinfo
 
 # logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+*.log*
 
 # environment variables
 .env
-.env.production
-.env.development
+.env.*
 .dev.vars
-.dev.vars.development
-.dev.vars.production
+.dev.vars.*
 
 # macOS-specific files
 .DS_Store
+
+# React Router
+**/.react-router/
+/build/
 
 # Turso dev files
 dump.sql

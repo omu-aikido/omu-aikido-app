@@ -3,11 +3,11 @@ import { tv } from "tailwind-variants"
 export const style = {
   footer: {
     link: tv({
-      base: "text-cyan-600 dark:text-blue-300 hover:text-blue-600 dark:hover:text-cyan-400 visited:text-emerald-600 dark:visited:text-emerald-300",
+      base: "mx-2 text-cyan-600 dark:text-blue-300 hover:text-blue-600 dark:hover:text-cyan-400 visited:text-emerald-600 dark:visited:text-emerald-300",
     }),
     social: {
       link: tv({
-        base: "flex text-slate-700 dark:text-slate-300 mx-2 my-0 items-center hover:transform hover:scale-110 transition-transform",
+        base: "flex text-slate-700 dark:text-slate-300 mx-2 my-0 px-2 items-center hover:transform hover:scale-110 transition-transform",
       }),
       text: tv({
         base: "text-slate-700 dark:text-slate-300 text-sm font-bold mr-2 hidden md:block",
@@ -32,6 +32,7 @@ export const style = {
       block: tv({
         base: [
           "flex gap-2 items-center",
+          "mx-auto px-auto",
           "rounded-lg backdrop-blur-lg",
           "bg-slate-300/30 dark:bg-slate-700/30",
         ],

@@ -1,0 +1,29 @@
+---
+import { ReactHeader } from "@/./react-router-app/components/component/Header"
+import { AccountUi } from "@/rr7/components/component/AccountUi"
+import { Sidebar } from "@/rr7/components/ui/Sidebar"
+
+interface Link {
+  label: string
+  href: string
+}
+
+interface App {
+  name: string
+  path: string
+}
+
+interface Props {
+  title: string
+  homelink: string
+  textLinks: Link[]
+  apps: App[]
+}
+const { title, homelink, textLinks, apps } = Astro.props
+---
+
+<ReactHeader title={title} homelink={homelink} textLinks={textLinks}>
+  <Sidebar position="right" icon={"  ≡  "} client:load>
+    <AccountUi apps={apps} />
+  </Sidebar>
+</ReactHeader>
