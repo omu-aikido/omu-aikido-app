@@ -36,8 +36,7 @@ const useNewsData = (source: string, isLong: boolean) => {
         const data = await response.json()
         setNewsData(data as NewsItem[])
       } catch (err) {
-        console.error("Error fetching news:", err)
-        setError("Error loading news.")
+        setError(`Error loading news: ${err}`)
       } finally {
         setLoading(false)
       }

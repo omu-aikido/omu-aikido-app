@@ -13,9 +13,7 @@ export function Sidebar({ position, icon, children }: SidebarProps) {
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      console.log("Key pressed:", e.key, "Open state:", open)
       if (e.key === "Escape" && open) {
-        console.log("Closing sidebar with Escape")
         setOpen(false)
       }
     }
@@ -24,21 +22,11 @@ export function Sidebar({ position, icon, children }: SidebarProps) {
   }, [open])
 
   function handleOpenClick() {
-    console.log("Open button clicked, current state:", open)
     setOpen(true)
-    console.log("Setting open to true")
   }
 
   function handleCloseClick() {
-    console.log("Close button clicked, current state:", open)
     setOpen(false)
-    console.log("Setting open to false")
-  }
-
-  function handleBgClick(e: React.MouseEvent<HTMLDivElement>) {
-    if (e.target === e.currentTarget) {
-      setOpen(false)
-    }
   }
 
   return (
