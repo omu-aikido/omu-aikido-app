@@ -3,7 +3,7 @@ import { grade } from "@/src/utils"
 import { default as Layout } from "@/src/layouts/layout.astro"
 import { actions } from "astro:actions"
 import { tv } from "tailwind-variants"
-import Notification from "@/src/components/ui/notification.astro"
+import Notification from "@/src/components/notification.astro"
 const user = await Astro.locals.currentUser()
 
 if (!user) {
