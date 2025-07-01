@@ -8,6 +8,7 @@ export default tseslint.config(
       "dist/",
       "node_modules/",
       ".astro/",
+      ".react-router/*",
       ".wrangler/",
       ".react-router/",
       "worker-configuration.d.ts",

@@ -1,5 +1,3 @@
-import React from "react"
-
 interface AppIconProps {
   title: string
   id: string
