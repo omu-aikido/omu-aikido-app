@@ -6,6 +6,7 @@ on:
 
 jobs:
   lint-and-format:
+    environment: preview
     runs-on: ubuntu-latest
     name: Code Quality Check
     steps:
@@ -20,6 +21,15 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Setiup .env variables
+        run: |
+          echo "" > .env
+          echo "PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.PUBLIC_CLERK_PUBLISHABLE_KEY }}" >> .env
+          echo "VITE_CLERK_PUBLISHABLE_KEY"=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}" >> .env
+          echo "CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}" >> .env
+          echo "TURSO_DATABASE_URL=${{ secrets.TURSO_DATABASE_URL }}" >> .env
+          echo "TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}" >> .env
 
       - name: Build Projects
         run: npm run check
