@@ -20,32 +20,42 @@ export async function AccountUi({ apps }: AccountUiProps) {
   return (
     <div className="m-0 p-0">
       <SignedOut>
-        <SignInButton mode="modal" />
+        <div className="[&_button]:w-full [&_button]:justify-center [&_button]:bg-blue-600 [&_button]:text-white hover:[&_button]:bg-blue-700 dark:[&_button]:bg-blue-500 dark:hover:[&_button]:bg-blue-600">
+          <SignInButton mode="modal" />
+        </div>
       </SignedOut>
       <SignedIn>
         {user && (
-          <a className={style.header.clerk.name()} href="/account">
+          <a
+            className={`${style.header.clerk.name()} p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800`}
+            href="/account"
+          >
             <img
               src={user.imageUrl}
               alt={`Profile picture of ${user.firstName} ${user.lastName}`}
               className={style.header.clerk.icon()}
               loading="lazy"
             />
-            <span>
+            <span className="text-gray-800 dark:text-gray-200">
               {user.lastName} {user.firstName}
             </span>
           </a>
         )}
-        <hr />
+        <hr className="my-2 border-gray-200 dark:border-gray-700" />
         {apps.map((app) => (
           <div className="flex flex-col" key={app.path}>
-            <a className={style.header.link()} href={app.path}>
+            <a
+              className={`${style.header.link()} p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200`}
+              href={app.path}
+            >
               {app.name}
             </a>
           </div>
         ))}
-        <hr />
-        <SignOutButton />
+        <hr className="my-2 border-gray-200 dark:border-gray-700" />
+        <div className="[&_button]:w-full [&_button]:justify-start [&_button]:text-gray-800 hover:[&_button]:bg-gray-100 dark:[&_button]:text-gray-200 dark:hover:[&_button]:bg-gray-800">
+          <SignOutButton />
+        </div>
       </SignedIn>
     </div>
   )

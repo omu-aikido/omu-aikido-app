@@ -7,7 +7,7 @@ interface GridProps {
 }
 
 export const Grid: React.FC<GridProps> = ({ variant, children, className = "" }) => {
-  const baseClasses = "grid grid-rows-[repeat(auto,1fr)] gap-4 list-none p-0"
+  const baseClasses = "grid grid-rows-[repeat(auto,1fr)] gap-4 list-none p-3"
 
   const variantClasses = {
     small:

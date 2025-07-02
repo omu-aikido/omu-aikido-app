@@ -42,7 +42,7 @@ export function Sidebar({ position, icon, children }: SidebarProps) {
       {/* Overlay background */}
       {open && (
         <div
-          className="fixed inset-0 bg-slate-200/40 dark:bg-slate-600/40 backdrop-blur-sm z-40 transition-opacity duration-300"
+          className="fixed inset-0 bg-slate-200/40 dark:bg-slate-800/40 backdrop-blur-sm z-40 transition-opacity duration-300"
           onClick={() => setOpen(false)}
         />
       )}
@@ -53,7 +53,7 @@ export function Sidebar({ position, icon, children }: SidebarProps) {
         id="sidebar"
         className={`fixed top-0 ${
           position === "left" ? "left-0" : "right-0"
-        } h-full bg-white dark:bg-slate-800/ shadow-2xl z-50 transition-transform duration-300 ease-out ${
+        } h-full bg-slate-200 dark:bg-slate-800 shadow-2xl z-50 transition-transform duration-300 ease-out ${
           open ? "translate-x-0" : position === "left" ? "-translate-x-full" : "translate-x-full"
         } w-80 flex flex-col`}
       >
