@@ -30,6 +30,7 @@ jobs:
           echo "CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}" >> .env
           echo "TURSO_DATABASE_URL=${{ secrets.TURSO_DATABASE_URL }}" >> .env
           echo "TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}" >> .env
+          cp .env .dev.vars
 
       - name: Build Projects
         run: npm run check
@@ -39,9 +40,6 @@ jobs:
 
       - name: Check Prettier formatting
         run: npm run format
-
-      - name: TypeScript type check
-        run: npx astro check
 
       - name: Commit changes if any
         run: |
