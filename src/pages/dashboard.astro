@@ -7,11 +7,11 @@ import { APPS } from "@/src/const"
 import ActivityForm from "@/src/components/add-record.astro"
 import ActivityFormPh from "@/src/components/add-record-ph.astro"
 import { style } from "@/src/styles/component"
-import RecentsPh from "@/src/components/recents-ph.astro"
-import Recents from "@/src/components/recents.astro"
+import { Recents } from "@/rr7/components/component/Recents"
 
+const userId = Astro.locals.auth().userId
 const profile = Astro.locals.profile
-if (!profile) {
+if (!profile || !userId) {
   return Astro.redirect("/sign-in")
 }
 const role = Role.fromString(profile.role)
@@ -31,9 +31,7 @@ if (role && role.isManagement() && !APPS.some((app) => app.name === "管理者�
   <ActivityForm server:defer>
     <ActivityFormPh slot="fallback" />
   </ActivityForm>
-  <Recents server:defer>
-    <RecentsPh slot="fallback" />
-  </Recents>
+  <Recents userId={userId} />
 
   <hr />
   <Grid variant="offset">

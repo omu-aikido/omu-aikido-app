@@ -5,8 +5,7 @@ import { translateGrade, timeForNextGrade } from "@/src/utils"
 import ActivityForm from "@/src/components/add-record.astro"
 import { style } from "@/src/styles/component"
 
-import RecentsPh from "@/src/components/recents-ph.astro"
-import Recents from "@/src/components/recents.astro"
+import { Recents } from "@/rr7/components/component/Recents"
 
 const user = await Astro.locals.currentUser()
 
@@ -66,10 +65,7 @@ const needToNextGrade = Math.max(
   <h2>追加</h2>
 
   <ActivityForm />
-  <Recents server:defer>
-    <RecentsPh slot="fallback" />
-  </Recents>
-
+  <Recents userId={user.id} />
   <hr class="my-6 border-slate-200 dark:border-slate-700" />
 
   <div class="space-y-4">

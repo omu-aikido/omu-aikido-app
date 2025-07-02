@@ -73,7 +73,7 @@ export async function userActivity(input: {
   return activityData
 }
 
-export async function resentlyActivity(input: { userId: string; limit: number }) {
+export async function recentlyActivity(input: { userId: string; limit: number }) {
   const activityData = await db
     .select()
     .from(activity)

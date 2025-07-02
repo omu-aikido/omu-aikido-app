@@ -1,20 +1,10 @@
-import { useEffect, useState } from "react"
-import { resentlyActivity } from "@/src/lib/query/activity"
+import { recentlyActivity } from "@/src/lib/query/activity"
 
-const Recents = () => {
-  const [recents, setRecents] = useState([])
+export async function Recents({ userId }: { userId: string }) {
+  const recents = await recentlyActivity({ userId, limit: 1 })
+  const recent = recents.pop()
 
-  useEffect(() => {
-    const fetchRecents = async () => {
-      const userId = Astro.locals.auth().userId
-      const data = await resentlyActivity({ userId, limit: 1 })
-      setRecents(data)
-    }
-
-    fetchRecents()
-  }, [])
-
-  const relativeTime = (createAt) => {
+  const relativeTime = (createAt: string) => {
     const now = Date.now()
     const diff = now - new Date(createAt).getTime()
     const secondsUnit = 1000
@@ -43,7 +33,7 @@ const Recents = () => {
     return text
   }
 
-  if (recents.length === 0) return null
+  if (!recent) return null
 
   return (
     <div className="bg-slate-200 dark:bg-slate-800 border border-slate-600/90 p-4 rounded-lg mt-4">
@@ -51,18 +41,16 @@ const Recents = () => {
         最近追加した項目:
         <small
           id="relative-time"
-          data-timestamp={new Date(recents[0].createAt).getTime()}
+          data-timestamp={new Date(recent.createAt).getTime()}
           className="text-sm"
         >
-          {relativeTime(recents[0].createAt)}
+          {relativeTime(recent.createAt)}
         </small>
       </h2>
       <div className="flex justify-between text-sm text-slate-600 dark:text-slate-300 md:flex-row flex-col">
-        <span className="mr-2">
-          追加日時: {new Date(recents[0].createAt).toLocaleString("ja-JP")}
-        </span>
-        <span className="mr-2">日付: {new Date(recents[0].date).toLocaleDateString("ja-JP")}</span>
-        <span>{recents[0].period}時間</span>
+        <span className="mr-2">追加日時: {new Date(recent.createAt).toLocaleString("ja-JP")}</span>
+        <span className="mr-2">日付: {new Date(recent.date).toLocaleDateString("ja-JP")}</span>
+        <span>{recent.period}時間</span>
       </div>
     </div>
   )
