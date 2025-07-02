@@ -48,13 +48,12 @@
     "cf-typegen": "wrangler types",
     "rr-typegen": "react-router typegen",
     "prebuild": "npm run cf-typegen && npm run rr-typegen",
-    "precheck": "npm run cf-typegen && npm run rr-typegen",
-    "check": "astro build && astro check && tsc && wrangler deploy --dry-run",
+    "postbuild": "npm run format",
+    "check": "npm run build && astro check && npm run lint:fix && npm run format && tsc && wrangler deploy --dry-run",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "ci:lint": "npm run lint:fix && npm run format"
+    "format:check": "prettier --check ."
   },
   "type": "module",
   "volta": {
