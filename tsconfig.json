@@ -1,13 +1,17 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
+  "include": [".astro/types.d.ts", "**/*", ".react-router/types"],
   "exclude": ["dist"],
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "baseUrl": ".",
     "paths": {
       "@/src/*": ["./src/*"],
+      "@/rr7/*": ["./react-router-app/*"],
       "@/./*": ["./*"]
     },
+    "rootDirs": [".", "./.react-router/types"],
     "types": ["./worker-configuration.d.ts", "node"]
   }
 }
