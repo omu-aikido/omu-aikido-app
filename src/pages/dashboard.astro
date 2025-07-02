@@ -27,10 +27,12 @@ if (role && role.isManagement() && !APPS.some((app) => app.name === "管理者�
 ---
 
 <Layout title="ダッシュボード">
-  {/* 
+  {
+    /* 
     <NewsReader content="short" path="news" source="app/news" client:load /> -->
     <hr />
-  */}
+  */
+  }
   <h2 class={style.text.title()}>追加</h2>
 
   <ActivityForm server:defer>
