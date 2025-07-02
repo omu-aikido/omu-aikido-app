@@ -17,13 +17,13 @@ export function ReactHeader({ title, homelink, textLinks, children }: AuthedHead
   return (
     <>
       <header className="m-0 py-0 px-6 top-0 z-50 sticky bg-slate-200/70 dark:bg-slate-800/90 text-slate-900 dark:text-slate-200 flex justify-between items-center h-20">
-        <h2 className="items-center-safe justify-items-center w-1/6 ">
+        <h2 className="items-center-safe justify-items-center md:w-1/6 ">
           <a className="items-center-safe justify-items-center text-xl font-bold" href={homelink}>
             {title.slice(0, 8)}
           </a>
         </h2>
         {textLinks.length > 0 && (
-          <div className="hidden sm:flex">
+          <div className="hidden md:flex">
             <nav className={style.header.navigation.block()}>
               {textLinks.map((link) => (
                 <a
