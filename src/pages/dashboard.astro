@@ -4,11 +4,9 @@ import { Role } from "@/src/class"
 import Grid from "@/rr7/components/ui/Grid"
 import { AppIcon } from "@/rr7/components/ui/AppIcon"
 import { APPS } from "@/src/const"
-import ActivityForm from "@/src/components/add-record.astro"
-import ActivityFormPh from "@/src/components/add-record-ph.astro"
-import { style } from "@/src/styles/component"
+import { AddRecord } from "@/rr7/components/component/AddRecord"
 import { Recents } from "@/rr7/components/component/Recents"
-
+import { style } from "@/src/styles/component"
 const userId = Astro.locals.auth().userId
 const profile = Astro.locals.profile
 if (!profile || !userId) {
@@ -26,11 +24,10 @@ if (role && role.isManagement() && !APPS.some((app) => app.name === "管理者�
 ---
 
 <Layout title="ダッシュボード">
-  <h2 class={style.text.title()}>追加</h2>
+  <h2 class={style.text.title()}>記録追加</h2>
 
-  <ActivityForm server:defer>
-    <ActivityFormPh slot="fallback" />
-  </ActivityForm>
+  <AddRecord client:load />
+
   <Recents userId={userId} />
 
   <hr />

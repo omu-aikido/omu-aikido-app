@@ -2,7 +2,7 @@
 import { default as Layout } from "@/src/layouts/layout.astro"
 import { userActivity } from "@/src/lib/query/activity"
 import { translateGrade, timeForNextGrade } from "@/src/utils"
-import ActivityForm from "@/src/components/add-record.astro"
+import { AddRecord } from "@/rr7/components/component/AddRecord"
 import { style } from "@/src/styles/component"
 
 import { Recents } from "@/rr7/components/component/Recents"
@@ -64,7 +64,7 @@ const needToNextGrade = Math.max(
   <hr />
   <h2>追加</h2>
 
-  <ActivityForm />
+  <AddRecord client:load />
   <Recents userId={user.id} />
   <hr class="my-6 border-slate-200 dark:border-slate-700" />
 

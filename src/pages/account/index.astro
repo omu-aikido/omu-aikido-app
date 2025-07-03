@@ -36,6 +36,7 @@ if (result && !result.error) {
     )
   }
   {
+    (
       <Notification
         title="プロフィール更新"
         message="プロフィールが正常に更新されました。"
@@ -44,6 +45,7 @@ if (result && !result.error) {
         onClose={() => console.log("Notification closed")}
         client:load
       />
+    )
   }
 
   <p class="text-gray-700 dark:text-gray-300 mb-4">

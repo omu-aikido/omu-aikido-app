@@ -105,7 +105,7 @@ export const style = {
     }),
     input: tv({
       base: [
-        "col-span-2 px-3 py-2",
+        "col-span-2 px-3 py-2 h-10",
         "bg-slate-100 dark:bg-slate-800",
         "border border-slate-400 dark:border-slate-600 rounded-md",
       ],
@@ -117,9 +117,9 @@ export const style = {
     }),
     button: tv({
       base: [
-        "col-span-3 py-2 px-4 rounded-md transition-colors",
-        "bg-emerald-300 dark:bg-emerald-700 text-slate-800 dark:text-slate-200",
-        "hover:bg-emerald-400 dark:hover:bg-emerald-600",
+        "col-span-3 py-2 px-4 rounded-md transition-colors h-10 flex items-center justify-center",
+        "bg-blue-300 dark:bg-blue-700 text-slate-800 dark:text-slate-200",
+        "hover:bg-emerald-300 dark:hover:bg-emerald-800",
         "disabled:bg-slate-200 dark:disabled:bg-slate-700",
       ],
       variants: {
