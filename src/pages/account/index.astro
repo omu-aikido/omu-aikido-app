@@ -1,6 +1,6 @@
 ---
 import { default as Layout } from "@/src/layouts/layout.astro"
-import Notification from "@/src/components/notification.astro"
+import { Notification } from "@/rr7/components/component/Notification"
 const user = await Astro.locals.currentUser()
 
 if (!user) {
@@ -30,18 +30,20 @@ if (result && !result.error) {
         message={`プロフィールの更新に失敗しました。 ${result.error.message}`}
         type="error"
         duration={10000}
+        onClose={() => console.log("Notification closed")}
+        client:load
       />
     )
   }
   {
-    result && !result.error && (
       <Notification
         title="プロフィール更新"
         message="プロフィールが正常に更新されました。"
         type="success"
         duration={3000}
+        onClose={() => console.log("Notification closed")}
+        client:load
       />
-    )
   }
 
   <p class="text-gray-700 dark:text-gray-300 mb-4">

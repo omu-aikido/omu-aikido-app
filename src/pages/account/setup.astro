@@ -3,7 +3,7 @@ import { grade } from "@/src/utils"
 import { default as Layout } from "@/src/layouts/layout.astro"
 import { actions } from "astro:actions"
 import { tv } from "tailwind-variants"
-import Notification from "@/src/components/notification.astro"
+import { Notification } from "@/rr7/components/component/Notification"
 const user = await Astro.locals.currentUser()
 
 if (!user) {
@@ -24,6 +24,8 @@ const result = Astro.getActionResult(actions.user.profile.add)
         message={`プロフィールの登録に失敗しました。 ${result.error.message}`}
         type="error"
         duration={10000}
+        onClose={() => console.log("Notification closed")}
+        client:load
       />
     )
   }

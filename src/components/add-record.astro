@@ -2,7 +2,7 @@
 import { style } from "@/src/styles/component"
 const userId = Astro.locals.auth().userId!
 import { actions } from "astro:actions"
-import Notification from "./notification.astro"
+import { Notification } from "@/rr7/components/component/Notification"
 
 const result = Astro.getActionResult(actions.record.add)
 ---
@@ -14,6 +14,8 @@ const result = Astro.getActionResult(actions.record.add)
       message="記録が正常に追加されました。"
       type="success"
       duration={3000}
+      onClose={() => console.log("Notification closed")}
+      client:load
     />
   )
 }
@@ -24,6 +26,8 @@ const result = Astro.getActionResult(actions.record.add)
       message={`記録の追加に失敗しました: ${result.error.message}`}
       type="error"
       duration={5000}
+      onClose={() => console.log("Notification closed")}
+      client:load
     />
   )
 }
