@@ -52,10 +52,6 @@ export async function AccountUi({ apps }: AccountUiProps) {
             </a>
           </div>
         ))}
-        <hr className="my-2 border-gray-200 dark:border-gray-700" />
-        <div className="[&_button]:w-full [&_button]:justify-start [&_button]:text-gray-800 hover:[&_button]:bg-gray-100 dark:[&_button]:text-gray-200 dark:hover:[&_button]:bg-gray-800">
-          <SignOutButton />
-        </div>
       </SignedIn>
     </div>
   )

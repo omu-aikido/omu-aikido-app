@@ -10,6 +10,7 @@ if (!user) {
 import * as profile from "@/src/lib/query/profile"
 import { grade, year } from "@/src/utils"
 import { actions } from "astro:actions"
+import { SignOutButton } from "@clerk/astro/components"
 
 const userProfile = Astro.locals.profile
 if (!userProfile) {
@@ -36,8 +37,8 @@ if (result && !result.error) {
     )
   }
   {
-    (
-      result && <Notification
+    result && (
+      <Notification
         title="プロフィール更新"
         message="プロフィールが正常に更新されました。"
         type="success"
@@ -48,16 +49,7 @@ if (result && !result.error) {
     )
   }
 
-  <p class="text-gray-700 dark:text-gray-300 mb-4">
-    メールアドレス・パスワードの変更などは
-    <a
-      href="https://accounts.omu-aikido.com"
-      class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline transition-colors duration-200"
-    >
-      こちら
-    </a>
-    から行ってください。
-  </p>
+  
 
   <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">プロフィール</h1>
 
@@ -150,6 +142,27 @@ if (result && !result.error) {
       登録
     </button>
   </form>
+
+  <hr class="my-2 border-gray-200 dark:border-gray-700" />
+  <div class="mt-6">
+    <p class="text-gray-700 dark:text-gray-300 mb-4">
+    メールアドレス・パスワードの変更などは
+    <a
+      href="https://accounts.omu-aikido.com"
+      class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline transition-colors duration-200"
+    >
+      こちら(外部リンク)
+    </a>
+    から行ってください。
+  </p>
+    <p>
+      サインアウトはここからできます→
+
+    <SignOutButton
+      class="w-1/3 bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 text-white py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 dark:focus:ring-offset-gray-800 font-medium transition-colors duration-200"
+    />
+    </p>
+  </div>
 </Layout>
 
 <script>
