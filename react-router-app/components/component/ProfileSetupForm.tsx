@@ -1,4 +1,3 @@
-import { getProfile } from "@/src/lib/query/profile"
 import React, { useState, useEffect } from "react"
 
 const gradeOptions = [
@@ -41,20 +40,30 @@ function ProfileSetupForm({ userId, patch, put }: ProfileSetupFormProps) {
   const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
-    console.log("ProfileSetupForm mounted", { patch, put, userId })
     if (patch) {
-      getProfile({ userId })
-        .then((res) => {
-          console.log(res)
-          if (!(res instanceof Response)) {
-            setGrade(`${res.grade}`)
-            setGetGradeAt(res.getGradeAt || "")
-            setJoinedAt(res.joinedAt.toString())
-            setYear(res.year || "b1")
+      fetch(`/api/user/profile?userId=${userId}`)
+        .then(async (response) => {
+          if (response.ok) {
+            const data: ApiResponse = await response.json()
+
+            if (data.success && data.profile) {
+              const profile = data.profile
+              setGrade(String(profile.grade))
+              const gradeDate = profile.getGradeAt
+                ? new Date(profile.getGradeAt).toISOString().split("T")[0]
+                : ""
+              setGetGradeAt(gradeDate)
+              setJoinedAt(profile.joinedAt.toString())
+              setYear(profile.year || "b1")
+            } else {
+              setErrorMessage("プロフィールデータの読み込みに失敗しました")
+            }
+          } else {
+            setErrorMessage(`プロフィールが見つかりません (${response.status})`)
           }
         })
         .catch((error) => {
-          setErrorMessage(`プロフィールの取得中にエラーが発生しました: ${error.message}`)
+          setErrorMessage(`プロフィールの取得中にエラーが発生しました: ${error.status}`)
         })
     }
   }, [patch, userId])

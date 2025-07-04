@@ -61,8 +61,13 @@ export const profileSchema = z.object({
   year: z.string(),
 })
 
-// 空のスキーマとしてエクスポート（必要に応じて内容を修正してください）
-export const publicMetadataProfileSchema = z.object({})
+export const publicMetadataProfileSchema = z.object({
+  role: Role.type().optional(),
+  grade: z.preprocess((val) => Number(val), z.number()),
+  getGradeAt: z.string().datetime().nullable(), // null を許可
+  joinedAt: z.preprocess((val) => Number(val), z.number()),
+  year: z.string(),
+})
 // createProfileInputSchema: createProfile用の入力スキーマ
 export const createProfileInputSchema = z.object({
   id: z.string(),

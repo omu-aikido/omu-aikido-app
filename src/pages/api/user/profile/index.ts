@@ -100,3 +100,58 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     })
   }
 }
+
+export const GET: APIRoute = async ({ url, locals }) => {
+  try {
+    const auth = locals.auth()
+    if (!auth.userId) {
+      return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+        status: 401,
+      })
+    }
+
+    const urlParams = new URLSearchParams(url.search)
+    const requestedUserId = urlParams.get("userId")
+
+    // userIdが指定されている場合は、それが認証済みユーザーと一致するかチェック
+    const targetUserId = requestedUserId || auth.userId
+
+    if (requestedUserId && auth.userId !== requestedUserId) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized: User ID mismatch" }),
+        { status: 403 },
+      )
+    }
+
+    const profile = await getProfile({ userId: targetUserId })
+
+    if (profile instanceof Response) {
+      const status = profile.status
+      const errorText = await profile.text()
+
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: status === 404 ? "Profile not found" : errorText,
+        }),
+        { status },
+      )
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        profile: profile,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    )
+  } catch (error) {
+    console.error("Error fetching profile:", error)
+    return new Response(JSON.stringify({ success: false, error: "Internal Server Error" }), {
+      status: 500,
+    })
+  }
+}

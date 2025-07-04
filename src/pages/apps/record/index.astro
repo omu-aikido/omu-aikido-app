@@ -6,16 +6,14 @@ import { AddRecord } from "@/rr7/components/component/AddRecord"
 import { style } from "@/src/styles/component"
 
 import { Recents } from "@/rr7/components/component/Recents"
+import { year } from "drizzle-orm/mysql-core"
 
 const user = await Astro.locals.currentUser()
 
 if (!user) {
   return Astro.redirect("/sign-in")
 }
-const userProfile = Astro.locals.profile
-if (!userProfile) {
-  return Astro.redirect("/sign-in")
-}
+const userProfile = Astro.locals.profile!
 
 const now = new Date()
 const start = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
@@ -29,9 +27,11 @@ const activities = (
 ).sort((a, b) => {
   return new Date(b.date).getTime() - new Date(a.date).getTime()
 })
+console.log(userProfile)
+console.log(new Date(userProfile.joinedAt, 3, 2))
 const activityFromPreviousGrade = await userActivity({
   userId: user.id,
-  start: new Date(userProfile.getGradeAt ?? userProfile.joinedAt),
+  start: new Date(userProfile.getGradeAt ?? (userProfile.joinedAt, 3, 1)), // 4月1日 (月は0ベース)
   end: new Date(),
 })
 const grade = userProfile.grade
