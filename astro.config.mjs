@@ -8,6 +8,7 @@ import { jaJP } from "@clerk/localizations"
 import sitemap from "@astrojs/sitemap"
 
 import react from "@astrojs/react"
+
 import tailwindcss from "@tailwindcss/vite"
 
 // https://astro.build/config
@@ -40,7 +41,6 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [tailwindcss()],
     resolve: {
       alias: import.meta.env.PROD
         ? {
@@ -48,5 +48,8 @@ export default defineConfig({
           }
         : undefined,
     },
+
+    // @ts-ignore
+    plugins: [tailwindcss()],
   },
 })

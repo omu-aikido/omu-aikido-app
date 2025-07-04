@@ -1,11 +1,7 @@
 import type { APIRoute } from "astro"
 import { createProfile, updateProfile, getProfile } from "@/src/lib/query/profile"
-import { profile as profileSchema } from "@/src/zod"
+import { createProfileInputSchema, updateProfileInputSchema } from "@/src/zod"
 
-const createProfileSchema = profileSchema.omit({ role: true })
-const updateProfileSchema = profileSchema.omit({ role: true })
-
-// プロファイル作成または更新（POST）
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const auth = locals.auth()
@@ -16,7 +12,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const input = await request.json()
-    const parsedInput = createProfileSchema.safeParse(input)
+    const parsedInput = createProfileInputSchema.safeParse(input)
 
     if (!parsedInput.success) {
       return new Response(JSON.stringify({ success: false, error: "Invalid input" }), {
@@ -24,22 +20,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
       })
     }
 
-    const { id, grade, getGradeAt, joinedAt, year } = parsedInput.data
+    const data = parsedInput.data
 
-    if (auth.userId !== id) {
+    if (auth.userId !== data.id) {
       return new Response(
         JSON.stringify({ success: false, error: "Unauthorized: User ID mismatch" }),
         { status: 403 },
       )
     }
 
-    const result = await createProfile({
-      id: id,
-      grade: Number(grade),
-      getGradeAt: getGradeAt ? new Date(getGradeAt) : new Date(),
-      joinedAt: Number(joinedAt),
-      year: year,
-    })
+    const result = await createProfile(data)
 
     if (result instanceof Response && result.status !== 200) {
       const errorText = await result.text()
@@ -59,10 +49,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 }
 
-// プロファイル更新（PATCH）
 export const PATCH: APIRoute = async ({ request, locals }) => {
   try {
-    console.log("PATCH")
     const auth = locals.auth()
     if (!auth.userId) {
       return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
@@ -71,7 +59,7 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     }
 
     const input = await request.json()
-    const parsedInput = updateProfileSchema.safeParse(input)
+    const parsedInput = updateProfileInputSchema.safeParse(input)
 
     if (!parsedInput.success) {
       return new Response(JSON.stringify({ success: false, error: "Invalid input" }), {
@@ -79,32 +67,23 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
       })
     }
 
-    const { id, grade, getGradeAt, joinedAt, year } = parsedInput.data
+    const data = parsedInput.data
 
-    if (auth.userId !== id) {
+    if (auth.userId !== data.id) {
       return new Response(
         JSON.stringify({ success: false, error: "Unauthorized: User ID mismatch" }),
         { status: 403 },
       )
     }
 
-    // 既存のプロファイル情報を取得してroleを取得
-    console.log("fetchin current profile")
-    const existingProfile = await getProfile({ userId: id })
+    const existingProfile = await getProfile({ userId: data.id })
     if (existingProfile instanceof Response) {
       return new Response(JSON.stringify({ success: false, error: "Profile not found" }), {
         status: 404,
       })
     }
 
-    const result = await updateProfile({
-      id: id,
-      grade: Number(grade),
-      getGradeAt: getGradeAt ? new Date(getGradeAt) : new Date(),
-      joinedAt: Number(joinedAt),
-      year: year,
-      role: existingProfile.role, // 既存のプロファイルからroleを取得
-    })
+    const result = await updateProfile(data)
 
     if (result instanceof Response && result.status !== 200) {
       const errorText = await result.text()

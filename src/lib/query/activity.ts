@@ -19,17 +19,6 @@ export async function getAllActivities(input: { applicateBy: string }) {
   if (applicateBy instanceof Response) {
     return applicateBy
   }
-  if (
-    !(applicateBy instanceof Object) ||
-    !(
-      "grade" in applicateBy &&
-      "getGradeAt" in applicateBy &&
-      "joinedAt" in applicateBy &&
-      "year" in applicateBy
-    )
-  ) {
-    throw new Error("Invalid profile format.")
-  }
 
   const role = Role.fromString(applicateBy.role)
   if (!role || !role.isManagement()) {

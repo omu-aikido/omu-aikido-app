@@ -1,36 +1,8 @@
 ---
 import { Footer } from "@/rr7/components/component/Footer"
-
-import { getRole } from "@/src/lib/query/profile"
-import { APP_NAME, APPS } from "@/src/const"
 import Header from "@/src/components/header.astro"
 import { Head } from "@/rr7/components/component/Head"
 import "@/src/styles/global.css"
-
-/** Main menu items */
-const textLinks: { label: string; href: string }[] = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Apps", href: "/apps" },
-  { label: "Account", href: "/account" },
-]
-
-const pathname = new URL(Astro.request.url).pathname
-
-if (!(pathname.startsWith("/account/setup") || pathname.startsWith("/account/recovery"))) {
-  const profile = Astro.locals.profile!
-  const role = getRole({ profile })
-
-  if (role && role.isManagement() && !textLinks.some((link) => link.label === "Admin")) {
-    textLinks.push({ label: "Admin", href: "/admin" })
-  }
-  if (role && role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
-    APPS.push({
-      name: "管理者メニュー",
-      path: "/admin",
-      desc: "管理者メニューに移動します。",
-    })
-  }
-}
 
 interface Props {
   title: string
@@ -38,15 +10,16 @@ interface Props {
 
 const homelink = "/dashboard"
 const { title } = Astro.props
+const paths = Astro.locals.paths
 ---
 
 <html
   lang="ja"
   class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans scroll-smooth select-none overflow-x-hidden max-w-full"
 >
-  <Head title={`${title} | ${APP_NAME}`} />
+  <Head title={`${title} | ハム大合気ポータル`} />
   <body class="flex-col min-h-dvh">
-    <Header title={title} homelink={homelink} textLinks={textLinks} apps={APPS} />
+    <Header title={title} homelink={homelink} textLinks={paths} />
     <div class="p-6 mx-auto max-w-5xl">
       <main class="min-h-[75vh] overflow-y-auto mb-auto">
         <slot />

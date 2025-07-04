@@ -51,11 +51,50 @@ export class Role {
   }
 }
 
-export const profile = z.object({
+// profile → profileSchema にリネームし export
+export const profileSchema = z.object({
   id: z.string(),
   grade: z.preprocess((val) => Number(val), z.number()), // 文字列から数値へ変換
   role: Role.type(),
   getGradeAt: z.string().nullable(), // null を許可
   joinedAt: z.preprocess((val) => Number(val), z.number()), // 文字列から数値へ変換
+  year: z.string(),
+})
+
+// 空のスキーマとしてエクスポート（必要に応じて内容を修正してください）
+export const publicMetadataProfileSchema = z.object({})
+// createProfileInputSchema: createProfile用の入力スキーマ
+export const createProfileInputSchema = z.object({
+  id: z.string(),
+  role: Role.type().optional(),
+  year: z.string(),
+  grade: z.preprocess((val) => Number(val), z.number()),
+  joinedAt: z.preprocess((val) => Number(val), z.number()),
+  getGradeAt: z.preprocess(
+    (val) => (val instanceof Date ? val.toISOString() : val),
+    z.string().datetime().nullable(),
+  ),
+})
+
+// updateProfileInputSchema: updateProfile用の入力スキーマ
+export const updateProfileInputSchema = z.object({
+  id: z.string(),
+  role: Role.type().optional(),
+  year: z.string().optional(),
+  grade: z.preprocess((val) => Number(val), z.number()).optional(),
+  joinedAt: z.preprocess((val) => Number(val), z.number()).optional(),
+  getGradeAt: z
+    .preprocess(
+      (val) => (val instanceof Date ? val.toISOString() : val),
+      z.string().datetime().nullable(),
+    )
+    .optional(),
+})
+export const apiProfileInputSchema = z.object({
+  id: z.string(),
+  grade: z.preprocess((val) => Number(val), z.number()),
+  role: Role.type().optional(),
+  getGradeAt: z.string().datetime().nullable(),
+  joinedAt: z.preprocess((val) => Number(val), z.number()),
   year: z.string(),
 })

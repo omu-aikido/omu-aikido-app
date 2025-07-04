@@ -1,14 +1,10 @@
 import { SignedIn, SignedOut, SignInButton, useAuth } from "@clerk/astro/react"
 import { style } from "@/src/styles/component"
 import { getAccount } from "@/src/lib/query/profile"
-
-interface App {
-  name: string
-  path: string
-}
+import type { PagePath } from "@/src/type"
 
 interface AccountUiProps {
-  apps: App[]
+  apps: PagePath[]
 }
 
 export async function AccountUi({ apps }: AccountUiProps) {
@@ -43,10 +39,10 @@ export async function AccountUi({ apps }: AccountUiProps) {
         )}
         <hr className="my-2 border-gray-200 dark:border-gray-700" />
         {apps.map((app) => (
-          <div className="flex flex-col" key={app.path}>
+          <div className="flex flex-col" key={app.href}>
             <a
               className={`${style.header.link()} p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200`}
-              href={app.path}
+              href={app.href}
             >
               {app.name}
             </a>

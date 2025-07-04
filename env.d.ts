@@ -9,13 +9,14 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
-import type { Profile } from "@/src/type"
+import type { Profile, PagePath } from "@/src/type"
 type Runtime = import("@astrojs/cloudflare").Runtime<ENV>
 
 declare global {
   namespace App {
     interface Locals extends Runtime {
       profile: Profile | null
+      paths: PagePath[]
     }
   }
 }

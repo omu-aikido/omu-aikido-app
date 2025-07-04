@@ -2,27 +2,21 @@
 import { default as Layout } from "@/src/layouts/layout.astro"
 import Grid from "@/rr7/components/ui/Grid"
 import { AppIcon } from "@/rr7/components/ui/AppIcon"
-import { APPS } from "@/src/const"
-import { getRole } from "@/src/lib/query/profile"
 import { style } from "@/src/styles/component"
-const profile = Astro.locals.profile
-if (!profile) {
-  return Astro.redirect("/sign-in")
-}
-const role = getRole({ profile })
+import path from "path"
 
-if (role && role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
-  APPS.push({
-    name: "管理者メニュー",
-    path: "/admin",
-    desc: "管理者メニューに移動します。",
-  })
-}
+const apps = [
+  {
+    name: "記録",
+    path: "/apps/record",
+    desc: "稽古の記録をつける",
+  },
+]
 ---
 
 <Layout title="アプリ一覧">
   <h1 class={style.text.title()}>アプリ</h1>
   <Grid variant="offset">
-    {APPS.map((app) => <AppIcon title={app.name} id={app.path} desc={app.desc} />)}
+    {apps.map((app) => <AppIcon title={app.name} id={app.path} desc={app.desc} />)}
   </Grid>
 </Layout>

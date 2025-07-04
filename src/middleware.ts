@@ -1,65 +1,65 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/astro/server"
 import * as profile from "@/src/lib/query/profile"
 import { Role } from "@/src/zod"
+import type { PagePath } from "./type"
 
-const isProtectedRoute = createRouteMatcher([
-  "/dashboard(.*)",
-  "/app(.*)",
-  "/account(.*)",
-  "/admin(.*)",
-])
+const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/app(.*)", "/account(.*)"])
 const isAccountRecoverlyRoute = createRouteMatcher(["/account/setup", "/account/recovery"])
 const isAdminRoute = createRouteMatcher(["/admin(.*)"])
 const isApiRequest = createRouteMatcher(["/api(.*)"])
+
 export const onRequest = clerkMiddleware(async (auth, context, next) => {
-  const { redirectToSignIn, userId } = auth()
+  const { redirectToSignIn, userId, isAuthenticated } = auth()
 
-  if (!userId && isProtectedRoute(context.request)) {
-    if (isApiRequest(context.request)) {
-      return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      })
-    }
-    return redirectToSignIn()
-  } else if (userId) {
-    if (isApiRequest(context.request)) {
-      if (isAdminRoute(context.request)) {
-        const userProfile = await profile.getProfile({ userId: userId })
-        if (userProfile instanceof Response) {
-          return new Response(JSON.stringify({ success: false, error: "Forbidden" }), {
-            status: 403,
-            headers: { "Content-Type": "application/json" },
-          })
-        }
-        const role = Role.fromString(userProfile.role)
-        if (role && !role.isManagement()) {
-          return new Response(JSON.stringify({ success: false, error: "Forbidden" }), {
-            status: 403,
-            headers: { "Content-Type": "application/json" },
-          })
-        }
-      }
-      return next()
-    }
+  context.locals.paths = [
+    {
+      name: "ホーム",
+      href: "/dashboard",
+      desc: "ダッシュボードへ",
+    },
+    {
+      name: "アプリ一覧",
+      href: "/apps",
+      desc: "アプリの一覧",
+    },
+    {
+      name: "アカウント",
+      href: "/account",
+      desc: "アカウント設定を行う",
+    },
+  ]
 
-    const userProfile = await profile.getProfile({ userId: userId })
+  if ((isProtectedRoute(context.request) && !isAuthenticated) || !userId) return redirectToSignIn()
 
-    if (userProfile instanceof Response) {
-      if (!isAccountRecoverlyRoute(context.request)) {
-        if (userProfile.status === 404) {
-          return context.redirect("/account/setup")
-        } else if (userProfile.status === 422) {
-          return context.redirect("/account/recovery")
-        }
-      }
-    } else {
-      context.locals.profile = userProfile
-      const role = Role.fromString(userProfile.role)
-      if (isAdminRoute(context.request) && role && !role.isManagement()) {
-        return context.redirect("/dashboard")
-      }
+  if (isApiRequest(context.request) || isAccountRecoverlyRoute(context.request)) return next()
+
+  const userProfile = await profile.getProfile({ userId: userId })
+
+  if (userProfile instanceof Response) {
+    switch (userProfile.status) {
+      case 404:
+        return context.redirect("/account/setup")
+      case 422:
+        return context.redirect("/account/recovery")
+      default:
+        return next()
     }
   }
+
+  context.locals.profile = userProfile
+  const role = Role.fromString(userProfile.role)
+  context.locals.paths = appendPaths(context.locals.paths, role)
+
+  if (isAdminRoute(context.request)) {
+    if (role && !role.isManagement()) return context.redirect("/dashboard")
+  }
+
   return next()
 })
+
+function appendPaths(paths: PagePath[], role: Role | null): PagePath[] {
+  if (role && role.isManagement())
+    paths.push({ name: "管理", href: "/admin", desc: "管理者ページ" })
+
+  return paths
+}

@@ -12,7 +12,7 @@ import ProfileSetupForm from "@/rr7/components/component/ProfileSetupForm"
 
 <Layout title="アカウント">
   <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">プロフィール</h1>
-  <ProfileSetupForm userId={Astro.locals.auth().userId!} patch={true} client:load />
+  <ProfileSetupForm userId={Astro.locals.auth().userId!} patch client:load />
 
   <hr class="my-2 border-gray-200 dark:border-gray-700" />
   <div class="mt-6">

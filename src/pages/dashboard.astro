@@ -1,26 +1,26 @@
 ---
 import { default as Layout } from "@/src/layouts/layout.astro"
-import { Role } from "@/src/zod"
 import Grid from "@/rr7/components/ui/Grid"
 import { AppIcon } from "@/rr7/components/ui/AppIcon"
-import { APPS } from "@/src/const"
 import { AddRecord } from "@/rr7/components/component/AddRecord"
 import { Recents } from "@/rr7/components/component/Recents"
 import { style } from "@/src/styles/component"
-const userId = Astro.locals.auth().userId
-const profile = Astro.locals.profile
-if (!profile || !userId) {
-  return Astro.redirect("/sign-in")
-}
-const role = Role.fromString(profile.role)
-
-if (role && role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
-  APPS.push({
-    name: "管理者メニュー",
-    path: "/admin",
-    desc: "管理者メニューに移動します。",
-  })
-}
+import type { PagePath } from "@/src/type"
+const userId = Astro.locals.auth().userId!
+const apps: PagePath[] = [
+  {
+    name: "記録",
+    href: "/apps/record",
+    desc: "稽古の記録をつける",
+  },
+  ...Astro.locals.paths
+    .filter((p) => p.name !== "ホーム")
+    .map((p) => ({
+      name: p.name,
+      href: p.href,
+      desc: p.desc,
+    })),
+]
 ---
 
 <Layout title="ダッシュボード">
@@ -32,6 +32,6 @@ if (role && role.isManagement() && !APPS.some((app) => app.name === "管理者�
 
   <hr />
   <Grid variant="offset">
-    {APPS.map((app) => <AppIcon title={app.name} id={app.path} desc={app.desc} />)}
+    {apps.map((app: PagePath) => <AppIcon title={app.name} id={app.href} desc={app.desc} />)}
   </Grid>
 </Layout>

@@ -1,3 +1,4 @@
+import { getProfile } from "@/src/lib/query/profile"
 import React, { useState, useEffect } from "react"
 
 const gradeOptions = [
@@ -28,15 +29,35 @@ interface ApiResponse {
 interface ProfileSetupFormProps {
   userId: string
   patch?: boolean
+  put?: boolean
 }
 
-const ProfileSetupForm: React.FC<ProfileSetupFormProps> = ({ userId, patch }) => {
-  const [grade, setGrade] = useState("")
+function ProfileSetupForm({ userId, patch, put }: ProfileSetupFormProps) {
+  const [grade, setGrade] = useState("0")
   const [getGradeAt, setGetGradeAt] = useState("")
   const [joinedAt, setJoinedAt] = useState(new Date().getFullYear().toString())
-  const [year, setYear] = useState("")
+  const [year, setYear] = useState("b1")
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
+
+  useEffect(() => {
+    console.log("ProfileSetupForm mounted", { patch, put, userId })
+    if (patch) {
+      getProfile({ userId })
+        .then((res) => {
+          console.log(res)
+          if (!(res instanceof Response)) {
+            setGrade(`${res.grade}`)
+            setGetGradeAt(res.getGradeAt || "")
+            setJoinedAt(res.joinedAt.toString())
+            setYear(res.year || "b1")
+          }
+        })
+        .catch((error) => {
+          setErrorMessage(`プロフィールの取得中にエラーが発生しました: ${error.message}`)
+        })
+    }
+  }, [patch, userId])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -51,9 +72,15 @@ const ProfileSetupForm: React.FC<ProfileSetupFormProps> = ({ userId, patch }) =>
       year,
     }
 
+    let method: "POST" | "PATCH" = "POST"
+    if (patch) {
+      method = "PATCH"
+    } else if (put) {
+      method = "PATCH"
+    }
     try {
       const response = await fetch("/api/user/profile", {
-        method: patch ? "PATCH" : "POST",
+        method: method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -107,7 +134,6 @@ const ProfileSetupForm: React.FC<ProfileSetupFormProps> = ({ userId, patch }) =>
               onChange={(e) => setGrade(e.target.value)}
               disabled={loading}
             >
-              <option value={"0"}>選択してください</option>
               {gradeOptions.map((g) => (
                 <option key={g.grade} value={g.grade}>
                   {g.name}

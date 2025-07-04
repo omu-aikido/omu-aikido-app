@@ -31,7 +31,7 @@ const activities = (
 })
 const activityFromPreviousGrade = await userActivity({
   userId: user.id,
-  start: new Date(userProfile.getGradeAt),
+  start: new Date(userProfile.getGradeAt ?? userProfile.joinedAt),
   end: new Date(),
 })
 const grade = userProfile.grade
