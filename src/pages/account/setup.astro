@@ -1,6 +1,6 @@
 ---
 import { default as Layout } from "@/src/layouts/layout.astro"
-import ProfileSetupForm from "@/rr7/components/component/ProfileSetupForm";
+import ProfileSetupForm from "@/rr7/components/component/ProfileSetupForm"
 ---
 
 <Layout title="プロフィール登録">
@@ -9,7 +9,7 @@ import ProfileSetupForm from "@/rr7/components/component/ProfileSetupForm";
       <h1 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">
         セットアップ
       </h1>
-      <ProfileSetupForm userId={Astro.locals.auth().userId!} client:load/>
+      <ProfileSetupForm userId={Astro.locals.auth().userId!} client:load />
     </div>
   </div>
 </Layout>

@@ -8,7 +8,7 @@ if (!user || !userProfile) {
   return Astro.redirect("/sign-in")
 }
 
-const date = (new URL(Astro.request.url).searchParams.get("date")) ?? undefined
+const date = new URL(Astro.request.url).searchParams.get("date") ?? undefined
 const period = new URL(Astro.request.url).searchParams.get("period") ?? undefined
 ---
 
