@@ -58,7 +58,10 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --check .",
-    "format:fix": "prettier --write ."
+    "format:fix": "prettier --write .",
+    "test": "playwright test",
+    "test:mobile": "playwright test --project=Android --project=iPhone",
+    "test:security": "playwright test --project=Authorized --project=Unauthorized"
   },
   "type": "module",
   "volta": {

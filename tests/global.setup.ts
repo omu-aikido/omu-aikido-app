@@ -43,7 +43,7 @@ setup("authenticate and save state to storage", async ({ page, context }) => {
   }
 
   // 認証完了後、ダッシュボードページが表示されることを確認
-  await page.waitForSelector("h2:has-text('ダッシュボード')", {
+  await page.waitForSelector("h1:has-text('記録追加')", {
     timeout: 10000,
   })
 

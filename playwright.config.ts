@@ -29,14 +29,22 @@ export default defineConfig({
       testMatch: /global\.setup\.ts/,
     },
     {
-      name: "UnAuthorized Security Test",
+      name: "Unauthorized",
       testMatch: /.*sec\.spec\.ts/,
       use: { ...devices["Desktop Chrome"] },
     },
     {
-      name: "Authorized Security Test",
+      name: "Authorized",
       testMatch: /.*auth\.spec\.ts/,
       use: { ...devices["Desktop Chrome"], storageState: "playwright/.clerk/user.json" },
+    },
+    {
+      name: "Android",
+      use: { ...devices["Pixel 5"], storageState: "playwright/.clerk/user.json" },
+    },
+    {
+      name: "iPhone",
+      use: { ...devices["iPhone 12"], storageState: "playwright/.clerk/user.json" },
     },
   ],
 
