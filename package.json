@@ -45,7 +45,6 @@
   "scripts": {
     "astro": "astro",
     "dev": "astro dev --remote",
-    "prepreview": "npm run db",
     "preview": "astro build && wrangler dev --port 3000",
     "build": "astro build",
     "db": "turso dev -f local.db",

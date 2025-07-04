@@ -14,14 +14,22 @@ const textLinks: { label: string; href: string }[] = [
   { label: "Account", href: "/account" },
 ]
 
-const profile = Astro.locals.profile
-if (!profile) {
-  return Astro.redirect("/sign-in")
-}
-const role = getRole({ profile })
+const pathname = new URL(Astro.request.url).pathname
 
-if (role && role.isManagement() && !textLinks.some((link) => link.label === "Admin")) {
-  textLinks.push({ label: "Admin", href: "/admin" })
+if (!(pathname.startsWith("/account/setup") || pathname.startsWith("/account/recovery"))) {
+  const profile = Astro.locals.profile!
+  const role = getRole({ profile })
+
+  if (role && role.isManagement() && !textLinks.some((link) => link.label === "Admin")) {
+    textLinks.push({ label: "Admin", href: "/admin" })
+  }
+  if (role && role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
+    APPS.push({
+      name: "管理者メニュー",
+      path: "/admin",
+      desc: "管理者メニューに移動します。",
+    })
+  }
 }
 
 interface Props {
@@ -30,14 +38,6 @@ interface Props {
 
 const homelink = "/dashboard"
 const { title } = Astro.props
-
-if (role && role.isManagement() && !APPS.some((app) => app.name === "管理者メニュー")) {
-  APPS.push({
-    name: "管理者メニュー",
-    path: "/admin",
-    desc: "管理者メニューに移動します。",
-  })
-}
 ---
 
 <html

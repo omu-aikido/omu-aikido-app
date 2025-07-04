@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, SignInButton, SignOutButton, useAuth } from "@clerk/astro/react"
+import { SignedIn, SignedOut, SignInButton, useAuth } from "@clerk/astro/react"
 import { style } from "@/src/styles/component"
 import { getAccount } from "@/src/lib/query/profile"
 

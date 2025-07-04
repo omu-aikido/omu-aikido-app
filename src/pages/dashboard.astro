@@ -1,6 +1,6 @@
 ---
 import { default as Layout } from "@/src/layouts/layout.astro"
-import { Role } from "@/src/class"
+import { Role } from "@/src/zod"
 import Grid from "@/rr7/components/ui/Grid"
 import { AppIcon } from "@/rr7/components/ui/AppIcon"
 import { APPS } from "@/src/const"
@@ -26,7 +26,7 @@ if (role && role.isManagement() && !APPS.some((app) => app.name === "管理者�
 <Layout title="ダッシュボード">
   <h2 class={style.text.title()}>記録追加</h2>
 
-  <AddRecord client:load />
+  <AddRecord />
 
   <Recents userId={userId} />
 

@@ -13,7 +13,7 @@ if (!currentUser || !userId) {
 
 import * as profile from "@/src/lib/query/admin/profile"
 import { grade, year } from "@/src/utils"
-import { Role } from "@/src/class"
+import { Role } from "@/src/zod"
 import { getUser } from "@/src/lib/query/admin/clerk"
 import { getProfile } from "@/src/lib/query/profile"
 
@@ -87,7 +87,7 @@ if (Astro.request.method == "POST") {
       id="getGradeAt"
       name="getGradeAt"
       class="col-span-3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      value=`${(new Date(userProfile.getGradeAt)).toISOString().split('T')[0]}`
+      value=`${(new Date(userProfile.getGradeAt ?? "")).toISOString().split('T')[0]}`
     />
     <label for="joinedAt" class="col-span-1">
       入部年度

@@ -8,7 +8,7 @@ const { query, paging } = Astro.props
 
 import { countUsers, listUser, searchAccounts } from "@/src/lib/query/admin/clerk"
 import { getRole } from "@/src/lib/query/profile"
-import { Role } from "@/src/class"
+import { Role } from "@/src/zod"
 
 import { translateYear, translateGrade } from "@/src/utils"
 import type { User } from "@clerk/astro/server"

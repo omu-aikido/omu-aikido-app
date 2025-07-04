@@ -6,7 +6,7 @@ import { eq, gte, lte, and, desc } from "drizzle-orm"
 import * as uuid from "uuid"
 
 import { getProfile } from "@/src/lib/query/profile"
-import { Role } from "@/src/class"
+import { Role } from "@/src/zod"
 
 export const selectActivity = activity.$inferSelect
 export const inputActivity = activity.$inferInsert
@@ -127,7 +127,7 @@ export async function getActivity(input: { id: string }) {
 export async function updateActivity(input: {
   userId: string
   activityId: string
-  activityData: typeof inputActivity
+  activityData: Partial<typeof inputActivity>
 }) {
   const validatedInput = z
     .object({
@@ -141,7 +141,7 @@ export async function updateActivity(input: {
     return null
   }
 
-  const setData: typeof inputActivity = {
+  const setData: Partial<typeof inputActivity> = {
     date: input.activityData.date,
     id: input.activityData.id,
     userId: input.activityData.userId,

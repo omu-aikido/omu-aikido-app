@@ -1,4 +1,4 @@
-import { Role } from "@/src/class"
+import { Role } from "@/src/zod"
 import { profile } from "@/src/zod"
 import type { Profile } from "@/src/type"
 import { createClerkClient, type User } from "@clerk/astro/server"
@@ -87,22 +87,29 @@ export async function createProfile(input: {
   // 既に有効なプロフィールがある場合はエラーとする。
   const existingProfile = await getProfile({ userId: input.id })
   if (!(existingProfile instanceof Response)) {
-    throw new Error("User already exists.")
+    return new Response("User already exists.", {
+      status: 409, // Conflict
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
   }
 
   const getGradeAtString = new Date(input.getGradeAt).toISOString()
 
   try {
-    await clerkClient.users.updateUserMetadata(input.id, {
-      publicMetadata: profile.safeParse({
+    const user = await clerkClient.users.updateUserMetadata(input.id, {
+      publicMetadata: profile.parse({
+        id: input.id,
         grade: input.grade,
+        role: "member",
         getGradeAt: getGradeAtString,
         joinedAt: input.joinedAt,
         year: input.year,
-        role: "member",
-      }).data,
-      privateMetadata: {},
+      }),
     })
+
+    console.log(user.publicMetadata)
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

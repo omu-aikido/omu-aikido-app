@@ -60,7 +60,7 @@ export function Sidebar({ position, icon, children }: SidebarProps) {
         <div className="p-6 flex-1">
           <span
             id="close-sidebar-btn"
-            className="cursor-pointer flex items-center justify-center text-xl h-8 w-8 rounded-xl outline-2 outline-slate-400/60 dark:outline-slate-500/60 transition-all duration-300 ease-out hover:bg-slate-400 dark:hover:bg-slate-600 hover:scale-110 hover:-rotate-3 active:scale-95 active:-rotate-1 absolute top-2 right-2"
+            className="cursor-pointer flex items-center justify-center text-xl h-8 w-8 rounded-xl outline-2 outline-slate-400/60 dark:outline-slate-500/60 transition-all duration-300 ease-out hover:bg-slate-400 dark:hover:bg-slate-600 hover:scale-110 hover:-rotate-3 active:scale-95 active:-rotate-1"
             onClick={handleCloseClick}
           >
             ×
