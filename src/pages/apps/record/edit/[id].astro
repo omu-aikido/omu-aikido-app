@@ -7,7 +7,7 @@ const { id } = Astro.params
 ---
 
 <Layout title="編集">
-  <EditRecordForm id={id!} redirectTo={redirectTo} />
+  <EditRecordForm id={id!} redirectTo={redirectTo} client:load />
 </Layout>
 
 ---jsx

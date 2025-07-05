@@ -5,8 +5,8 @@ import { eq, gte, lte, and, desc } from "drizzle-orm"
 
 import * as uuid from "uuid"
 
-import { getProfile } from "@/src/lib/query/profile"
-import { Role } from "@/src/zod"
+import { getProfile } from "src/lib/query/profile"
+import { Role } from "src/zod"
 
 export const selectActivity = activity.$inferSelect
 export const inputActivity = activity.$inferInsert
@@ -58,6 +58,33 @@ export async function userActivity(input: {
     .where(
       and(eq(activity.userId, input.userId), gte(activity.date, start), lte(activity.date, end)),
     )
+
+  return activityData
+}
+
+// 新規追加: 指定された期間内のアクティビティを取得する関数
+export async function getActivitiesByDateRange(input: {
+  userId?: string
+  startDate?: string
+  endDate?: string
+}) {
+  const { userId, startDate, endDate } = input
+
+  let conditions = []
+  if (userId) {
+    conditions.push(eq(activity.userId, userId))
+  }
+  if (startDate) {
+    conditions.push(gte(activity.date, startDate))
+  }
+  if (endDate) {
+    conditions.push(lte(activity.date, endDate))
+  }
+
+  const activityData = await db
+    .select()
+    .from(activity)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
 
   return activityData
 }
@@ -139,5 +166,38 @@ export async function updateActivity(input: {
     updatedAt: new Date().toISOString(),
   }
 
-  await db.update(activity).set(setData).where(eq(activity.id, validatedInput.activityId)).execute()
+  const result = await db
+    .update(activity)
+    .set(setData)
+    .where(eq(activity.id, validatedInput.activityId))
+    .execute()
+
+  return result
+}
+
+// 新規追加: 複数のアクティビティをupsertする関数
+export async function upsertActivities(input: {
+  userId: string
+  activities: Array<typeof inputActivity>
+}) {
+  const results = []
+  for (const act of input.activities) {
+    if (act.id) {
+      // 既存のアクティビティを更新
+      const result = await updateActivity({
+        userId: input.userId,
+        activityId: act.id,
+        activityData: act,
+      })
+      results.push(result)
+    } else {
+      // 新規アクティビティを作成
+      const result = await createActivity({
+        userId: input.userId,
+        activity: act,
+      })
+      results.push(result)
+    }
+  }
+  return results
 }

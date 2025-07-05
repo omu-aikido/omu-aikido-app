@@ -6,7 +6,7 @@ import { style } from "../../../src/styles/component"
 export type ResultType = "success" | "error" | null
 
 export const AddRecord = () => {
-  const { userId, isSignedIn, getToken } = useAuth() // userIdも取得
+  const { userId, isSignedIn } = useAuth() // userIdも取得
   const [result, setResult] = useState<ResultType>(null)
   const [submitting, setSubmitting] = useState(false)
   const [formState, setFormState] = useState({
@@ -27,16 +27,13 @@ export const AddRecord = () => {
       }
 
       try {
-        const token = await getToken()
-
-        const response = await fetch("/api/record/add", {
+        const response = await fetch("/api/me/activities", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            userId: userId, // user.idからuserIdに変更
+            userId: userId,
             date: formState.date,
             period: formState.period,
           }),
@@ -47,14 +44,17 @@ export const AddRecord = () => {
         }
 
         setResult("success")
+        // 成功時にページをリロードしてRecentsを更新
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500) // 成功メッセージを表示してからリロード
       } catch (error) {
-        console.error("Error adding record:", error)
         setResult("error")
       } finally {
         setSubmitting(false)
       }
     },
-    [setSubmitting, setResult, formState.date, formState.period, userId, isSignedIn, getToken], // 依存関係を更新
+    [setSubmitting, setResult, formState.date, formState.period, userId, isSignedIn], // 依存関係を更新
   )
 
   return (
@@ -68,7 +68,6 @@ export const AddRecord = () => {
           type={result === "error" ? "error" : "success"}
           duration={result === "error" ? 5000 : 3000}
           onClose={() => {
-            console.log("Notification closed")
             setResult(null)
             setFormState({
               date: new Date().toISOString().split("T")[0],

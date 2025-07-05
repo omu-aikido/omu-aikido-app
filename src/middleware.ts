@@ -18,7 +18,7 @@ export const onRequest = clerkMiddleware(async (auth, context, next) => {
       desc: "ダッシュボードへ",
     },
     {
-      name: "アプリ一覧",
+      name: "アプリ",
       href: "/apps",
       desc: "アプリの一覧",
     },

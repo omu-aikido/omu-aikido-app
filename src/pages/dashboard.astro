@@ -26,7 +26,7 @@ const apps: PagePath[] = [
 <Layout title="ダッシュボード">
   <h1 class={style.text.title()}>記録追加</h1>
 
-  <AddRecord />
+  <AddRecord client:load />
 
   <Recents userId={userId} />
 

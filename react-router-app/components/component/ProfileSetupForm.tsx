@@ -10,7 +10,7 @@ const gradeOptions = [
 ]
 
 const inputClass =
-  "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+  "w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 
 interface Profile {
   grade: string
@@ -119,17 +119,17 @@ function ProfileSetupForm({ userId, patch, put }: ProfileSetupFormProps) {
   }
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="bg-slate-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto">
         <form
-          className="space-y-6 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md"
+          className="space-y-6 bg-white dark:bg-slate-800 p-8 rounded-lg shadow-md"
           onSubmit={handleSubmit}
         >
           {errorMessage && <div className="text-red-500 text-center mb-4">{errorMessage}</div>}
           <div>
             <label
               htmlFor="grade"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
             >
               所持級段位
               <span className="text-red-600 dark:text-red-400 ml-1">*</span>
@@ -154,7 +154,7 @@ function ProfileSetupForm({ userId, patch, put }: ProfileSetupFormProps) {
           <div>
             <label
               htmlFor="getGradeAt"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
             >
               級段位取得日
             </label>
@@ -172,7 +172,7 @@ function ProfileSetupForm({ userId, patch, put }: ProfileSetupFormProps) {
           <div>
             <label
               htmlFor="joinedAt"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
             >
               入部年度
               <span className="text-red-600 dark:text-red-400 ml-1">*</span>
@@ -193,7 +193,7 @@ function ProfileSetupForm({ userId, patch, put }: ProfileSetupFormProps) {
           <div>
             <label
               htmlFor="year"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
             >
               学年
               <span className="text-red-600 dark:text-red-400 ml-1">*</span>
@@ -220,7 +220,7 @@ function ProfileSetupForm({ userId, patch, put }: ProfileSetupFormProps) {
 
           <button
             type="submit"
-            className="cursor-pointer w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 transition duration-200"
+            className="cursor-pointer w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-slate-800 transition duration-200"
             disabled={loading}
           >
             {loading ? "送信中..." : patch ? "更新" : "登録"}

@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+// 新API対応版 EditRecordForm.tsx
+import React, { useState, useEffect } from "react"
 
 type ActivityData = {
   id: string
@@ -7,29 +8,61 @@ type ActivityData = {
 }
 
 type EditRecordFormProps = {
-  activity: ActivityData
+  id: string
   redirectTo: string
 }
 
-export const EditRecordForm: React.FC<EditRecordFormProps> = ({ activity, redirectTo }) => {
-  const [date, setDate] = useState(new Date(activity.date).toISOString().split("T")[0])
-  const [period, setPeriod] = useState<number | "">(activity.period)
+export const EditRecordForm: React.FC<EditRecordFormProps> = ({ id, redirectTo }) => {
+  const [activity, setActivity] = useState<ActivityData | null>(null)
+  const [date, setDate] = useState("")
+  const [period, setPeriod] = useState<number | "">("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
+
+  // アクティビティデータを取得
+  useEffect(() => {
+    const fetchActivity = async () => {
+      try {
+        setInitialLoading(true)
+        const res = await fetch(`/api/me/activities/${id}`)
+        if (!res.ok) {
+          throw new Error("アクティビティの取得に失敗しました")
+        }
+        const activityData: ActivityData = await res.json()
+        setActivity(activityData)
+        setDate(new Date(activityData.date).toISOString().split("T")[0])
+        setPeriod(activityData.period)
+      } catch (err: any) {
+        setError(err.message || "アクティビティの読み込み中にエラーが発生しました")
+      } finally {
+        setInitialLoading(false)
+      }
+    }
+
+    fetchActivity()
+  }, [id])
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!activity) {
+      setError("アクティビティデータが見つかりません")
+      return
+    }
     if (!window.confirm("このアクティビティを更新してもよろしいですか？")) return
     setLoading(true)
     setError("")
     setSuccess("")
     try {
-      const res = await fetch("/api/record", {
+      const res = await fetch(`/api/me/activities/${activity.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: activity.id, date, period: Number(period) }),
+        body: JSON.stringify({
+          date,
+          period: Number(period),
+        }),
       })
       if (res.ok) {
         setSuccess("更新しました。リストに戻ります。")
@@ -49,15 +82,18 @@ export const EditRecordForm: React.FC<EditRecordFormProps> = ({ activity, redire
 
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!activity) {
+      setError("アクティビティデータが見つかりません")
+      return
+    }
     if (!window.confirm("このアクティビティを削除してもよろしいですか？")) return
     setDeleteLoading(true)
     setError("")
     setSuccess("")
     try {
-      const res = await fetch("/api/record", {
+      const res = await fetch(`/api/me/activities/${activity.id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: activity.id }),
       })
       if (res.ok) {
         setSuccess("削除しました。リストに戻ります。")
@@ -75,7 +111,51 @@ export const EditRecordForm: React.FC<EditRecordFormProps> = ({ activity, redire
     }
   }
 
-  if (error) return <div className="text-red-600">{error}</div>
+  // 初期ローディング中
+  if (initialLoading) {
+    return (
+      <div className="max-w-lg mx-auto p-4 sm:p-6">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-slate-600 dark:text-slate-400">読み込み中...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // エラー表示
+  if (error && !activity) {
+    return (
+      <div className="max-w-lg mx-auto p-4 sm:p-6">
+        <div className="text-red-600 text-center">
+          <p>{error}</p>
+          <a
+            href={redirectTo}
+            className="mt-4 inline-block bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 font-medium py-2 px-4 rounded-md transition-colors"
+          >
+            戻る
+          </a>
+        </div>
+      </div>
+    )
+  }
+
+  // アクティビティが存在しない場合
+  if (!activity) {
+    return (
+      <div className="max-w-lg mx-auto p-4 sm:p-6">
+        <div className="text-center">
+          <p className="text-slate-600 dark:text-slate-400">アクティビティが見つかりません</p>
+          <a
+            href={redirectTo}
+            className="mt-4 inline-block bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 font-medium py-2 px-4 rounded-md transition-colors"
+          >
+            戻る
+          </a>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-lg mx-auto p-4 sm:p-6">

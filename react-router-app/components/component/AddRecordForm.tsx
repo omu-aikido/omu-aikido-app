@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+// 新API対応版 AddRecordForm.tsx
+import React, { useState, useEffect } from "react"
 
 interface AddRecordFormProps {
   initialDate?: string
@@ -10,7 +11,11 @@ interface ApiResponse {
   error?: string
 }
 
-// URLパラメータを取得する関数
+interface ProfileResponse {
+  success?: boolean
+  profile?: { id: string }
+}
+
 const getUrlParams = () => {
   const urlParams = new URLSearchParams(window.location.search)
   return {
@@ -34,6 +39,18 @@ const AddRecordForm: React.FC<AddRecordFormProps> = ({ initialDate, initialPerio
       : null,
   )
   const [success, setSuccess] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
+
+  useEffect(() => {
+    // 認証済みユーザーのIDを取得
+    fetch("/api/user/profile")
+      .then((res) => res.json() as Promise<ProfileResponse>)
+      .then((data) => {
+        if (data?.success && data?.profile?.id) setUserId(data.profile.id)
+        else setError("ユーザー情報の取得に失敗しました。")
+      })
+      .catch(() => setError("ユーザー情報の取得に失敗しました。"))
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,8 +58,14 @@ const AddRecordForm: React.FC<AddRecordFormProps> = ({ initialDate, initialPerio
     setError(null)
     setSuccess(false)
 
+    if (!userId) {
+      setError("ユーザー情報が取得できません。")
+      setLoading(false)
+      return
+    }
+
     try {
-      const response = await fetch("/api/record", {
+      const response = await fetch("/api/me/activities", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,6 +73,7 @@ const AddRecordForm: React.FC<AddRecordFormProps> = ({ initialDate, initialPerio
         body: JSON.stringify({
           date: date,
           period: parseInt(period),
+          userId,
         }),
       })
 
@@ -57,7 +81,7 @@ const AddRecordForm: React.FC<AddRecordFormProps> = ({ initialDate, initialPerio
 
       if (response.ok && result.success) {
         setSuccess(true)
-        window.location.href = "/apps/record" // 成功時にリダイレクト
+        window.location.href = "/apps/record"
       } else {
         setError(result.error || "記録の追加に失敗しました。")
       }
@@ -78,7 +102,7 @@ const AddRecordForm: React.FC<AddRecordFormProps> = ({ initialDate, initialPerio
       {isValidParams ? (
         <>
           <h1 className="text-2xl font-bold">自動記録</h1>
-          <p className="text-gray-500">以下の内容で記録を追加しますか？</p>
+          <p className="text-slate-500">以下の内容で記録を追加しますか？</p>
           <div className="mt-4">
             <p>日付: {parsedDate?.toLocaleDateString("ja-JP")}</p>
             <p>稽古時間: {parsedPeriod}時間</p>

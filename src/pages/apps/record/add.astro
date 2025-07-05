@@ -13,5 +13,5 @@ const period = new URL(Astro.request.url).searchParams.get("period") ?? undefine
 ---
 
 <Layout title="自動記録">
-  <AddRecordForm initialDate={date} initialPeriod={period} />
+  <AddRecordForm initialDate={date} initialPeriod={period} client:load />
 </Layout>
