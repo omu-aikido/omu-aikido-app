@@ -100,7 +100,7 @@ function ProfileSetupForm({ userId, patch, put }: ProfileSetupFormProps) {
       let result: ApiResponse
       try {
         result = JSON.parse(responseText)
-      } catch (parseError) {
+      } catch {
         setErrorMessage(`登録エラー`)
         return
       }
@@ -111,8 +111,8 @@ function ProfileSetupForm({ userId, patch, put }: ProfileSetupFormProps) {
         const msg = result.error || "不明なエラーが発生しました。"
         setErrorMessage(`プロフィールの登録に失敗しました。 ${msg}`)
       }
-    } catch (error: any) {
-      setErrorMessage(`プロフィールの登録中にエラーが発生しました。 ${error.message}`)
+    } catch {
+      setErrorMessage("プロフィールの登録中にエラーが発生しました。")
     } finally {
       setLoading(false)
     }

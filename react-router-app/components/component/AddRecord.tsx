@@ -48,7 +48,7 @@ export const AddRecord = () => {
         setTimeout(() => {
           window.location.reload()
         }, 1500) // 成功メッセージを表示してからリロード
-      } catch (error) {
+      } catch {
         setResult("error")
       } finally {
         setSubmitting(false)

@@ -20,7 +20,7 @@ const paths = Astro.locals.paths
   <Head title={`${title} | ハム大合気ポータル`} />
   <body class="flex-col min-h-dvh">
     <Header title={title} homelink={homelink} textLinks={paths} />
-    <div class="p-6 mx-auto max-w-5xl">
+    <div class="p-3 md:p-6 mx-auto max-w-5xl">
       <main class="min-h-[75vh] overflow-y-auto mb-auto">
         <slot />
       </main>

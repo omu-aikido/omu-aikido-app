@@ -15,14 +15,14 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     return new Response("Invalid user ID in some activities", { status: 403 })
   }
   // デバッグ用ログ: 受信したbodyとauth.userIdを出力
-  console.log("PATCH /api/me/activities/batch body:", body)
-  console.log("PATCH /api/me/activities/batch auth.userId:", auth.userId)
+  // console.log("PATCH /api/me/activities/batch body:", body)
+  // console.log("PATCH /api/me/activities/batch auth.userId:", auth.userId)
 
   try {
     const results = await upsertActivities({ userId: auth.userId, activities: body })
     return Response.json(results)
-  } catch (error: any) {
-    console.error("Error upserting activities:", error)
-    return new Response(error.message, { status: 500 })
+  } catch (error) {
+    // console.error("Error upserting activities:", error)
+    return new Response((error as Error).message, { status: 500 })
   }
 }

@@ -61,7 +61,7 @@ const needToNextGrade = Math.max(
   <hr />
   <h2>追加</h2>
 
-  <AddRecord client:load/>
+  <AddRecord client:load />
   <hr class="my-6 border-slate-200 dark:border-slate-700" />
 
   <div class="space-y-4">
@@ -69,8 +69,6 @@ const needToNextGrade = Math.max(
       <h2 class="text-xl font-semibold text-slate-900 dark:text-white">今月の稽古履歴</h2>
       <a href="/apps/record/list" class={style.text.link()}> 全ての稽古履歴 &gt;&gt; </a>
     </div>
-    <MonthlyActivittyForm
-      client:load
-      />
+    <MonthlyActivittyForm client:load />
   </div>
 </Layout>

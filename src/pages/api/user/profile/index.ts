@@ -41,8 +41,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return new Response(JSON.stringify({ success: true, data: result }), {
       status: 201,
     })
-  } catch (error) {
-    console.error("Error creating/updating profile:", error)
+  } catch {
+    // console.error("Error creating/updating profile:", error)
     return new Response(JSON.stringify({ success: false, error: "Internal Server Error" }), {
       status: 500,
     })
@@ -93,8 +93,8 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     }
 
     return new Response(JSON.stringify({ success: true }), { status: 200 })
-  } catch (error) {
-    console.error("Error updating profile:", error)
+  } catch {
+    // console.error("Error updating profile:", error)
     return new Response(JSON.stringify({ success: false, error: "Internal Server Error" }), {
       status: 500,
     })
@@ -148,8 +148,8 @@ export const GET: APIRoute = async ({ url, locals }) => {
         headers: { "Content-Type": "application/json" },
       },
     )
-  } catch (error) {
-    console.error("Error fetching profile:", error)
+  } catch {
+    // console.error("Error fetching profile:", error)
     return new Response(JSON.stringify({ success: false, error: "Internal Server Error" }), {
       status: 500,
     })

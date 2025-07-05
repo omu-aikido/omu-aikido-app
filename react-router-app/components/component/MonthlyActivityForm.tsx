@@ -46,8 +46,8 @@ function MonthlyActivityForm() {
       const data: ActivityType[] = await response.json()
       setActivities(data)
       setOriginalActivities(JSON.parse(JSON.stringify(data))) // ディープコピー
-    } catch (e: any) {
-      setError(e.message)
+    } catch {
+      setError("エラーが発生しました")
     } finally {
       setLoading(false)
     }
@@ -79,7 +79,6 @@ function MonthlyActivityForm() {
     setLoading(true)
     setError(null)
     try {
-      console.log(activitiesToUpsert)
       const response = await fetch("/api/me/activities/batch", {
         method: "PATCH",
         headers: {
@@ -94,8 +93,8 @@ function MonthlyActivityForm() {
       await response.json() // 成功レスポンスをパース
       fetchActivities() // データ再取得
       setShowDailyActivityModal(false)
-    } catch (e: any) {
-      setError(e.message)
+    } catch {
+      setError("エラーが発生しました。")
     } finally {
       setLoading(false)
     }
@@ -127,10 +126,6 @@ function MonthlyActivityForm() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-200">
       <div className="">
         <div className="">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-8 text-slate-900 dark:text-white text-center">
-            月間アクティビティ
-          </h1>
-
           <div className="flex flex-row justify-between items-center mb-4 sm:mb-8 gap-2">
             <button
               onClick={handlePrevMonth}

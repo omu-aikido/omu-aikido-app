@@ -35,8 +35,8 @@ export const EditRecordForm: React.FC<EditRecordFormProps> = ({ id, redirectTo }
         setActivity(activityData)
         setDate(new Date(activityData.date).toISOString().split("T")[0])
         setPeriod(activityData.period)
-      } catch (err: any) {
-        setError(err.message || "アクティビティの読み込み中にエラーが発生しました")
+      } catch {
+        setError("アクティビティの読み込み中にエラーが発生しました")
       } finally {
         setInitialLoading(false)
       }
@@ -73,8 +73,8 @@ export const EditRecordForm: React.FC<EditRecordFormProps> = ({ id, redirectTo }
         const err = (await res.json()) as { message?: string }
         setError(err.message || "更新に失敗しました")
       }
-    } catch (e: any) {
-      setError(e.message || "更新時にエラーが発生しました")
+    } catch {
+      setError("更新時にエラーが発生しました")
     } finally {
       setLoading(false)
     }
@@ -104,8 +104,8 @@ export const EditRecordForm: React.FC<EditRecordFormProps> = ({ id, redirectTo }
         const err = (await res.json()) as { message?: string }
         setError(err.message || "削除に失敗しました")
       }
-    } catch (e: any) {
-      setError(e.message || "削除時にエラーが発生しました")
+    } catch {
+      setError("削除時にエラーが発生しました")
     } finally {
       setDeleteLoading(false)
     }

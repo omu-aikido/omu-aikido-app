@@ -1,7 +1,7 @@
 // 入力バリデーション・エラー状態のE2Eテスト
 import { test, expect } from "@playwright/test"
 import { AddRecordPage } from "./pages/AddRecordPage"
-import { RecordListPage } from "./pages/RecordListPage"
+// import { RecordListPage } from "./pages/RecordListPage"
 
 test.describe("エッジケース・バリデーション", () => {
   test("必須フィールド未入力時のエラー表示", async ({ page }) => {

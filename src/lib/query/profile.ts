@@ -97,7 +97,7 @@ export async function createProfile(
       ...metadata,
       role: "member", // 常に"member"で上書き
     })
-    const user = await clerkClient.users.updateUserMetadata(id, { publicMetadata })
+    await clerkClient.users.updateUserMetadata(id, { publicMetadata })
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
@@ -133,7 +133,7 @@ export async function updateProfile(
       ...metadata,
       role,
     })
-    const user = await clerkClient.users.updateUserMetadata(id, { publicMetadata })
+    await clerkClient.users.updateUserMetadata(id, { publicMetadata })
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { "Content-Type": "application/json" },

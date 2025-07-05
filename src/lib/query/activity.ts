@@ -70,7 +70,7 @@ export async function getActivitiesByDateRange(input: {
 }) {
   const { userId, startDate, endDate } = input
 
-  let conditions = []
+  const conditions = []
   if (userId) {
     conditions.push(eq(activity.userId, userId))
   }

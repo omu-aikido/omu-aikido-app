@@ -28,8 +28,8 @@ const getUrlParams = () => {
 const AddRecordForm: React.FC<AddRecordFormProps> = ({ initialDate, initialPeriod }) => {
   const urlParams = getUrlParams()
 
-  const [date, setDate] = useState(urlParams.date || initialDate || "")
-  const [period, setPeriod] = useState(urlParams.period || initialPeriod || "")
+  const [date] = useState(urlParams.date || initialDate || "")
+  const [period] = useState(urlParams.period || initialPeriod || "")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(
     urlParams.error
@@ -85,9 +85,8 @@ const AddRecordForm: React.FC<AddRecordFormProps> = ({ initialDate, initialPerio
       } else {
         setError(result.error || "記録の追加に失敗しました。")
       }
-    } catch (err) {
+    } catch {
       setError("ネットワークエラーが発生しました。")
-      console.error("フェッチエラー:", err)
     } finally {
       setLoading(false)
     }
