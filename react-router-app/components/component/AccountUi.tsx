@@ -23,7 +23,7 @@ export async function AccountUi({ apps }: AccountUiProps) {
       <SignedIn>
         {user && (
           <a
-            className={`${style.header.clerk.name()} p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800`}
+            className={`${style.header.clerk.name()} p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800`}
             href="/account"
           >
             <img
@@ -32,16 +32,16 @@ export async function AccountUi({ apps }: AccountUiProps) {
               className={style.header.clerk.icon()}
               loading="lazy"
             />
-            <span className="text-gray-800 dark:text-gray-200">
+            <span className="text-slate-800 dark:text-slate-200">
               {user.lastName} {user.firstName}
             </span>
           </a>
         )}
-        <hr className="my-2 border-gray-200 dark:border-gray-700" />
+        <hr className="my-2 border-slate-200 dark:border-slate-700" />
         {apps.map((app) => (
           <div className="flex flex-col" key={app.href}>
             <a
-              className={`${style.header.link()} p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200`}
+              className={`${style.header.link()} p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200`}
               href={app.href}
             >
               {app.name}

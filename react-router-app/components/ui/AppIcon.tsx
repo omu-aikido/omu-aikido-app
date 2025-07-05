@@ -7,8 +7,8 @@ interface AppIconProps {
 export function AppIcon({ title, id, desc }: AppIconProps) {
   return (
     <a href={id} className="group block touch-manipulation">
-      <div className="relative overflow-hidden bg-white dark:bg-gray-800 rounded-xl hover:border hover:border-blue-400 shadow-md active:shadow-lg transition-all duration-200 ease-out active:scale-[0.98] border border-gray-200 dark:border-gray-700 min-h-[120px]">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 opacity-0 group-active:opacity-100 transition-opacity duration-200"></div>
+      <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-xl hover:border hover:border-blue-400 shadow-md active:shadow-lg transition-all duration-200 ease-out active:scale-[0.98] border border-slate-200 dark:border-slate-700 min-h-[120px]">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-800 dark:to-slate-900 opacity-0 group-active:opacity-100 transition-opacity duration-200"></div>
         <div className="relative p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
@@ -27,12 +27,14 @@ export function AppIcon({ title, id, desc }: AppIconProps) {
                   />
                 </svg>
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-white group-active:text-blue-600 dark:group-active:text-blue-400 transition-colors duration-200 leading-tight">
+              <h4 className="text-lg font-semibold text-slate-900 dark:text-white group-active:text-blue-600 dark:group-active:text-blue-400 transition-colors duration-200 leading-tight">
                 {title}
               </h4>
             </div>
           </div>
-          <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed mb-5">{desc}</p>
+          <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed mb-5">
+            {desc}
+          </p>
           <div className="flex items-center text-blue-600 dark:text-blue-400 text-base font-medium">
             詳細を見る
             <svg
