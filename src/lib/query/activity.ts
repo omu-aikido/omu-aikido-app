@@ -175,7 +175,7 @@ export async function updateActivity(input: {
   return result
 }
 
-// 新規追加: 複数のアクティビティをupsertする関数
+// 複数のアクティビティをupsertする関数
 export async function upsertActivities(input: {
   userId: string
   activities: Array<typeof inputActivity>

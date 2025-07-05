@@ -37,7 +37,7 @@ export async function getTrainings(input: { userId: string }) {
   if (user instanceof Response) {
     return []
   }
-  const date = new Date(user.getGradeAt)
+  const date = new Date(user.getGradeAt ? user.getGradeAt : new Date(user.joinedAt, 3, 2))
   const today = new Date()
 
   const activities = await db
