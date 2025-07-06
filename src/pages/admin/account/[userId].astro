@@ -13,7 +13,7 @@ if (!currentUser || !userId) {
 
 import * as profile from "@/src/lib/query/admin/profile"
 import { grade, year } from "@/src/utils"
-import { Role } from "@/src/class"
+import { Role } from "@/src/zod"
 import { getUser } from "@/src/lib/query/admin/clerk"
 import { getProfile } from "@/src/lib/query/profile"
 
@@ -70,7 +70,7 @@ if (Astro.request.method == "POST") {
       id="grade"
       name="grade"
       required
-      class="col-span-3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      class="col-span-3 border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
     >
       {
         grade.map((g) => (
@@ -86,8 +86,8 @@ if (Astro.request.method == "POST") {
       type="date"
       id="getGradeAt"
       name="getGradeAt"
-      class="col-span-3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      value=`${(new Date(userProfile.getGradeAt)).toISOString().split('T')[0]}`
+      class="col-span-3 border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      value=`${(new Date(userProfile.getGradeAt ?? "")).toISOString().split('T')[0]}`
     />
     <label for="joinedAt" class="col-span-1">
       入部年度
@@ -99,7 +99,7 @@ if (Astro.request.method == "POST") {
       name="joinedAt"
       placeholder="4桁の数字"
       required
-      class="col-span-3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      class="col-span-3 border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       value={userProfile.joinedAt}
     />
     <label for="year" class="col-span-1">
@@ -111,7 +111,7 @@ if (Astro.request.method == "POST") {
       name="year"
       value={userProfile.year}
       required
-      class="col-span-3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      class="col-span-3 border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
     >
       {
         year.map((y) => (
@@ -127,7 +127,7 @@ if (Astro.request.method == "POST") {
       name="role"
       value={userProfile.role}
       required
-      class="col-span-3 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      class="col-span-3 border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
     >
       {
         Role.ALL.map((r) => (

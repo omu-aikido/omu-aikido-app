@@ -40,3 +40,10 @@ local.db*
 # Roo Ignore
 .roo.*.md
 .roo.*.mdx
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+**/playwright/.clerk

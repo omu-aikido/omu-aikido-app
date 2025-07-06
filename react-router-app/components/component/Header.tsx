@@ -1,14 +1,10 @@
 import { style } from "@/src/styles/component"
-
-interface Link {
-  label: string
-  href: string
-}
+import type { PagePath } from "@/src/type"
 
 interface AuthedHeaderProps {
   title: string
   homelink: string
-  textLinks: Link[]
+  textLinks: PagePath[]
   children: React.ReactNode
 }
 
@@ -42,7 +38,7 @@ export function ReactHeader({ title, homelink, textLinks, children }: AuthedHead
                         : undefined
                   }
                 >
-                  {link.label}
+                  {link.name}
                 </a>
               ))}
             </nav>

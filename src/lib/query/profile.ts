@@ -1,7 +1,8 @@
-import { Role } from "@/src/class"
-import { profile } from "@/src/zod"
+import { Role, createProfileInputSchema, updateProfileInputSchema } from "@/src/zod"
+import { publicMetadataProfileSchema } from "@/src/zod"
 import type { Profile } from "@/src/type"
 import { createClerkClient, type User } from "@clerk/astro/server"
+import { z } from "zod"
 
 export async function getAccount(input: {
   userId: string | undefined | null
@@ -42,44 +43,41 @@ export async function getProfile(input: { userId: string }): Promise<Profile | R
       })
     }
 
-    try {
-      const parsedProfile = profile.safeParse(user.publicMetadata)
-      if (!parsedProfile.success) {
-        return new Response("Something Went Wrong with Loading Profile", {
-          status: 303,
-          headers: {
-            Location: "/account/recovery",
-          },
-        })
-      }
-      return parsedProfile.data as Profile
-    } catch (error) {
+    const parsedProfile = publicMetadataProfileSchema.safeParse(user.publicMetadata)
+    if (!parsedProfile.success) {
       return new Response("Something Went Wrong with Loading Profile", {
         status: 303,
         headers: {
           Location: "/account/recovery",
         },
-        statusText: `${error instanceof Error ? error.message : "Unknown error"}`,
       })
     }
+
+    // Profile型に変換
+    return {
+      ...parsedProfile.data,
+      id: user.id,
+    } as Profile
   } catch (error) {
-    return new Response("Missing Correct User Schema", {
-      status: 422,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      statusText: `${error instanceof Error ? error.message : "Unknown error"}`,
+    const status = error instanceof Error ? 422 : 303
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    }
+    if (status === 303) {
+      headers.Location = "/account/recovery"
+    }
+
+    return new Response("Something Went Wrong with Loading Profile", {
+      status,
+      headers,
+      statusText: error instanceof Error ? error.message : "Unknown error",
     })
   }
 }
 
-export async function createProfile(input: {
-  id: string
-  grade: number
-  getGradeAt: Date
-  joinedAt: number
-  year: string
-}): Promise<Response> {
+export async function createProfile(
+  input: z.infer<typeof createProfileInputSchema>,
+): Promise<Response> {
   const clerkClient = createClerkClient({
     secretKey: import.meta.env.CLERK_SECRET_KEY,
   })
@@ -87,80 +85,63 @@ export async function createProfile(input: {
   // 既に有効なプロフィールがある場合はエラーとする。
   const existingProfile = await getProfile({ userId: input.id })
   if (!(existingProfile instanceof Response)) {
-    throw new Error("User already exists.")
+    return new Response("User already exists.", {
+      status: 409,
+      headers: { "Content-Type": "application/json" },
+    })
   }
 
-  const getGradeAtString = new Date(input.getGradeAt).toISOString()
-
   try {
-    await clerkClient.users.updateUserMetadata(input.id, {
-      publicMetadata: profile.safeParse({
-        grade: input.grade,
-        getGradeAt: getGradeAtString,
-        joinedAt: input.joinedAt,
-        year: input.year,
-        role: "member",
-      }).data,
-      privateMetadata: {},
+    const { id, ...metadata } = input
+    const publicMetadata = publicMetadataProfileSchema.parse({
+      ...metadata,
+      role: "member", // 常に"member"で上書き
     })
-
+    await clerkClient.users.updateUserMetadata(id, { publicMetadata })
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     })
   } catch (error) {
     return new Response("Failed to create profile", {
       status: 500,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       statusText: `${error instanceof Error ? error.message : "Unknown error"}`,
     })
   }
 }
 
-export async function updateProfile(input: {
-  id: string
-  grade: number
-  getGradeAt: Date
-  joinedAt: number
-  year: string
-  role: string
-}): Promise<Response> {
+export async function updateProfile(
+  input: z.infer<typeof updateProfileInputSchema>,
+): Promise<Response> {
   const clerkClient = createClerkClient({
     secretKey: import.meta.env.CLERK_SECRET_KEY,
   })
 
-  const year = new Date().getFullYear()
-  const getGradeAtValidate = input.getGradeAt ? input.getGradeAt : new Date(year, 3, 1, 0, 0, 0, 0)
-  const getGradeAtString = new Date(getGradeAtValidate).toISOString()
-
   try {
-    await clerkClient.users.updateUserMetadata(input.id, {
-      publicMetadata: profile.safeParse({
-        grade: input.grade,
-        getGradeAt: getGradeAtString,
-        joinedAt: input.joinedAt,
-        year: input.year,
-        role: input.role,
-      }).data,
-      privateMetadata: {},
-    })
+    // 既存profile取得
+    const existingProfile = await getProfile({ userId: input.id })
+    let role: string | undefined = "member"
+    if (!(existingProfile instanceof Response)) {
+      role = input.role ?? existingProfile.role
+    } else {
+      role = input.role ?? "member"
+    }
 
+    const { id, ...metadata } = input
+    const publicMetadata = publicMetadataProfileSchema.parse({
+      ...metadata,
+      role,
+    })
+    await clerkClient.users.updateUserMetadata(id, { publicMetadata })
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     })
   } catch (error) {
     return new Response("Failed to update profile", {
       status: 500,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       statusText: `${error instanceof Error ? error.message : "Unknown error"}`,
     })
   }

@@ -32,14 +32,8 @@ jobs:
           echo "TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}" >> .env
           cp .env .dev.vars
 
-      - name: Build Projects
+      - name: Build & Check Projects
         run: npm run check
-
-      - name: Run ESLint
-        run: npm run lint:fix
-
-      - name: Check Prettier formatting
-        run: npm run format
 
       - name: Commit changes if any
         run: |

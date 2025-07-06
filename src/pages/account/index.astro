@@ -1,175 +1,37 @@
 ---
 import { default as Layout } from "@/src/layouts/layout.astro"
-import Notification from "@/src/components/notification.astro"
 const user = await Astro.locals.currentUser()
 
 if (!user) {
   return Astro.redirect("/sign-in")
 }
 
-import * as profile from "@/src/lib/query/profile"
-import { grade, year } from "@/src/utils"
-import { actions } from "astro:actions"
-
-const userProfile = Astro.locals.profile
-if (!userProfile) {
-  return Astro.redirect("/sign-in")
-}
-const role = profile.getRole({ profile: userProfile })
-const result = Astro.getActionResult(actions.user.profile.update)
-if (result && !result.error) {
-  Astro.redirect("/account#/status")
-}
+import { SignOutButton } from "@clerk/astro/components"
+import ProfileSetupForm from "@/rr7/components/component/ProfileSetupForm"
 ---
 
 <Layout title="アカウント">
-  {
-    result && result.error && (
-      <Notification
-        title="プロフィール更新"
-        message={`プロフィールの更新に失敗しました。 ${result.error.message}`}
-        type="error"
-        duration={10000}
-      />
-    )
-  }
-  {
-    result && !result.error && (
-      <Notification
-        title="プロフィール更新"
-        message="プロフィールが正常に更新されました。"
-        type="success"
-        duration={3000}
-      />
-    )
-  }
+  <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">プロフィール</h1>
+  <ProfileSetupForm userId={Astro.locals.auth().userId!} patch client:load />
 
-  <p class="text-gray-700 dark:text-gray-300 mb-4">
-    メールアドレス・パスワードの変更などは
-    <a
-      href="https://accounts.omu-aikido.com"
-      class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline transition-colors duration-200"
-    >
-      こちら
-    </a>
-    から行ってください。
-  </p>
-
-  <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">プロフィール</h1>
-
-  <form
-    id="setup-form"
-    class="max-w-md mx-auto space-y-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-lg"
-    method="POST"
-    action={actions.user.profile.update}
-  >
-    <div class="space-y-2">
-      <label for="grade" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        所持級段位
-        <span class="text-red-600 dark:text-red-400 ml-1">*</span>
-      </label>
-      <select
-        id="grade"
-        name="grade"
-        required
-        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  <hr class="my-2 border-slate-200 dark:border-slate-700" />
+  <div class="mt-6">
+    <p class="text-slate-700 dark:text-slate-300 mb-4">
+      メールアドレス・パスワードの変更などは
+      <a
+        href="https://accounts.omu-aikido.com"
+        class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline transition-colors duration-200"
       >
-        {
-          grade.map((g) => (
-            <option value={g.grade} selected={g.grade === userProfile.grade}>
-              {g.name}
-            </option>
-          ))
-        }
-      </select>
-    </div>
+        こちら(外部リンク)
+      </a>
+      から行ってください。
+    </p>
+    <p>
+      サインアウトはここからできます→
 
-    <div class="space-y-2">
-      <label for="getGradeAt" class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >級段位取得日</label
-      >
-      <input
-        type="date"
-        id="getGradeAt"
-        name="getGradeAt"
-        value=`${(new Date(userProfile.getGradeAt)).toISOString().split('T')[0]}`
-        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      <SignOutButton
+        class="w-1/3 bg-slate-400 hover:bg-slate-500 dark:bg-slate-600 dark:hover:bg-slate-700 text-white py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2 dark:focus:ring-offset-slate-800 font-medium transition-colors duration-200"
       />
-    </div>
-
-    <div class="space-y-2">
-      <label for="joinedAt" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        入部年度
-        <span class="text-red-600 dark:text-red-400 ml-1">*</span>
-      </label>
-      <input
-        type="number"
-        id="joinedAt"
-        name="joinedAt"
-        placeholder="4桁の数字"
-        required
-        value={userProfile.joinedAt}
-        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-      />
-    </div>
-
-    <div class="space-y-2">
-      <label for="year" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        学年
-        <span class="text-red-600 dark:text-red-400 ml-1">*</span>
-      </label>
-      <select
-        id="year"
-        name="year"
-        value={userProfile.year}
-        required
-        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-      >
-        {
-          year.map((y) => (
-            <option value={y.year} selected={y.year === userProfile.year}>
-              {y.name}
-            </option>
-          ))
-        }
-      </select>
-    </div>
-
-    <input type="hidden" name="role" value={role?.toString()} />
-    <input type="hidden" name="id" value={user.id} />
-
-    <button
-      type="submit"
-      id="profile-form"
-      class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 font-medium transition-colors duration-200"
-    >
-      登録
-    </button>
-  </form>
+    </p>
+  </div>
 </Layout>
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.querySelector("form")
-    const button = document.getElementById("profile-form") as HTMLButtonElement
-
-    if (!form || !button) {
-      console.error("Form or button element not found")
-      return
-    }
-
-    form.addEventListener("submit", (event) => {
-      event.preventDefault()
-      button.textContent = "送信中..."
-      button.classList.add(
-        "text-slate-800",
-        "dark:text-slate-100",
-        "bg-slate-300",
-        "dark:bg-slate-600",
-        "cursor-pointer",
-      )
-      button.disabled = true
-      form.submit()
-    })
-  })
-</script>

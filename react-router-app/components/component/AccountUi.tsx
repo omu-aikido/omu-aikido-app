@@ -1,14 +1,10 @@
-import { SignedIn, SignedOut, SignInButton, SignOutButton, useAuth } from "@clerk/astro/react"
+import { SignedIn, SignedOut, SignInButton, useAuth } from "@clerk/astro/react"
 import { style } from "@/src/styles/component"
 import { getAccount } from "@/src/lib/query/profile"
-
-interface App {
-  name: string
-  path: string
-}
+import type { PagePath } from "@/src/type"
 
 interface AccountUiProps {
-  apps: App[]
+  apps: PagePath[]
 }
 
 export async function AccountUi({ apps }: AccountUiProps) {
@@ -20,32 +16,38 @@ export async function AccountUi({ apps }: AccountUiProps) {
   return (
     <div className="m-0 p-0">
       <SignedOut>
-        <SignInButton mode="modal" />
+        <div className="[&_button]:w-full [&_button]:justify-center [&_button]:bg-blue-600 [&_button]:text-white hover:[&_button]:bg-blue-700 dark:[&_button]:bg-blue-500 dark:hover:[&_button]:bg-blue-600">
+          <SignInButton mode="modal" />
+        </div>
       </SignedOut>
       <SignedIn>
         {user && (
-          <a className={style.header.clerk.name()} href="/account">
+          <a
+            className={`${style.header.clerk.name()} p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800`}
+            href="/account"
+          >
             <img
               src={user.imageUrl}
               alt={`Profile picture of ${user.firstName} ${user.lastName}`}
               className={style.header.clerk.icon()}
               loading="lazy"
             />
-            <span>
+            <span className="text-slate-800 dark:text-slate-200">
               {user.lastName} {user.firstName}
             </span>
           </a>
         )}
-        <hr />
+        <hr className="my-2 border-slate-200 dark:border-slate-700" />
         {apps.map((app) => (
-          <div className="flex flex-col" key={app.path}>
-            <a className={style.header.link()} href={app.path}>
+          <div className="flex flex-col" key={app.href}>
+            <a
+              className={`${style.header.link()} p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200`}
+              href={app.href}
+            >
               {app.name}
             </a>
           </div>
         ))}
-        <hr />
-        <SignOutButton />
       </SignedIn>
     </div>
   )

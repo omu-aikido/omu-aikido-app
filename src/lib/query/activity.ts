@@ -5,8 +5,8 @@ import { eq, gte, lte, and, desc } from "drizzle-orm"
 
 import * as uuid from "uuid"
 
-import { getProfile } from "@/src/lib/query/profile"
-import { Role } from "@/src/class"
+import { getProfile } from "src/lib/query/profile"
+import { Role } from "src/zod"
 
 export const selectActivity = activity.$inferSelect
 export const inputActivity = activity.$inferInsert
@@ -18,17 +18,6 @@ export async function getAllActivities(input: { applicateBy: string }) {
 
   if (applicateBy instanceof Response) {
     return applicateBy
-  }
-  if (
-    !(applicateBy instanceof Object) ||
-    !(
-      "grade" in applicateBy &&
-      "getGradeAt" in applicateBy &&
-      "joinedAt" in applicateBy &&
-      "year" in applicateBy
-    )
-  ) {
-    throw new Error("Invalid profile format.")
   }
 
   const role = Role.fromString(applicateBy.role)
@@ -73,7 +62,34 @@ export async function userActivity(input: {
   return activityData
 }
 
-export async function resentlyActivity(input: { userId: string; limit: number }) {
+// 新規追加: 指定された期間内のアクティビティを取得する関数
+export async function getActivitiesByDateRange(input: {
+  userId?: string
+  startDate?: string
+  endDate?: string
+}) {
+  const { userId, startDate, endDate } = input
+
+  const conditions = []
+  if (userId) {
+    conditions.push(eq(activity.userId, userId))
+  }
+  if (startDate) {
+    conditions.push(gte(activity.date, startDate))
+  }
+  if (endDate) {
+    conditions.push(lte(activity.date, endDate))
+  }
+
+  const activityData = await db
+    .select()
+    .from(activity)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+
+  return activityData
+}
+
+export async function recentlyActivity(input: { userId: string; limit: number }) {
   const activityData = await db
     .select()
     .from(activity)
@@ -127,7 +143,7 @@ export async function getActivity(input: { id: string }) {
 export async function updateActivity(input: {
   userId: string
   activityId: string
-  activityData: typeof inputActivity
+  activityData: Partial<typeof inputActivity>
 }) {
   const validatedInput = z
     .object({
@@ -141,7 +157,7 @@ export async function updateActivity(input: {
     return null
   }
 
-  const setData: typeof inputActivity = {
+  const setData: Partial<typeof inputActivity> = {
     date: input.activityData.date,
     id: input.activityData.id,
     userId: input.activityData.userId,
@@ -150,5 +166,38 @@ export async function updateActivity(input: {
     updatedAt: new Date().toISOString(),
   }
 
-  await db.update(activity).set(setData).where(eq(activity.id, validatedInput.activityId)).execute()
+  const result = await db
+    .update(activity)
+    .set(setData)
+    .where(eq(activity.id, validatedInput.activityId))
+    .execute()
+
+  return result
+}
+
+// 複数のアクティビティをupsertする関数
+export async function upsertActivities(input: {
+  userId: string
+  activities: Array<typeof inputActivity>
+}) {
+  const results = []
+  for (const act of input.activities) {
+    if (act.id) {
+      // 既存のアクティビティを更新
+      const result = await updateActivity({
+        userId: input.userId,
+        activityId: act.id,
+        activityData: act,
+      })
+      results.push(result)
+    } else {
+      // 新規アクティビティを作成
+      const result = await createActivity({
+        userId: input.userId,
+        activity: act,
+      })
+      results.push(result)
+    }
+  }
+  return results
 }

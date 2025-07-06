@@ -2,37 +2,20 @@
 import { default as Layout } from "@/src/layouts/layout.astro"
 import { userActivity } from "@/src/lib/query/activity"
 import { translateGrade, timeForNextGrade } from "@/src/utils"
-import ActivityForm from "@/src/components/add-record.astro"
+import { AddRecord } from "@/rr7/components/component/AddRecord"
 import { style } from "@/src/styles/component"
-
-import RecentsPh from "@/src/components/recents-ph.astro"
-import Recents from "@/src/components/recents.astro"
+import MonthlyActivittyForm from "@/rr7/components/component/MonthlyActivityForm"
 
 const user = await Astro.locals.currentUser()
 
 if (!user) {
   return Astro.redirect("/sign-in")
 }
-const userProfile = Astro.locals.profile
-if (!userProfile) {
-  return Astro.redirect("/sign-in")
-}
+const userProfile = Astro.locals.profile!
 
-const now = new Date()
-const start = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-const end = new Date()
-const activities = (
-  await userActivity({
-    userId: user.id,
-    start: start,
-    end: end,
-  })
-).sort((a, b) => {
-  return new Date(b.date).getTime() - new Date(a.date).getTime()
-})
 const activityFromPreviousGrade = await userActivity({
   userId: user.id,
-  start: new Date(userProfile.getGradeAt),
+  start: new Date(userProfile.getGradeAt ?? (userProfile.joinedAt, 3, 1)), // 4月1日 (月は0ベース)
   end: new Date(),
 })
 const grade = userProfile.grade
@@ -65,11 +48,7 @@ const needToNextGrade = Math.max(
   <hr />
   <h2>追加</h2>
 
-  <ActivityForm />
-  <Recents server:defer>
-    <RecentsPh slot="fallback" />
-  </Recents>
-
+  <AddRecord client:load />
   <hr class="my-6 border-slate-200 dark:border-slate-700" />
 
   <div class="space-y-4">
@@ -77,35 +56,6 @@ const needToNextGrade = Math.max(
       <h2 class="text-xl font-semibold text-slate-900 dark:text-white">今月の稽古履歴</h2>
       <a href="/apps/record/list" class={style.text.link()}> 全ての稽古履歴 &gt;&gt; </a>
     </div>
-
-    <div class={style.table.container()}>
-      <table class={style.table.table()}>
-        <thead class={style.table.thead.container()}>
-          <tr>
-            <th class={style.table.thead.th()}> 日付 </th>
-            <th class={style.table.thead.th()}> 稽古時間 </th>
-          </tr>
-        </thead>
-        <tbody class={style.table.tbody.container()}>
-          {
-            activities.length === 0 ? (
-              <tr class={style.table.tbody.tr()}>
-                <td class={style.table.tbody.td()}>履歴はありません</td>
-                <td class={style.table.tbody.td()}>追加しましょう!</td>
-              </tr>
-            ) : (
-              activities.map((activity) => (
-                <tr class={style.table.tbody.tr()}>
-                  <td class={style.table.tbody.td()}>
-                    {new Date(activity.date).toLocaleDateString("ja-JP")}
-                  </td>
-                  <td class={style.table.tbody.td()}>{activity.period}時間</td>
-                </tr>
-              ))
-            )
-          }
-        </tbody>
-      </table>
-    </div>
+    <MonthlyActivittyForm client:load />
   </div>
 </Layout>
