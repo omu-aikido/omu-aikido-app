@@ -87,7 +87,13 @@ const totalTrains = parseInt(
           <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
             <p class="text-sm text-green-600 dark:text-green-400 font-medium">取得日</p>
             <p class="text-lg font-bold text-green-900 dark:text-green-100">
-              {new Date(userProfile.getGradeAt).toLocaleDateString("ja-JP")}
+              {
+                new Date(
+                  userProfile.getGradeAt
+                    ? userProfile.getGradeAt
+                    : new Date(userProfile.joinedAt, 3, 2),
+                ).toLocaleDateString("ja-JP")
+              }
             </p>
           </div>
 

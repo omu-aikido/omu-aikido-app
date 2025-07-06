@@ -4,7 +4,6 @@ import { userActivity } from "@/src/lib/query/activity"
 import { translateGrade, timeForNextGrade } from "@/src/utils"
 import { AddRecord } from "@/rr7/components/component/AddRecord"
 import { style } from "@/src/styles/component"
-import { Recents } from "@/rr7/components/component/Recents"
 import MonthlyActivittyForm from "@/rr7/components/component/MonthlyActivityForm"
 
 const user = await Astro.locals.currentUser()
@@ -14,18 +13,6 @@ if (!user) {
 }
 const userProfile = Astro.locals.profile!
 
-const now = new Date()
-const start = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-const end = new Date()
-const activities = (
-  await userActivity({
-    userId: user.id,
-    start: start,
-    end: end,
-  })
-).sort((a, b) => {
-  return new Date(b.date).getTime() - new Date(a.date).getTime()
-})
 const activityFromPreviousGrade = await userActivity({
   userId: user.id,
   start: new Date(userProfile.getGradeAt ?? (userProfile.joinedAt, 3, 1)), // 4月1日 (月は0ベース)

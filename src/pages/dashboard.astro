@@ -31,7 +31,7 @@ const apps: PagePath[] = [
   <Recents userId={userId} />
 
   <hr />
-  <Grid variant="offset">
+  <Grid>
     {apps.map((app: PagePath) => <AppIcon title={app.name} id={app.href} desc={app.desc} />)}
   </Grid>
 </Layout>
