@@ -5,7 +5,7 @@ import { eq, gte, lte, and, desc } from "drizzle-orm"
 
 import * as uuid from "uuid"
 
-import { getProfile } from "src/lib/query/profile"
+import { getProfile } from "@/src/lib/query/profile"
 import { Role } from "src/zod"
 
 export const selectActivity = activity.$inferSelect
