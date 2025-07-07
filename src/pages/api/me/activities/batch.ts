@@ -1,28 +1,80 @@
-// src/pages/api/me/activities/batch.ts
-import { upsertActivities, inputActivity } from "@/src/lib/query/activity"
+import {
+  createActivities,
+  updateActivities,
+  deleteActivities,
+  inputActivity,
+} from "src/lib/query/activity"
 import type { APIRoute } from "astro"
 
-// PATCH: 認証ユーザー自身の活動の一括更新/作成
-export const PATCH: APIRoute = async ({ request, locals }) => {
+export type BatchRequestBody = {
+  userId: string
+  added?: Array<typeof inputActivity>
+  updated?: Array<typeof inputActivity>
+  deleted?: string[]
+}
+
+export const POST: APIRoute = async ({ request, locals }) => {
   const auth = locals.auth()
-  if (!auth.userId) return new Response("Unauthorized", { status: 401 })
-
-  const body = (await request.json()) as Array<typeof inputActivity>
-
-  // 各アクティビティのuserIdが認証ユーザーと一致するか検証
-  const invalidActivities = body.filter((act) => act.userId && act.userId !== auth.userId)
-  if (invalidActivities.length > 0) {
-    return new Response("Invalid user ID in some activities", { status: 403 })
+  if (!auth.userId) {
+    return new Response("Unauthorized", { status: 401 })
   }
-  // デバッグ用ログ: 受信したbodyとauth.userIdを出力
-  // console.log("PATCH /api/me/activities/batch body:", body)
-  // console.log("PATCH /api/me/activities/batch auth.userId:", auth.userId)
+
+  const body = (await request.json()) as BatchRequestBody
+
+  if (body.userId !== auth.userId) {
+    return new Response("Invalid user ID in payload", { status: 403 })
+  }
+
+  type BatchResult = {
+    affected: number
+    success: boolean
+  }
+
+  type BatchResponse = {
+    added?: BatchResult
+    updated?: BatchResult
+    delete?: BatchResult
+  }
 
   try {
-    const results = await upsertActivities({ userId: auth.userId, activities: body })
-    return Response.json(results)
+    const results: BatchResponse = {}
+    let status = 200
+
+    if (body.deleted && body.deleted.length > 0) {
+      const expected = body.deleted.length
+      const deleted = await deleteActivities({ userId: auth.userId, ids: body.deleted })
+      const affected = deleted.map((r) => r.rowsAffected).reduce((a, b) => a + b, 0)
+      results.delete = {
+        affected: affected,
+        success: affected === expected,
+      }
+      if (affected !== expected) status = 500
+    }
+
+    if (body.added && body.added.length > 0) {
+      const expected = body.added.length
+      const added = await createActivities({ userId: auth.userId, activities: body.added })
+      const affected = added.rowsAffected
+      results.added = {
+        affected: affected,
+        success: expected === added.rowsAffected,
+      }
+      if (affected !== expected) status = 500
+    }
+
+    if (body.updated && body.updated.length > 0) {
+      const expected = body.updated.length
+      const updated = await updateActivities({ userId: auth.userId, activities: body.updated })
+      const affected = updated.map((r) => r.rowsAffected).reduce((a, b) => a + b, 0)
+      results.updated = {
+        affected: affected,
+        success: expected === affected,
+      }
+      if (affected !== expected) status = 500
+    }
+
+    return new Response(JSON.stringify(results, null, 2).toString(), { status: status })
   } catch (error) {
-    // console.error("Error upserting activities:", error)
     return new Response((error as Error).message, { status: 500 })
   }
 }

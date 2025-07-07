@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react"
 import { format } from "date-fns"
-import type { ActivityType } from "db/schema" // 型のみのインポートに修正
+import type { ActivityType } from "db/schema"
 import { useAuth } from "@clerk/astro/react"
+
+interface DailyActivityItem extends ActivityType {
+  isDeleted?: boolean
+}
 
 interface DailyActivityProps {
   date: Date
   activities: ActivityType[]
-  onSave: (updatedActivities: ActivityType[]) => void
+  onSave: (updatedActivities: DailyActivityItem[]) => void
   onClose: () => void
 }
 
 const DailyActivity: React.FC<DailyActivityProps> = ({ date, activities, onSave, onClose }) => {
-  const [dailyActivities, setDailyActivities] = useState<ActivityType[]>(activities)
+  const [dailyActivities, setDailyActivities] = useState<DailyActivityItem[]>(activities)
   const userId = useAuth().userId || ""
 
   useEffect(() => {
@@ -28,23 +32,29 @@ const DailyActivity: React.FC<DailyActivityProps> = ({ date, activities, onSave,
     setDailyActivities((prev) => [
       ...prev,
       {
-        id: "",
+        id: `tmp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         userId: userId,
         date: format(date, "yyyy-MM-dd"),
         period: 1.5,
         createAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-      } as ActivityType,
+        isDeleted: false, // 新しいアクティビティは削除済みではない
+      } as DailyActivityItem,
     ])
   }
 
   const handleDeleteActivity = (index: number) => {
-    setDailyActivities((prev) => prev.filter((_, i) => i !== index))
+    setDailyActivities((prev) =>
+      prev.map((act, i) => (i === index ? { ...act, isDeleted: true } : act)),
+    )
   }
 
   const handleSave = () => {
-    onSave(dailyActivities)
-    onClose()
+    const sanitized = dailyActivities.map((act) =>
+      typeof act.id === "string" && act.id.startsWith("tmp-") ? { ...act, id: "" } : act,
+    )
+    onSave(sanitized)
+    // onClose() // onCloseはMonthlyActivityFormで管理されるため、ここでは呼び出さない
   }
 
   return (
@@ -59,18 +69,23 @@ const DailyActivity: React.FC<DailyActivityProps> = ({ date, activities, onSave,
           </p>
         )}
         {dailyActivities.map((act, index) => (
-          <div key={act.id || `new-${index}`} className="flex items-center mb-2">
+          <div
+            key={act.id}
+            className={`flex items-center mb-2 ${act.isDeleted ? "opacity-50 line-through" : ""}`}
+          >
             <input
               type="number"
               step="0.5"
               value={act.period}
               onChange={(e) => handlePeriodChange(index, parseFloat(e.target.value))}
               className="border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white p-2 rounded w-24 mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={act.isDeleted} // 削除済みのアクティビティは編集不可
             />
             <span className="mr-auto text-slate-900 dark:text-white">時間</span>
             <button
               onClick={() => handleDeleteActivity(index)}
-              className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white px-3 py-1 rounded transition-colors"
+              className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white px-3 py-1 rounded transition-colors ml-2"
+              disabled={act.isDeleted} // 削除済みのアクティビティは再度削除不可
             >
               削除
             </button>
