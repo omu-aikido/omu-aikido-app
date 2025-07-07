@@ -3,7 +3,7 @@ import {
   updateActivities,
   deleteActivities,
   inputActivity,
-} from "src/lib/query/activity"
+} from "@/src/lib/query/activity"
 import type { APIRoute } from "astro"
 
 export type BatchRequestBody = {

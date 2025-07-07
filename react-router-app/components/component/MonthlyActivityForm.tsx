@@ -30,6 +30,7 @@ function MonthlyActivityForm() {
   const [error, setError] = useState<string | null>(null)
   const [showDailyActivityModal, setShowDailyActivityModal] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [isChanged, setIsChanged] = useState(false)
   const { userId } = useAuth()
 
   const fetchActivities = useCallback(async () => {
@@ -49,7 +50,8 @@ function MonthlyActivityForm() {
         isDeleted: false,
       }))
       setActivities(withDeletedFlag)
-      setOriginalActivities(JSON.parse(JSON.stringify(withDeletedFlag)))
+      setOriginalActivities(withDeletedFlag)
+      setIsChanged(false)
     } catch {
       setError("エラーが発生しました")
     } finally {
@@ -65,16 +67,41 @@ function MonthlyActivityForm() {
 
   // DailyActivityから受け取った全アクティビティ（isDeleted含む）で上書き
   const handleSaveDailyActivities = (updatedDailyActivities: DailyActivityItem[]) => {
-    setActivities((prevActivities) => {
-      const dateToUpdate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : null
-      if (!dateToUpdate) {
-        return prevActivities
+    const dateToUpdate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : null
+    if (!dateToUpdate) return
+    const filteredPrevActivities = activities.filter((act) => act.date !== dateToUpdate)
+    const newActivities = [...filteredPrevActivities, ...updatedDailyActivities]
+    setActivities(newActivities)
+
+    // 日付ごとに件数と合計periodで比較
+    const groupByDate = (arr: DailyActivityItem[]) => {
+      const map = new Map<string, { count: number; total: number }>()
+      arr
+        .filter((a) => !a.isDeleted)
+        .forEach((a) => {
+          const d = a.date
+          if (!map.has(d)) map.set(d, { count: 0, total: 0 })
+          const v = map.get(d)!
+          map.set(d, {
+            count: v.count + 1,
+            total: v.total + (typeof a.period === "number" ? a.period : 0),
+          })
+        })
+      return map
+    }
+    const mapNew = groupByDate(newActivities)
+    const mapOrig = groupByDate(originalActivities)
+    let changed = false
+    const allDates = new Set([...mapNew.keys(), ...mapOrig.keys()])
+    for (const d of allDates) {
+      const n = mapNew.get(d) || { count: 0, total: 0 }
+      const o = mapOrig.get(d) || { count: 0, total: 0 }
+      if (n.count !== o.count || n.total !== o.total) {
+        changed = true
+        break
       }
-
-      const filteredPrevActivities = prevActivities.filter((act) => act.date !== dateToUpdate)
-
-      return [...filteredPrevActivities, ...updatedDailyActivities]
-    })
+    }
+    setIsChanged(changed)
     setShowDailyActivityModal(false)
   }
 
@@ -88,32 +115,56 @@ function MonthlyActivityForm() {
         return
       }
 
-      // 追加・更新・削除をisDeletedで判定
-      const activitiesToAdd: ActivityType[] = []
+      // 差分抽出の効率化（内容完全一致でペアリングして除外）
+      const compareFields: (keyof DailyActivityItem)[] = ["date", "period", "userId"]
+      const isContentEqual = (a: DailyActivityItem, b: DailyActivityItem) =>
+        compareFields.every((key) => a[key] === b[key])
+
+      // 1. 削除候補: originalに存在し、activitiesでisDeleted:true
+      const deletedCandidates = originalActivities.filter((oa) =>
+        activities.find((a) => a.id === oa.id && a.isDeleted),
+      )
+      // 2. 追加候補: idなし or idがtmp- or originalに存在しない、isDeleted:false
+      const addedCandidates = activities.filter(
+        (a) =>
+          (!a.id ||
+            (typeof a.id === "string" && a.id.startsWith("tmp-")) ||
+            !originalActivities.some((oa) => oa.id === a.id)) &&
+          !a.isDeleted,
+      )
+      // 3. 内容一致でペアリング
+      const matchedPairs: { delIdx: number; addIdx: number }[] = []
+      deletedCandidates.forEach((del, delIdx) => {
+        const addIdx = addedCandidates.findIndex((add) => isContentEqual(add, del))
+        if (addIdx !== -1) {
+          matchedPairs.push({ delIdx, addIdx })
+        }
+      })
+      // 除外した追加・削除候補を除いたリストを作成
+      const filteredDeleted = deletedCandidates.filter(
+        (_, idx) => !matchedPairs.some((m) => m.delIdx === idx),
+      )
+      const filteredAdded = addedCandidates.filter(
+        (_, idx) => !matchedPairs.some((m) => m.addIdx === idx),
+      )
+
+      // 通常の差分抽出
+      const activitiesToAdd: ActivityType[] = filteredAdded.map((a) => ({
+        ...stripIsDeleted(a),
+        id: typeof a.id === "string" && a.id.startsWith("tmp-") ? "" : a.id,
+      }))
       const activitiesToUpdate: ActivityType[] = []
-      const activitiesToDelete: string[] = []
+      const activitiesToDelete: string[] = filteredDeleted.map((a) => a.id!).filter(Boolean)
 
       activities.forEach((currentAct) => {
         const originalAct = originalActivities.find((oa) => oa.id === currentAct.id)
-        if (currentAct.isDeleted) {
-          if (currentAct.id && !activitiesToDelete.includes(currentAct.id)) {
-            activitiesToDelete.push(currentAct.id)
-          }
-        } else if (originalAct) {
-          if (
-            JSON.stringify({ ...originalAct, isDeleted: undefined }) !==
+        if (
+          originalAct &&
+          !currentAct.isDeleted &&
+          JSON.stringify({ ...originalAct, isDeleted: undefined }) !==
             JSON.stringify(stripIsDeleted(currentAct))
-          ) {
-            activitiesToUpdate.push(stripIsDeleted(currentAct))
-          }
-        } else {
-          activitiesToAdd.push({
-            ...stripIsDeleted(currentAct),
-            id:
-              typeof currentAct.id === "string" && currentAct.id.startsWith("tmp-")
-                ? ""
-                : currentAct.id,
-          })
+        ) {
+          activitiesToUpdate.push(stripIsDeleted(currentAct))
         }
       })
 
@@ -140,6 +191,7 @@ function MonthlyActivityForm() {
       }
 
       fetchActivities()
+      setIsChanged(false)
     } catch {
       setError("一括登録中にエラーが発生しました。")
     } finally {
@@ -170,13 +222,22 @@ function MonthlyActivityForm() {
     : []
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-200">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-200 relative">
+      {/* ローディング時の全体カバー（コンポーネント内限定） */}
+      {loading && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center bg-slate-50 dark:bg-slate-900 p-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mb-4"></div>
+          <p className="text-slate-900 dark:text-slate-200 text-lg font-semibold drop-shadow">
+            読み込み中...
+          </p>
+        </div>
+      )}
       <div className="">
         <div className="">
           <div className="flex flex-row justify-between items-center mb-4 sm:mb-8 gap-2">
             <button
               onClick={handlePrevMonth}
-              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm"
+              className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-500 dark:hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm"
             >
               ← 前月
             </button>
@@ -185,29 +246,24 @@ function MonthlyActivityForm() {
             </h2>
             <button
               onClick={handleNextMonth}
-              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm"
+              className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-500 dark:hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm"
             >
               次月 →
             </button>
           </div>
-          <button
-            onClick={handleBatchUpdate}
-            className="w-full flex-row  bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm"
-          >
-            一括登録
-          </button>
-          {loading && (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto mb-4"></div>
-              <p className="text-slate-600 dark:text-slate-400">読み込み中...</p>
-            </div>
-          )}
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
               <p className="text-red-600 dark:text-red-400 text-center">エラー: {error}</p>
             </div>
           )}
           <div className="overflow-x-auto w-full sm:block hidden">
+            <button
+              onClick={handleBatchUpdate}
+              className={`w-full flex-row px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm ${isChanged ? "bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-400 cursor-not-allowed"}`}
+              disabled={!isChanged}
+            >
+              一括登録
+            </button>
             <div className="min-w-[700px] grid grid-cols-7 gap-0">
               {["日", "月", "火", "水", "木", "金", "土"].map((day, index) => (
                 <div
@@ -247,7 +303,7 @@ function MonthlyActivityForm() {
                       .filter((act) => act.date === format(day, "yyyy-MM-dd") && !act.isDeleted)
                       .map((act, i) => (
                         <div
-                          key={i}
+                          key={act.id || `tmp-${i}`}
                           className="text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded-full font-medium"
                         >
                           {act.period}h
@@ -270,7 +326,7 @@ function MonthlyActivityForm() {
                     className="flex items-start py-3 px-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     onClick={() => handleDayClick(day)}
                   >
-                    <div className="w-20 flex-shrink-0 font-semibold text-blue-700 dark:text-blue-300">
+                    <div className="w-20 flex-shrink-0 font-semibold text-slate-700 dark:text-slate-300">
                       {`${format(day, "d日")} (${["日", "月", "火", "水", "木", "金", "土"][day.getDay()]})`}
                     </div>
                     <div className="flex-1 space-y-1">
@@ -279,7 +335,7 @@ function MonthlyActivityForm() {
                       ) : (
                         acts.map((act, i) => (
                           <span
-                            key={i}
+                            key={act.id || `tmp-${i}`}
                             className="inline-block bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded-full text-xs font-medium mr-2"
                           >
                             {act.period}h
@@ -291,14 +347,14 @@ function MonthlyActivityForm() {
                 )
               })}
             </ul>
+            <button
+              onClick={handleBatchUpdate}
+              className={`fixed bottom-6 right-6 z-50 px-6 py-3 rounded-full font-medium transition-all duration-200 shadow-lg hover:shadow-xl ${isChanged ? "bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-400 cursor-not-allowed"}`}
+              disabled={!isChanged}
+            >
+              一括登録
+            </button>
           </div>
-
-          <button
-            onClick={handleBatchUpdate}
-            className="w-full flex-row  bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm"
-          >
-            一括登録
-          </button>
         </div>
       </div>
 

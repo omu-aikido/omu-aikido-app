@@ -50,47 +50,45 @@ const DailyActivity: React.FC<DailyActivityProps> = ({ date, activities, onSave,
   }
 
   const handleSave = () => {
-    const sanitized = dailyActivities.map((act) =>
-      typeof act.id === "string" && act.id.startsWith("tmp-") ? { ...act, id: "" } : act,
-    )
+    const sanitized = dailyActivities
+      .filter((act) => !act.isDeleted)
+      .map((act) =>
+        typeof act.id === "string" && act.id.startsWith("tmp-") ? { ...act, id: "" } : act,
+      )
     onSave(sanitized)
-    // onClose() // onCloseはMonthlyActivityFormで管理されるため、ここでは呼び出さない
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-600 bg-opacity-50 dark:bg-slate-900 dark:bg-opacity-75 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-slate-600/50 dark:bg-slate-900/75 flex justify-center items-center z-50">
       <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
         <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">
           {format(date, "yyyy年MM月dd日")} のアクティビティ
         </h2>
-        {dailyActivities.length === 0 && (
+        {dailyActivities.filter((act) => !act.isDeleted).length === 0 && (
           <p className="text-slate-600 dark:text-slate-400 mb-4">
             この日のアクティビティはありません。
           </p>
         )}
-        {dailyActivities.map((act, index) => (
-          <div
-            key={act.id}
-            className={`flex items-center mb-2 ${act.isDeleted ? "opacity-50 line-through" : ""}`}
-          >
-            <input
-              type="number"
-              step="0.5"
-              value={act.period}
-              onChange={(e) => handlePeriodChange(index, parseFloat(e.target.value))}
-              className="border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white p-2 rounded w-24 mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={act.isDeleted} // 削除済みのアクティビティは編集不可
-            />
-            <span className="mr-auto text-slate-900 dark:text-white">時間</span>
-            <button
-              onClick={() => handleDeleteActivity(index)}
-              className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white px-3 py-1 rounded transition-colors ml-2"
-              disabled={act.isDeleted} // 削除済みのアクティビティは再度削除不可
-            >
-              削除
-            </button>
-          </div>
-        ))}
+        {dailyActivities
+          .filter((act) => !act.isDeleted)
+          .map((act, index) => (
+            <div key={act.id} className="flex items-center mb-2">
+              <input
+                type="number"
+                step="0.5"
+                value={act.period}
+                onChange={(e) => handlePeriodChange(index, parseFloat(e.target.value))}
+                className="border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white p-2 rounded w-24 mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="mr-auto text-slate-900 dark:text-white">時間</span>
+              <button
+                onClick={() => handleDeleteActivity(index)}
+                className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white px-3 py-1 rounded transition-colors ml-2"
+              >
+                削除
+              </button>
+            </div>
+          ))}
         <button
           onClick={handleAddActivity}
           className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors mt-4 mr-2"
