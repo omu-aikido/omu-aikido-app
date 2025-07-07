@@ -1,6 +1,6 @@
 ---
-import { default as Layout } from "@/src/layouts/auth-layout.astro"
-import { createActivity, inputActivity } from "@/src/lib/query/activity"
+import { default as Layout } from "@/src/layouts/layout.astro"
+import AddRecordForm from "@/rr7/components/component/AddRecordForm.tsx"
 
 const user = await Astro.locals.currentUser()
 const userProfile = Astro.locals.profile
@@ -8,71 +8,10 @@ if (!user || !userProfile) {
   return Astro.redirect("/sign-in")
 }
 
-const date = new URL(Astro.request.url).searchParams.get("date")
-const period = new URL(Astro.request.url).searchParams.get("period")
-
-let isValidParams = false
-
-if (!date || !period) {
-  isValidParams = false
-}
-const parsedDate = date ? new Date(date) : null
-const parsedPeriod = (period as unknown as number) ? (period as unknown as number) : null
-
-if (!parsedDate || !parsedPeriod) {
-  isValidParams = false
-} else {
-  isValidParams = true
-}
-
-if (Astro.request.method == "POST" && isValidParams) {
-  const data = await Astro.request.formData()
-  const date = data.get("date") as unknown as Date
-  const dataParsed = new Date(date).toISOString().split("T")[0]
-  const period = data.get("period") as unknown as number
-
-  const actData: typeof inputActivity = {
-    date: dataParsed,
-    id: user.id, // バックエンドで生成するのでなんでもいい
-    userId: user.id,
-    period: period,
-  }
-  const result = await createActivity({
-    userId: user.id,
-    activity: actData,
-  })
-
-  if (result.rowsAffected == 1) {
-    return Astro.redirect("/apps/record")
-  } else {
-    return Astro.redirect("/apps/record/add?error=failed")
-  }
-}
+const date = new URL(Astro.request.url).searchParams.get("date") ?? undefined
+const period = new URL(Astro.request.url).searchParams.get("period") ?? undefined
 ---
 
 <Layout title="自動記録">
-  {
-    isValidParams && parsedDate ? (
-      <div class="flex flex-col items-center justify-center w-full h-full">
-        <h1 class="text-2xl font-bold">自動記録</h1>
-        <p class="text-gray-500">以下の内容で記録を追加しますか？</p>
-        <div class="mt-4">
-          <p>日付: {parsedDate.toLocaleDateString("ja-JP")}</p>
-          <p>稽古時間: {parsedPeriod}時間</p>
-        </div>
-        <form method="POST" class="mt-4">
-          <input type="hidden" name="date" value={date} />
-          <input type="hidden" name="period" value={period} />
-          <button type="submit" class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
-            記録する
-          </button>
-        </form>
-      </div>
-    ) : (
-      <div class="flex flex-col items-center justify-center w-full h-full">
-        <h1 class="text-2xl font-bold">エラー</h1>
-        <p class="text-red-500">不正なパラメータです。</p>
-      </div>
-    )
-  }
+  <AddRecordForm initialDate={date} initialPeriod={period} client:load />
 </Layout>

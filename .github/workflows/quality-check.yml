@@ -6,6 +6,7 @@ on:
 
 jobs:
   lint-and-format:
+    environment: preview
     runs-on: ubuntu-latest
     name: Code Quality Check
     steps:
@@ -19,16 +20,20 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      - name: Run ESLint
-        run: npm run lint:fix
+      - name: Setiup .env variables
+        run: |
+          echo "" > .env
+          echo "PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.PUBLIC_CLERK_PUBLISHABLE_KEY }}" >> .env
+          echo "VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}" >> .env
+          echo "CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}" >> .env
+          echo "TURSO_DATABASE_URL=${{ secrets.TURSO_DATABASE_URL }}" >> .env
+          echo "TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}" >> .env
+          cp .env .dev.vars
 
-      - name: Check Prettier formatting
-        run: npm run format
-
-      - name: TypeScript type check
-        run: npx astro check
+      - name: Build & Check Projects
+        run: npm run check
 
       - name: Commit changes if any
         run: |

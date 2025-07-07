@@ -8,3 +8,5 @@ export const activity = sqliteTable("activity", {
   createAt: text().default("sql`(CURRENT_TIMESTAMP)`").notNull(),
   updatedAt: text(),
 })
+
+export type ActivityType = typeof activity.$inferSelect
