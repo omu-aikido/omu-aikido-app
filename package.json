@@ -54,7 +54,7 @@
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check",
     "typegen": "wrangler types && react-router typegen",
-    "check": "npm run build && astro check && npm run format:fix && npm run lint:fix && tsc && wrangler deploy --dry-run",
+    "check": "npm run build && astro check && npm run lint:fix && tsc && wrangler deploy --dry-run",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --check .",
