@@ -1,11 +1,11 @@
 import { z } from "zod"
 import { db } from "@/src/lib/drizzle"
 import { activity } from "@/./db/schema"
-import { eq, gte, lte, and, desc } from "drizzle-orm"
+import { eq, gte, lte, and, desc, inArray } from "drizzle-orm"
 
 import * as uuid from "uuid"
 
-import { getProfile } from "src/lib/query/profile"
+import { getProfile } from "@/src/lib/query/profile"
 import { Role } from "src/zod"
 
 export const selectActivity = activity.$inferSelect
@@ -175,29 +175,62 @@ export async function updateActivity(input: {
   return result
 }
 
-// 複数のアクティビティをupsertする関数
-export async function upsertActivities(input: {
+export async function createActivities(input: {
   userId: string
   activities: Array<typeof inputActivity>
 }) {
-  const results = []
-  for (const act of input.activities) {
-    if (act.id) {
-      // 既存のアクティビティを更新
-      const result = await updateActivity({
-        userId: input.userId,
-        activityId: act.id,
-        activityData: act,
-      })
-      results.push(result)
-    } else {
-      // 新規アクティビティを作成
-      const result = await createActivity({
-        userId: input.userId,
-        activity: act,
-      })
-      results.push(result)
-    }
+  const invalid = input.activities.some((act) => act.userId !== input.userId)
+  if (invalid) throw new Error("Invalid user ID in some activities")
+
+  const activitiesData = input.activities.map((act) => ({
+    ...act,
+    id: uuid.v4(),
+    createAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }))
+
+  const result = await db.insert(activity).values(activitiesData).execute()
+  return result
+}
+
+export async function updateActivities(input: {
+  userId: string
+  activities: Array<typeof inputActivity>
+}) {
+  const ids = input.activities.map((act) => act.id)
+  const existingActivities = await db.select().from(activity).where(inArray(activity.id, ids))
+  const invalid = existingActivities.some((a) => a.userId !== input.userId)
+  if (invalid) throw new Error("Invalid user ID in some activities")
+
+  const results = await db.transaction(async (tx) => {
+    const updatePromises = input.activities.map((act) =>
+      tx
+        .update(activity)
+        .set({
+          ...act,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(activity.id, act.id))
+        .execute(),
+    )
+    return Promise.all(updatePromises)
+  })
+
+  return results
+}
+
+export async function deleteActivities(input: { userId: string; ids: string[] }) {
+  if (!Array.isArray(input.ids) || input.ids.length === 0) {
+    throw new Error("No activity IDs provided")
   }
+  const activities = await db.select().from(activity).where(inArray(activity.id, input.ids))
+  const invalid = activities.some((a) => a.userId !== input.userId)
+  if (invalid) throw new Error("Invalid user ID in some activities")
+  const results = await db.transaction(async (tx) => {
+    const updatePromises = input.ids.map((id) =>
+      tx.delete(activity).where(eq(activity.id, id)).execute(),
+    )
+    return Promise.all(updatePromises)
+  })
   return results
 }

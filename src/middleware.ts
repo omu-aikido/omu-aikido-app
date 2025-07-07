@@ -3,7 +3,7 @@ import * as profile from "@/src/lib/query/profile"
 import { Role } from "@/src/zod"
 import type { PagePath } from "./type"
 
-const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/app(.*)", "/account(.*)"])
+const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/apps(.*)", "/account(.*)"])
 const isAccountRecoverlyRoute = createRouteMatcher(["/account/setup", "/account/recovery"])
 const isAdminRoute = createRouteMatcher(["/admin(.*)"])
 const isApiRequest = createRouteMatcher(["/api(.*)"])
