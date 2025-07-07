@@ -73,7 +73,6 @@ function MonthlyActivityForm() {
     const newActivities = [...filteredPrevActivities, ...updatedDailyActivities]
     setActivities(newActivities)
 
-    // 日付ごとに件数と合計periodで比較
     const groupByDate = (arr: DailyActivityItem[]) => {
       const map = new Map<string, { count: number; total: number }>()
       arr
