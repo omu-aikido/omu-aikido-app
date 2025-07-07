@@ -1,4 +1,5 @@
 // 新API対応版 AddRecordForm.tsx
+import { useAuth } from "@clerk/astro/react"
 import React, { useState, useEffect } from "react"
 
 interface AddRecordFormProps {
@@ -42,14 +43,7 @@ const AddRecordForm: React.FC<AddRecordFormProps> = ({ initialDate, initialPerio
   const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
-    // 認証済みユーザーのIDを取得
-    fetch("/api/user/profile")
-      .then((res) => res.json() as Promise<ProfileResponse>)
-      .then((data) => {
-        if (data?.success && data?.profile?.id) setUserId(data.profile.id)
-        else setError("ユーザー情報の取得に失敗しました。")
-      })
-      .catch(() => setError("ユーザー情報の取得に失敗しました。"))
+    setUserId(useAuth().userId || null)
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
