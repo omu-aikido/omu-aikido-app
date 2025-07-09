@@ -1,4 +1,12 @@
 ---
+function userActivity(arg0: { userId: any; start: Date; end: Date }) {
+throw new Error("Function not implemented.")
+}
+
+function timeForNextGrade(grade: number) {
+throw new Error("Function not implemented.")
+}
+
 import { default as Layout } from "@/src/layouts/layout.astro"
 import Grid from "@/rr7/components/ui/Grid"
 import { AppIcon } from "@/rr7/components/ui/AppIcon"
@@ -6,6 +14,7 @@ import { AddRecord } from "@/rr7/components/component/AddRecord"
 import { Recents } from "@/rr7/components/component/Recents"
 import { style } from "@/src/styles/component"
 import type { PagePath } from "@/src/type"
+import ForNextGrade from "../components/for-next-grade.astro";
 const userId = Astro.locals.auth().userId!
 const apps: PagePath[] = [
   {
@@ -24,7 +33,8 @@ const apps: PagePath[] = [
 ---
 
 <Layout title="ダッシュボード">
-  <h1 class={style.text.title()}>記録追加</h1>
+  <ForNextGrade />
+  <h1 class={`mt-4 ${style.text.title()}`}>記録追加</h1>
 
   <AddRecord client:load />
 

@@ -1,0 +1,33 @@
+---
+export const prerender = false
+
+import { userActivity } from "@/src/lib/query/activity"
+import { timeForNextGrade } from "@/src/utils"
+import NextGrade from "@/rr7/components/component/NextGrade"
+
+const user = await Astro.locals.currentUser()
+
+if (!user) {
+  return Astro.redirect("/sign-in")
+}
+const userProfile = Astro.locals.profile!
+
+const activityFromPreviousGrade = await userActivity({
+  userId: user.id,
+  start: new Date(
+    userProfile.getGradeAt ? userProfile.getGradeAt : new Date(userProfile.joinedAt, 3, 1),
+  ),
+  end: new Date(),
+})
+const grade = userProfile.grade
+const forNextGrade = timeForNextGrade(grade)
+const needToNextGrade = Math.max(
+  0,
+  Math.floor(
+    forNextGrade -
+      activityFromPreviousGrade.map((record) => record.period).reduce((a, b) => a + b, 0) / 1.5,
+  ),
+)
+---
+
+<NextGrade grade={grade} needToNextGrade={needToNextGrade} nextGrade={forNextGrade} client:load />

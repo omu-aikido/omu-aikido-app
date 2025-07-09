@@ -189,7 +189,9 @@ function MonthlyActivityForm() {
         return
       }
 
-      fetchActivities()
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500) // 成功メッセージを表示してからリロード
       setIsChanged(false)
     } catch {
       setError("一括登録中にエラーが発生しました。")
