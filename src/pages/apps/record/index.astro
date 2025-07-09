@@ -5,6 +5,7 @@ import { translateGrade, timeForNextGrade } from "@/src/utils"
 import { AddRecord } from "@/rr7/components/component/AddRecord"
 import { style } from "@/src/styles/component"
 import MonthlyActivittyForm from "@/rr7/components/component/MonthlyActivityForm"
+import NextGrade from "@/rr7/components/component/NextGrade"
 
 const user = await Astro.locals.currentUser()
 
@@ -16,7 +17,7 @@ const userProfile = Astro.locals.profile!
 const activityFromPreviousGrade = await userActivity({
   userId: user.id,
   start: new Date(
-    userProfile.getGradeAt ?? new Date(new Date(userProfile.joinedAt).getFullYear(), 3, 1),
+    userProfile.getGradeAt ? userProfile.getGradeAt :new Date(userProfile.joinedAt, 3, 1),
   ),
   end: new Date(),
 })
@@ -34,19 +35,7 @@ const needToNextGrade = Math.max(
 <Layout title="きろく">
   <h1 class={style.text.title()}>きろく</h1>
 
-  {
-    grade > 0 && (
-      <>
-        <h2>
-          {translateGrade(grade >= 0 ? grade - 2 : grade - 1)}
-          {grade >= 0 ? "昇級" : "昇段"}まで
-        </h2>
-        <p>
-          {needToNextGrade} / {nextGrade} 日
-        </p>
-      </>
-    )
-  }
+  <NextGrade grade={grade} needToNextGrade={needToNextGrade} nextGrade={nextGrade} />
   <hr />
   <h2>追加</h2>
 

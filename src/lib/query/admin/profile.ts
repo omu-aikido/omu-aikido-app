@@ -34,7 +34,7 @@ export async function updateProfile(input: {
   const year = new Date().getFullYear()
   const getGradeAtValidate = input.getGradeAt ? input.getGradeAt : new Date(year, 3, 1, 0, 0, 0, 0)
   const getGradeAtString = new Date(getGradeAtValidate).toISOString()
-  
+
   const updatedMetadata = {
     grade: input.grade,
     getGradeAt: getGradeAtString,
