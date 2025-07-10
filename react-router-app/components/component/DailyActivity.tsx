@@ -43,19 +43,14 @@ const DailyActivity: React.FC<DailyActivityProps> = ({ date, activities, onSave,
     ])
   }
 
-  const handleDeleteActivity = (index: number) => {
+  const handleDeleteActivity = (id: DailyActivityItem["id"]) => {
     setDailyActivities((prev) =>
-      prev.map((act, i) => (i === index ? { ...act, isDeleted: true } : act)),
+      prev.map((act) => (act.id === id ? { ...act, isDeleted: true } : act)),
     )
   }
 
   const handleSave = () => {
-    const sanitized = dailyActivities
-      .filter((act) => !act.isDeleted)
-      .map((act) =>
-        typeof act.id === "string" && act.id.startsWith("tmp-") ? { ...act, id: "" } : act,
-      )
-    onSave(sanitized)
+    onSave(dailyActivities)
   }
 
   return (
@@ -71,18 +66,23 @@ const DailyActivity: React.FC<DailyActivityProps> = ({ date, activities, onSave,
         )}
         {dailyActivities
           .filter((act) => !act.isDeleted)
-          .map((act, index) => (
+          .map((act) => (
             <div key={act.id} className="flex items-center mb-2">
               <input
                 type="number"
                 step="0.5"
                 value={act.period}
-                onChange={(e) => handlePeriodChange(index, parseFloat(e.target.value))}
+                onChange={(e) =>
+                  handlePeriodChange(
+                    dailyActivities.findIndex((a) => a.id === act.id),
+                    parseFloat(e.target.value),
+                  )
+                }
                 className="border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white p-2 rounded w-24 mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <span className="mr-auto text-slate-900 dark:text-white">時間</span>
               <button
-                onClick={() => handleDeleteActivity(index)}
+                onClick={() => handleDeleteActivity(act.id)}
                 className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white px-3 py-1 rounded transition-colors ml-2"
               >
                 削除

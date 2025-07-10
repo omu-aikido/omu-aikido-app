@@ -41,7 +41,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: |
-            deploy --name record
+            deploy
           secrets: |
             PUBLIC_CLERK_PUBLISHABLE_KEY
             VITE_CLERK_PUBLISHABLE_KEY

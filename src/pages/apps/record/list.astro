@@ -1,6 +1,6 @@
 ---
 import { default as Layout } from "@/src/layouts/layout.astro"
-import ActivityList from "@/src/components/activity-list.astro"
+import ActivityList from "@/rr7/components/component/ActivityList"
 import { style } from "@/src/styles/component"
 
 const startParam = Astro.url.searchParams.get("start")
@@ -88,37 +88,8 @@ function generateSortUrl(newSortOrder: "asc" | "desc"): string {
     endDate={endValue}
     page={currentPage}
     baseUrl={currentUrl}
-    server:defer
-  >
-    <div slot="fallback">
-      <table class={style.table.container()}>
-        <thead class={style.table.thead.container()}>
-          <tr class={style.table.thead.tr()}>
-            <th class={style.table.thead.th()}>日付</th>
-            <th class={style.table.thead.th()}>稽古時間</th>
-            <th class={style.table.thead.th()}>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            Array.from({ length: 8 }).map((_) => (
-              <tr class={style.table.tbody.tr()}>
-                <td class={style.table.tbody.td()}>
-                  <span class="ph-text">&nbsp;</span>
-                </td>
-                <td class={style.table.tbody.td()}>
-                  <span class="ph-text">&nbsp;</span>
-                </td>
-                <td class={style.table.tbody.td()}>
-                  <span class="ph-text">&nbsp;</span>
-                </td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-  </ActivityList>
+    client:load
+  />
 
   <hr />
 

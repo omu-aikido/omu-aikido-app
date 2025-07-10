@@ -22,10 +22,20 @@ export async function updateProfile(input: {
     throw new Error("Unauthorized.")
   }
 
+  // 既存プロファイル取得
+  const existingProfile = await getProfile({ userId: input.id })
+  if (existingProfile instanceof Response) {
+    return new Response("Target profile not found", {
+      status: 404,
+      headers: { "Content-Type": "application/json" },
+    })
+  }
+
   const year = new Date().getFullYear()
   const getGradeAtValidate = input.getGradeAt ? input.getGradeAt : new Date(year, 3, 1, 0, 0, 0, 0)
   const getGradeAtString = new Date(getGradeAtValidate).toISOString()
-  const profile = {
+
+  const updatedMetadata = {
     grade: input.grade,
     getGradeAt: getGradeAtString,
     joinedAt: input.joinedAt,
@@ -35,8 +45,7 @@ export async function updateProfile(input: {
 
   try {
     await clerkClient.users.updateUserMetadata(input.id, {
-      publicMetadata: profile,
-      privateMetadata: {},
+      publicMetadata: updatedMetadata,
     })
 
     return new Response(JSON.stringify({ success: true }), {

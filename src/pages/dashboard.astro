@@ -6,6 +6,7 @@ import { AddRecord } from "@/rr7/components/component/AddRecord"
 import { Recents } from "@/rr7/components/component/Recents"
 import { style } from "@/src/styles/component"
 import type { PagePath } from "@/src/type"
+import NextGrade from "@/rr7/components/component/NextGrade"
 const userId = Astro.locals.auth().userId!
 const apps: PagePath[] = [
   {
@@ -24,7 +25,8 @@ const apps: PagePath[] = [
 ---
 
 <Layout title="ダッシュボード">
-  <h1 class={style.text.title()}>記録追加</h1>
+  <NextGrade client:load />
+  <h1 class={`mt-4 ${style.text.title()}`}>記録追加</h1>
 
   <AddRecord client:load />
 
