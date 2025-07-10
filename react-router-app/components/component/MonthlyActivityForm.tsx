@@ -73,7 +73,6 @@ function MonthlyActivityForm() {
     const newActivities = [...filteredPrevActivities, ...updatedDailyActivities]
     setActivities(newActivities)
 
-    // 日付ごとに件数と合計periodで比較
     const groupByDate = (arr: DailyActivityItem[]) => {
       const map = new Map<string, { count: number; total: number }>()
       arr
@@ -120,10 +119,11 @@ function MonthlyActivityForm() {
       const isContentEqual = (a: DailyActivityItem, b: DailyActivityItem) =>
         compareFields.every((key) => a[key] === b[key])
 
-      // 1. 削除候補: originalに存在し、activitiesでisDeleted:true
-      const deletedCandidates = originalActivities.filter((oa) =>
-        activities.find((a) => a.id === oa.id && a.isDeleted),
-      )
+      // 1. 削除候補: originalに存在し、activitiesでisDeleted:true または activitiesに存在しない
+      const deletedCandidates = originalActivities.filter((oa) => {
+        const currentActivity = activities.find((a) => a.id === oa.id)
+        return !currentActivity || currentActivity.isDeleted
+      })
       // 2. 追加候補: idなし or idがtmp- or originalに存在しない、isDeleted:false
       const addedCandidates = activities.filter(
         (a) =>
@@ -158,13 +158,15 @@ function MonthlyActivityForm() {
 
       activities.forEach((currentAct) => {
         const originalAct = originalActivities.find((oa) => oa.id === currentAct.id)
-        if (
-          originalAct &&
-          !currentAct.isDeleted &&
-          JSON.stringify({ ...originalAct, isDeleted: undefined }) !==
-            JSON.stringify(stripIsDeleted(currentAct))
-        ) {
-          activitiesToUpdate.push(stripIsDeleted(currentAct))
+        if (originalAct && !currentAct.isDeleted) {
+          const fieldsToCompare: (keyof DailyActivityItem)[] = ["date", "period", "userId"]
+          const hasChanges = fieldsToCompare.some(
+            (field) => originalAct[field] !== currentAct[field],
+          )
+
+          if (hasChanges) {
+            activitiesToUpdate.push(stripIsDeleted(currentAct))
+          }
         }
       })
 
@@ -180,20 +182,23 @@ function MonthlyActivityForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
+
       try {
         await res.clone().json()
       } catch {
         setError("不正なレスポンスです。")
       }
       if (!res.ok) {
-        setError("サーバエラー")
+        setError(`サーバエラー`)
         return
       }
 
-      fetchActivities()
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500) // 成功メッセージを表示してからリロード
       setIsChanged(false)
     } catch {
-      setError("一括登録中にエラーが発生しました。")
+      setError(`一括登録中にエラーが発生しました`)
     } finally {
       setLoading(false)
     }

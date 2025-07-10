@@ -64,7 +64,7 @@ export const profileSchema = z.object({
 export const publicMetadataProfileSchema = z.object({
   role: Role.type().optional(),
   grade: z.preprocess((val) => Number(val), z.number()),
-  getGradeAt: z.string().datetime().nullable(), // null を許可
+  getGradeAt: z.string().nullable(),
   joinedAt: z.preprocess((val) => Number(val), z.number()),
   year: z.string(),
 })
@@ -75,10 +75,18 @@ export const createProfileInputSchema = z.object({
   year: z.string(),
   grade: z.preprocess((val) => Number(val), z.number()),
   joinedAt: z.preprocess((val) => Number(val), z.number()),
-  getGradeAt: z.preprocess(
-    (val) => (val instanceof Date ? val.toISOString() : val),
-    z.string().datetime().nullable(),
-  ),
+  getGradeAt: z.preprocess((val) => {
+    if (!val || val === "") return null
+    if (val instanceof Date) return val.toISOString()
+    if (typeof val === "string") {
+      // YYYY-MM-DD形式をISO文字列に変換
+      if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+        return new Date(val + "T00:00:00.000Z").toISOString()
+      }
+      return val
+    }
+    return val
+  }, z.string().nullable()),
 })
 
 // updateProfileInputSchema: updateProfile用の入力スキーマ
@@ -89,17 +97,25 @@ export const updateProfileInputSchema = z.object({
   grade: z.preprocess((val) => Number(val), z.number()).optional(),
   joinedAt: z.preprocess((val) => Number(val), z.number()).optional(),
   getGradeAt: z
-    .preprocess(
-      (val) => (val instanceof Date ? val.toISOString() : val),
-      z.string().datetime().nullable(),
-    )
+    .preprocess((val) => {
+      if (!val || val === "") return null
+      if (val instanceof Date) return val.toISOString()
+      if (typeof val === "string") {
+        // YYYY-MM-DD形式をISO文字列に変換
+        if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+          return new Date(val + "T00:00:00.000Z").toISOString()
+        }
+        return val
+      }
+      return val
+    }, z.string().nullable())
     .optional(),
 })
 export const apiProfileInputSchema = z.object({
   id: z.string(),
   grade: z.preprocess((val) => Number(val), z.number()),
   role: Role.type().optional(),
-  getGradeAt: z.string().datetime().nullable(),
+  getGradeAt: z.string().nullable(),
   joinedAt: z.preprocess((val) => Number(val), z.number()),
   year: z.string(),
 })

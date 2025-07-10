@@ -31,6 +31,14 @@ export const grade = [
     name: "二段",
     grade: -2,
   },
+  {
+    name: "三段",
+    grade: -3,
+  },
+  {
+    name: "四段",
+    grade: -4,
+  },
 ]
 
 export function translateGrade(grade_value: string | number): string {

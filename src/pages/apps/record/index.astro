@@ -1,52 +1,14 @@
 ---
 import { default as Layout } from "@/src/layouts/layout.astro"
-import { userActivity } from "@/src/lib/query/activity"
-import { translateGrade, timeForNextGrade } from "@/src/utils"
 import { AddRecord } from "@/rr7/components/component/AddRecord"
 import { style } from "@/src/styles/component"
-import MonthlyActivittyForm from "@/rr7/components/component/MonthlyActivityForm"
-
-const user = await Astro.locals.currentUser()
-
-if (!user) {
-  return Astro.redirect("/sign-in")
-}
-const userProfile = Astro.locals.profile!
-
-const activityFromPreviousGrade = await userActivity({
-  userId: user.id,
-  start: new Date(
-    userProfile.getGradeAt ?? new Date(new Date(userProfile.joinedAt).getFullYear(), 3, 1),
-  ),
-  end: new Date(),
-})
-const grade = userProfile.grade
-const nextGrade = timeForNextGrade(grade)
-const needToNextGrade = Math.max(
-  0,
-  Math.floor(
-    nextGrade -
-      activityFromPreviousGrade.map((record) => record.period).reduce((a, b) => a + b, 0) / 1.5,
-  ),
-)
+import MonthlyActivityForm from "@/rr7/components/component/MonthlyActivityForm"
+import NextGrade from "@/rr7/components/component/NextGrade"
 ---
 
 <Layout title="きろく">
+  <NextGrade client:load />
   <h1 class={style.text.title()}>きろく</h1>
-
-  {
-    grade > 0 && (
-      <>
-        <h2>
-          {translateGrade(grade >= 0 ? grade - 2 : grade - 1)}
-          {grade >= 0 ? "昇級" : "昇段"}まで
-        </h2>
-        <p>
-          {needToNextGrade} / {nextGrade} 日
-        </p>
-      </>
-    )
-  }
   <hr />
   <h2>追加</h2>
 
@@ -58,6 +20,6 @@ const needToNextGrade = Math.max(
       <h2 class="text-xl font-semibold text-slate-900 dark:text-white">今月の稽古履歴</h2>
       <a href="/apps/record/list" class={style.text.link()}> 全ての稽古履歴 &gt;&gt; </a>
     </div>
-    <MonthlyActivittyForm client:load />
+    <MonthlyActivityForm client:load />
   </div>
 </Layout>

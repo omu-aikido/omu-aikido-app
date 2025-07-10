@@ -93,10 +93,10 @@ export async function createProfile(
 
   try {
     const { id, ...metadata } = input
-    const publicMetadata = publicMetadataProfileSchema.parse({
+    const publicMetadata = {
       ...metadata,
-      role: "member", // 常に"member"で上書き
-    })
+      role: "member" as const,
+    }
     await clerkClient.users.updateUserMetadata(id, { publicMetadata })
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
@@ -121,19 +121,24 @@ export async function updateProfile(
   try {
     // 既存profile取得
     const existingProfile = await getProfile({ userId: input.id })
-    let role: string | undefined = "member"
-    if (!(existingProfile instanceof Response)) {
-      role = input.role ?? existingProfile.role
-    } else {
-      role = input.role ?? "member"
+    if (existingProfile instanceof Response) {
+      return new Response("Profile not found", {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      })
     }
 
     const { id, ...metadata } = input
-    const publicMetadata = publicMetadataProfileSchema.parse({
-      ...metadata,
-      role,
-    })
-    await clerkClient.users.updateUserMetadata(id, { publicMetadata })
+    // 既存データとマージ
+    const updatedMetadata = {
+      grade: metadata.grade ?? existingProfile.grade,
+      getGradeAt: metadata.getGradeAt ?? existingProfile.getGradeAt,
+      joinedAt: metadata.joinedAt ?? existingProfile.joinedAt,
+      year: metadata.year ?? existingProfile.year,
+      role: metadata.role ?? existingProfile.role,
+    }
+
+    await clerkClient.users.updateUserMetadata(id, { publicMetadata: updatedMetadata })
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
