@@ -5,11 +5,11 @@ import { timeForNextGrade } from "@/src/utils"
 import { AddRecord } from "@/rr7/components/component/AddRecord"
 import { style } from "@/src/styles/component"
 import MonthlyActivityForm from "@/rr7/components/component/MonthlyActivityForm"
-import ForNextGrade from "@/src/components/for-next-grade.astro"
+import NextGrade from "@/rr7/components/component/NextGrade"
 ---
 
 <Layout title="きろく">
-  <ForNextGrade />
+  <NextGrade client:load />
   <h1 class={style.text.title()}>きろく</h1>
   <hr />
   <h2>追加</h2>
