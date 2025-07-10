@@ -37,7 +37,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: versions upload
+          command: versions upload --preview-alias preview
           secrets: |
             PUBLIC_CLERK_PUBLISHABLE_KEY
             VITE_CLERK_PUBLISHABLE_KEY
