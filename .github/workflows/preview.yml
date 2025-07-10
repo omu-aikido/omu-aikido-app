@@ -32,16 +32,12 @@ jobs:
           echo "TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}" >> .env
       - name: Build
         run: npm run build --remote
-      - name: Rename Projects Name
-        run: |
-          sed -i 's/"name": "record"/"name": "record-preview"/g' wrangler.jsonc
-      - name: Deploy
+      - name: Deploy to Preview
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: |
-            deploy --name record-preview
+          command: versions upload
           secrets: |
             PUBLIC_CLERK_PUBLISHABLE_KEY
             VITE_CLERK_PUBLISHABLE_KEY
