@@ -18,7 +18,7 @@ const ActivityList: React.FC<Props> = ({ startDate, endDate, page = 1, baseUrl }
   const [activities, setActivities] = useState<Activity[]>([])
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(page)
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+  const [sortOrder] = useState<"asc" | "desc">("desc")
   const itemsPerPage = 8
 
   // Fetch activities from API
@@ -89,7 +89,7 @@ const ActivityList: React.FC<Props> = ({ startDate, endDate, page = 1, baseUrl }
   }
 
   const paginationStyles = {
-    button: (type: "previous" | "next", disabled: boolean) =>
+    button: (disabled: boolean) =>
       `inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
         disabled
           ? "text-slate-400 bg-slate-100 cursor-not-allowed dark:text-slate-600 dark:bg-slate-800"
@@ -160,14 +160,14 @@ const ActivityList: React.FC<Props> = ({ startDate, endDate, page = 1, baseUrl }
           <div className="pagination-controls flex gap-2">
             <button
               onClick={() => handlePageChange(safePage - 1)}
-              className={paginationStyles.button("previous", safePage <= 1)}
+              className={paginationStyles.button(safePage <= 1)}
               disabled={safePage <= 1}
             >
               前へ
             </button>
             <button
               onClick={() => handlePageChange(safePage + 1)}
-              className={paginationStyles.button("next", safePage >= totalPages)}
+              className={paginationStyles.button(safePage >= totalPages)}
               disabled={safePage >= totalPages}
             >
               次へ

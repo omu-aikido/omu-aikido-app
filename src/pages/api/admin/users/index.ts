@@ -31,8 +31,7 @@ export const GET = async (context: APIContext) => {
         headers: { "Content-Type": "application/json" },
       },
     )
-  } catch (error) {
-    console.error("Error fetching users:", error)
+  } catch {
     return new Response("Internal Server Error", { status: 500 })
   }
 }

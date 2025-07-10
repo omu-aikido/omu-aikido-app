@@ -12,11 +12,6 @@ interface ApiResponse {
   error?: string
 }
 
-interface ProfileResponse {
-  success?: boolean
-  profile?: { id: string }
-}
-
 const getUrlParams = () => {
   const urlParams = new URLSearchParams(window.location.search)
   return {

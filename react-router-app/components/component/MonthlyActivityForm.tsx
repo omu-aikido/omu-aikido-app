@@ -183,7 +183,6 @@ function MonthlyActivityForm() {
         body: JSON.stringify(payload),
       })
 
-      let responseData
       try {
         await res.clone().json()
       } catch {
@@ -198,7 +197,7 @@ function MonthlyActivityForm() {
         window.location.reload()
       }, 1500) // 成功メッセージを表示してからリロード
       setIsChanged(false)
-    } catch (error) {
+    } catch {
       setError(`一括登録中にエラーが発生しました`)
     } finally {
       setLoading(false)
