@@ -1,4 +1,4 @@
-name: Preview
+name: Staging Environment
 
 on:
   pull_request:
@@ -36,9 +36,3 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: versions upload --preview-alias preview
-          secrets: |
-            PUBLIC_CLERK_PUBLISHABLE_KEY
-            VITE_CLERK_PUBLISHABLE_KEY
-            CLERK_SECRET_KEY
-            TURSO_DATABASE_URL
-            TURSO_AUTH_TOKEN
