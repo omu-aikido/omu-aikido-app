@@ -1,16 +1,13 @@
-name: Deploy to Cloudflare Worker
+name: Preview
 
 on:
   pull_request:
-    types:
-      - closed
-    branches:
-      - 'main'
+    types: [opened, synchronize, reopened]
 
 jobs:
-  deploy:
-    if: github.event.pull_request.merged == true
+  preview:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged != true
     environment: prod
     name: Deploy
     permissions:
@@ -33,13 +30,12 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build --remote
-      - name: Deploy
+      - name: Deploy to Preview
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: |
-            deploy --name record
+          command: versions upload --preview-alias preview
           secrets: |
             PUBLIC_CLERK_PUBLISHABLE_KEY
             VITE_CLERK_PUBLISHABLE_KEY
