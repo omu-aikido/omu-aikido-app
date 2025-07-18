@@ -1,5 +1,5 @@
 export default {
-  schema: "./db/schema.ts",
+  schema: "./app/db/schema.ts",
   out: "./migrations",
   dialect: "turso",
   dbCredentials: {

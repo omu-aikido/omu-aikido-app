@@ -7,5 +7,14 @@
   "printWidth": 100,
   "useTabs": false,
   "endOfLine": "lf",
-  "plugins": ["prettier-plugin-astro"]
+  "arrowParens": "avoid",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "embeddedLanguageFormatting": "auto",
+  "htmlWhitespaceSensitivity": "css",
+  "insertPragma": false,
+  "proseWrap": "preserve",
+  "quoteProps": "as-needed",
+  "requirePragma": false,
+  "plugins": []
 }

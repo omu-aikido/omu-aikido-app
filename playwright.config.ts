@@ -12,45 +12,38 @@ import { defineConfig, devices } from "@playwright/test"
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: "./tests",
+  testDir: "tests/e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "http://localhost:4173",
     trace: "on-first-retry",
   },
 
   projects: [
     {
-      name: "global setup",
-      testMatch: /global\.setup\.ts/,
+      name: "authsetup",
+      testMatch: "tests/e2e/global.setup.ts",
     },
     {
       name: "Unauthorized",
-      testMatch: /.*sec\.spec\.ts/,
+      testMatch: /.*unauth\.spec\.ts/,
       use: { ...devices["Desktop Chrome"] },
+      dependencies: ["authsetup"],
     },
     {
       name: "Authorized",
       testMatch: /.*auth\.spec\.ts/,
       use: { ...devices["Desktop Chrome"], storageState: "playwright/.clerk/user.json" },
     },
-    {
-      name: "Android",
-      use: { ...devices["Pixel 5"], storageState: "playwright/.clerk/user.json" },
-    },
-    {
-      name: "iPhone",
-      use: { ...devices["iPhone 12"], storageState: "playwright/.clerk/user.json" },
-    },
   ],
 
   webServer: {
-    command: "npm run preview",
-    url: "http://localhost:3000",
+    command: "pnpm preview",
+    url: "http://localhost:4173",
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },

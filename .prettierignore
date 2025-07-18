@@ -1,14 +1,55 @@
-dist/
+# Dependencies
 node_modules/
-.astro/
-*.min.js
-*.min.css
+pnpm-lock.yaml
 package-lock.json
 yarn.lock
-pnpm-lock.yaml
-wrangler.toml
+
+# Build outputs
+dist/
+build/
+.react-router/
+.wrangler/
+
+# Generated files
+worker-configuration.d.ts
+*.tsbuildinfo
+
+# Minified files
+*.min.js
+*.min.css
+
+# Environment files
 .env*
+.dev.vars
+
+# Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
 migrations/
+*.db
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# CI/CD
 .github/
-.worker-configuration.d.ts
+
+# Cloudflare
+wrangler.toml
+
+# Coverage
+coverage/
+
+# Temporary files
+*.tmp
+*.temp

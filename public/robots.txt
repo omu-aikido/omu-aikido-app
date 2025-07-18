@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /dashboard
-Disallow: /account
-Disallow: /admin
-Disallow: /apps
-Disallow: /news
-
-Sitemap: https://app.omu-aikido.com/sitemap-index.xml
