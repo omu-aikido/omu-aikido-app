@@ -1,25 +1,55 @@
 {
   "files.associations": {
+    "wrangler.json": "jsonc",
     "*.css": "tailwindcss"
   },
   "tailwindCSS.experimental.classRegex": [["tv\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]],
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
   },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": ["."],
   "[astro]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "editor.detectIndentation": false,
   "editor.tabSize": 2,
+  "editor.insertSpaces": true,
   "prettier.configPath": ".prettierrc.json",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "emmet.includeLanguages": {
+    "typescript": "html",
+    "typescriptreact": "html"
+  },
+  "emmet.triggerExpansionOnTab": true,
   "[github-actions-workflow]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
