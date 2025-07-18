@@ -1,0 +1,341 @@
+import { getAuth } from "@clerk/react-router/ssr.server"
+import { addMonths, eachDayOfInterval, endOfMonth, format, startOfMonth, subMonths } from "date-fns"
+import { useEffect, useMemo, useState } from "react"
+import { redirect, useActionData, useFetcher, useSearchParams } from "react-router"
+
+import MonthlyActivityList from "../components/component/MonthlyActivityList"
+import MonthlyCalendarGrid from "../components/component/MonthlyCalendarGrid"
+import MonthNavigation from "../components/component/MonthNavigation"
+
+import type { Route } from "./+types/record"
+
+import DailyActivity from "~/components/component/DailyActivity"
+import YearMonthSelectorInline from "~/components/component/YearMonthSelector"
+import type { ActivityType } from "~/db/schema"
+import {
+  createActivities,
+  deleteActivities,
+  getActivitiesByDateRange,
+  updateActivities,
+} from "~/lib/query/activity"
+import type { DailyActivityItem } from "~/type"
+
+function stripIsDeleted(obj: DailyActivityItem): ActivityType {
+  return {
+    id: obj.id,
+    userId: obj.userId,
+    date: obj.date,
+    period: obj.period,
+    createAt: obj.createAt,
+    updatedAt: obj.updatedAt,
+  } as ActivityType
+}
+
+export async function loader(args: Route.LoaderArgs) {
+  const { request, context } = args
+  const auth = await getAuth(args)
+  const userId = auth.userId!
+
+  if (!userId) return redirect("/sign-in?redirect_url=" + args.request.url)
+
+  const url = new URL(request.url)
+  const currentMonth = url.searchParams.get("month") || format(new Date(), "yyyy-MM")
+  const [year, month] = currentMonth.split("-")
+  const date = new Date(parseInt(year), parseInt(month) - 1)
+
+  const startDate = startOfMonth(date).toISOString()
+  const endDate = endOfMonth(date).toISOString()
+
+  try {
+    const activities: ActivityType[] = await getActivitiesByDateRange({
+      userId,
+      startDate,
+      endDate,
+      env: context.cloudflare.env,
+    })
+
+    return {
+      userId,
+      activities: activities.map(act => ({ ...act, isDeleted: false })),
+      currentMonth: format(date, "yyyy-MM"),
+    }
+  } catch {
+    return {
+      userId,
+      currentMonth: format(date, "yyyy-MM"),
+      error: "データの取得に失敗しました",
+    }
+  }
+}
+
+export async function action(args: Route.ActionArgs) {
+  const { request, context } = args
+  const formData = await request.formData()
+  const actionType = formData.get("actionType")
+  const auth = await getAuth(args)
+  const userId = auth.userId!
+
+  if (actionType === "batchUpdate") {
+    const payload = JSON.parse(formData.get("payload") as string)
+
+    try {
+      if (payload.added && payload.added.length > 0) {
+        await createActivities({ userId, activities: payload.added, env: context.cloudflare.env })
+      }
+      if (payload.updated && payload.updated.length > 0) {
+        await updateActivities({ userId, activities: payload.updated, env: context.cloudflare.env })
+      }
+      if (payload.deleted && payload.deleted.length > 0) {
+        await deleteActivities({ userId, ids: payload.deleted, env: context.cloudflare.env })
+      }
+
+      return redirect(`/record?month=${formData.get("currentMonth")}`)
+    } catch {
+      return { error: `登録に失敗しました。` }
+    }
+  }
+
+  return null
+}
+
+function MonthlyActivityForm({ loaderData }: Route.ComponentProps) {
+  // totalPeriod を受け取る
+  const {
+    userId,
+    activities: initialActivities,
+    currentMonth: loadedMonth,
+    error: loaderError,
+  } = loaderData
+  const actionData = useActionData<typeof action>()
+  const fetcher = useFetcher()
+
+  const [originalActivities, setOriginalActivities] = useState<DailyActivityItem[]>(
+    initialActivities || [],
+  )
+  const [currentActivities, setActivities] = useState<DailyActivityItem[]>(initialActivities || [])
+
+  useEffect(() => {
+    setOriginalActivities(initialActivities || [])
+    setActivities(initialActivities || [])
+  }, [initialActivities])
+
+  const currentMonth = useMemo(() => {
+    const [year, month] = loadedMonth.split("-")
+    return new Date(parseInt(year), parseInt(month) - 1)
+  }, [loadedMonth])
+
+  const error = loaderError || actionData?.error || null
+  const [showDailyActivityModal, setShowDailyActivityModal] = useState(false)
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const handleSelectYearMonth = (date: Date) => {
+    setSearchParams({
+      ...Object.fromEntries(searchParams.entries()),
+      month: format(date, "yyyy-MM"),
+    })
+  }
+
+  const isChanged = useMemo(() => {
+    const groupByDate = (arr: DailyActivityItem[]) => {
+      const map = new Map<string, { count: number; total: number }>()
+      arr
+        .filter(a => !a.isDeleted)
+        .forEach(a => {
+          const d = a.date
+          if (!map.has(d)) map.set(d, { count: 0, total: 0 })
+          const v = map.get(d)!
+          map.set(d, {
+            count: v.count + 1,
+            total: v.total + (typeof a.period === "number" ? a.period : 0),
+          })
+        })
+      return map
+    }
+    const mapNew = groupByDate(currentActivities)
+    const mapOrig = groupByDate(originalActivities)
+    const allDates = new Set([...mapNew.keys(), ...mapOrig.keys()])
+    for (const d of allDates) {
+      const n = mapNew.get(d) || { count: 0, total: 0 }
+      const o = mapOrig.get(d) || { count: 0, total: 0 }
+      if (n.count !== o.count || n.total !== o.total) {
+        return true
+      }
+    }
+    return false
+  }, [currentActivities, originalActivities])
+
+  const handleSaveDailyActivities = (updatedDailyActivities: DailyActivityItem[]) => {
+    const dateToUpdate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : null
+    if (!dateToUpdate) return
+    const filteredPrevActivities = currentActivities.filter(act => act.date !== dateToUpdate)
+    const newActivities = [...filteredPrevActivities, ...updatedDailyActivities] // updatedDailyActivityModal を updatedDailyActivities に修正
+    setActivities(newActivities)
+    setShowDailyActivityModal(false)
+  }
+
+  const prepareBatchUpdatePayload = () => {
+    if (!userId) return null
+
+    const compareFields: (keyof DailyActivityItem)[] = ["date", "period", "userId"]
+    const isContentEqual = (a: DailyActivityItem, b: DailyActivityItem) =>
+      compareFields.every(key => a[key] === b[key])
+
+    const deletedCandidates = originalActivities.filter(oa => {
+      const currentActivity = currentActivities.find(a => a.id === oa.id)
+      return !currentActivity || currentActivity.isDeleted
+    })
+
+    const addedCandidates = currentActivities.filter(
+      a =>
+        (!a.id ||
+          (typeof a.id === "string" && a.id.startsWith("tmp-")) ||
+          !originalActivities.some(oa => oa.id === a.id)) &&
+        !a.isDeleted,
+    )
+
+    const matchedPairs: { delIdx: number; addIdx: number }[] = []
+    deletedCandidates.forEach((del, delIdx) => {
+      const addIdx = addedCandidates.findIndex(add => isContentEqual(add, del))
+      if (addIdx !== -1) {
+        matchedPairs.push({ delIdx, addIdx })
+      }
+    })
+
+    const filteredDeleted = deletedCandidates.filter(
+      (_, idx) => !matchedPairs.some(m => m.delIdx === idx),
+    )
+    const filteredAdded = addedCandidates.filter(
+      (_, idx) => !matchedPairs.some(m => m.addIdx === idx),
+    )
+
+    const activitiesToAdd: ActivityType[] = filteredAdded.map(a => ({
+      ...stripIsDeleted(a),
+      id: typeof a.id === "string" && a.id.startsWith("tmp-") ? "" : a.id,
+    }))
+
+    const activitiesToUpdate: ActivityType[] = []
+    currentActivities.forEach(currentAct => {
+      const originalAct = originalActivities.find(oa => oa.id === currentAct.id)
+      if (originalAct && !currentAct.isDeleted) {
+        const fieldsToCompare: (keyof DailyActivityItem)[] = ["date", "period", "userId"]
+        const hasChanges = fieldsToCompare.some(field => originalAct[field] !== currentAct[field])
+        if (hasChanges) {
+          activitiesToUpdate.push(stripIsDeleted(currentAct))
+        }
+      }
+    })
+
+    const activitiesToDelete: string[] = filteredDeleted.map(a => a.id!).filter(Boolean)
+
+    return {
+      userId,
+      added: activitiesToAdd,
+      updated: activitiesToUpdate,
+      deleted: activitiesToDelete,
+    }
+  }
+
+  const daysInMonth = eachDayOfInterval({
+    start: startOfMonth(currentMonth),
+    end: endOfMonth(currentMonth),
+  })
+
+  const handlePrevMonth = () => {
+    const newMonth = subMonths(currentMonth, 1)
+    window.location.href = `/record?month=${format(newMonth, "yyyy-MM")}`
+  }
+
+  const handleNextMonth = () => {
+    const newMonth = addMonths(currentMonth, 1)
+    window.location.href = `/record?month=${format(newMonth, "yyyy-MM")}`
+  }
+
+  const handleDayClick = (date: Date) => {
+    setSelectedDate(date)
+    setShowDailyActivityModal(true)
+  }
+
+  const dailyActivitiesForSelectedDate = selectedDate
+    ? currentActivities.filter(act => act.date === format(selectedDate, "yyyy-MM-dd"))
+    : []
+
+  return (
+    <div className="min-h-screen transition-colors duration-200 relative">
+      <>
+        <h1 className="text-2xl font-bold text-center mb-8 text-slate-800 dark:text-slate-200">
+          記録一覧
+        </h1>
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-800 rounded-lg p-4 mb-6">
+            <p className="text-red-600 dark:text-red-400 text-center">エラー: {error}</p>
+          </div>
+        )}
+        <MonthNavigation
+          currentMonth={currentMonth}
+          onPrev={handlePrevMonth}
+          onNext={handleNextMonth}
+          onSelect={handleSelectYearMonth}
+          YearMonthSelector={YearMonthSelectorInline}
+        />
+        <div className="overflow-x-auto w-full sm:block hidden">
+          <fetcher.Form method="post">
+            <button
+              type="submit"
+              className={`rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 w-full ${isChanged ? "bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-400 cursor-not-allowed"}`}
+              disabled={!isChanged || fetcher.state == "submitting"}
+            >
+              登録
+            </button>
+            <input type="hidden" name="actionType" value="batchUpdate" />
+            <input type="hidden" name="currentMonth" value={format(currentMonth, "yyyy-MM")} />
+            <input
+              type="hidden"
+              name="payload"
+              value={JSON.stringify(prepareBatchUpdatePayload())}
+            />
+            <MonthlyCalendarGrid
+              daysInMonth={daysInMonth}
+              currentActivities={currentActivities}
+              onDayClick={handleDayClick}
+            />
+          </fetcher.Form>
+        </div>
+        <div className="w-full block sm:hidden">
+          <MonthlyActivityList
+            daysInMonth={daysInMonth}
+            currentActivities={currentActivities}
+            onDayClick={handleDayClick}
+          />
+          <fetcher.Form method="post">
+            <input type="hidden" name="actionType" value="batchUpdate" />
+            <input type="hidden" name="currentMonth" value={format(currentMonth, "yyyy-MM")} />
+            <input
+              type="hidden"
+              name="payload"
+              value={JSON.stringify(prepareBatchUpdatePayload())}
+            />
+            <button
+              type="submit"
+              className={`rounded-lg px-5 py-2 fixed right-6 bottom-6 font-medium text-lg transition-colors duration-200 shadow-sm ${isChanged ? "bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-400 cursor-not-allowed"} `}
+              disabled={!isChanged || fetcher.state == "submitting"}
+            >
+              登録
+            </button>
+          </fetcher.Form>
+        </div>
+      </>
+      {showDailyActivityModal && selectedDate && (
+        <DailyActivity
+          userId={userId}
+          date={selectedDate}
+          activities={dailyActivitiesForSelectedDate}
+          onSave={handleSaveDailyActivities}
+          onClose={() => setShowDailyActivityModal(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+export default MonthlyActivityForm
