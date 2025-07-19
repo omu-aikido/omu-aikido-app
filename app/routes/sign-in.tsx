@@ -72,32 +72,32 @@ export default function SignInPage() {
         <div>
           <label htmlFor="email" className={style.form.label({ necessary: true })}>
             メールアドレス
-            <input
-              id="email"
-              type="email"
-              name="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              className={style.form.input()}
-            />
           </label>
+          <input
+            id="email"
+            type="email"
+            name="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+            className={style.form.input()}
+          />
         </div>
         <div>
           <label htmlFor="password" className={style.form.label({ necessary: true })}>
             パスワード
-            <input
-              id="password"
-              type="password"
-              name="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              className={style.form.input()}
-            />
           </label>
+          <input
+            id="password"
+            type="password"
+            name="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+            className={style.form.input()}
+          />
         </div>
         {error && (
           <div className={style.text.error()}>
@@ -107,7 +107,7 @@ export default function SignInPage() {
         <button
           type="submit"
           disabled={loading}
-          className={style.button.default({ type: "primary", disabled: loading })}
+          className={style.button.default({ type: "primary", disabled: loading, class: "w-full" })}
         >
           {loading ? "サインイン中..." : "サインイン"}
         </button>
