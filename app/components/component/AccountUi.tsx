@@ -20,10 +20,7 @@ export function AccountUi({ apps }: AccountUiProps) {
     <div className="m-0 p-0">
       <SignedIn>
         {user && (
-          <Link
-            className={`${style.header.clerk.name()} p-2 rounded-md hover:bg-slate-300 dark:hover:bg-slate-700 `}
-            to="/account"
-          >
+          <Link className={style.header.clerk.name()} to="/account">
             <img
               src={user.imageUrl}
               alt={`Profile picture of ${user.firstName} ${user.lastName}`}
@@ -38,18 +35,15 @@ export function AccountUi({ apps }: AccountUiProps) {
         <hr className="my-2 border-slate-200 dark:border-slate-700" />
         {apps.map(app => (
           <div className="flex flex-col" key={app.href}>
-            <Link
-              className={`${style.header.link()} p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-transparent hover:border-slate-400 dark:hover:border-slate-700`}
-              to={app.href}
-            >
+            <Link className={style.header.link()} to={app.href}>
               {app.name}
             </Link>
           </div>
         ))}
         <hr />
 
-        <div
-          className={`hover:cursor-pointer p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-transparent hover:border-slate-400 dark:hover:border-slate-500`}
+        <button
+          className={style.button.default({ type: "secondary", className: "w-full" })}
           aria-label="サインアウト"
           onClick={e => {
             e.preventDefault()
@@ -60,12 +54,12 @@ export function AccountUi({ apps }: AccountUiProps) {
           }}
         >
           <SignOutButton>
-            <span className="flex flex-row items-center">
+            <span className="flex flex-row items-center justify-center">
               サインアウト
               <Icon icon="sign-out" />
             </span>
           </SignOutButton>
-        </div>
+        </button>
       </SignedIn>
     </div>
   )

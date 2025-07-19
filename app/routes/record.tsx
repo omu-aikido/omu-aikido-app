@@ -18,19 +18,12 @@ import {
   getActivitiesByDateRange,
   updateActivities,
 } from "~/lib/query/activity"
+import { style } from "~/styles/component"
 import type { DailyActivityItem } from "~/type"
 
-function stripIsDeleted(obj: DailyActivityItem): ActivityType {
-  return {
-    id: obj.id,
-    userId: obj.userId,
-    date: obj.date,
-    period: obj.period,
-    createAt: obj.createAt,
-    updatedAt: obj.updatedAt,
-  } as ActivityType
 }
 
+// MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
   const { request, context } = args
   const auth = await getAuth(args)
@@ -68,6 +61,7 @@ export async function loader(args: Route.LoaderArgs) {
   }
 }
 
+// MARK: Action
 export async function action(args: Route.ActionArgs) {
   const { request, context } = args
   const formData = await request.formData()
@@ -98,7 +92,8 @@ export async function action(args: Route.ActionArgs) {
   return null
 }
 
-function MonthlyActivityForm({ loaderData }: Route.ComponentProps) {
+// MARK: Component
+export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps) {
   // totalPeriod を受け取る
   const {
     userId,
@@ -119,39 +114,15 @@ function MonthlyActivityForm({ loaderData }: Route.ComponentProps) {
     setActivities(initialActivities || [])
   }, [initialActivities])
 
-  const currentMonth = useMemo(() => {
-    const [year, month] = loadedMonth.split("-")
-    return new Date(parseInt(year), parseInt(month) - 1)
-  }, [loadedMonth])
-
   const error = loaderError || actionData?.error || null
   const [showDailyActivityModal, setShowDailyActivityModal] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [searchParams, setSearchParams] = useSearchParams()
 
-  const handleSelectYearMonth = (date: Date) => {
-    setSearchParams({
-      ...Object.fromEntries(searchParams.entries()),
-      month: format(date, "yyyy-MM"),
-    })
-  }
+  // 新しいフックを呼び出す
+  const { currentMonth, handleSelectYearMonth, daysInMonth, handlePrevMonth, handleNextMonth } =
+    useMonthlyNavigation(loadedMonth)
 
   const isChanged = useMemo(() => {
-    const groupByDate = (arr: DailyActivityItem[]) => {
-      const map = new Map<string, { count: number; total: number }>()
-      arr
-        .filter(a => !a.isDeleted)
-        .forEach(a => {
-          const d = a.date
-          if (!map.has(d)) map.set(d, { count: 0, total: 0 })
-          const v = map.get(d)!
-          map.set(d, {
-            count: v.count + 1,
-            total: v.total + (typeof a.period === "number" ? a.period : 0),
-          })
-        })
-      return map
-    }
     const mapNew = groupByDate(currentActivities)
     const mapOrig = groupByDate(originalActivities)
     const allDates = new Set([...mapNew.keys(), ...mapOrig.keys()])
@@ -169,86 +140,9 @@ function MonthlyActivityForm({ loaderData }: Route.ComponentProps) {
     const dateToUpdate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : null
     if (!dateToUpdate) return
     const filteredPrevActivities = currentActivities.filter(act => act.date !== dateToUpdate)
-    const newActivities = [...filteredPrevActivities, ...updatedDailyActivities] // updatedDailyActivityModal を updatedDailyActivities に修正
+    const newActivities = [...filteredPrevActivities, ...updatedDailyActivities]
     setActivities(newActivities)
     setShowDailyActivityModal(false)
-  }
-
-  const prepareBatchUpdatePayload = () => {
-    if (!userId) return null
-
-    const compareFields: (keyof DailyActivityItem)[] = ["date", "period", "userId"]
-    const isContentEqual = (a: DailyActivityItem, b: DailyActivityItem) =>
-      compareFields.every(key => a[key] === b[key])
-
-    const deletedCandidates = originalActivities.filter(oa => {
-      const currentActivity = currentActivities.find(a => a.id === oa.id)
-      return !currentActivity || currentActivity.isDeleted
-    })
-
-    const addedCandidates = currentActivities.filter(
-      a =>
-        (!a.id ||
-          (typeof a.id === "string" && a.id.startsWith("tmp-")) ||
-          !originalActivities.some(oa => oa.id === a.id)) &&
-        !a.isDeleted,
-    )
-
-    const matchedPairs: { delIdx: number; addIdx: number }[] = []
-    deletedCandidates.forEach((del, delIdx) => {
-      const addIdx = addedCandidates.findIndex(add => isContentEqual(add, del))
-      if (addIdx !== -1) {
-        matchedPairs.push({ delIdx, addIdx })
-      }
-    })
-
-    const filteredDeleted = deletedCandidates.filter(
-      (_, idx) => !matchedPairs.some(m => m.delIdx === idx),
-    )
-    const filteredAdded = addedCandidates.filter(
-      (_, idx) => !matchedPairs.some(m => m.addIdx === idx),
-    )
-
-    const activitiesToAdd: ActivityType[] = filteredAdded.map(a => ({
-      ...stripIsDeleted(a),
-      id: typeof a.id === "string" && a.id.startsWith("tmp-") ? "" : a.id,
-    }))
-
-    const activitiesToUpdate: ActivityType[] = []
-    currentActivities.forEach(currentAct => {
-      const originalAct = originalActivities.find(oa => oa.id === currentAct.id)
-      if (originalAct && !currentAct.isDeleted) {
-        const fieldsToCompare: (keyof DailyActivityItem)[] = ["date", "period", "userId"]
-        const hasChanges = fieldsToCompare.some(field => originalAct[field] !== currentAct[field])
-        if (hasChanges) {
-          activitiesToUpdate.push(stripIsDeleted(currentAct))
-        }
-      }
-    })
-
-    const activitiesToDelete: string[] = filteredDeleted.map(a => a.id!).filter(Boolean)
-
-    return {
-      userId,
-      added: activitiesToAdd,
-      updated: activitiesToUpdate,
-      deleted: activitiesToDelete,
-    }
-  }
-
-  const daysInMonth = eachDayOfInterval({
-    start: startOfMonth(currentMonth),
-    end: endOfMonth(currentMonth),
-  })
-
-  const handlePrevMonth = () => {
-    const newMonth = subMonths(currentMonth, 1)
-    window.location.href = `/record?month=${format(newMonth, "yyyy-MM")}`
-  }
-
-  const handleNextMonth = () => {
-    const newMonth = addMonths(currentMonth, 1)
-    window.location.href = `/record?month=${format(newMonth, "yyyy-MM")}`
   }
 
   const handleDayClick = (date: Date) => {
@@ -263,9 +157,7 @@ function MonthlyActivityForm({ loaderData }: Route.ComponentProps) {
   return (
     <div className="min-h-screen transition-colors duration-200 relative">
       <>
-        <h1 className="text-2xl font-bold text-center mb-8 text-slate-800 dark:text-slate-200">
-          記録一覧
-        </h1>
+        <h1 className={style.text.sectionTitle()}>記録一覧</h1>
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-800 rounded-lg p-4 mb-6">
             <p className="text-red-600 dark:text-red-400 text-center">エラー: {error}</p>
@@ -292,7 +184,9 @@ function MonthlyActivityForm({ loaderData }: Route.ComponentProps) {
             <input
               type="hidden"
               name="payload"
-              value={JSON.stringify(prepareBatchUpdatePayload())}
+              value={JSON.stringify(
+                prepareBatchUpdatePayload(userId, originalActivities, currentActivities),
+              )}
             />
             <MonthlyCalendarGrid
               daysInMonth={daysInMonth}
@@ -313,7 +207,9 @@ function MonthlyActivityForm({ loaderData }: Route.ComponentProps) {
             <input
               type="hidden"
               name="payload"
-              value={JSON.stringify(prepareBatchUpdatePayload())}
+              value={JSON.stringify(
+                prepareBatchUpdatePayload(userId, originalActivities, currentActivities),
+              )}
             />
             <button
               type="submit"
@@ -338,4 +234,139 @@ function MonthlyActivityForm({ loaderData }: Route.ComponentProps) {
   )
 }
 
-export default MonthlyActivityForm
+// MARK: Helper
+
+function useMonthlyNavigation(loadedMonth: string) {
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const currentMonth = useMemo(() => {
+    const [year, month] = loadedMonth.split("-")
+    return new Date(parseInt(year), parseInt(month) - 1)
+  }, [loadedMonth])
+
+  const handleSelectYearMonth = (date: Date) => {
+    setSearchParams({
+      ...Object.fromEntries(searchParams.entries()),
+      month: format(date, "yyyy-MM"),
+    })
+  }
+
+  const daysInMonth = useMemo(
+    () =>
+      eachDayOfInterval({
+        start: startOfMonth(currentMonth),
+        end: endOfMonth(currentMonth),
+      }),
+    [currentMonth],
+  )
+
+  const handlePrevMonth = () => {
+    const newMonth = subMonths(currentMonth, 1)
+    window.location.href = `/record?month=${format(newMonth, "yyyy-MM")}`
+  }
+
+  const handleNextMonth = () => {
+    const newMonth = addMonths(currentMonth, 1)
+    window.location.href = `/record?month=${format(newMonth, "yyyy-MM")}`
+  }
+
+  return {
+    currentMonth,
+    handleSelectYearMonth,
+    daysInMonth,
+    handlePrevMonth,
+    handleNextMonth,
+  }
+}
+
+function prepareBatchUpdatePayload(
+  userId: string | undefined,
+  originalActivities: DailyActivityItem[],
+  currentActivities: DailyActivityItem[],
+) {
+  if (!userId) return null
+
+  const deletedCandidates = originalActivities.filter(oa => {
+    const currentActivity = currentActivities.find(a => a.id === oa.id)
+    return !currentActivity || currentActivity.isDeleted
+  })
+
+  const addedCandidates = currentActivities.filter(
+    a =>
+      (!a.id ||
+        (typeof a.id === "string" && a.id.startsWith("tmp-")) ||
+        !originalActivities.some(oa => oa.id === a.id)) &&
+      !a.isDeleted,
+  )
+
+  const matchedPairs: { delIdx: number; addIdx: number }[] = []
+  deletedCandidates.forEach((del, delIdx) => {
+    const addIdx = addedCandidates.findIndex(add => isContentEqual(add, del))
+    if (addIdx !== -1) {
+      matchedPairs.push({ delIdx, addIdx })
+    }
+  })
+
+  const filteredDeleted = deletedCandidates.filter(
+    (_, idx) => !matchedPairs.some(m => m.delIdx === idx),
+  )
+  const filteredAdded = addedCandidates.filter(
+    (_, idx) => !matchedPairs.some(m => m.addIdx === idx),
+  )
+
+  const activitiesToAdd: ActivityType[] = filteredAdded.map(a => ({
+    ...stripIsDeleted(a),
+    id: typeof a.id === "string" && a.id.startsWith("tmp-") ? "" : a.id,
+  }))
+
+  const activitiesToUpdate: ActivityType[] = []
+  currentActivities.forEach(currentAct => {
+    const originalAct = originalActivities.find(oa => oa.id === currentAct.id)
+    if (originalAct && !currentAct.isDeleted) {
+      const fieldsToCompare: (keyof DailyActivityItem)[] = ["date", "period", "userId"]
+      const hasChanges = fieldsToCompare.some(field => originalAct[field] !== currentAct[field])
+      if (hasChanges) {
+        activitiesToUpdate.push(stripIsDeleted(currentAct))
+      }
+    }
+  })
+
+  const activitiesToDelete: string[] = filteredDeleted.map(a => a.id!).filter(Boolean)
+
+  return {
+    userId,
+    added: activitiesToAdd,
+    updated: activitiesToUpdate,
+    deleted: activitiesToDelete,
+  }
+}
+function stripIsDeleted(obj: DailyActivityItem): ActivityType {
+  return {
+    id: obj.id,
+    userId: obj.userId,
+    date: obj.date,
+    period: obj.period,
+    createAt: obj.createAt,
+    updatedAt: obj.updatedAt,
+  } as ActivityType
+}
+
+const groupByDate = (arr: DailyActivityItem[]) => {
+  const map = new Map<string, { count: number; total: number }>()
+  arr
+    .filter(a => !a.isDeleted)
+    .forEach(a => {
+      const d = a.date
+      if (!map.has(d)) map.set(d, { count: 0, total: 0 })
+      const v = map.get(d)!
+      map.set(d, {
+        count: v.count + 1,
+        total: v.total + (typeof a.period === "number" ? a.period : 0),
+      })
+    })
+  return map
+}
+
+const compareFields: (keyof DailyActivityItem)[] = ["date", "period", "userId"]
+const isContentEqual = (a: DailyActivityItem, b: DailyActivityItem) =>
+  compareFields.every(key => a[key] === b[key])

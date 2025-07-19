@@ -6,12 +6,15 @@ import { redirect } from "react-router"
 import type { Route } from "./+types/account"
 
 import { NavigationTab } from "~/components/ui/NavigationTab"
+import { style } from "~/styles/component"
 
+// MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
   const { userId } = await getAuth(args)
   if (!userId) return redirect("/sign-in?redirect_url=" + args.request.url)
 }
 
+// MARK: Component
 export default function ProfileForm() {
   const { isLoaded, isSignedIn, user } = useUser()
   const [isEditing, setIsEditing] = useState(false)
@@ -21,6 +24,11 @@ export default function ProfileForm() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
+  const [visible, setVisible] = useState(false)
+
+  const toggleVisibility = () => {
+    setVisible(v => !v)
+  }
 
   const tab = [
     { to: "/account", label: "プロフィール" },
@@ -90,70 +98,87 @@ export default function ProfileForm() {
       <NavigationTab tabs={tab} />
       {!isEditing ? (
         <>
-          <button
-            type="button"
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-            onClick={() => setIsEditing(true)}
-          >
+          <label className="block mb-1 font-medium">現在のパスワード</label>
+          <input
+            type="password"
+            className={style.form.input({ disabled: true })}
+            value="*****************"
+            onChange={e => setCurrentPassword(e.target.value)}
+            required
+            disabled
+          />
+          <button type="button" className={style.form.button()} onClick={() => setIsEditing(true)}>
             パスワードを変更
           </button>
         </>
       ) : (
-        <form onSubmit={handlePasswordUpdate} className="space-y-4">
+        <form onSubmit={handlePasswordUpdate} className={style.form.container()}>
           <div>
-            <label className="block mb-1 font-medium">現在のパスワード</label>
+            <label className={style.form.label()}>現在のパスワード</label>
             <input
-              type="password"
-              className="w-full border rounded px-3 py-2"
+              type={visible ? "text" : "password"}
+              className={style.form.input()}
               value={currentPassword}
+              autoComplete="current-password"
+              name="current-password"
               onChange={e => setCurrentPassword(e.target.value)}
               required
             />
           </div>
           <div>
-            <label className="block mb-1 font-medium">新規パスワード</label>
+            <label className={style.form.label()}>新規パスワード</label>
             <input
-              type="password"
-              className="w-full border rounded px-3 py-2"
+              type={visible ? "text" : "password"}
+              className={style.form.input()}
               value={newPassword}
+              autoComplete="new-password"
+              name="new-password"
               onChange={e => setNewPassword(e.target.value)}
               required
             />
           </div>
           <div>
-            <label className="block mb-1 font-medium">確認</label>
+            <label className={style.form.label()}>確認</label>
             <input
-              type="password"
-              className="w-full border rounded px-3 py-2"
+              type={visible ? "text" : "password"}
+              className={style.form.input()}
               value={confirmPassword}
+              autoComplete="new-password"
+              name="new-password-confirm"
               onChange={e => setConfirmPassword(e.target.value)}
               required
             />
           </div>
-          {error && <div className="text-red-500">{error}</div>}
-          {success && <div className="text-green-500">{success}</div>}
+          {error && <div className={style.text.error()}>{error}</div>}
+          {success && <div className={style.text.success()}>{success}</div>}
+          <button type="button" onClick={toggleVisibility} className={style.text.info()}>
+            {visible ? "🙈" : "👁️"} パスワードを表示する
+          </button>
           <div className="flex gap-2">
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-              disabled={loading}
-            >
-              {loading ? "変更中..." : "保存"}
-            </button>
-            <button
-              type="button"
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
-              onClick={() => {
-                setIsEditing(false)
-                setError("")
-                setSuccess("")
-                setCurrentPassword("")
-                setNewPassword("")
-                setConfirmPassword("")
-              }}
-            >
-              キャンセル
-            </button>
+            <>
+              <button
+                type="submit"
+                className={style.form.button({ disabled: loading, type: "green" })}
+                disabled={loading}
+              >
+                {loading ? "変更中..." : "保存"}
+              </button>
+              <button
+                type="button"
+                className={style.form.button({ disabled: loading, type: "gray" })}
+                disabled={loading}
+                onClick={() => {
+                  setIsEditing(false)
+                  setError("")
+                  setSuccess("")
+                  setCurrentPassword("")
+                  setNewPassword("")
+                  setConfirmPassword("")
+                }}
+              >
+                キャンセル
+              </button>
+            </>
           </div>
         </form>
       )}

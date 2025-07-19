@@ -8,6 +8,7 @@ import type { Route } from "./+types/account"
 import { NavigationTab } from "~/components/ui/NavigationTab"
 import { style } from "~/styles/component"
 
+// MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
   const { userId } = await getAuth(args)
   if (!userId) {
@@ -28,6 +29,7 @@ export async function loader(args: Route.LoaderArgs) {
   }
 }
 
+// MARK: Action
 export async function action(args: Route.ActionArgs) {
   const { userId } = await getAuth(args)
   if (!userId) {
@@ -60,6 +62,7 @@ export async function action(args: Route.ActionArgs) {
   return user
 }
 
+// MARK: Component
 export default function ProfileForm({ loaderData }: Route.ComponentProps) {
   const fetcher = useFetcher()
   const user = loaderData.user
@@ -75,235 +78,168 @@ export default function ProfileForm({ loaderData }: Route.ComponentProps) {
     { to: "/account/security", label: "セキュリティ" },
   ]
 
+  const FormWrapper = isEditing ? fetcher.Form : "form"
+  const disabled = !isEditing || fetcher.state !== "idle"
+
   return (
     <div className="max-w-lg mx-auto p-4">
       <h1 className="text-xl font-bold mb-4">アカウント</h1>
       <NavigationTab tabs={tab} />
-
-      {isEditing ? (
-        <fetcher.Form
-          method="post"
-          className={style.form.container()}
-          encType="multipart/form-data"
-        >
-          <div className="flex gap-2 items-center">
-            <div className="w-12 h-12 mr-4 rounded-full relative group overflow-hidden flex-shrink-0">
-              <img
-                src={user.imageUrl}
-                alt="Profile"
-                className="w-full h-full object-cover rounded-full aspect-square"
-              />
-              <label
-                htmlFor="profileImage"
-                className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-50 group-hover:opacity-100 transition-opacity cursor-pointer"
-              >
-                <span className="text-xs text-white">変更</span>
-              </label>
-              <input
-                type="file"
-                name="profileImage"
-                id="profileImage"
-                accept="image/*"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-            </div>
-            <div className="w-1/2">
-              <label htmlFor="lastName" className={style.form.label({ necessary: true })}>
-                姓
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                id="lastName"
-                defaultValue={user.lastName ?? ""}
-                required
-                className={style.form.input()}
-              />
-            </div>
-            <div className="w-1/2">
-              <label htmlFor="firstName" className={style.form.label({ necessary: true })}>
-                名
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                id="firstName"
-                defaultValue={user.firstName ?? ""}
-                required
-                className={style.form.input()}
-              />
-            </div>
-          </div>
-          <div>
-            <label htmlFor="username" className={style.form.label()}>
-              ユーザー名
-            </label>
-            <input
-              type="text"
-              name="username"
-              id="username"
-              defaultValue={loaderData.username}
-              className={style.form.input()}
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className={style.form.label({ necessary: true })}>
-              メールアドレス
-            </label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              defaultValue={loaderData.email}
-              required
-              className={style.form.input()}
-            />
-          </div>
-          <div className="flex gap-2">
-            {fetcher.state !== "idle" ? (
-              <span className="ml-2 text-blue-500 flex items-center">
-                <svg className="animate-spin h-5 w-5 mr-1" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  />
-                </svg>
-                Loading...
-              </span>
-            ) : (
-              <>
-                <button
-                  type="submit"
-                  className={style.form.button({
-                    disabled: fetcher.state !== "idle",
-                    type: "green",
-                  })}
-                  disabled={fetcher.state !== "idle"}
-                >
-                  保存
-                </button>
-                <button
-                  type="button"
-                  className={style.form.button({
-                    disabled: fetcher.state !== "idle",
-                    type: "gray",
-                  })}
-                  disabled={fetcher.state !== "idle"}
-                  onClick={() => setIsEditing(false)}
-                >
-                  キャンセル
-                </button>
-              </>
-            )}
-          </div>
-        </fetcher.Form>
-      ) : (
-        <div>
-          <form className={style.form.container()}>
-            <div className="flex gap-2 items-center">
-              <img src={user.imageUrl} alt="Profile" className="w-12 h-12 mr-4 rounded-full" />
-              <div className="w-1/2">
-                <label htmlFor="lastName" className={style.form.label()}>
-                  姓
-                </label>
-                <input
-                  type="text"
-                  name="lastName"
-                  id="lastName"
-                  defaultValue={user.lastName ?? ""}
-                  disabled
-                  className={style.form.input({ disabled: true })}
-                />
-              </div>
-              <div className="w-1/2">
-                <label htmlFor="firstName" className={style.form.label()}>
-                  名
-                </label>
-                <input
-                  type="text"
-                  name="firstName"
-                  id="firstName"
-                  defaultValue={user.firstName ?? ""}
-                  disabled
-                  className={style.form.input({ disabled: true })}
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="username" className={style.form.label()}>
-                ユーザー名
-              </label>
-              <input
-                type="text"
-                name="username"
-                id="username"
-                defaultValue={loaderData.username}
-                disabled
-                className={style.form.input({ disabled: true })}
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className={style.form.label()}>
-                メールアドレス
-              </label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                defaultValue={loaderData.email}
-                disabled
-                className={style.form.input({ disabled: true })}
-              />
-            </div>
-          </form>
-          <button
-            type="button"
-            className={style.form.button() + " mt-4"}
-            onClick={() => setIsEditing(true)}
-          >
-            編集
-          </button>
+      <FormWrapper
+        method="post"
+        className={style.form.container()}
+        encType={isEditing ? "multipart/form-data" : undefined}
+      >
+        <div className="flex gap-2">
+          <ProfileImageInput imageUrl={user.imageUrl} isEditing={isEditing} />
+          <LastNameInput lastName={user.lastName ?? undefined} disabled={disabled} />
+          <FirstNameInput firstName={user.firstName ?? undefined} disabled={disabled} />
         </div>
-      )}
-      <div className="mt-6">
-        {/*
-        <h2 className="font-semibold mb-2">Discord連携</h2>
-        {loaderData.discordAccount ? (
-          <div className="flex items-center gap-2">
-            {loaderData.discordAccount.imageUrl ? (
-              <img
-                src={loaderData.discordAccount.imageUrl}
-                alt="Discord"
-                className="w-8 h-8 rounded-full"
-              />
-            ) : null}
-            <span>
-              {loaderData.discordAccount.username || loaderData.discordAccount.emailAddress}
-            </span>
-          </div>
-        ) : (
-          <button
-            type="button"
-            className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition"
-            onClick={() => {
-              window.location.href = "/auth/discord"
-            }}
-          >
-            Discord連携する
-          </button>
+        <UsernameInput username={loaderData.username} disabled={disabled} />
+        <EmailInput email={loaderData.email} disabled={disabled} />
+        <div className="flex gap-x-2">
+          {isEditing ? (
+            <>
+              <button
+                type="submit"
+                className={style.form.button({
+                  disabled: fetcher.state !== "idle",
+                  type: "green",
+                })}
+                disabled={fetcher.state !== "idle"}
+              >
+                {fetcher.state !== "idle" ? "通信中……" : "保存"}
+              </button>
+              <button
+                type="button"
+                className={style.form.button({
+                  disabled: fetcher.state !== "idle",
+                  type: "gray",
+                })}
+                disabled={fetcher.state !== "idle"}
+                onClick={() => setIsEditing(false)}
+              >
+                キャンセル
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              className={style.form.button()}
+              onClick={() => setIsEditing(true)}
+            >
+              編集
+            </button>
+          )}
+        </div>
+      </FormWrapper>
+    </div>
+  )
+}
+
+// MARK: Form Field Components
+function ProfileImageInput({ imageUrl, isEditing }: { imageUrl: string; isEditing: boolean }) {
+  return (
+    <div className="flex gap-2 items-center">
+      <div className="w-12 h-12 mr-4 rounded-full relative group overflow-hidden flex-shrink-0">
+        <img
+          src={imageUrl}
+          alt="Profile"
+          className="w-full h-full object-cover rounded-full aspect-square"
+        />
+        {isEditing && (
+          <>
+            <label
+              htmlFor="profileImage"
+              className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-50 group-hover:opacity-100 transition-opacity cursor-pointer"
+            >
+              <span className="text-xs text-white">変更</span>
+            </label>
+            <input
+              type="file"
+              name="profileImage"
+              id="profileImage"
+              accept="image/*"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+          </>
         )}
-        */}
       </div>
+    </div>
+  )
+}
+
+function LastNameInput({ lastName, disabled }: { lastName?: string; disabled: boolean }) {
+  return (
+    <div className="w-1/2">
+      <label htmlFor="lastName" className={style.form.label({ necessary: true })}>
+        姓
+      </label>
+      <input
+        type="text"
+        name="lastName"
+        id="lastName"
+        defaultValue={lastName ?? ""}
+        required
+        className={style.form.input({ disabled })}
+        disabled={disabled}
+      />
+    </div>
+  )
+}
+
+function FirstNameInput({ firstName, disabled }: { firstName?: string; disabled: boolean }) {
+  return (
+    <div className="w-1/2">
+      <label htmlFor="firstName" className={style.form.label({ necessary: true })}>
+        名
+      </label>
+      <input
+        type="text"
+        name="firstName"
+        id="firstName"
+        defaultValue={firstName ?? ""}
+        required
+        className={style.form.input({ disabled })}
+        disabled={disabled}
+      />
+    </div>
+  )
+}
+
+function UsernameInput({ username, disabled }: { username: string; disabled: boolean }) {
+  return (
+    <div>
+      <label htmlFor="username" className={style.form.label()}>
+        ユーザー名
+      </label>
+      <input
+        type="text"
+        name="username"
+        id="username"
+        defaultValue={username}
+        className={style.form.input({ disabled })}
+        disabled={disabled}
+      />
+    </div>
+  )
+}
+
+function EmailInput({ email, disabled }: { email: string; disabled: boolean }) {
+  return (
+    <div>
+      <label htmlFor="email" className={style.form.label({ necessary: true })}>
+        メールアドレス
+      </label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        defaultValue={email}
+        required
+        className={style.form.input({ disabled })}
+        disabled={disabled}
+      />
     </div>
   )
 }

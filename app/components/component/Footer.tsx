@@ -1,12 +1,28 @@
+import { tv } from "tailwind-variants"
+
 import { Icon } from "../ui/Icon"
 
 import { style } from "~/styles/component"
+
+const footer = {
+  link: tv({
+    base: "mx-2 text-cyan-600 dark:text-blue-300 hover:text-blue-600 dark:hover:text-cyan-400 visited:text-emerald-600 dark:visited:text-emerald-300",
+  }),
+  social: {
+    link: tv({
+      base: "flex text-slate-700 dark:text-slate-300 mx-2 my-0 px-2 items-center hover:transform hover:scale-110 transition-transform",
+    }),
+    text: tv({
+      base: "text-slate-700 dark:text-slate-300 text-sm font-bold mr-2 hidden md:block",
+    }),
+  },
+}
 
 export function Footer() {
   return (
     <footer className="flex flex-col items-center justify-center p-4 bg-slate-300 dark:bg-slate-800">
       <div className="text-center items-center p-4">
-        <p className="text-slate-700 dark:text-slate-300">
+        <p className={style.text.info({ class: "text-center" })}>
           © OMU Aikido Club All Rights Reserved.
           <br />
           〒599-8531 大阪府堺市中区学園町1番1号 大阪公立大学合氣道部
@@ -14,10 +30,10 @@ export function Footer() {
       </div>
 
       <div>
-        <a href="https://omu-aikido.com/privacy-policy" className={style.footer.link()}>
+        <a href="https://omu-aikido.com/privacy-policy" className={footer.link()}>
           プライバシーポリシー
         </a>
-        <a href="https://omu-aikido.com/terms-of-service" className={style.footer.link()}>
+        <a href="https://omu-aikido.com/terms-of-service" className={footer.link()}>
           利用規約
         </a>
       </div>
@@ -26,42 +42,42 @@ export function Footer() {
         <a
           href="https://twitter.com/fudaiaiki"
           aria-label="旧府大合氣道部 Twitter"
-          className={style.footer.social.link()}
+          className={footer.social.link()}
           target="_blank"
           rel="noopener noreferrer"
         >
           <Icon icon="twitter-logo" />
-          <span className={style.footer.social.text()}>旧府大Twitter</span>
+          <span className={footer.social.text()}>旧府大Twitter</span>
         </a>
         <a
           href="https://twitter.com/new_ocuaikido"
           aria-label="旧市大合気道サークル Twitter"
-          className={style.footer.social.link()}
+          className={footer.social.link()}
           target="_blank"
           rel="noopener noreferrer"
         >
           <Icon icon="twitter-logo" />
-          <span className={style.footer.social.text()}>旧市大Twitter</span>
+          <span className={footer.social.text()}>旧市大Twitter</span>
         </a>
         <a
           href="https://instagram.com/hamudaiaikidoubu"
           aria-label="Instagram"
-          className={style.footer.social.link()}
+          className={footer.social.link()}
           target="_blank"
           rel="noopener noreferrer"
         >
           <Icon icon="instagram-logo" />
-          <span className={style.footer.social.text()}>Instagram</span>
+          <span className={footer.social.text()}>Instagram</span>
         </a>
         <a
           href="https://github.com/omu-aikido"
           aria-label="GitHub"
-          className={style.footer.social.link()}
+          className={footer.social.link()}
           target="_blank"
           rel="noopener noreferrer"
         >
           <Icon icon="github-logo" />
-          <span className={style.footer.social.text()}>GitHub</span>
+          <span className={footer.social.text()}>GitHub</span>
         </a>
       </div>
     </footer>

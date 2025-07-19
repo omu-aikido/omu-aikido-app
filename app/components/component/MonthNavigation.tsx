@@ -1,3 +1,5 @@
+import { style } from "~/styles/component"
+
 type Props = {
   currentMonth: Date
   onPrev: () => void
@@ -17,7 +19,10 @@ export default function MonthNavigation({
     <div className="flex flex-row justify-between items-center mb-4 sm:mb-8 gap-2">
       <button
         onClick={onPrev}
-        className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-500 dark:hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm"
+        className={style.button.default({
+          type: "primary",
+          className: "px-4 sm:px-6 py-2 sm:py-3",
+        })}
       >
         ← 前月
       </button>
@@ -28,7 +33,10 @@ export default function MonthNavigation({
       </div>
       <button
         onClick={onNext}
-        className="bg-blue-400 hover:bg-blue-600 dark:bg-blue-500 dark:hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm"
+        className={style.button.default({
+          type: "primary",
+          className: "px-4 sm:px-6 py-2 sm:py-3",
+        })}
       >
         次月 →
       </button>

@@ -1,7 +1,10 @@
 import { format } from "date-fns"
 import React, { useEffect, useState } from "react"
 
+import { toLocalJPString } from "../../lib/utils"
+
 import type { ActivityType } from "~/db/schema"
+import { style } from "~/styles/component"
 
 interface DailyActivityItem extends ActivityType {
   isDeleted?: boolean
@@ -9,7 +12,7 @@ interface DailyActivityItem extends ActivityType {
 
 interface DailyActivityProps {
   userId: string
-  date: Date | null // ここを Date | null に変更
+  date: Date | null
   activities: DailyActivityItem[]
   onSave: (updatedActivities: DailyActivityItem[]) => void
   onClose: () => void
@@ -35,7 +38,7 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
   }
 
   const handleAddActivity = () => {
-    if (!date) return // dateがnullの場合のハンドリングを追加
+    if (!date) return
     setDailyActivities(prev => [
       ...prev,
       {
@@ -45,7 +48,7 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
         period: 1.5,
         createAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        isDeleted: false, // 新しいアクティビティは削除済みではない
+        isDeleted: false,
       } as DailyActivityItem,
     ])
   }
@@ -60,24 +63,24 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
 
   return (
     <div className="fixed inset-0 bg-slate-600/50 dark:bg-slate-900/75 flex justify-center items-center z-50">
-      <div className="flex flex-col bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl shadow-2xl max-w-md w-full mx-4">
-        <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">
+      <div className={style.card.container({ class: "max-w-md w-full mx-4" })}>
+        <h2 className={style.text.sectionTitle({ class: "text-xl mb-4" })}>
           {date ? format(date, "yyyy年MM月dd日") : "日付不明"} の記録
         </h2>
         <div className="flex flex-col max-h-80 overflow-y-auto mb-4">
           {dailyActivities.filter(act => !act.isDeleted).length === 0 && (
-            <p className="text-slate-600 dark:text-slate-400">この日の活動記録がありません。</p>
+            <p className={style.text.info()}>この日の活動記録がありません。</p>
           )}
           {dailyActivities
             .filter(act => !act.isDeleted)
-            .map(act => (
+            .map((act, index) => (
               <div
                 key={act.id}
                 className="flex items-center py-0.5 border-b border-slate-200 dark:border-slate-600"
               >
                 <button
                   onClick={() => handleDeleteActivity(act.id)}
-                  className="p-1 mx-3 rounded-full hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
+                  className="p-1 mx-1 sm:mx-3 rounded-full hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors"
                   title="削除"
                 >
                   <svg
@@ -100,15 +103,13 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
                   step="0.5"
                   value={act.period}
                   id={act.id}
-                  onChange={e =>
-                    handlePeriodChange(
-                      dailyActivities.findIndex(a => a.id === act.id),
-                      parseFloat(e.target.value),
-                    )
-                  }
-                  className="border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white p-2 rounded w-20 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2"
+                  onChange={e => handlePeriodChange(index, parseFloat(e.target.value))}
+                  className={style.form.input({ className: "w-20 mr-2" })}
                 />
                 <span className="text-slate-900 dark:text-white">時間</span>
+                <span className={style.text.info({ class: "items-end ml-auto font-mono" })}>
+                  {toLocalJPString(new Date(act.updatedAt ? act.updatedAt : act.createAt))}
+                </span>
               </div>
             ))}
           <button
@@ -116,7 +117,7 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
             className="flex items-center py-0.5 border-b border-slate-200 dark:border-slate-600 cursor-pointer"
             style={{ minHeight: "48px" }}
           >
-            <div className="p-1 mx-3 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors">
+            <div className="p-1 mx-1 sm:mx-3 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 text-blue-500"
@@ -138,13 +139,13 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
         <div className="flex items-center mt-6">
           <button
             onClick={onClose}
-            className="bg-slate-300 hover:bg-slate-400 dark:bg-slate-600 dark:hover:bg-slate-700 text-slate-800 dark:text-white px-4 py-2 rounded transition-colors mr-auto cursor-pointer"
+            className={style.button.default({ type: "secondary", className: "mr-auto" })}
           >
             戻る
           </button>
           <button
             onClick={handleSave}
-            className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white px-4 py-2 rounded transition-colors place-items-start cursor-pointer"
+            className={style.button.default({ type: "primary", className: "place-items-start" })}
           >
             一時保存
           </button>
