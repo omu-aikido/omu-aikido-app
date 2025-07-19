@@ -6,6 +6,13 @@ import { style } from "../styles/component"
 
 import { Icon } from "~/components/ui/Icon"
 
+// MARK: Meta
+export function meta() {
+  return [
+    { title: "サインイン | ハム大合気ポータル" },
+    { name: "description", content: "サインインページ" },
+  ]
+}
 
 // MARK: Component
 export default function SignUpPage() {

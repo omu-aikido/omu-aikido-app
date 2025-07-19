@@ -10,8 +10,29 @@ import { grade as gradeOptions } from "~/lib/utils"
 import { style } from "~/styles/component"
 import type { Profile } from "~/type"
 
+// MARK: Loader
+export async function loader(args: Route.LoaderArgs) {
+  const auth = await getAuth(args)
+  const userId = auth.userId
+
+  const env = args.context.cloudflare.env
+
+  // Redirect unauthenticated users to sign-in page with redirect URL
+  if (!userId) return redirect("/sign-in?redirect_url=" + args.request.url)
+
+  const profile: Profile | null = await getProfile({ userId, env })
+
+  // Return user ID for the component
+  return { profile }
+}
+
+
+// MARK: Meta
 export function meta({}: Route.MetaArgs) {
-  return [{ title: "プロフィール設定" }, { name: "description", content: "プロフィール情報の管理" }]
+  return [
+    { title: "ステータス | プロフィール | ハム大合気ポータル" },
+    { name: "description", content: "アカウントのステータスを設定できます。" },
+  ]
 }
 
 // MARK: Action
@@ -39,22 +60,6 @@ export async function action(args: Route.ActionArgs) {
   )
 
   return res
-}
-
-// MARK: Loader
-export async function loader(args: Route.LoaderArgs) {
-  const auth = await getAuth(args)
-  const userId = auth.userId
-
-  const env = args.context.cloudflare.env
-
-  // Redirect unauthenticated users to sign-in page with redirect URL
-  if (!userId) return redirect("/sign-in?redirect_url=" + args.request.url)
-
-  const profile: Profile | null = await getProfile({ userId, env })
-
-  // Return user ID for the component
-  return { profile }
 }
 
 // MARK: Component

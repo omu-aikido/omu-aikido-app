@@ -21,7 +21,6 @@ import {
 import { style } from "~/styles/component"
 import type { DailyActivityItem } from "~/type"
 
-}
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
@@ -59,6 +58,14 @@ export async function loader(args: Route.LoaderArgs) {
       error: "データの取得に失敗しました",
     }
   }
+}
+
+// MARK: Meta
+export function meta(args: Route.MetaArgs) {
+  return [
+    { title: `${args.data?.currentMonth ?? "1ヶ"}月の記録 | ハム大合気ポータル` },
+    { name: "description", content: "1カ月毎の記録を一覧できます。" },
+  ]
 }
 
 // MARK: Action

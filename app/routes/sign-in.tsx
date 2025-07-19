@@ -17,6 +17,14 @@ export async function loader(args: Route.LoaderArgs) {
   if (userId) return redirect(new URL(args.request.url).searchParams.get("redirect_url") ?? "/")
 }
 
+// MARK: Meta
+export function meta() {
+  return [
+    { title: "サインイン | ハム大合気ポータル" },
+    { name: "description", content: "サインインページ" },
+  ]
+}
+
 // MARK: Component
 export default function SignInPage() {
   const { signIn, setActive, isLoaded } = useSignIn()

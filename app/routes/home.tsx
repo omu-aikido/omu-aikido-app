@@ -15,13 +15,6 @@ import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
 import type { ActionResult, PagePath } from "~/type"
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "ハム大合気ポータル" },
-    { name: "description", content: "大阪公立大学合氣道部の活動管理アプリ" },
-  ]
-}
-
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
@@ -64,6 +57,14 @@ export async function loader(args: Route.LoaderArgs) {
   const recent = await recentlyActivity({ userId: userId!, limit: 1, env })
 
   return { gradeData, apps, recent }
+}
+
+// MARK: Meta
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "ホーム | ハム大合気ポータル" },
+    { name: "description", content: "大阪公立大学合氣道部の活動管理アプリ" },
+  ]
 }
 
 // MARK: Action

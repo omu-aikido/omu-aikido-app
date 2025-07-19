@@ -14,6 +14,14 @@ export async function loader(args: Route.LoaderArgs) {
   if (!userId) return redirect("/sign-in?redirect_url=" + args.request.url)
 }
 
+// MARK: Meta
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "パスワード | プロフィール | ハム大合気ポータル" },
+    { name: "description", content: "アカウントのパスワードの変更" },
+  ]
+}
+
 // MARK: Component
 export default function ProfileForm() {
   const { isLoaded, isSignedIn, user } = useUser()

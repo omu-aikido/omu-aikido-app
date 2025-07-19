@@ -29,6 +29,14 @@ export async function loader(args: Route.LoaderArgs) {
   }
 }
 
+// MARK: Meta
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "アカウント | プロフィール | ハム大合気ポータル" },
+    { name: "description", content: "アカウントのアカウント設定" },
+  ]
+}
+
 // MARK: Action
 export async function action(args: Route.ActionArgs) {
   const { userId } = await getAuth(args)
