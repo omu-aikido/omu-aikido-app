@@ -1,32 +1,17 @@
 import { createClerkClient } from "@clerk/react-router/api.server"
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { useEffect, useState } from "react"
-import { redirect, useFetcher } from "react-router"
+import { Link, redirect, useFetcher, useOutletContext } from "react-router"
 
 import type { Route } from "./+types/account"
+import type { AccountLayoutContext } from "./layout"
 
-import { NavigationTab } from "~/components/ui/NavigationTab"
 import { style } from "~/styles/component"
 
-// MARK: Loader
-export async function loader(args: Route.LoaderArgs) {
-  const { userId } = await getAuth(args)
-  if (!userId) {
-    return redirect("/sign-in?redirect_url=" + args.request.url)
-  }
-  const clerkClient = createClerkClient({
-    secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
-  })
-  const user = await clerkClient.users.getUser(userId)
-  const email = user.emailAddresses?.[0]?.emailAddress || ""
-  const discordAccount = user.externalAccounts?.find(acc => acc.provider === "discord")
-  const username = user.username || ""
-  return {
-    user,
-    email,
-    discordAccount,
-    username,
-  }
+// MARK: Loader - 親のレイアウトから共通データを受け取る
+export async function loader(_args: Route.LoaderArgs) {
+  // 親のレイアウトで認証チェックは済んでいるため、ここでは何もしない
+  return {}
 }
 
 // MARK: Meta
@@ -71,28 +56,21 @@ export async function action(args: Route.ActionArgs) {
 }
 
 // MARK: Component
-export default function ProfileForm({ loaderData }: Route.ComponentProps) {
+export default function ProfileForm() {
   const fetcher = useFetcher()
-  const user = loaderData.user
+  // 親のレイアウトから共通データを取得
+  const { user } = useOutletContext<AccountLayoutContext>()
   const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
     if (fetcher.data) setIsEditing(false)
   }, [fetcher.data])
 
-  const tab = [
-    { to: "/account", label: "プロフィール" },
-    { to: "/account/status", label: "ステータス" },
-    { to: "/account/security", label: "セキュリティ" },
-  ]
-
-  const FormWrapper = isEditing ? fetcher.Form : "form"
   const disabled = !isEditing || fetcher.state !== "idle"
+  const FormWrapper = isEditing ? fetcher.Form : "form"
 
   return (
-    <div className="max-w-lg mx-auto p-4">
-      <h1 className="text-xl font-bold mb-4">アカウント</h1>
-      <NavigationTab tabs={tab} />
+    <>
       <FormWrapper
         method="post"
         className={style.form.container()}
@@ -103,8 +81,8 @@ export default function ProfileForm({ loaderData }: Route.ComponentProps) {
           <LastNameInput lastName={user.lastName ?? undefined} disabled={disabled} />
           <FirstNameInput firstName={user.firstName ?? undefined} disabled={disabled} />
         </div>
-        <UsernameInput username={loaderData.username} disabled={disabled} />
-        <EmailInput email={loaderData.email} disabled={disabled} />
+        <UsernameInput username={user.username || ""} disabled={disabled} />
+        <EmailInput email={user.emailAddresses?.[0]?.emailAddress || ""} disabled={disabled} />
         <div className="flex gap-x-2">
           {isEditing ? (
             <>
@@ -141,7 +119,14 @@ export default function ProfileForm({ loaderData }: Route.ComponentProps) {
           )}
         </div>
       </FormWrapper>
-    </div>
+      <p className="mt-4">
+        Discordアカウントの設定は
+        <Link to="/account/discord" className={style.text.link()}>
+          こちら
+        </Link>
+        から
+      </p>
+    </>
   )
 }
 

@@ -104,7 +104,7 @@ export const style = {
         },
         type: {
           green: "bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600",
-          gray: "bg-gray-300 hover:bg-gray-400 text-slate-900 dark:bg-gray-600 dark:hover:bg-gray-700 dark:text-slate-300 text-sm",
+          gray: "bg-gray-300 hover:bg-gray-400 text-slate-900 dark:bg-gray-600 dark:hover:bg-gray-700 dark:text-slate-300",
           danger: "bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600",
         },
       },
@@ -152,7 +152,7 @@ export const style = {
     subtitle: tv({}),
     body: tv({}),
     link: tv({
-      base: "text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline transition-colors duration-200",
+      base: " text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline transition-colors duration-200",
     }),
     highlight: tv({}),
     error: tv({

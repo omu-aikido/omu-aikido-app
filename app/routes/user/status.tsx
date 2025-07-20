@@ -4,7 +4,6 @@ import { redirect, useFetcher } from "react-router"
 
 import type { Route } from "./+types/status"
 
-import { NavigationTab } from "~/components/ui/NavigationTab"
 import { getProfile, updateProfile } from "~/lib/query/profile"
 import { grade as gradeOptions } from "~/lib/utils"
 import { style } from "~/styles/component"
@@ -17,15 +16,14 @@ export async function loader(args: Route.LoaderArgs) {
 
   const env = args.context.cloudflare.env
 
-  // Redirect unauthenticated users to sign-in page with redirect URL
+  // 親のレイアウトで認証チェック済みだが、プロフィールデータが必要
   if (!userId) return redirect("/sign-in?redirect_url=" + args.request.url)
 
   const profile: Profile | null = await getProfile({ userId, env })
 
-  // Return user ID for the component
+  // Return profile data for the component
   return { profile }
 }
-
 
 // MARK: Meta
 export function meta({}: Route.MetaArgs) {
@@ -63,14 +61,8 @@ export async function action(args: Route.ActionArgs) {
 }
 
 // MARK: Component
-export default function ProfilePage(props: Route.ComponentProps) {
-  const tab = [
-    { to: "/account", label: "プロフィール" },
-    { to: "/account/status", label: "ステータス" },
-    { to: "/account/security", label: "セキュリティ" },
-  ]
-
-  const { profile } = props.loaderData
+export default function StatusForm({ loaderData }: Route.ComponentProps) {
+  const profile = loaderData.profile
   const fetcher = useFetcher()
   const [isEditing, setIsEditing] = useState(false)
 
@@ -79,63 +71,48 @@ export default function ProfilePage(props: Route.ComponentProps) {
   }, [fetcher.data])
 
   if (!profile) {
-    return (
-      <div className="max-w-lg mx-auto p-4">
-        <h1 className="text-xl font-bold mb-4">アカウント</h1>
-        <NavigationTab tabs={tab} />
-        <p>プロフィール情報が見つかりませんでした。</p>
-      </div>
-    )
+    return <p>プロフィール情報が見つかりませんでした。</p>
   }
 
   const FormWrapper = isEditing ? fetcher.Form : "form"
 
   return (
-    <div className="max-w-lg mx-auto p-4">
-      <h1 className="text-xl font-bold mb-4">アカウント</h1>
-      <NavigationTab tabs={tab} />
+    <FormWrapper
+      method="post"
+      className={style.form.container()}
+      encType={isEditing ? "multipart/form-data" : undefined}
+    >
+      <GradeSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
+      <GetGradeAtInput profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
+      <JoinedAtInput profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
+      <YearSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
 
-      <FormWrapper
-        method="post"
-        className={style.form.container()}
-        encType={isEditing ? "multipart/form-data" : undefined}
-      >
-        <GradeSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
-        <GetGradeAtInput profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
-        <JoinedAtInput profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
-        <YearSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
-
-        <div className="flex gap-2">
-          {isEditing ? (
-            <>
-              <button
-                type="submit"
-                className={style.form.button({ disabled: fetcher.state !== "idle", type: "green" })}
-                disabled={fetcher.state !== "idle"}
-              >
-                {fetcher.state !== "idle" ? "通信中……" : "保存"}
-              </button>
-              <button
-                type="button"
-                className={style.form.button({ disabled: fetcher.state !== "idle", type: "gray" })}
-                disabled={fetcher.state !== "idle"}
-                onClick={() => setIsEditing(false)}
-              >
-                キャンセル
-              </button>
-            </>
-          ) : (
+      <div className="flex gap-2">
+        {isEditing ? (
+          <>
+            <button
+              type="submit"
+              className={style.form.button({ disabled: fetcher.state !== "idle", type: "green" })}
+              disabled={fetcher.state !== "idle"}
+            >
+              {fetcher.state !== "idle" ? "通信中……" : "保存"}
+            </button>
             <button
               type="button"
-              className={style.form.button()}
-              onClick={() => setIsEditing(true)}
+              className={style.form.button({ disabled: fetcher.state !== "idle", type: "gray" })}
+              disabled={fetcher.state !== "idle"}
+              onClick={() => setIsEditing(false)}
             >
-              編集
+              キャンセル
             </button>
-          )}
-        </div>
-      </FormWrapper>
-    </div>
+          </>
+        ) : (
+          <button type="button" className={style.form.button()} onClick={() => setIsEditing(true)}>
+            編集
+          </button>
+        )}
+      </div>
+    </FormWrapper>
   )
 }
 
