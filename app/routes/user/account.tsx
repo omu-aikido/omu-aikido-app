@@ -115,11 +115,13 @@ export default function ProfileForm() {
         </div>
       </FormWrapper>
       <p className="mt-4">
-        Discordアカウントの設定は
         <Link to="/account/discord" className={style.text.link()}>
-          こちら
+          Discordアカウント連携
         </Link>
-        から
+        <span className="mx-2">&nbsp;</span>
+        <Link to="/account/security" className={style.text.link()}>
+          パスワードの変更
+        </Link>
       </p>
     </>
   )

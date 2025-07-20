@@ -11,7 +11,7 @@ type Props = {
 }
 
 const listItem = tv({
-  base: "flex items-start py-3 px-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors",
+  base: "flex items-center flex-row justify-between py-3 px-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors",
   variants: {
     today: {
       true: "bg-green-100 dark:bg-green-900/40",
@@ -38,21 +38,23 @@ function DayActivitySummary({ totalHours, count }: { totalHours: number; count: 
       <div
         className={style.text.info({
           class:
-            "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded-sm font-medium",
+            "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 rounded-sm font-medium text-sm",
         })}
       >
         合計 {totalHours}h
       </div>
-      {count >= 2 && count < 100 && (
-        <span className="place-items-center flex items-center bg-green-700 dark:bg-green-200 text-green-100 dark:text-green-800 rounded-full w-6 h-6 justify-center text-xs font-bold shadow-sm">
-          {count}
-        </span>
-      )}
-      {count >= 100 && (
-        <span className="place-items-center flex items-center bg-green-700 dark:bg-green-200 text-green-100 dark:text-green-800 rounded-full w-6 h-6 justify-center text-xs font-bold shadow-sm">
-          +99
-        </span>
-      )}
+      <div className="mr-4">
+        {count >= 2 && count < 100 && (
+          <span className="place-items-center flex items-center bg-green-700 dark:bg-green-200 text-green-100 dark:text-green-800 rounded-full w-5 h-5 justify-center text-xs font-bold shadow-sm">
+            {count}
+          </span>
+        )}
+        {count >= 100 && (
+          <span className="place-items-center flex items-center bg-green-700 dark:bg-green-200 text-green-100 dark:text-green-800 rounded-full w-5 h-5 justify-center text-xs font-bold shadow-sm">
+            +99
+          </span>
+        )}
+      </div>
     </div>
   )
 }
@@ -80,7 +82,11 @@ export default function MonthlyActivityList({ daysInMonth, currentActivities, on
             </div>
             <div className="flex-1 space-y-1">
               {acts.length === 0 ? (
-                <span className={style.text.info({ class: "text-sm text-slate-500" })}>
+                <span
+                  className={style.text.info({
+                    class: "text-sm text-slate-400 dark:text-slate-500",
+                  })}
+                >
                   記録なし
                 </span>
               ) : (

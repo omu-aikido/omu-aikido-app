@@ -107,7 +107,6 @@ export function translateYear(year_value: string): string {
 
 export function toLocalJPString(date: Date): string {
   return date.toLocaleDateString("ja-JP", {
-    year: "numeric",
     month: "long",
     day: "numeric",
     hour: "2-digit",

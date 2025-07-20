@@ -38,7 +38,6 @@ export default function AccountLayout(args: Route.ComponentProps) {
   const navigationTabs = [
     { to: "/account", label: "プロフィール" },
     { to: "/account/status", label: "ステータス" },
-    { to: "/account/security", label: "セキュリティ" },
   ]
 
   return (

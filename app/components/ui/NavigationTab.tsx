@@ -25,7 +25,7 @@ export function NavigationTab({ tabs = [] }: { tabs?: NavigationTabProp[] }) {
   const location = useLocation()
   return (
     <nav
-      className="flex overflow-x-auto w-full mb-4 justify-start border-b border-slate-300 dark:border-slate-700"
+      className="flex overflow-x-auto w-full mb-4 justify-start border-b border-slate-400 dark:border-slate-700"
       role="tablist"
       aria-label="タブナビゲーション"
     >

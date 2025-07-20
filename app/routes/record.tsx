@@ -182,9 +182,13 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
             <button
               type="submit"
               className={`rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 w-full ${isChanged ? "bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-400 cursor-not-allowed"}`}
-              disabled={!isChanged || fetcher.state == "submitting"}
+              disabled={!isChanged || fetcher.state !== "idle"}
             >
-              登録
+              {fetcher.state === "idle"
+                ? "登録"
+                : fetcher.state === "loading"
+                  ? "読み込み中"
+                  : "送信中"}
             </button>
             <input type="hidden" name="actionType" value="batchUpdate" />
             <input type="hidden" name="currentMonth" value={format(currentMonth, "yyyy-MM")} />
