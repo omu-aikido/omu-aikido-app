@@ -139,13 +139,13 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
         <div className="flex items-center mt-6">
           <button
             onClick={onClose}
-            className={style.button.default({ type: "secondary", className: "mr-auto" })}
+            className={style.button({ type: "secondary", className: "mr-auto" })}
           >
             戻る
           </button>
           <button
             onClick={handleSave}
-            className={style.button.default({ type: "primary", className: "place-items-start" })}
+            className={style.button({ type: "primary", className: "place-items-start" })}
           >
             一時保存
           </button>

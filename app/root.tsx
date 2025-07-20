@@ -4,7 +4,7 @@ import { rootAuthLoader } from "@clerk/react-router/ssr.server"
 import { isRouteErrorResponse, useLoaderData } from "react-router"
 
 import type { Route } from "./+types/root"
-import { AppContent } from "./layout"
+import { AppContent } from "./layout/layout"
 import "./styles/global.css"
 
 export const links: Route.LinksFunction = () => [

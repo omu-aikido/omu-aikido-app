@@ -5,8 +5,8 @@ export default [
   index("routes/home.tsx"),
   // Record
   route("record", "routes/record.tsx"),
-  // User Account (nested with layout)
-  route("account", "routes/user/layout.tsx", [
+  // Account
+  route("account", "layout/user.tsx", [
     index("routes/user/account.tsx"),
     route("security", "routes/user/security.tsx"),
     route("status", "routes/user/status.tsx"),

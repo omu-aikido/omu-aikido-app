@@ -107,7 +107,7 @@ export default function SignInPage() {
         <button
           type="submit"
           disabled={loading}
-          className={style.button.default({ type: "primary", disabled: loading, class: "w-full" })}
+          className={style.button({ type: "primary", disabled: loading, class: "w-full" })}
         >
           {loading ? "サインイン中..." : "サインイン"}
         </button>

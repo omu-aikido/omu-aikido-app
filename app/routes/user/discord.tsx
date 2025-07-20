@@ -1,39 +1,24 @@
 import { useUser } from "@clerk/react-router"
-import { createClerkClient } from "@clerk/react-router/api.server"
-import { getAuth } from "@clerk/react-router/ssr.server"
 import { useState } from "react"
-import { redirect } from "react-router"
-
-import type { Route } from "./+types/discord"
+import { useOutletContext } from "react-router"
 
 import { Icon } from "~/components/ui/Icon"
+import type { UserLayoutComponentProps } from "~/layout/user"
 
-// MARK: Loader
-export async function loader(args: Route.LoaderArgs) {
-  const { userId } = await getAuth(args)
-  if (!userId) {
-    return redirect("/sign-in?redirect_url=" + args.request.url)
-  }
-  const clerkClient = createClerkClient({
-    secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
-  })
-  const user = await clerkClient.users.getUser(userId)
-  const email = user.emailAddresses?.[0]?.emailAddress || ""
-  const discordAccount = user.externalAccounts?.find(acc => acc.provider === "oauth_discord")
-  const username = user.username || ""
-  return {
-    user,
-    email,
-    discordAccount,
-    username,
-  }
+export function meta() {
+  return [
+    { title: "Discord連携 | ハム大合気ポータル" },
+    { name: "description", content: "Discord連携機能の設定" },
+  ]
 }
 
 // MARK: Component
-export default function Discord({ loaderData }: Route.ComponentProps) {
-  const { user } = useUser()
+export default function Discord() {
   const [isConnecting, setIsConnecting] = useState(false)
   const [isDisconnecting, setIsDisconnecting] = useState(false)
+  const context = useOutletContext<UserLayoutComponentProps>()
+  const { loaderData } = context
+  const { user } = useUser()
 
   const handleConnectDiscord = async () => {
     if (!user) return

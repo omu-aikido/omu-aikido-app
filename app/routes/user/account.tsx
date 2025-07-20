@@ -4,20 +4,14 @@ import { useEffect, useState } from "react"
 import { Link, redirect, useFetcher, useOutletContext } from "react-router"
 
 import type { Route } from "./+types/account"
-import type { AccountLayoutContext } from "./layout"
 
+import type { UserLayoutComponentProps } from "~/layout/user"
 import { style } from "~/styles/component"
-
-// MARK: Loader - 親のレイアウトから共通データを受け取る
-export async function loader(_args: Route.LoaderArgs) {
-  // 親のレイアウトで認証チェックは済んでいるため、ここでは何もしない
-  return {}
-}
 
 // MARK: Meta
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "アカウント | プロフィール | ハム大合気ポータル" },
+    { title: "プロフィール | ハム大合気ポータル" },
     { name: "description", content: "アカウントのアカウント設定" },
   ]
 }
@@ -58,8 +52,9 @@ export async function action(args: Route.ActionArgs) {
 // MARK: Component
 export default function ProfileForm() {
   const fetcher = useFetcher()
-  // 親のレイアウトから共通データを取得
-  const { user } = useOutletContext<AccountLayoutContext>()
+
+  const context = useOutletContext<UserLayoutComponentProps>()
+  const user = context.loaderData.user
   const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {

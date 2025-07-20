@@ -19,7 +19,7 @@ export default function MonthNavigation({
     <div className="flex flex-row justify-between items-center mb-4 sm:mb-8 gap-2">
       <button
         onClick={onPrev}
-        className={style.button.default({
+        className={style.button({
           type: "primary",
           className: "px-4 sm:px-6 py-2 sm:py-3",
         })}
@@ -33,7 +33,7 @@ export default function MonthNavigation({
       </div>
       <button
         onClick={onNext}
-        className={style.button.default({
+        className={style.button({
           type: "primary",
           className: "px-4 sm:px-6 py-2 sm:py-3",
         })}

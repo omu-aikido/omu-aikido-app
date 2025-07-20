@@ -2,27 +2,10 @@ import { createClerkClient } from "@clerk/react-router/api.server"
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { Outlet, redirect } from "react-router"
 
-import type { Route } from "./+types/layout"
+import type { Route } from "./+types/user"
+export type UserLayoutComponentProps = Route.ComponentProps
 
 import { NavigationTab } from "~/components/ui/NavigationTab"
-
-// MARK: Types
-export interface AccountLayoutContext {
-  userId: string
-  user: {
-    id: string
-    emailAddresses: Array<{ emailAddress: string }>
-    username: string | null
-    firstName: string | null
-    lastName: string | null
-    imageUrl: string
-    externalAccounts: Array<{ provider: string }> | null
-  }
-  email: string
-  discordAccount?: { provider: string }
-  username: string
-  env: unknown
-}
 
 // MARK: Loader - 共通の認証処理
 export async function loader(args: Route.LoaderArgs) {
@@ -37,7 +20,7 @@ export async function loader(args: Route.LoaderArgs) {
 
   const user = await clerkClient.users.getUser(userId)
   const email = user.emailAddresses?.[0]?.emailAddress || ""
-  const discordAccount = user.externalAccounts?.find(acc => acc.provider === "discord")
+  const discordAccount = user.externalAccounts?.find(acc => acc.provider === "oauth_discord")
   const username = user.username || ""
 
   return {
@@ -51,7 +34,7 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 // MARK: Component - 共通のレイアウトとナビゲーション
-export default function AccountLayout({ loaderData }: Route.ComponentProps) {
+export default function AccountLayout(args: Route.ComponentProps) {
   const navigationTabs = [
     { to: "/account", label: "プロフィール" },
     { to: "/account/status", label: "ステータス" },
@@ -60,10 +43,10 @@ export default function AccountLayout({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="max-w-lg mx-auto p-4">
-      <h1 className="text-xl font-bold mb-4">{`アカウント: ${loaderData.user.lastName} ${loaderData.user.firstName}`}</h1>
+      <h1 className="text-xl font-bold mb-4">{`アカウント: ${args.loaderData.user.lastName} ${args.loaderData.user.firstName}`}</h1>
       <NavigationTab tabs={navigationTabs} />
       <div className="mt-6">
-        <Outlet context={loaderData} />
+        <Outlet context={args} />
       </div>
     </div>
   )

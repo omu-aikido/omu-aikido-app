@@ -28,7 +28,7 @@ export async function loader(args: Route.LoaderArgs) {
 // MARK: Meta
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "ステータス | プロフィール | ハム大合気ポータル" },
+    { title: "ステータス | ハム大合気ポータル" },
     { name: "description", content: "アカウントのステータスを設定できます。" },
   ]
 }

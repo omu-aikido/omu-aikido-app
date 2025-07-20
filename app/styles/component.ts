@@ -125,22 +125,20 @@ export const style = {
     }),
   },
 
-  button: {
-    default: tv({
-      base: "py-2 px-4 rounded-md font-medium transition-colors duration-200 shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-slate-800",
-      variants: {
-        disabled: {
-          true: "opacity-50 cursor-not-allowed",
-        },
-        type: {
-          primary: "", // ベーススタイルが primary に相当
-          secondary:
-            "bg-slate-300 hover:bg-slate-400 dark:bg-slate-600 dark:hover:bg-slate-700 text-slate-800 dark:text-white",
-          danger: "bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600",
-        },
+  button: tv({
+    base: "py-2 px-4 rounded-md font-medium transition-colors duration-200 shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-slate-800",
+    variants: {
+      disabled: {
+        true: "opacity-50 cursor-not-allowed",
       },
-    }),
-  },
+      type: {
+        primary: "", // ベーススタイルが primary に相当
+        secondary:
+          "bg-slate-300 hover:bg-slate-400 dark:bg-slate-600 dark:hover:bg-slate-700 text-slate-800 dark:text-white",
+        danger: "bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600",
+      },
+    },
+  }),
 
   text: {
     title: tv({
@@ -149,7 +147,9 @@ export const style = {
     sectionTitle: tv({
       base: "text-xl font-bold mb-4 text-slate-800 dark:text-slate-200",
     }),
-    subtitle: tv({}),
+    subtitle: tv({
+      base: "text-lg font-semibold text-slate-700 dark:text-slate-300",
+    }),
     body: tv({}),
     link: tv({
       base: " text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline transition-colors duration-200",

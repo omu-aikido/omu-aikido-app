@@ -43,7 +43,7 @@ export function AccountUi({ apps }: AccountUiProps) {
         <hr />
 
         <button
-          className={style.button.default({ type: "secondary", className: "w-full" })}
+          className={style.button({ type: "secondary", className: "w-full" })}
           aria-label="サインアウト"
           onClick={e => {
             e.preventDefault()

@@ -2,12 +2,11 @@ import { useAuth, useUser } from "@clerk/react-router"
 import { useEffect, useState } from "react"
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from "react-router"
 
-import { Role } from "./lib/zod"
-
 import { AccountUi } from "~/components/component/AccountUi"
 import { Footer } from "~/components/component/Footer"
 import { ReactHeader } from "~/components/component/Header"
 import { Sidebar } from "~/components/ui/Sidebar"
+import { Role } from "~/lib/zod"
 import type { PagePath } from "~/type"
 
 export function AppContent() {

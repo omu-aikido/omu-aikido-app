@@ -361,10 +361,7 @@ export default function SignUpPage() {
             required
             className={style.form.input({ class: "col-span-2" })}
           />
-          <button
-            type="submit"
-            className={style.button.default({ type: "primary", class: "col-span-3" })}
-          >
+          <button type="submit" className={style.button({ type: "primary", class: "col-span-3" })}>
             次へ
           </button>
         </form>
@@ -491,11 +488,7 @@ export default function SignUpPage() {
             className={style.form.input({ class: "col-span-2" })}
             disabled={loading}
           />
-          <button
-            type="submit"
-            className={style.button.default({ type: "primary" })}
-            disabled={loading}
-          >
+          <button type="submit" className={style.button({ type: "primary" })} disabled={loading}>
             {loading ? "認証中…" : "認証する"}
           </button>
         </form>

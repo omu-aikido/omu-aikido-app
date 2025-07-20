@@ -5,16 +5,10 @@ import type { Route } from "./+types/security"
 
 import { style } from "~/styles/component"
 
-// MARK: Loader - 親のレイアウトで認証チェック済み
-export async function loader(_args: Route.LoaderArgs) {
-  // 認証チェックは親のレイアウトで実施済み
-  return {}
-}
-
 // MARK: Meta
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "パスワード | プロフィール | ハム大合気ポータル" },
+    { title: "パスワード変更 | ハム大合気ポータル" },
     { name: "description", content: "アカウントのパスワードの変更" },
   ]
 }
