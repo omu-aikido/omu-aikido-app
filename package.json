@@ -7,7 +7,7 @@
     "fix": "pnpm lint:fix && pnpm format",
     "lint": "eslint .",
     "build": "react-router build",
-    "check": "pnpm build && tsc -b && pnpm db:check && wrangler deploy --dry-run",
+    "check": "pnpm build && react-router typegen& tsc -b && pnpm db:check && wrangler deploy --dry-run",
     "format": "prettier --write .",
     "deploy": "pnpm build && wrangler deploy --dry-run",
     "preview": "pnpm build && wrangler dev --port 4173",
