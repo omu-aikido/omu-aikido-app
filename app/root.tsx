@@ -24,11 +24,7 @@ import type { PagePath } from "./type"
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
+  { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
   {
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
@@ -66,9 +62,7 @@ export async function loader(args: Route.LoaderArgs) {
   return rootAuthLoader(
     args,
     () => {
-      return {
-        links,
-      }
+      return { links }
     },
     {
       secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
@@ -152,12 +146,19 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       </head>
       <body className="h-dvh bg-gray-100 text-gray-800">
         <ReactHeader title="ポータル">
-          <Sidebar position="right" icon={"  ≡  "} open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <Sidebar
+            position="right"
+            icon={"  ≡  "}
+            open={sidebarOpen}
+            onOpenChange={setSidebarOpen}
+          >
             <p>メニューは利用できません</p>
           </Sidebar>
         </ReactHeader>
         <main className="min-h-4/5 p-6 mx-auto max-w-3xl text-center">
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-400 mb-4">{message}</h1>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-400 mb-4">
+            {message}
+          </h1>
           {status === 404 && <img src="/404 NotFound.png" />}
           {status === 500 && <img src="/500 InternalServerError.png" />}
           <p className="text-lg mb-6 text-slate-600 dark:text-slate-500">{details}</p>

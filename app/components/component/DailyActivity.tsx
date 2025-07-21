@@ -54,7 +54,9 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
   }
 
   const handleDeleteActivity = (id: DailyActivityItem["id"]) => {
-    setDailyActivities(prev => prev.map(act => (act.id === id ? { ...act, isDeleted: true } : act)))
+    setDailyActivities(prev =>
+      prev.map(act => (act.id === id ? { ...act, isDeleted: true } : act)),
+    )
   }
 
   const handleSave = () => {
@@ -107,8 +109,12 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
                   className={style.form.input({ className: "w-20 mr-2" })}
                 />
                 <span className="text-slate-900 dark:text-white">時間</span>
-                <span className={style.text.info({ class: "items-end ml-auto font-mono" })}>
-                  {toLocalJPString(new Date(act.updatedAt ? act.updatedAt : act.createAt))}
+                <span
+                  className={style.text.info({ class: "items-end ml-auto font-mono" })}
+                >
+                  {toLocalJPString(
+                    new Date(act.updatedAt ? act.updatedAt : act.createAt),
+                  )}
                 </span>
               </div>
             ))}

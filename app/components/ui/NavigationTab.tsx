@@ -16,10 +16,7 @@ const style = {
   },
 }
 
-export type NavigationTabProp = {
-  to: string
-  label: string
-}
+export type NavigationTabProp = { to: string; label: string }
 
 export function NavigationTab({ tabs = [] }: { tabs?: NavigationTabProp[] }) {
   const location = useLocation()

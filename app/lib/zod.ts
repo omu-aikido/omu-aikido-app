@@ -12,7 +12,13 @@ export class Role {
   static readonly TREASURER = new Role("treasurer", "会計")
   static readonly MEMBER = new Role("member", "部員")
 
-  static readonly ALL = [Role.ADMIN, Role.CAPTAIN, Role.VICE_CAPTAIN, Role.TREASURER, Role.MEMBER]
+  static readonly ALL = [
+    Role.ADMIN,
+    Role.CAPTAIN,
+    Role.VICE_CAPTAIN,
+    Role.TREASURER,
+    Role.MEMBER,
+  ]
 
   static fromString(role: string): Role | null {
     switch (role) {

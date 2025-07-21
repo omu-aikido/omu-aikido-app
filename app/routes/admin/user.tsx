@@ -42,10 +42,7 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
 
     // If reset parameter exists, redirect to clear query params
     if (url.searchParams.get("reset")) {
-      return new Response(null, {
-        status: 302,
-        headers: { Location: url.pathname },
-      })
+      return new Response(null, { status: 302, headers: { Location: url.pathname } })
     }
 
     // Validate and parse date parameters
@@ -157,14 +154,8 @@ export async function action(args: Route.ActionArgs) {
 
   if (!year || !gradeStr || !role || !joinedAtStr) {
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: "必須フィールドが入力されていません",
-      }),
-      {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      },
+      JSON.stringify({ success: false, error: "必須フィールドが入力されていません" }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
     )
   }
 
@@ -178,10 +169,7 @@ export async function action(args: Route.ActionArgs) {
         success: false,
         error: "級段位または入部年度の形式が正しくありません",
       }),
-      {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      },
+      { status: 400, headers: { "Content-Type": "application/json" } },
     )
   }
 
@@ -189,14 +177,8 @@ export async function action(args: Route.ActionArgs) {
   const currentYear = new Date().getFullYear()
   if (joinedAt < 1950 || joinedAt > currentYear + 1) {
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: "入部年度が有効な範囲外です",
-      }),
-      {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      },
+      JSON.stringify({ success: false, error: "入部年度が有効な範囲外です" }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
     )
   }
 
@@ -206,14 +188,8 @@ export async function action(args: Route.ActionArgs) {
     getGradeAt = new Date(getGradeAtStr)
     if (isNaN(getGradeAt.getTime())) {
       return new Response(
-        JSON.stringify({
-          success: false,
-          error: "級段位取得日の形式が正しくありません",
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        JSON.stringify({ success: false, error: "級段位取得日の形式が正しくありません" }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
       )
     }
   }
@@ -223,41 +199,22 @@ export async function action(args: Route.ActionArgs) {
 
   if (!targetUserId) {
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: "ユーザーIDが必要です",
-      }),
-      {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      },
+      JSON.stringify({ success: false, error: "ユーザーIDが必要です" }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
     )
   }
 
   try {
     const result = await updateProfile({
       applicateBy: userId,
-      newProfile: {
-        id: targetUserId,
-        year,
-        grade,
-        role,
-        joinedAt,
-        getGradeAt,
-      },
+      newProfile: { id: targetUserId, year, grade, role, joinedAt, getGradeAt },
       env: args.context.cloudflare.env,
     })
 
     if (result instanceof Error) {
       return new Response(
-        JSON.stringify({
-          success: false,
-          error: "プロフィールの更新に失敗しました",
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        },
+        JSON.stringify({ success: false, error: "プロフィールの更新に失敗しました" }),
+        { status: 500, headers: { "Content-Type": "application/json" } },
       )
     }
 
@@ -268,10 +225,7 @@ export async function action(args: Route.ActionArgs) {
         success: false,
         error: "サーバーエラーが発生しました" + `${err}`,
       }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+      { status: 500, headers: { "Content-Type": "application/json" } },
     )
   }
 }
@@ -303,7 +257,8 @@ export default function AdminUser(args: Route.ComponentProps) {
   useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data) {
       try {
-        const response = typeof fetcher.data === "string" ? JSON.parse(fetcher.data) : fetcher.data
+        const response =
+          typeof fetcher.data === "string" ? JSON.parse(fetcher.data) : fetcher.data
         if (response?.error) {
           setNotification({ type: "error", message: response.error })
           const timer = setTimeout(() => setNotification(null), 5000)
@@ -349,7 +304,9 @@ export default function AdminUser(args: Route.ComponentProps) {
 
       {/* Notification */}
       {notification && (
-        <div className={notificationStyle({ type: notification.type, className: "mb-6" })}>
+        <div
+          className={notificationStyle({ type: notification.type, className: "mb-6" })}
+        >
           <div className="flex items-center justify-between">
             <span>{notification.message}</span>
             <button
@@ -405,12 +362,32 @@ export default function AdminUser(args: Route.ComponentProps) {
       >
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <RoleSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
+            <RoleSelect
+              profile={profile}
+              isEditing={isEditing}
+              fetcherState={fetcher.state}
+            />
           </div>
-          <GradeSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
-          <GetGradeAtInput profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
-          <JoinedAtInput profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
-          <YearSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
+          <GradeSelect
+            profile={profile}
+            isEditing={isEditing}
+            fetcherState={fetcher.state}
+          />
+          <GetGradeAtInput
+            profile={profile}
+            isEditing={isEditing}
+            fetcherState={fetcher.state}
+          />
+          <JoinedAtInput
+            profile={profile}
+            isEditing={isEditing}
+            fetcherState={fetcher.state}
+          />
+          <YearSelect
+            profile={profile}
+            isEditing={isEditing}
+            fetcherState={fetcher.state}
+          />
         </div>
 
         <div className="flex gap-2">
@@ -451,7 +428,11 @@ export default function AdminUser(args: Route.ComponentProps) {
       </FormWrapper>
 
       {/* Stats Section */}
-      <StatsSection trainCount={trainCount} totalTrains={totalTrains} grade={profile.grade} />
+      <StatsSection
+        trainCount={trainCount}
+        totalTrains={totalTrains}
+        grade={profile.grade}
+      />
 
       {/* Filter Section */}
       <FilterSection
@@ -508,7 +489,9 @@ function UserProfileSection({ user, profile, discord }: UserProfileSectionProps)
         <div className="space-y-3 flex flex-col">
           <div className={info().frame()}>
             <label className={info().label()}>役職</label>
-            <p className={info().value()}>{Role.fromString(profile.role)?.ja || "部員"}</p>
+            <p className={info().value()}>
+              {Role.fromString(profile.role)?.ja || "部員"}
+            </p>
           </div>
           <div className={info().frame()}>
             <label className={info().label()}>作成日</label>
@@ -538,14 +521,20 @@ function StatsSection({ trainCount, totalTrains, grade }: StatsSectionProps) {
     <div className={statsCard({ className: "mb-6" })}>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <p className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">次の級段位まで</p>
+          <p className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">
+            次の級段位まで
+          </p>
           <p className="text-lg font-bold text-yellow-900 dark:text-yellow-100">
             {trainCount}/{timeForNextGrade(grade)}回
           </p>
         </div>
         <div>
-          <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">累計稽古回数</p>
-          <p className="text-lg font-bold text-purple-900 dark:text-purple-100">{totalTrains}回</p>
+          <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">
+            累計稽古回数
+          </p>
+          <p className="text-lg font-bold text-purple-900 dark:text-purple-100">
+            {totalTrains}回
+          </p>
         </div>
       </div>
     </div>
@@ -558,12 +547,19 @@ interface FilterSectionProps {
   startValue: string
   endValue: string
 }
-function FilterSection({ showFilters, setShowFilters, startValue, endValue }: FilterSectionProps) {
+function FilterSection({
+  showFilters,
+  setShowFilters,
+  startValue,
+  endValue,
+}: FilterSectionProps) {
   return (
     <div className={filterCard({ className: "mb-6" })}>
       <div>
         <button onClick={() => setShowFilters(!showFilters)} className={filterButton()}>
-          <span className="text-lg font-medium text-slate-900 dark:text-slate-50">フィルター</span>
+          <span className="text-lg font-medium text-slate-900 dark:text-slate-50">
+            フィルター
+          </span>
         </button>
         {showFilters && (
           <div className="p-6">
@@ -661,7 +657,9 @@ function ActivitiesTable({ activities, page, total, limit }: ActivitiesTableProp
                   <td className={tableCell({ variant: "primary" })}>
                     {new Date(activity.date).toLocaleDateString("ja-JP")}
                   </td>
-                  <td className={tableCell({ variant: "primary" })}>{activity.period}時間</td>
+                  <td className={tableCell({ variant: "primary" })}>
+                    {activity.period}時間
+                  </td>
                   <td className={tableCell({ variant: "secondary" })}>
                     {activity.updatedAt
                       ? new Date(activity.updatedAt).toLocaleString("ja-JP")
@@ -763,7 +761,9 @@ function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
 
 function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
   const disabled = !isEditing || fetcherState === "loading"
-  const value = profile.getGradeAt ? new Date(profile.getGradeAt).toISOString().split("T")[0] : ""
+  const value = profile.getGradeAt
+    ? new Date(profile.getGradeAt).toISOString().split("T")[0]
+    : ""
   return (
     <div>
       <label htmlFor="getGradeAt" className={style.form.label()}>
@@ -840,7 +840,8 @@ const info = tv({
   slots: {
     frame: "flex flex-row",
     label: "block text-sm font-medium text-slate-700 dark:text-slate-300",
-    value: "ml-auto items-end justify-center text-sm text-slate-900 dark:text-slate-100 font-mono",
+    value:
+      "ml-auto items-end justify-center text-sm text-slate-900 dark:text-slate-100 font-mono",
   },
 })
 
@@ -858,7 +859,8 @@ const button = tv({
     variant: {
       primary: "bg-blue-600 hover:bg-blue-700 text-slate-50 focus:ring-blue-500",
       secondary: "bg-slate-500 hover:bg-slate-600 text-slate-50 focus:ring-slate-500",
-      ghost: "text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300",
+      ghost:
+        "text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300",
     },
   },
 })

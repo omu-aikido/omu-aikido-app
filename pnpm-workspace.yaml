@@ -1,3 +1,1 @@
-onlyBuiltDependencies:
-  - "@clerk/shared"
-  - esbuild
+onlyBuiltDependencies: -"@clerk/shared" - esbuild

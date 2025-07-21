@@ -77,7 +77,10 @@ export default function ProfileForm() {
           <FirstNameInput firstName={user.firstName ?? undefined} disabled={disabled} />
         </div>
         <UsernameInput username={user.username || ""} disabled={disabled} />
-        <EmailInput email={user.emailAddresses?.[0]?.emailAddress || ""} disabled={disabled} />
+        <EmailInput
+          email={user.emailAddresses?.[0]?.emailAddress || ""}
+          disabled={disabled}
+        />
         <div className="flex gap-x-2">
           {isEditing ? (
             <>
@@ -128,7 +131,13 @@ export default function ProfileForm() {
 }
 
 // MARK: Form Field Components
-function ProfileImageInput({ imageUrl, isEditing }: { imageUrl: string; isEditing: boolean }) {
+function ProfileImageInput({
+  imageUrl,
+  isEditing,
+}: {
+  imageUrl: string
+  isEditing: boolean
+}) {
   return (
     <div className="flex gap-2 items-center">
       <div className="w-12 h-12 mr-4 rounded-full relative group overflow-hidden flex-shrink-0">
@@ -178,7 +187,13 @@ function LastNameInput({ lastName, disabled }: { lastName?: string; disabled: bo
   )
 }
 
-function FirstNameInput({ firstName, disabled }: { firstName?: string; disabled: boolean }) {
+function FirstNameInput({
+  firstName,
+  disabled,
+}: {
+  firstName?: string
+  disabled: boolean
+}) {
   return (
     <div className="w-1/2">
       <label htmlFor="firstName" className={style.form.label({ necessary: true })}>

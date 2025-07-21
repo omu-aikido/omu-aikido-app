@@ -15,9 +15,7 @@ export async function getAccount(input: {
   userId: string | undefined | null
   env: Env
 }): Promise<User | null> {
-  const clerkClient = createClerkClient({
-    secretKey: input.env.CLERK_SECRET_KEY,
-  })
+  const clerkClient = createClerkClient({ secretKey: input.env.CLERK_SECRET_KEY })
 
   if (!input.userId) {
     return null
@@ -37,9 +35,7 @@ export async function getProfile(input: {
   userId: string | null
   env: Env
 }): Promise<Profile | null> {
-  const clerkClient = createClerkClient({
-    secretKey: input.env.CLERK_SECRET_KEY,
-  })
+  const clerkClient = createClerkClient({ secretKey: input.env.CLERK_SECRET_KEY })
 
   if (!input.userId) return null
 
@@ -56,15 +52,10 @@ export async function getProfile(input: {
     }
 
     // Profile型に変換
-    return {
-      ...parsedProfile.data,
-      id: user.id,
-    } as Profile
+    return { ...parsedProfile.data, id: user.id } as Profile
   } catch (error) {
     const status = error instanceof Error ? 422 : 303
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    }
+    const headers: Record<string, string> = { "Content-Type": "application/json" }
     if (status === 303) {
       headers.Location = "/account/recovery"
     }
@@ -77,9 +68,7 @@ export async function createProfile(
   input: z.infer<typeof createProfileInputSchema>,
   env: Env,
 ): Promise<Response> {
-  const clerkClient = createClerkClient({
-    secretKey: env.CLERK_SECRET_KEY,
-  })
+  const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
 
   // 既に有効なプロフィールがある場合はエラーとする。
   const existingProfile = await getProfile({ userId: input.id, env })
@@ -92,10 +81,7 @@ export async function createProfile(
 
   try {
     const { id, ...metadata } = input
-    const publicMetadata = {
-      ...metadata,
-      role: "member" as const,
-    }
+    const publicMetadata = { ...metadata, role: "member" as const }
     await clerkClient.users.updateUserMetadata(id, { publicMetadata })
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
@@ -114,9 +100,7 @@ export async function updateProfile(
   input: z.infer<typeof updateProfileInputSchema>,
   env: Env,
 ): Promise<Response> {
-  const clerkClient = createClerkClient({
-    secretKey: env.CLERK_SECRET_KEY,
-  })
+  const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
 
   try {
     // 既存profile取得

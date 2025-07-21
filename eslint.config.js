@@ -29,15 +29,15 @@ export default tseslint.config(
       ecmaVersion: 2022,
       sourceType: "module",
       parserOptions: {
-        project: ["./tsconfig.cloudflare.json", "./tsconfig.node.json", "./tsconfig.test.json"],
+        project: [
+          "./tsconfig.cloudflare.json",
+          "./tsconfig.node.json",
+          "./tsconfig.test.json",
+        ],
         tsconfigRootDir: import.meta.dirname,
-        ecmaFeatures: {
-          jsx: true,
-        },
+        ecmaFeatures: { jsx: true },
       },
-      globals: {
-        React: "readonly",
-      },
+      globals: { React: "readonly" },
     },
     plugins: {
       react,
@@ -45,11 +45,7 @@ export default tseslint.config(
       "react-refresh": reactRefresh,
       import: importPlugin,
     },
-    settings: {
-      react: {
-        version: "detect",
-      },
-    },
+    settings: { react: { version: "detect" } },
     rules: {
       // TypeScript rules
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
@@ -92,10 +88,7 @@ export default tseslint.config(
         {
           groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
           "newlines-between": "always",
-          alphabetize: {
-            order: "asc",
-            caseInsensitive: true,
-          },
+          alphabetize: { order: "asc", caseInsensitive: true },
         },
       ],
       "import/no-duplicates": "error",

@@ -8,16 +8,9 @@ export type Grade = 0 | 5 | 4 | 3 | 2 | 1 | -1 | -2
 
 export type Profile = z.infer<typeof profileSchema>
 
-type PagePath = {
-  name: string
-  href: string
-  desc: string
-}
+type PagePath = { name: string; href: string; desc: string }
 
-type ActionResult<T = unknown> = {
-  data: T
-  result: boolean
-}
+type ActionResult<T = unknown> = { data: T; result: boolean }
 
 export interface DailyActivityItem extends ActivityType {
   isDeleted?: boolean

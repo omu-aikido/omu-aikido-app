@@ -1,5 +1,12 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
-import { addMonths, eachDayOfInterval, endOfMonth, format, startOfMonth, subMonths } from "date-fns"
+import {
+  addMonths,
+  eachDayOfInterval,
+  endOfMonth,
+  format,
+  startOfMonth,
+  subMonths,
+} from "date-fns"
 import { useEffect, useMemo, useState } from "react"
 import { redirect, useActionData, useFetcher, useSearchParams } from "react-router"
 
@@ -80,13 +87,25 @@ export async function action(args: Route.ActionArgs) {
 
     try {
       if (payload.added && payload.added.length > 0) {
-        await createActivities({ userId, activities: payload.added, env: context.cloudflare.env })
+        await createActivities({
+          userId,
+          activities: payload.added,
+          env: context.cloudflare.env,
+        })
       }
       if (payload.updated && payload.updated.length > 0) {
-        await updateActivities({ userId, activities: payload.updated, env: context.cloudflare.env })
+        await updateActivities({
+          userId,
+          activities: payload.updated,
+          env: context.cloudflare.env,
+        })
       }
       if (payload.deleted && payload.deleted.length > 0) {
-        await deleteActivities({ userId, ids: payload.deleted, env: context.cloudflare.env })
+        await deleteActivities({
+          userId,
+          ids: payload.deleted,
+          env: context.cloudflare.env,
+        })
       }
 
       return redirect(`/record?month=${formData.get("currentMonth")}`)
@@ -113,7 +132,9 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
   const [originalActivities, setOriginalActivities] = useState<DailyActivityItem[]>(
     initialActivities || [],
   )
-  const [currentActivities, setActivities] = useState<DailyActivityItem[]>(initialActivities || [])
+  const [currentActivities, setActivities] = useState<DailyActivityItem[]>(
+    initialActivities || [],
+  )
 
   useEffect(() => {
     setOriginalActivities(initialActivities || [])
@@ -125,8 +146,13 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
   // 新しいフックを呼び出す
-  const { currentMonth, handleSelectYearMonth, daysInMonth, handlePrevMonth, handleNextMonth } =
-    useMonthlyNavigation(loadedMonth)
+  const {
+    currentMonth,
+    handleSelectYearMonth,
+    daysInMonth,
+    handlePrevMonth,
+    handleNextMonth,
+  } = useMonthlyNavigation(loadedMonth)
 
   const isChanged = useMemo(() => {
     const mapNew = groupByDate(currentActivities)
@@ -145,7 +171,9 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
   const handleSaveDailyActivities = (updatedDailyActivities: DailyActivityItem[]) => {
     const dateToUpdate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : null
     if (!dateToUpdate) return
-    const filteredPrevActivities = currentActivities.filter(act => act.date !== dateToUpdate)
+    const filteredPrevActivities = currentActivities.filter(
+      act => act.date !== dateToUpdate,
+    )
     const newActivities = [...filteredPrevActivities, ...updatedDailyActivities]
     setActivities(newActivities)
     setShowDailyActivityModal(false)
@@ -190,7 +218,11 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                   : "送信中"}
             </button>
             <input type="hidden" name="actionType" value="batchUpdate" />
-            <input type="hidden" name="currentMonth" value={format(currentMonth, "yyyy-MM")} />
+            <input
+              type="hidden"
+              name="currentMonth"
+              value={format(currentMonth, "yyyy-MM")}
+            />
             <input
               type="hidden"
               name="payload"
@@ -213,7 +245,11 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
           />
           <fetcher.Form method="post">
             <input type="hidden" name="actionType" value="batchUpdate" />
-            <input type="hidden" name="currentMonth" value={format(currentMonth, "yyyy-MM")} />
+            <input
+              type="hidden"
+              name="currentMonth"
+              value={format(currentMonth, "yyyy-MM")}
+            />
             <input
               type="hidden"
               name="payload"
@@ -334,7 +370,9 @@ function prepareBatchUpdatePayload(
     const originalAct = originalActivities.find(oa => oa.id === currentAct.id)
     if (originalAct && !currentAct.isDeleted) {
       const fieldsToCompare: (keyof DailyActivityItem)[] = ["date", "period", "userId"]
-      const hasChanges = fieldsToCompare.some(field => originalAct[field] !== currentAct[field])
+      const hasChanges = fieldsToCompare.some(
+        field => originalAct[field] !== currentAct[field],
+      )
       if (hasChanges) {
         activitiesToUpdate.push(stripIsDeleted(currentAct))
       }

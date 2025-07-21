@@ -46,16 +46,7 @@ export async function action(args: Route.ActionArgs) {
   const getGradeAt = formData.get("getGradeAt")?.toString()
 
   const env = args.context.cloudflare.env
-  const res = await updateProfile(
-    {
-      id: userId,
-      year,
-      grade,
-      joinedAt,
-      getGradeAt,
-    },
-    env,
-  )
+  const res = await updateProfile({ id: userId, year, grade, joinedAt, getGradeAt }, env)
 
   return res
 }
@@ -83,8 +74,16 @@ export default function StatusForm({ loaderData }: Route.ComponentProps) {
       encType={isEditing ? "multipart/form-data" : undefined}
     >
       <GradeSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
-      <GetGradeAtInput profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
-      <JoinedAtInput profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
+      <GetGradeAtInput
+        profile={profile}
+        isEditing={isEditing}
+        fetcherState={fetcher.state}
+      />
+      <JoinedAtInput
+        profile={profile}
+        isEditing={isEditing}
+        fetcherState={fetcher.state}
+      />
       <YearSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
 
       <div className="flex gap-2">
@@ -92,14 +91,20 @@ export default function StatusForm({ loaderData }: Route.ComponentProps) {
           <>
             <button
               type="submit"
-              className={style.form.button({ disabled: fetcher.state !== "idle", type: "green" })}
+              className={style.form.button({
+                disabled: fetcher.state !== "idle",
+                type: "green",
+              })}
               disabled={fetcher.state !== "idle"}
             >
               {fetcher.state !== "idle" ? "通信中……" : "保存"}
             </button>
             <button
               type="button"
-              className={style.form.button({ disabled: fetcher.state !== "idle", type: "gray" })}
+              className={style.form.button({
+                disabled: fetcher.state !== "idle",
+                type: "gray",
+              })}
               disabled={fetcher.state !== "idle"}
               onClick={() => setIsEditing(false)}
             >
@@ -107,7 +112,11 @@ export default function StatusForm({ loaderData }: Route.ComponentProps) {
             </button>
           </>
         ) : (
-          <button type="button" className={style.form.button()} onClick={() => setIsEditing(true)}>
+          <button
+            type="button"
+            className={style.form.button()}
+            onClick={() => setIsEditing(true)}
+          >
             編集
           </button>
         )}
@@ -150,7 +159,9 @@ function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
 
 function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
   const disabled = !isEditing || fetcherState === "loading"
-  const value = profile.getGradeAt ? new Date(profile.getGradeAt).toISOString().split("T")[0] : ""
+  const value = profile.getGradeAt
+    ? new Date(profile.getGradeAt).toISOString().split("T")[0]
+    : ""
   return (
     <div>
       <label htmlFor="getGradeAt" className={style.form.label()}>

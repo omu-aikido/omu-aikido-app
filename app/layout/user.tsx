@@ -20,7 +20,9 @@ export async function loader(args: Route.LoaderArgs) {
 
   const user = await clerkClient.users.getUser(userId)
   const email = user.emailAddresses?.[0]?.emailAddress || ""
-  const discordAccount = user.externalAccounts?.find(acc => acc.provider === "oauth_discord")
+  const discordAccount = user.externalAccounts?.find(
+    acc => acc.provider === "oauth_discord",
+  )
   const username = user.username || ""
 
   return {

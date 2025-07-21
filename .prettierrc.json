@@ -4,7 +4,7 @@
   "jsxSingleQuote": false,
   "tabWidth": 2,
   "trailingComma": "all",
-  "printWidth": 100,
+  "printWidth": 90,
   "useTabs": false,
   "endOfLine": "lf",
   "arrowParens": "avoid",
@@ -13,7 +13,8 @@
   "embeddedLanguageFormatting": "auto",
   "htmlWhitespaceSensitivity": "css",
   "insertPragma": false,
-  "proseWrap": "preserve",
+  "proseWrap": "always",
+  "objectWrap": "collapse",
   "quoteProps": "as-needed",
   "requirePragma": false,
   "plugins": []

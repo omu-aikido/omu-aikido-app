@@ -14,7 +14,8 @@ export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
   const userId = auth.userId
 
-  if (userId) return redirect(new URL(args.request.url).searchParams.get("redirect_url") ?? "/")
+  if (userId)
+    return redirect(new URL(args.request.url).searchParams.get("redirect_url") ?? "/")
 }
 
 // MARK: Meta
@@ -44,10 +45,7 @@ export default function SignInPage() {
       return
     }
     try {
-      const result = await signIn.create({
-        identifier: email,
-        password,
-      })
+      const result = await signIn.create({ identifier: email, password })
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId })
         window.location.href = "/"
@@ -57,7 +55,8 @@ export default function SignInPage() {
     } catch (err) {
       let errorMsg = "サインインに失敗しました"
       if (typeof err === "object" && err && "errors" in err) {
-        errorMsg = (err as { errors?: { message?: string }[] }).errors?.[0]?.message || errorMsg
+        errorMsg =
+          (err as { errors?: { message?: string }[] }).errors?.[0]?.message || errorMsg
       }
       setError(errorMsg)
     } finally {
@@ -68,7 +67,11 @@ export default function SignInPage() {
   return (
     <div className={style.card.container({ class: "max-w-md mx-auto" })}>
       <h1 className={style.text.sectionTitle()}>サインイン</h1>
-      <fetcher.Form method="post" onSubmit={handleSubmit} className={style.form.container()}>
+      <fetcher.Form
+        method="post"
+        onSubmit={handleSubmit}
+        className={style.form.container()}
+      >
         <div>
           <label htmlFor="email" className={style.form.label({ necessary: true })}>
             メールアドレス
@@ -107,7 +110,11 @@ export default function SignInPage() {
         <button
           type="submit"
           disabled={loading}
-          className={style.button({ type: "primary", disabled: loading, class: "w-full" })}
+          className={style.button({
+            type: "primary",
+            disabled: loading,
+            class: "w-full",
+          })}
         >
           {loading ? "サインイン中..." : "サインイン"}
         </button>

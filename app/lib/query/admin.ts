@@ -15,15 +15,17 @@ export async function updateProfile(input: {
   }
   env: Env
 }): Promise<User> {
-  const clerkClient = createClerkClient({
-    secretKey: input.env.CLERK_SECRET_KEY,
+  const clerkClient = createClerkClient({ secretKey: input.env.CLERK_SECRET_KEY })
+  const applicaterProfile = await getProfile({
+    userId: input.applicateBy,
+    env: input.env,
   })
-  const applicaterProfile = await getProfile({ userId: input.applicateBy, env: input.env })
 
   if (!applicaterProfile) throw new Error("Applicater profile not found")
 
   const applicated = getRole({ profile: applicaterProfile })
-  if (!applicated || !applicated.isManagement()) throw new Error("Method Not Allow: Account Role")
+  if (!applicated || !applicated.isManagement())
+    throw new Error("Method Not Allow: Account Role")
 
   const current = await getProfile({ userId: input.newProfile.id, env: input.env })
   if (!current) throw new Error("not found profile")

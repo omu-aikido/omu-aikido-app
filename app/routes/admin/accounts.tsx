@@ -24,11 +24,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
   try {
     // クエリパラメータを適切に設定
-    const getUserListParams = {
-      limit,
-      offset,
-      query,
-    }
+    const getUserListParams = { limit, offset, query }
 
     // 検索クエリがある場合は追加
     if (query.trim()) {
@@ -38,25 +34,18 @@ export async function loader(args: LoaderFunctionArgs) {
     const clerkUsers = await clerkClient.users.getUserList(getUserListParams)
 
     const users: User[] = clerkUsers.data.sort((a: User, b: User) => {
-      return Role.compare(a.publicMetadata.role as string, b.publicMetadata.role as string)
+      return Role.compare(
+        a.publicMetadata.role as string,
+        b.publicMetadata.role as string,
+      )
     })
 
     // 総ページ数を計算
     const totalPages = Math.ceil(clerkUsers.totalCount / limit)
 
-    return {
-      users,
-      totalPages,
-      currentPage,
-      query,
-    }
+    return { users, totalPages, currentPage, query }
   } catch {
-    return {
-      users: [] as User[],
-      totalPages: 0,
-      currentPage,
-      query,
-    }
+    return { users: [] as User[], totalPages: 0, currentPage, query }
   }
 }
 
@@ -96,7 +85,11 @@ export default function AdminAccounts(args: Route.ComponentProps) {
           </button>
         </form>
       </div>
-      <ClerkUsers users={users as User[]} totalPages={totalPages} currentPage={currentPage} />
+      <ClerkUsers
+        users={users as User[]}
+        totalPages={totalPages}
+        currentPage={currentPage}
+      />
     </div>
   )
 }

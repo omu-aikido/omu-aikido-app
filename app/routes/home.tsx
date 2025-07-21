@@ -39,7 +39,9 @@ export async function loader(args: Route.LoaderArgs) {
   const profile = await getProfile({ userId, env })
   const activityFromPreviousGrade = await userActivity({
     userId,
-    start: new Date(profile?.getGradeAt ? profile.getGradeAt : new Date(profile!.joinedAt, 3, 1)),
+    start: new Date(
+      profile?.getGradeAt ? profile.getGradeAt : new Date(profile!.joinedAt, 3, 1),
+    ),
     end: new Date(),
     env,
   })
@@ -49,7 +51,10 @@ export async function loader(args: Route.LoaderArgs) {
     0,
     Math.floor(
       forNextGrade -
-        activityFromPreviousGrade.map(record => record.period).reduce((a, b) => a + b, 0) / 1.5,
+        activityFromPreviousGrade
+          .map(record => record.period)
+          .reduce((a, b) => a + b, 0) /
+          1.5,
     ),
   )
   const gradeData = { grade, needToNextGrade, forNextGrade }
@@ -75,20 +80,14 @@ export async function action(args: Route.ActionArgs): Promise<ActionResult> {
   const userId = formData.get("userId") as string
   const date = formData.get("date") as string
   const period = formData.get("period") as unknown as number
-  if (!date || !period)
-    return {
-      data: null,
-      result: false,
-    }
-  const response = await createActivity({ userId, activity: { id: "", date, userId, period }, env })
-  const result = {
-    row: response.rows,
-    count: response.rowsAffected,
-  }
-  return {
-    data: result,
-    result: result.count == 1,
-  }
+  if (!date || !period) return { data: null, result: false }
+  const response = await createActivity({
+    userId,
+    activity: { id: "", date, userId, period },
+    env,
+  })
+  const result = { row: response.rows, count: response.rowsAffected }
+  return { data: result, result: result.count == 1 }
 }
 
 // MARK: Component

@@ -5,7 +5,10 @@ type Props = {
   onPrev: () => void
   onNext: () => void
   onSelect: (date: Date) => void
-  YearMonthSelector: React.ComponentType<{ currentMonth: Date; onSelect: (date: Date) => void }>
+  YearMonthSelector: React.ComponentType<{
+    currentMonth: Date
+    onSelect: (date: Date) => void
+  }>
 }
 
 export default function MonthNavigation({

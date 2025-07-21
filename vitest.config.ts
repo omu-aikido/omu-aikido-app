@@ -2,8 +2,5 @@
 import { defineConfig } from "vitest/config"
 
 export default defineConfig({
-  test: {
-    environment: "happy-dom",
-    dir: "tests/functions",
-  },
+  test: { environment: "happy-dom", dir: "tests/functions" },
 })

@@ -22,7 +22,9 @@ export function NextGrade(gradeData: {
         <p className="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400">
           {needToNextGrade} / {forNextGrade}{" "}
         </p>
-        <span className="text-base font-medium text-gray-600 dark:text-gray-400 mt-1">日</span>
+        <span className="text-base font-medium text-gray-600 dark:text-gray-400 mt-1">
+          日
+        </span>
       </div>
       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
         <div

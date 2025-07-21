@@ -8,7 +8,13 @@ interface SidebarProps {
   onOpenChange?: (open: boolean) => void
 }
 
-export function Sidebar({ position, icon, children, open: openProp, onOpenChange }: SidebarProps) {
+export function Sidebar({
+  position,
+  icon,
+  children,
+  open: openProp,
+  onOpenChange,
+}: SidebarProps) {
   const [internalOpen, setInternalOpen] = useState(false)
   const open = openProp !== undefined ? openProp : internalOpen
   const setOpen = useCallback(
@@ -63,7 +69,11 @@ export function Sidebar({ position, icon, children, open: openProp, onOpenChange
         className={`fixed top-0 ${
           position === "left" ? "left-0" : "right-0"
         } h-full bg-slate-200 dark:bg-slate-800 shadow-2xl z-50 transition-transform duration-300 ease-out ${
-          open ? "translate-x-0" : position === "left" ? "-translate-x-full" : "translate-x-full"
+          open
+            ? "translate-x-0"
+            : position === "left"
+              ? "-translate-x-full"
+              : "translate-x-full"
         } w-80 flex flex-col`}
       >
         <div className="p-6 flex-1">

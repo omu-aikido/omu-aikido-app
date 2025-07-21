@@ -49,7 +49,9 @@ export default function Discord() {
 
     setIsDisconnecting(true)
     try {
-      const discordExternalAccount = user.externalAccounts.find(acc => acc.provider === "discord")
+      const discordExternalAccount = user.externalAccounts.find(
+        acc => acc.provider === "discord",
+      )
 
       if (discordExternalAccount) {
         await discordExternalAccount.destroy()

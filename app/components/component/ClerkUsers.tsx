@@ -64,14 +64,19 @@ export function ClerkUsers({ users, totalPages, currentPage }: Props) {
         {users && users.length > 0 ? (
           users
             .sort((a: User, b: User) => {
-              return Role.compare(a.publicMetadata.role as string, b.publicMetadata.role as string)
+              return Role.compare(
+                a.publicMetadata.role as string,
+                b.publicMetadata.role as string,
+              )
             })
             .map((user: User) => <UserCell user={user} key={user.id} />)
         ) : (
           <div className="text-center text-slate-500 dark:text-slate-400 py-8">
             <div className="flex justify-center items-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600">
-                <span className="ml-2 text-slate-600 dark:text-slate-400">読み込み中...</span>
+                <span className="ml-2 text-slate-600 dark:text-slate-400">
+                  読み込み中...
+                </span>
               </div>
             </div>
           </div>

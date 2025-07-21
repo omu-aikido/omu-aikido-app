@@ -21,7 +21,10 @@ const cell = tv({
   compoundSlots: [
     {
       slots: ["week", "date"],
-      class: ["p-2 transition-colors duration-200", "border-slate-300 dark:border-slate-600"],
+      class: [
+        "p-2 transition-colors duration-200",
+        "border-slate-300 dark:border-slate-600",
+      ],
     },
   ],
   variants: {
@@ -44,27 +47,15 @@ const cell = tv({
       },
     },
     disabled: {
-      true: {
-        date: "bg-slate-100 dark:bg-slate-800 opacity-80",
-      },
+      true: { date: "bg-slate-100 dark:bg-slate-800 opacity-80" },
       false: {
         date: "cursor-pointer bg-white dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800",
       },
     },
-    isFirstRow: {
-      true: {
-        date: "border-t",
-      },
-    },
-    isFirstCol: {
-      true: {
-        date: "border-l",
-      },
-    },
+    isFirstRow: { true: { date: "border-t" } },
+    isFirstCol: { true: { date: "border-l" } },
   },
-  defaultVariants: {
-    disabled: false,
-  },
+  defaultVariants: { disabled: false },
 })
 
 // 日ごとのセルコンポーネント
@@ -119,7 +110,13 @@ function WeekdayHeaderCell({ day, index }: { day: string; index: number }) {
   return <div className={cell({ isSunday, isSaturday }).week()}>{day}</div>
 }
 
-function DayActivitySummary({ totalHours, count }: { totalHours: number; count: number }) {
+function DayActivitySummary({
+  totalHours,
+  count,
+}: {
+  totalHours: number
+  count: number
+}) {
   if (totalHours <= 0) return null
   return (
     <div
@@ -143,7 +140,11 @@ function DayActivitySummary({ totalHours, count }: { totalHours: number; count: 
   )
 }
 
-export default function MonthlyCalendarGrid({ daysInMonth, currentActivities, onDayClick }: Props) {
+export default function MonthlyCalendarGrid({
+  daysInMonth,
+  currentActivities,
+  onDayClick,
+}: Props) {
   const firstDayCol = daysInMonth[0].getDay()
   return (
     <div className="min-w-[700px] grid grid-cols-7 gap-0 mb-6">
@@ -156,7 +157,11 @@ export default function MonthlyCalendarGrid({ daysInMonth, currentActivities, on
         .map((_, i) => (
           <div
             key={`empty-start-${i}`}
-            className={cell({ disabled: true, isFirstRow: true, isFirstCol: i === 0 }).date()}
+            className={cell({
+              disabled: true,
+              isFirstRow: true,
+              isFirstCol: i === 0,
+            }).date()}
             aria-disabled="true"
           />
         ))}
@@ -182,7 +187,8 @@ export default function MonthlyCalendarGrid({ daysInMonth, currentActivities, on
             key={`empty-end-${i}`}
             className={cell({
               disabled: true,
-              isFirstCol: (daysInMonth[daysInMonth.length - 1].getDay() + 1 + i) % 7 === 0,
+              isFirstCol:
+                (daysInMonth[daysInMonth.length - 1].getDay() + 1 + i) % 7 === 0,
             }).date()}
             aria-disabled="true"
           />

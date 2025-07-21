@@ -15,10 +15,7 @@ export async function loader(args: Route.LoaderArgs) {
   if (!userId) {
     return redirect("/sign-in?redirect_url=" + args.request.url)
   }
-  const profile = await getProfile({
-    userId,
-    env,
-  })
+  const profile = await getProfile({ userId, env })
   if (!profile) return redirect("/")
   const role = Role.fromString(profile.role)
   if (!role || !role.isManagement) return redirect("/")

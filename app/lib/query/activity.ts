@@ -13,10 +13,7 @@ export const inputActivity = activity.$inferInsert
 export async function getAllActivities(input: { applicateBy: string; env: Env }) {
   const db = createDb(input.env)
 
-  const applicateBy = await getProfile({
-    userId: input.applicateBy,
-    env: input.env,
-  })
+  const applicateBy = await getProfile({ userId: input.applicateBy, env: input.env })
 
   if (!applicateBy) return applicateBy
 
@@ -69,7 +66,11 @@ export async function userActivity(input: {
     .select()
     .from(activity)
     .where(
-      and(eq(activity.userId, input.userId), gte(activity.date, start), lte(activity.date, end)),
+      and(
+        eq(activity.userId, input.userId),
+        gte(activity.date, start),
+        lte(activity.date, end),
+      ),
     )
 
   return activityData
@@ -105,7 +106,11 @@ export async function getActivitiesByDateRange(input: {
 }
 
 // MARK: recentlyActivity
-export async function recentlyActivity(input: { userId: string; limit: number; env: Env }) {
+export async function recentlyActivity(input: {
+  userId: string
+  limit: number
+  env: Env
+}) {
   const db = createDb(input.env)
 
   const activityData = await db
@@ -131,7 +136,10 @@ export async function deleteActivity(input: { userId: string; id: string; env: E
     throw new Error("Invalid user ID")
   }
 
-  const result = await db.delete(activity).where(eq(activity.id, validatedInput.id)).execute()
+  const result = await db
+    .delete(activity)
+    .where(eq(activity.id, validatedInput.id))
+    .execute()
 
   return result
 }
@@ -174,10 +182,7 @@ export async function updateActivity(input: {
   const db = createDb(input.env)
 
   const validatedInput = z
-    .object({
-      userId: z.string(),
-      activityId: z.string(),
-    })
+    .object({ userId: z.string(), activityId: z.string() })
     .parse(input)
 
   const user = await getProfile({ userId: validatedInput.userId, env: input.env })
@@ -234,7 +239,10 @@ export async function updateActivities(input: {
   const db = createDb(input.env)
 
   const ids = input.activities.map(act => act.id)
-  const existingActivities = await db.select().from(activity).where(inArray(activity.id, ids))
+  const existingActivities = await db
+    .select()
+    .from(activity)
+    .where(inArray(activity.id, ids))
   const invalid = existingActivities.some(a => a.userId !== input.userId)
   if (invalid) throw new Error("Invalid user ID in some activities")
 
@@ -242,10 +250,7 @@ export async function updateActivities(input: {
     const updatePromises = input.activities.map(act =>
       tx
         .update(activity)
-        .set({
-          ...act,
-          updatedAt: new Date().toISOString(),
-        })
+        .set({ ...act, updatedAt: new Date().toISOString() })
         .where(eq(activity.id, act.id))
         .execute(),
     )
@@ -256,13 +261,20 @@ export async function updateActivities(input: {
 }
 
 // MARK: deleteActivities
-export async function deleteActivities(input: { userId: string; ids: string[]; env: Env }) {
+export async function deleteActivities(input: {
+  userId: string
+  ids: string[]
+  env: Env
+}) {
   const db = createDb(input.env)
 
   if (!Array.isArray(input.ids) || input.ids.length === 0) {
     throw new Error("No activity IDs provided")
   }
-  const activities = await db.select().from(activity).where(inArray(activity.id, input.ids))
+  const activities = await db
+    .select()
+    .from(activity)
+    .where(inArray(activity.id, input.ids))
   const invalid = activities.some(a => a.userId !== input.userId)
   if (invalid) throw new Error("Invalid user ID in some activities")
   const results = await db.transaction(async tx => {

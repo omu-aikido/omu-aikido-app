@@ -8,7 +8,13 @@ interface IconProps {
   className?: string
 }
 
-export function Icon({ icon, color = "currentColor", gradient, size, className }: IconProps) {
+export function Icon({
+  icon,
+  color = "currentColor",
+  gradient,
+  size,
+  className,
+}: IconProps) {
   const iconPath = iconPaths[icon]
 
   // For React, you typically pass styles as an object

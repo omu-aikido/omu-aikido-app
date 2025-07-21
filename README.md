@@ -30,8 +30,7 @@
 pnpm install --frozen-lock
 ```
 
-2.  **環境変数の設定**:
-    `.env`ファイルに以下の環境変数を設定する必要があります。
+2.  **環境変数の設定**: `.env`ファイルに以下の環境変数を設定する必要があります。
     - `CLERK_PUBLISHABLE_KEY`
     - `CLERK_SECRET_KEY`
     - `TURSO_DATABASE_URL`
@@ -57,7 +56,8 @@ pnpm install --frozen-lock
 ## ディレクトリ構造
 
 - `app/`: アプリケーションのソースコードが含まれています。
-- `migrations/`: Drizzle ORMによって生成されたデータベースマイグレーションファイルが含まれています。
+- `migrations/`: Drizzle
+  ORMによって生成されたデータベースマイグレーションファイルが含まれています。
 - `tests/`: ユニットテスト（Vitest）およびE2Eテスト（Playwright）のコードが含まれています。
 - `workers/`: Cloudflare Workersのコードが含まれています。
 

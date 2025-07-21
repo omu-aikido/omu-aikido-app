@@ -46,8 +46,12 @@ export function Recents({ recent }: { recent: ActivityType | null }) {
         </small>
       </h2>
       <div className="flex justify-between text-sm text-slate-600 dark:text-slate-300 md:flex-row flex-col">
-        <span className="mr-2">追加日時: {new Date(recent.createAt).toLocaleString("ja-JP")}</span>
-        <span className="mr-2">日付: {new Date(recent.date).toLocaleDateString("ja-JP")}</span>
+        <span className="mr-2">
+          追加日時: {new Date(recent.createAt).toLocaleString("ja-JP")}
+        </span>
+        <span className="mr-2">
+          日付: {new Date(recent.date).toLocaleDateString("ja-JP")}
+        </span>
         <span>{recent.period}時間</span>
       </div>
     </div>

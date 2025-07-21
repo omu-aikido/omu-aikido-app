@@ -56,17 +56,17 @@ export default function SecurityPage() {
     }
     setLoading(true)
     try {
-      await user.updatePassword({
-        currentPassword,
-        newPassword,
-      })
+      await user.updatePassword({ currentPassword, newPassword })
       setSuccess("パスワードが変更されました。")
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
     } catch (err: unknown) {
       if (err && typeof err === "object" && "message" in err) {
-        setError(String((err as { message?: string }).message) || "パスワード変更に失敗しました。")
+        setError(
+          String((err as { message?: string }).message) ||
+            "パスワード変更に失敗しました。",
+        )
       } else {
         setError("パスワード変更に失敗しました。")
       }
@@ -88,7 +88,11 @@ export default function SecurityPage() {
             required
             disabled
           />
-          <button type="button" className={style.form.button()} onClick={() => setIsEditing(true)}>
+          <button
+            type="button"
+            className={style.form.button()}
+            onClick={() => setIsEditing(true)}
+          >
             パスワードを変更
           </button>
         </>

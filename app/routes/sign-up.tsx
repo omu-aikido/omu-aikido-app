@@ -39,10 +39,10 @@ export async function action(args: ActionFunctionArgs) {
     // Cloudflare環境から秘密キーを取得
     const secretKey = args.context.cloudflare.env.CLERK_SECRET_KEY
     if (!secretKey) {
-      return new Response(JSON.stringify({ success: false, error: "Server configuration error" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      })
+      return new Response(
+        JSON.stringify({ success: false, error: "Server configuration error" }),
+        { status: 500, headers: { "Content-Type": "application/json" } },
+      )
     }
 
     const clerkClient = createClerkClient({ secretKey })
@@ -51,10 +51,10 @@ export async function action(args: ActionFunctionArgs) {
     const email = formData.get("email")
     const userId = formData.get("userId")
     if (typeof email !== "string" || typeof userId !== "string") {
-      return new Response(JSON.stringify({ success: false, error: "Invalid User Infomation" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      })
+      return new Response(
+        JSON.stringify({ success: false, error: "Invalid User Infomation" }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      )
     }
 
     // リクエストから認証状態を取得
@@ -73,15 +73,16 @@ export async function action(args: ActionFunctionArgs) {
     // unsafeMetadataからプロファイル情報を取得
     const unsafeMetadata = user.unsafeMetadata as UnsafeMetadata
     if (!unsafeMetadata || typeof unsafeMetadata !== "object") {
-      return new Response(JSON.stringify({ success: false, error: "No profile data to migrate" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      })
+      return new Response(
+        JSON.stringify({ success: false, error: "No profile data to migrate" }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      )
     }
 
     // 値の型・範囲チェック
     const year = typeof unsafeMetadata.year === "string" ? unsafeMetadata.year : undefined
-    const grade = typeof unsafeMetadata.grade === "number" ? unsafeMetadata.grade : undefined
+    const grade =
+      typeof unsafeMetadata.grade === "number" ? unsafeMetadata.grade : undefined
     const joinedAt =
       typeof unsafeMetadata.joinedAt === "number" &&
       unsafeMetadata.joinedAt >= 2000 &&
@@ -120,29 +121,18 @@ export async function action(args: ActionFunctionArgs) {
           error: `Invalid profile data - missing or invalid: ${missingFields.join(", ")}`,
           received: { year, grade, joinedAt, getGradeAt },
         }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       )
     }
 
     // プロファイルデータをpublicMetadataに移動
-    const profileData = {
-      year,
-      grade,
-      joinedAt,
-      getGradeAt,
-      role: "member" as const,
-    }
+    const profileData = { year, grade, joinedAt, getGradeAt, role: "member" as const }
 
     // publicMetadataを更新し、unsafeMetadataをクリア
     await clerkClient.users.updateUserMetadata(auth.userId, {
       publicMetadata: profileData,
     })
-    await clerkClient.users.updateUserMetadata(auth.userId, {
-      unsafeMetadata: {},
-    })
+    await clerkClient.users.updateUserMetadata(auth.userId, { unsafeMetadata: {} })
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
@@ -150,14 +140,8 @@ export async function action(args: ActionFunctionArgs) {
     })
   } catch {
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: "Internal server error",
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+      JSON.stringify({ success: false, error: "Internal server error" }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
     )
   }
 }
@@ -243,7 +227,8 @@ export default function SignUpPage() {
     } catch (err) {
       let errorMsg = "ユーザー登録に失敗しました"
       if (typeof err === "object" && err && "errors" in err) {
-        errorMsg = (err as { errors?: { message?: string }[] }).errors?.[0]?.message || errorMsg
+        errorMsg =
+          (err as { errors?: { message?: string }[] }).errors?.[0]?.message || errorMsg
       }
       setError(errorMsg)
     } finally {
@@ -262,7 +247,9 @@ export default function SignUpPage() {
       return
     }
     try {
-      const completeSignUp = await signUp.attemptEmailAddressVerification({ code: otpCode })
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
+        code: otpCode,
+      })
       if (completeSignUp.status === "complete" && completeSignUp.createdUserId) {
         await setActive({ session: completeSignUp.createdSessionId })
         // サーバーアクションでpublicMetadata移行
@@ -275,7 +262,8 @@ export default function SignUpPage() {
     } catch (err) {
       let errorMsg = "メール認証に失敗しました"
       if (typeof err === "object" && err && "errors" in err) {
-        errorMsg = (err as { errors?: { message?: string }[] }).errors?.[0]?.message || errorMsg
+        errorMsg =
+          (err as { errors?: { message?: string }[] }).errors?.[0]?.message || errorMsg
       }
       setError(errorMsg)
     } finally {
@@ -350,7 +338,10 @@ export default function SignUpPage() {
             required
             className={style.form.input({ class: "col-span-2" })}
           />
-          <label htmlFor="password-confirm" className={style.form.label({ necessary: true })}>
+          <label
+            htmlFor="password-confirm"
+            className={style.form.label({ necessary: true })}
+          >
             パスワード確認
           </label>
           <input
@@ -361,7 +352,10 @@ export default function SignUpPage() {
             required
             className={style.form.input({ class: "col-span-2" })}
           />
-          <button type="submit" className={style.button({ type: "primary", class: "col-span-3" })}>
+          <button
+            type="submit"
+            className={style.button({ type: "primary", class: "col-span-3" })}
+          >
             次へ
           </button>
         </form>
@@ -404,7 +398,10 @@ export default function SignUpPage() {
     return (
       <div className={style.card.container({ class: "max-w-md mx-auto" })}>
         <h1 className={style.text.sectionTitle()}>プロフィール設定</h1>
-        <form onSubmit={handleProfileSubmit} className={style.form.container({ vertical: true })}>
+        <form
+          onSubmit={handleProfileSubmit}
+          className={style.form.container({ vertical: true })}
+        >
           <label htmlFor="year" className={style.form.label({ necessary: true })}>
             学年
           </label>
@@ -477,7 +474,10 @@ export default function SignUpPage() {
       <div className={style.card.container({ class: "max-w-md mx-auto" })}>
         <h1 className={style.text.sectionTitle()}>メールアドレス認証</h1>
         <p className={style.text.body()}>メールに届いた認証コードを入力してください</p>
-        <form onSubmit={handleVerify} className={style.form.container({ vertical: true })}>
+        <form
+          onSubmit={handleVerify}
+          className={style.form.container({ vertical: true })}
+        >
           <input
             id="otpCode"
             name="otpCode"
@@ -488,7 +488,11 @@ export default function SignUpPage() {
             className={style.form.input({ class: "col-span-2" })}
             disabled={loading}
           />
-          <button type="submit" className={style.button({ type: "primary" })} disabled={loading}>
+          <button
+            type="submit"
+            className={style.button({ type: "primary" })}
+            disabled={loading}
+          >
             {loading ? "認証中…" : "認証する"}
           </button>
         </form>

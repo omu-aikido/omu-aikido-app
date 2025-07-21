@@ -12,12 +12,7 @@ type Props = {
 
 const listItem = tv({
   base: "flex items-center flex-row justify-between py-3 px-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors",
-  variants: {
-    today: {
-      true: "bg-green-100 dark:bg-green-900/40",
-      false: "",
-    },
-  },
+  variants: { today: { true: "bg-green-100 dark:bg-green-900/40", false: "" } },
 })
 
 const dayLabel = tv({
@@ -31,7 +26,13 @@ const dayLabel = tv({
   },
 })
 
-function DayActivitySummary({ totalHours, count }: { totalHours: number; count: number }) {
+function DayActivitySummary({
+  totalHours,
+  count,
+}: {
+  totalHours: number
+  count: number
+}) {
   if (totalHours <= 0) return null
   return (
     <div className="flex flex-row justify-between">
@@ -59,7 +60,11 @@ function DayActivitySummary({ totalHours, count }: { totalHours: number; count: 
   )
 }
 
-export default function MonthlyActivityList({ daysInMonth, currentActivities, onDayClick }: Props) {
+export default function MonthlyActivityList({
+  daysInMonth,
+  currentActivities,
+  onDayClick,
+}: Props) {
   return (
     <ul className="divide-y divide-slate-200 dark:divide-slate-700">
       {daysInMonth.map((day, idx) => {
@@ -75,7 +80,11 @@ export default function MonthlyActivityList({ daysInMonth, currentActivities, on
           0,
         )
         return (
-          <li key={idx} className={listItem({ today: isToday })} onClick={() => onDayClick(day)}>
+          <li
+            key={idx}
+            className={listItem({ today: isToday })}
+            onClick={() => onDayClick(day)}
+          >
             <div className={dayLabel({ day: dayOfWeek })}>
               {`${format(day, "d日")}
                 (${["日", "月", "火", "水", "木", "金", "土"][day.getDay()]})`}
