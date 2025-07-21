@@ -15,24 +15,14 @@ import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
 import type { ActionResult, PagePath } from "~/type"
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "ハム大合気ポータル" },
-    { name: "description", content: "大阪公立大学合氣道部の活動管理アプリ" },
-  ]
-}
-
+// MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
-  // MARK: Authentication
   const auth = await getAuth(args)
   const userId = auth.userId
-
   if (!userId) return redirect("/sign-in?redirect_url=" + args.request.url)
 
-  // MARK: Environment
   const env = args.context.cloudflare.env
 
-  // MARK: Apps
   const apps: PagePath[] = [
     { name: "記録", href: "/record", desc: "活動の記録をつけよう" },
     { name: "アカウント", href: "/account", desc: "アカウント設定ページ" },
@@ -46,9 +36,7 @@ export async function loader(args: Route.LoaderArgs) {
     }
   }
 
-  // MARK: Next Grade
   const profile = await getProfile({ userId, env })
-
   const activityFromPreviousGrade = await userActivity({
     userId,
     start: new Date(profile?.getGradeAt ? profile.getGradeAt : new Date(profile!.joinedAt, 3, 1)),
@@ -64,16 +52,22 @@ export async function loader(args: Route.LoaderArgs) {
         activityFromPreviousGrade.map(record => record.period).reduce((a, b) => a + b, 0) / 1.5,
     ),
   )
-
   const gradeData = { grade, needToNextGrade, forNextGrade }
 
-  // MARK: Recents Added
   const recent = await recentlyActivity({ userId: userId!, limit: 1, env })
 
-  // MARK: Return
   return { gradeData, apps, recent }
 }
 
+// MARK: Meta
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "ホーム | ハム大合気ポータル" },
+    { name: "description", content: "大阪公立大学合氣道部の活動管理アプリ" },
+  ]
+}
+
+// MARK: Action
 export async function action(args: Route.ActionArgs): Promise<ActionResult> {
   const request = args.request
   const env = args.context.cloudflare.env
@@ -97,13 +91,15 @@ export async function action(args: Route.ActionArgs): Promise<ActionResult> {
   }
 }
 
+// MARK: Component
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { gradeData, apps, recent } = loaderData
   const fetcher = useFetcher()
   return (
     <>
       <NextGrade {...gradeData} />
-      <h1 className={`mt-4 ${style.text.title()}`}>記録追加</h1>
+
+      <h1 className={style.text.sectionTitle() + " mt-4"}>記録追加</h1>
 
       <AddRecord fetcher={fetcher} />
 

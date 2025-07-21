@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react"
 
+import { style } from "~/styles/component" // Import style
+
 interface YearMonthSelectorModalProps {
   currentMonth: Date
   onSelect: (date: Date) => void
@@ -29,14 +31,14 @@ export default function YearMonthSelectorInline({
         max={yearOptions[yearOptions.length - 1]}
         value={year}
         onChange={e => setYear(Number(e.target.value))}
-        className="w-20 px-2 py-1 border rounded text-center bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white"
+        className={style.form.input() + " w-20 text-center"}
       />
       <span className="mx-1">年</span>
       <select
         value={month}
         id={`select-${month}`}
         onChange={e => setMonth(Number(e.target.value))}
-        className="px-2 py-1 border rounded bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white"
+        className={style.form.input()}
       >
         {monthOptions.map(m => (
           <option key={m} value={m}>

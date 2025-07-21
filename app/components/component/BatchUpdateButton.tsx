@@ -1,3 +1,5 @@
+import { style } from "~/styles/component" // Import style
+
 type Props = {
   isChanged: boolean
   submitting: boolean
@@ -14,8 +16,11 @@ export default function BatchUpdateButton({
   return (
     <button
       type="submit"
-      className={`rounded-lg font-medium transition-colors duration-200 shadow-sm ${isChanged ? "bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-400 cursor-not-allowed"} ${className}`}
-      disabled={!isChanged || submitting}
+      className={style.button({
+        disabled: !isChanged || submitting,
+        type: isChanged ? "primary" : "secondary", // Dynamically set type based on isChanged
+        className,
+      })}
     >
       {children}
     </button>

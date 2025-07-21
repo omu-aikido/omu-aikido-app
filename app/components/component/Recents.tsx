@@ -1,6 +1,7 @@
 import type { ActivityType } from "~/db/schema"
+import { style } from "~/styles/component" // Import style
 
-export async function Recents({ recent }: { recent: ActivityType | null }) {
+export function Recents({ recent }: { recent: ActivityType | null }) {
   const relativeTime = (createAt: string) => {
     const now = Date.now()
     const diff = now - new Date(createAt).getTime()
@@ -33,7 +34,7 @@ export async function Recents({ recent }: { recent: ActivityType | null }) {
   if (!recent) return null
 
   return (
-    <div className="bg-slate-200 dark:bg-slate-800 border border-slate-600/90 p-4 rounded-lg mt-4">
+    <div className={`${style.card.container()} mt-4`}>
       <h2 className="text-lg text-[rgb(var(--text))] mb-2 mt-0">
         最近追加した項目:
         <small

@@ -9,6 +9,7 @@ import type { Route } from "./+types/sign-in"
 
 import { Icon } from "~/components/ui/Icon"
 
+// MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
   const userId = auth.userId
@@ -16,6 +17,15 @@ export async function loader(args: Route.LoaderArgs) {
   if (userId) return redirect(new URL(args.request.url).searchParams.get("redirect_url") ?? "/")
 }
 
+// MARK: Meta
+export function meta() {
+  return [
+    { title: "サインイン | ハム大合気ポータル" },
+    { name: "description", content: "サインインページ" },
+  ]
+}
+
+// MARK: Component
 export default function SignInPage() {
   const { signIn, setActive, isLoaded } = useSignIn()
   const fetcher = useFetcher()
@@ -56,48 +66,48 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-8 bg-white dark:bg-slate-900 rounded-lg shadow">
-      <h1 className="text-2xl font-bold mb-6 text-center text-slate-900 dark:text-slate-100">
-        サインイン
-      </h1>
-      <fetcher.Form method="post" onSubmit={handleSubmit} className="space-y-4">
+    <div className={style.card.container({ class: "max-w-md mx-auto" })}>
+      <h1 className={style.text.sectionTitle()}>サインイン</h1>
+      <fetcher.Form method="post" onSubmit={handleSubmit} className={style.form.container()}>
         <div>
-          <label className="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+          <label htmlFor="email" className={style.form.label({ necessary: true })}>
             メールアドレス
-            <input
-              type="email"
-              name="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              className="mt-1 block w-full rounded border-slate-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:focus:border-indigo-400 px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-            />
           </label>
+          <input
+            id="email"
+            type="email"
+            name="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+            className={style.form.input()}
+          />
         </div>
         <div>
-          <label className="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+          <label htmlFor="password" className={style.form.label({ necessary: true })}>
             パスワード
-            <input
-              type="password"
-              name="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              className="mt-1 block w-full rounded border-slate-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:focus:border-indigo-400 px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-            />
           </label>
+          <input
+            id="password"
+            type="password"
+            name="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+            className={style.form.input()}
+          />
         </div>
         {error && (
-          <div className="text-red-600 dark:text-red-400 mt-2 text-sm">
+          <div className={style.text.error()}>
             メールアドレスまたはパスワードが正しくありません。
           </div>
         )}
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2 px-4 bg-indigo-600 dark:bg-indigo-700 text-white font-semibold rounded hover:bg-indigo-700 dark:hover:bg-indigo-800 transition disabled:opacity-50"
+          className={style.button({ type: "primary", disabled: loading, class: "w-full" })}
         >
           {loading ? "サインイン中..." : "サインイン"}
         </button>

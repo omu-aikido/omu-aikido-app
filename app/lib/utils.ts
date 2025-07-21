@@ -104,3 +104,13 @@ export function translateYear(year_value: string): string {
   const year_data = year.find(y => y.year === year_value)
   return year_data ? year_data.name : "不明"
 }
+
+export function toLocalJPString(date: Date): string {
+  return date.toLocaleDateString("ja-JP", {
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "numeric",
+  })
+}
