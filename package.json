@@ -10,7 +10,7 @@
     "check": "pnpm build && tsc -b && pnpm db:check && wrangler deploy --dry-run",
     "format": "prettier --write .",
     "deploy": "pnpm build && wrangler deploy --dry-run",
-    "preview": "pnpm build && vite preview",
+    "preview": "pnpm build && wrangler dev --port 4173",
     "postbuild": "pnpm format",
     "cf-typegen": "wrangler types",
     "rr-typegen": "react-router typegen",
@@ -23,6 +23,7 @@
     "typegen": "wrangler types && react-router typegen",
     "lint:fix": "eslint . --fix",
     "test:unit": "vitest",
+    "test:e2e": "playwright test",
     "typecheck": "pnpm cf-typegen && react-router typegen && tsc -b"
   },
   "dependencies": {
@@ -39,7 +40,6 @@
     "drizzle-orm": "^0.39.3",
     "drizzle-zod": "^0.7.0",
     "isbot": "^5.1.27",
-    "playwright": "^1.54.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router": "^7.5.3",

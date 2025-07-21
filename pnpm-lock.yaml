@@ -47,9 +47,6 @@ importers:
       isbot:
         specifier: ^5.1.27
         version: 5.1.28
-      playwright:
-        specifier: ^1.54.1
-        version: 1.54.1
       react:
         specifier: ^19.1.0
         version: 19.1.0
