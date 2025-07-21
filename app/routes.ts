@@ -12,6 +12,11 @@ export default [
     route("status", "routes/user/status.tsx"),
     route("discord", "routes/user/discord.tsx"),
   ]),
+  // Admin routes
+  route("admin", "layout/admin.tsx", [
+    index("routes/admin/accounts.tsx"),
+    route("user/:userId", "routes/admin/user.tsx"),
+  ]),
   // Sign In
   route("sign-in", "routes/sign-in.tsx"),
   // Sign Up

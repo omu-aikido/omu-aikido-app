@@ -21,7 +21,6 @@ import {
 import { style } from "~/styles/component"
 import type { DailyActivityItem } from "~/type"
 
-
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
   const { request, context } = args
