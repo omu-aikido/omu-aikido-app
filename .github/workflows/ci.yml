@@ -16,14 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: development
     steps:
-      - name: Create .dev.vars file
-        run: |
-          cat <<EOF > .dev.vars
-          CLERK_PUBLISHABLE_KEY=${{ secrets.CLERK_PUBLISHABLE_KEY }}
-          CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}
-          TURSO_DATABASE_URL=${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}
-          EOF
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -53,9 +45,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate types
-        run: pnpm run typegen
-
       - name: Lint check
         run: pnpm run lint
 
@@ -63,7 +52,7 @@ jobs:
         run: pnpm run format:check
 
       - name: Type check
-        run: pnpm run typecheck
+        run: pnpm run check
 
   unit-test:
     name: Unit Test
@@ -112,14 +101,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: development
     steps:
-      - name: Create .dev.vars file
-        run: |
-          cat <<EOF > .dev.vars
-          CLERK_PUBLISHABLE_KEY=${{ secrets.CLERK_PUBLISHABLE_KEY }}
-          CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}
-          TURSO_DATABASE_URL=${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}
-          EOF
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -222,22 +203,3 @@ jobs:
 
       - name: Run Playwright tests
         run: pnpm playwright test
-
-  ci-success:
-    env:
-      CLERK_PUBLISHABLE_KEY: ${{ secrets.CLERK_PUBLISHABLE_KEY }}
-      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-      TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-    name: CI Success
-    runs-on: ubuntu-latest
-    environment: development
-    needs: [lint-and-typecheck, unit-test, build, e2e-test]
-    if: always()
-    steps:
-      - name: Check all jobs success
-        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
-        run: exit 1
-
-      - name: CI Success
-        run: echo "All CI jobs completed successfully!"
