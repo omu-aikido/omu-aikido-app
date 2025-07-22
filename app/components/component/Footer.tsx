@@ -1,3 +1,4 @@
+import { Link } from "react-router"
 import { tv } from "tailwind-variants"
 
 import { Icon } from "../ui/Icon"
@@ -30,12 +31,12 @@ export function Footer() {
       </div>
 
       <div>
-        <a href="https://omu-aikido.com/privacy-policy" className={footer.link()}>
+        <Link to="https://omu-aikido.com/privacy-policy" className={footer.link()}>
           プライバシーポリシー
-        </a>
-        <a href="https://omu-aikido.com/terms-of-service" className={footer.link()}>
+        </Link>
+        <Link to="https://omu-aikido.com/terms-of-service" className={footer.link()}>
           利用規約
-        </a>
+        </Link>
       </div>
 
       <div className="flex flex-row items-center justify-center p-4">

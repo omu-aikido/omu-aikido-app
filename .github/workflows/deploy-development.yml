@@ -3,6 +3,7 @@ name: Deploy Developemnt
 on:
   pull_request:
     types:
+      - opened
       - converted_to_draft
       - synchronize
 
