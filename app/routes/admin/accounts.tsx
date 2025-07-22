@@ -19,19 +19,17 @@ export async function loader(args: LoaderFunctionArgs) {
   const url = new URL(request.url)
   const query = url.searchParams.get("query") || ""
   const currentPage = parseInt(url.searchParams.get("page") || "0", 10)
-  const limit = 20
+  const limit = 15
   const offset = currentPage * limit
+  const orderBy = "created_at"
 
   try {
-    // クエリパラメータを適切に設定
-    const getUserListParams = { limit, offset, query }
-
-    // 検索クエリがある場合は追加
-    if (query.trim()) {
-      getUserListParams.query = query.trim()
-    }
-
-    const clerkUsers = await clerkClient.users.getUserList(getUserListParams)
+    const clerkUsers = await clerkClient.users.getUserList({
+      limit,
+      offset,
+      query: query.trim(),
+      orderBy,
+    })
 
     const users: User[] = clerkUsers.data.sort((a: User, b: User) => {
       return Role.compare(
