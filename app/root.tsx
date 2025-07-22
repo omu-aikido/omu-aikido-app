@@ -101,7 +101,7 @@ export default function App(args: Route.ComponentProps) {
               <AccountUi apps={links} />
             </Sidebar>
           </ReactHeader>
-          <main className="min-h-4/5 p-3 md:p-6 mx-auto max-w-5xl overflow-y-auto mb-auto">
+          <main className="min-h-4/5 p-3 md:p-6 mx-auto max-w-3xl overflow-y-auto mb-auto">
             <Outlet />
           </main>
           <ScrollRestoration />
