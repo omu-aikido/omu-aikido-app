@@ -45,14 +45,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint check
-        run: pnpm run lint
-
-      - name: Format check
-        run: pnpm run format:check
-
       - name: Type check
         run: pnpm run check
+
+      - name: Lint check
+        run: pnpm run lint:fix
+
+      - name: Format check
+        run: pnpm run format
+
+      - name: Commit changes if any
+        run: |
+          git config --local user.name "github-actions"
+          git config --local user.email "github-actions@users.noreply.github.com"
+          git add .
+          git commit -m "ci: apply lint and format fixes" || echo "No changes to commit"
+          git push
 
   unit-test:
     name: Unit Test
