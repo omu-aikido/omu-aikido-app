@@ -1,7 +1,7 @@
 import { createClerkClient } from "@clerk/react-router/api.server"
 import { getAuth, type ExternalAccount, type User } from "@clerk/react-router/ssr.server"
 import { useEffect, useState } from "react"
-import { redirect, useFetcher, useNavigate, useSearchParams } from "react-router"
+import { Link, redirect, useFetcher, useNavigate, useSearchParams } from "react-router"
 import { tv } from "tailwind-variants"
 
 import type { Route } from "./+types/user"
@@ -75,6 +75,14 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
     const totalActivitiesCount = all.length
     const activities = all.slice((page - 1) * limit, page * limit)
 
+    // 総稽古日数（ユニーク日付数）
+    const uniqueDates = new Set(all.map(a => new Date(a.date).toDateString()))
+    const totalDays = uniqueDates.size
+    // 総稽古回数（エントリー数）
+    const totalEntries = all.length
+    // 総稽古時間
+    const totalHours = all.reduce((sum, a) => sum + (a.period || 0), 0)
+
     return {
       user,
       profile,
@@ -86,6 +94,10 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
       page,
       totalActivitiesCount,
       limit,
+      // 追加
+      totalDays,
+      totalEntries,
+      totalHours,
     }
   } catch (error) {
     // Handle different types of errors appropriately
@@ -234,6 +246,9 @@ export default function AdminUser(args: Route.ComponentProps) {
     page = 1,
     totalActivitiesCount = 0,
     limit = 10,
+    totalDays = 0,
+    totalEntries = 0,
+    totalHours = 0,
   } = args.loaderData
   const discord = user?.externalAccounts?.find(acc => acc.provider === "oauth_discord")
 
@@ -273,9 +288,9 @@ export default function AdminUser(args: Route.ComponentProps) {
           <p className="text-lg text-slate-600 dark:text-slate-400">
             ユーザー情報が見つかりませんでした。
           </p>
-          <a href="/admin" className={button({ variant: "primary", class: "mt-4" })}>
+          <Link to="/admin" className={button({ variant: "primary", class: "mt-4" })}>
             アカウント管理に戻る
-          </a>
+          </Link>
         </div>
       </div>
     )
@@ -295,12 +310,6 @@ export default function AdminUser(args: Route.ComponentProps) {
 
   return (
     <>
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <a href="/admin" className={button({ variant: "ghost" })}>
-          ← アカウント管理に戻る
-        </a>
-      </div>
       {/* Notification */}
       {notification && (
         <div
@@ -432,6 +441,9 @@ export default function AdminUser(args: Route.ComponentProps) {
         totalTrainCount={trainCount}
         currentGradeTrainCount={doneTrain}
         grade={safeProfile.grade}
+        totalDays={totalDays}
+        totalEntries={totalEntries}
+        totalHours={totalHours}
       />
       {/* Filter Section */}
       <FilterSection startValue={startValue ?? ""} endValue={endValue ?? ""} />
@@ -471,7 +483,7 @@ function UserProfileSection({
   }
 
   return (
-    <div className={card({ className: "p-6 mb-6" })}>
+    <div className={card({ className: "p-6 mb-3" })}>
       {/* ステータスバッジ表示 */}
       {statusBadge}
       <div className="flex items-center gap-4 mb-6">
@@ -526,14 +538,20 @@ function StatsSection({
   totalTrainCount,
   currentGradeTrainCount,
   grade,
+  totalDays,
+  totalEntries,
+  totalHours,
 }: {
   totalTrainCount: number
   currentGradeTrainCount: number
   grade: number
+  totalDays: number
+  totalEntries: number
+  totalHours: number
 }) {
   return (
     <details className={statsCard({ className: "mb-6" })}>
-      <summary className="grid grid-cols-2 gap-4">
+      <summary className="grid grid-cols-2 gap-4 cursor-pointer">
         <div>
           <p className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">
             次の級段位まで
@@ -552,9 +570,23 @@ function StatsSection({
         </div>
       </summary>
       <hr className="mt-3" />
-      <div>
-        totalTrainCount:{totalTrainCount}/ currentGradeTrainCount:{currentGradeTrainCount}
-        /
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-4">
+        <div>
+          <span className="block text-xs text-slate-500">総稽古日数</span>
+          <span className="font-bold text-base">{totalDays}日</span>
+        </div>
+        <div>
+          <span className="block text-xs text-slate-500">総稽古回数</span>
+          <span className="font-bold text-base">{totalEntries}回</span>
+        </div>
+        <div>
+          <span className="block text-xs text-slate-500">総稽古時間</span>
+          <span className="font-bold text-base">{totalHours}時間</span>
+        </div>
+        <div>
+          <span className="block text-xs text-slate-500">現級段位での稽古回数</span>
+          <span className="font-bold text-base">{currentGradeTrainCount}時間</span>
+        </div>
       </div>
     </details>
   )
@@ -696,36 +728,29 @@ function ActivitiesTable({ activities, page, total, limit }: ActivitiesTableProp
       </div>
       {/* ページングUI */}
       {totalPages > 1 && (
-        <nav className="flex justify-center gap-2 py-4" aria-label="ページネーション">
-          <a
-            href={makePageUrl(page - 1)}
+        <nav
+          className="flex justify-center items-center gap-2 py-4"
+          aria-label="ページネーション"
+        >
+          <Link
+            to={makePageUrl(page - 1)}
             className={paginationButton({ disabled: page <= 1 })}
             aria-disabled={page <= 1}
             tabIndex={page <= 1 ? -1 : 0}
           >
             前へ
-          </a>
-          {Array.from({ length: totalPages }).map((_, i) => {
-            const p = i + 1
-            return (
-              <a
-                key={p}
-                href={makePageUrl(p)}
-                className={paginationButton({ active: p === page })}
-                aria-current={p === page ? "page" : undefined}
-              >
-                {p}
-              </a>
-            )
-          })}
-          <a
-            href={makePageUrl(page + 1)}
+          </Link>
+          <div className={paginationButton({ class: "border border-slate-500/30" })}>
+            {page + "/" + totalPages}
+          </div>
+          <Link
+            to={makePageUrl(page + 1)}
             className={paginationButton({ disabled: page >= totalPages })}
             aria-disabled={page >= totalPages}
             tabIndex={page >= totalPages ? -1 : 0}
           >
             次へ
-          </a>
+          </Link>
         </nav>
       )}
     </div>
@@ -907,7 +932,7 @@ const tableCell = tv({
 })
 
 const statsCard = tv({
-  base: "rounded-md bg-slate-100 dark:bg-slate-800/50 p-6 shadow-md",
+  base: "rounded-md bg-slate-100 dark:bg-slate-800/50 p-4 shadow-md",
 })
 
 const filterCard = tv({
