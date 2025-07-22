@@ -29,10 +29,11 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
 
   try {
     const user = await clerkClient.users.getUser(userId)
-    const profile = await getProfile({ userId, env: context.cloudflare.env })
+    let profile = await getProfile({ userId, env: context.cloudflare.env })
 
+    // プロフィールが取得できない場合でも空データで返す
     if (!profile) {
-      throw new Response("Profile not found", { status: 404 })
+      profile = null
     }
 
     // URL parameters for filtering
@@ -120,17 +121,30 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
       throw new Response("User not found", { status: 404 })
     }
 
-    throw new Response("Internal server error", { status: 500 })
+    // それ以外のエラーは最低限のデータで返す
+    return {
+      user: null,
+      profile: null,
+      activities: [],
+      trainCount: 0,
+      totalTrains: 0,
+      startValue: undefined,
+      endValue: undefined,
+      page: 1,
+      totalActivitiesCount: 0,
+      limit: 10,
+    }
   }
 }
 
 // MARK: Meta
 export function meta(args: Route.MetaArgs) {
+  const user = args.data?.user
   return [
     {
       title:
-        `${args.data?.user.lastName} ` +
-        `${args.data?.user.firstName} ` +
+        `${user?.lastName ?? ""} ` +
+        `${user?.firstName ?? ""} ` +
         "| ユーザー編集 - ハム大合気ポータル",
     },
     { name: "description", content: "合気道部員の詳細情報編集画面" },
@@ -245,7 +259,7 @@ export default function AdminUser(args: Route.ComponentProps) {
     limit = 10,
   } = args.loaderData
   const [showFilters, setShowFilters] = useState(false)
-  const discord = user.externalAccounts?.find(acc => acc.provider === "oauth_discord")
+  const discord = user?.externalAccounts?.find(acc => acc.provider === "oauth_discord")
 
   const fetcher = useFetcher()
   const [isEditing, setIsEditing] = useState(false)
@@ -276,12 +290,12 @@ export default function AdminUser(args: Route.ComponentProps) {
     if (!fetcher.data && fetcher.state == "idle") setIsEditing(false)
   }, [fetcher.state, fetcher.data])
 
-  if (!profile) {
+  if (!user) {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
           <p className="text-lg text-slate-600 dark:text-slate-400">
-            プロフィール情報が見つかりませんでした。
+            ユーザー情報が見つかりませんでした。
           </p>
           <a href="/admin" className={button({ variant: "primary", class: "mt-4" })}>
             アカウント管理に戻る
@@ -289,6 +303,16 @@ export default function AdminUser(args: Route.ComponentProps) {
         </div>
       </div>
     )
+  }
+
+  // profileがnullでもフォームを表示できるように初期値を用意
+  const safeProfile = profile ?? {
+    role: "member",
+    grade: 0,
+    getGradeAt: "",
+    joinedAt: new Date().getFullYear(),
+    year: "b1",
+    id: user.id,
   }
 
   const FormWrapper = isEditing ? fetcher.Form : "form"
@@ -301,7 +325,6 @@ export default function AdminUser(args: Route.ComponentProps) {
           ← アカウント管理に戻る
         </a>
       </div>
-
       {/* Notification */}
       {notification && (
         <div
@@ -319,10 +342,8 @@ export default function AdminUser(args: Route.ComponentProps) {
           </div>
         </div>
       )}
-
       {/* User Profile Section */}
-      <UserProfileSection user={user as User} profile={profile} discord={discord} />
-
+      <UserProfileSection user={user as User} unSafeprofile={profile} profile={safeProfile} discord={discord} />
       <FormWrapper
         method="post"
         className={style.form.container({ class: "mb-4" })}
@@ -363,33 +384,32 @@ export default function AdminUser(args: Route.ComponentProps) {
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
             <RoleSelect
-              profile={profile}
+              profile={safeProfile}
               isEditing={isEditing}
               fetcherState={fetcher.state}
             />
           </div>
           <GradeSelect
-            profile={profile}
+            profile={safeProfile}
             isEditing={isEditing}
             fetcherState={fetcher.state}
           />
           <GetGradeAtInput
-            profile={profile}
+            profile={safeProfile}
             isEditing={isEditing}
             fetcherState={fetcher.state}
           />
           <JoinedAtInput
-            profile={profile}
+            profile={safeProfile}
             isEditing={isEditing}
             fetcherState={fetcher.state}
           />
           <YearSelect
-            profile={profile}
+            profile={safeProfile}
             isEditing={isEditing}
             fetcherState={fetcher.state}
           />
         </div>
-
         <div className="flex gap-2">
           {isEditing ? (
             <>
@@ -426,14 +446,12 @@ export default function AdminUser(args: Route.ComponentProps) {
           )}
         </div>
       </FormWrapper>
-
       {/* Stats Section */}
       <StatsSection
         trainCount={trainCount}
         totalTrains={totalTrains}
-        grade={profile.grade}
+        grade={safeProfile.grade}
       />
-
       {/* Filter Section */}
       <FilterSection
         showFilters={showFilters}
@@ -441,7 +459,6 @@ export default function AdminUser(args: Route.ComponentProps) {
         startValue={startValue ?? ""}
         endValue={endValue ?? ""}
       />
-
       {/* Activities Table */}
       <ActivitiesTable
         activities={activities}
@@ -457,12 +474,25 @@ export default function AdminUser(args: Route.ComponentProps) {
 // Clerkのuser型はany相当でpropsを通す
 interface UserProfileSectionProps {
   user: User
+  unSafeprofile: Profile | null
   profile: Profile
   discord?: ExternalAccount
 }
-function UserProfileSection({ user, profile, discord }: UserProfileSectionProps) {
+function UserProfileSection({ user, unSafeprofile, profile, discord }: UserProfileSectionProps) {
+  // 不足データ判定
+  let statusBadge: React.ReactNode = null
+  if (!unSafeprofile) {
+    statusBadge = (
+      <span className="inline-block px-3 py-1 mb-2 rounded-full bg-red-100 text-red-700 text-xs font-bold">
+        プロフィール未設定
+      </span>
+    )
+  }
+
   return (
     <div className={card({ className: "p-6 mb-6" })}>
+      {/* ステータスバッジ表示 */}
+      {statusBadge}
       <div className="flex items-center gap-4 mb-6">
         <img
           src={user.imageUrl}
@@ -490,7 +520,7 @@ function UserProfileSection({ user, profile, discord }: UserProfileSectionProps)
           <div className={info().frame()}>
             <label className={info().label()}>役職</label>
             <p className={info().value()}>
-              {Role.fromString(profile.role)?.ja || "部員"}
+              {Role.fromString(profile?.role)?.ja || "部員"}
             </p>
           </div>
           <div className={info().frame()}>
