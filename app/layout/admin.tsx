@@ -24,11 +24,11 @@ export async function loader(args: Route.LoaderArgs) {
 // MARK: Component - 共通のレイアウトとナビゲーション
 export default function AccountLayout() {
   return (
-    <div className="max-w-lg mx-auto p-4">
+    <>
       <h1 className={style.text.sectionTitle()}>管理ページ</h1>
       <div className="mt-6">
         <Outlet />
       </div>
-    </div>
+    </>
   )
 }

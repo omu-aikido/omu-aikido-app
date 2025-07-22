@@ -43,12 +43,12 @@ export default function AccountLayout(args: Route.ComponentProps) {
   ]
 
   return (
-    <div className="max-w-lg mx-auto p-4">
+    <>
       <h1 className="text-xl font-bold mb-4">{`アカウント: ${args.loaderData.user.lastName} ${args.loaderData.user.firstName}`}</h1>
       <NavigationTab tabs={navigationTabs} />
       <div className="mt-6">
         <Outlet context={args} />
       </div>
-    </div>
+    </>
   )
 }

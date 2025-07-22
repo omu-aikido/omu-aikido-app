@@ -1,17 +1,17 @@
 import { createClerkClient } from "@clerk/react-router/api.server"
 import { getAuth, type ExternalAccount, type User } from "@clerk/react-router/ssr.server"
 import { useEffect, useState } from "react"
-import { redirect, useFetcher, useSearchParams } from "react-router"
+import { redirect, useFetcher, useNavigate, useSearchParams } from "react-router"
 import { tv } from "tailwind-variants"
 
 import type { Route } from "./+types/user"
 
 import { Icon } from "~/components/ui/Icon"
 import type { ActivityType } from "~/db/schema"
-import { userActivity } from "~/lib/query/activity"
+import { activitySummary } from "~/lib/query/activity"
 import { updateProfile } from "~/lib/query/admin"
 import { getProfile } from "~/lib/query/profile"
-import { grade as gradeOptions, timeForNextGrade } from "~/lib/utils"
+import { getJST, grade as gradeOptions, timeForNextGrade } from "~/lib/utils"
 import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
 import type { Profile } from "~/type"
@@ -26,38 +26,31 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
   if (!userId) {
     throw new Response("User ID is required", { status: 400 })
   }
+  const user = await clerkClient.users.getUser(userId)
+  const profile = await getProfile({ userId, env: context.cloudflare.env })
+
+  // fitler
+  const url = new URL(request.url)
+  const startParam = url.searchParams.get("start")
+  const endParam = url.searchParams.get("end")
+  // If reset parameter exists, redirect to clear query params
+  if (url.searchParams.get("reset")) {
+    return new Response(null, { status: 302, headers: { Location: url.pathname } })
+  }
 
   try {
-    const user = await clerkClient.users.getUser(userId)
-    const profile = await getProfile({ userId, env: context.cloudflare.env })
-
-    if (!profile) {
-      throw new Response("Profile not found", { status: 404 })
-    }
-
-    // URL parameters for filtering
-    const url = new URL(request.url)
-    const startParam = url.searchParams.get("start")
-    const endParam = url.searchParams.get("end")
-
-    // If reset parameter exists, redirect to clear query params
-    if (url.searchParams.get("reset")) {
-      return new Response(null, { status: 302, headers: { Location: url.pathname } })
-    }
-
-    // Validate and parse date parameters
     let startValue: Date | undefined
     let endValue: Date | undefined
 
     if (startParam) {
-      startValue = new Date(startParam)
+      startValue = getJST(new Date(startParam))
       if (isNaN(startValue.getTime())) {
         throw new Response("Invalid start date format", { status: 400 })
       }
     }
 
     if (endParam) {
-      endValue = new Date(endParam)
+      endValue = getJST(new Date(endParam))
       if (isNaN(endValue.getTime())) {
         throw new Response("Invalid end date format", { status: 400 })
       }
@@ -66,43 +59,28 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
     // ページング用クエリ取得
     const pageParam = url.searchParams.get("page")
     const page = Math.max(Number(pageParam) || 1, 1)
-    const limit = 10 // デフォルト10件固定
+    const limit = 10
+
+    const getGradeAt = new Date(
+      profile?.getGradeAt ?? (profile?.joinedAt ?? new Date().getFullYear(), 3, 1),
+    )
 
     // Get user activities with date filtering
-    const allActivities = (
-      await userActivity({
-        userId,
-        start: startValue,
-        end: endValue,
-        env: context.cloudflare.env,
-      })
-    ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-
-    const totalActivitiesCount = allActivities.length
-    const activities = allActivities.slice((page - 1) * limit, page * limit)
-
-    // Calculate training count from activities in filtered period
-    const trainCount = Math.floor(
-      activities.map(record => record.period).reduce((a, b) => a + b, 0) / 1.5,
-    )
-
-    // Calculate total training count (all activities)
-    const totalActivities = await userActivity({
+    const { all, total, done } = await activitySummary({
       userId,
-      start: undefined,
-      end: undefined,
+      getGradeAt,
       env: context.cloudflare.env,
     })
-    const totalTrains = Math.floor(
-      totalActivities.map(record => record.period).reduce((a, b) => a + b, 0) / 1.5,
-    )
+
+    const totalActivitiesCount = all.length
+    const activities = all.slice((page - 1) * limit, page * limit)
 
     return {
       user,
       profile,
       activities,
-      trainCount,
-      totalTrains,
+      trainCount: total,
+      doneTrain: done,
       startValue: startParam,
       endValue: endParam,
       page,
@@ -120,17 +98,30 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
       throw new Response("User not found", { status: 404 })
     }
 
-    throw new Response("Internal server error", { status: 500 })
+    // それ以外のエラーは最低限のデータで返す
+    return {
+      user: null,
+      profile: null,
+      activities: [],
+      trainCount: 0,
+      doneTrain: 0,
+      startValue: undefined,
+      endValue: undefined,
+      page: 1,
+      totalActivitiesCount: 0,
+      limit: 10,
+    }
   }
 }
 
 // MARK: Meta
 export function meta(args: Route.MetaArgs) {
+  const user = args.data?.user
   return [
     {
       title:
-        `${args.data?.user.lastName} ` +
-        `${args.data?.user.firstName} ` +
+        `${user?.lastName ?? ""} ` +
+        `${user?.firstName ?? ""} ` +
         "| ユーザー編集 - ハム大合気ポータル",
     },
     { name: "description", content: "合気道部員の詳細情報編集画面" },
@@ -237,15 +228,14 @@ export default function AdminUser(args: Route.ComponentProps) {
     profile,
     activities,
     trainCount,
-    totalTrains,
+    doneTrain,
     startValue,
     endValue,
     page = 1,
     totalActivitiesCount = 0,
     limit = 10,
   } = args.loaderData
-  const [showFilters, setShowFilters] = useState(false)
-  const discord = user.externalAccounts?.find(acc => acc.provider === "oauth_discord")
+  const discord = user?.externalAccounts?.find(acc => acc.provider === "oauth_discord")
 
   const fetcher = useFetcher()
   const [isEditing, setIsEditing] = useState(false)
@@ -276,12 +266,12 @@ export default function AdminUser(args: Route.ComponentProps) {
     if (!fetcher.data && fetcher.state == "idle") setIsEditing(false)
   }, [fetcher.state, fetcher.data])
 
-  if (!profile) {
+  if (!user) {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
           <p className="text-lg text-slate-600 dark:text-slate-400">
-            プロフィール情報が見つかりませんでした。
+            ユーザー情報が見つかりませんでした。
           </p>
           <a href="/admin" className={button({ variant: "primary", class: "mt-4" })}>
             アカウント管理に戻る
@@ -289,6 +279,16 @@ export default function AdminUser(args: Route.ComponentProps) {
         </div>
       </div>
     )
+  }
+
+  // profileがnullでもフォームを表示できるように初期値を用意
+  const safeProfile = profile ?? {
+    role: "member",
+    grade: 0,
+    getGradeAt: "",
+    joinedAt: new Date().getFullYear(),
+    year: "b1",
+    id: user.id,
   }
 
   const FormWrapper = isEditing ? fetcher.Form : "form"
@@ -301,7 +301,6 @@ export default function AdminUser(args: Route.ComponentProps) {
           ← アカウント管理に戻る
         </a>
       </div>
-
       {/* Notification */}
       {notification && (
         <div
@@ -319,10 +318,13 @@ export default function AdminUser(args: Route.ComponentProps) {
           </div>
         </div>
       )}
-
       {/* User Profile Section */}
-      <UserProfileSection user={user as User} profile={profile} discord={discord} />
-
+      <UserProfileSection
+        user={user as User}
+        unSafeprofile={profile}
+        profile={safeProfile}
+        discord={discord}
+      />
       <FormWrapper
         method="post"
         className={style.form.container({ class: "mb-4" })}
@@ -363,33 +365,32 @@ export default function AdminUser(args: Route.ComponentProps) {
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
             <RoleSelect
-              profile={profile}
+              profile={safeProfile}
               isEditing={isEditing}
               fetcherState={fetcher.state}
             />
           </div>
           <GradeSelect
-            profile={profile}
+            profile={safeProfile}
             isEditing={isEditing}
             fetcherState={fetcher.state}
           />
           <GetGradeAtInput
-            profile={profile}
+            profile={safeProfile}
             isEditing={isEditing}
             fetcherState={fetcher.state}
           />
           <JoinedAtInput
-            profile={profile}
+            profile={safeProfile}
             isEditing={isEditing}
             fetcherState={fetcher.state}
           />
           <YearSelect
-            profile={profile}
+            profile={safeProfile}
             isEditing={isEditing}
             fetcherState={fetcher.state}
           />
         </div>
-
         <div className="flex gap-2">
           {isEditing ? (
             <>
@@ -426,22 +427,14 @@ export default function AdminUser(args: Route.ComponentProps) {
           )}
         </div>
       </FormWrapper>
-
       {/* Stats Section */}
       <StatsSection
-        trainCount={trainCount}
-        totalTrains={totalTrains}
-        grade={profile.grade}
+        totalTrainCount={trainCount}
+        currentGradeTrainCount={doneTrain}
+        grade={safeProfile.grade}
       />
-
       {/* Filter Section */}
-      <FilterSection
-        showFilters={showFilters}
-        setShowFilters={setShowFilters}
-        startValue={startValue ?? ""}
-        endValue={endValue ?? ""}
-      />
-
+      <FilterSection startValue={startValue ?? ""} endValue={endValue ?? ""} />
       {/* Activities Table */}
       <ActivitiesTable
         activities={activities}
@@ -457,12 +450,30 @@ export default function AdminUser(args: Route.ComponentProps) {
 // Clerkのuser型はany相当でpropsを通す
 interface UserProfileSectionProps {
   user: User
+  unSafeprofile: Profile | null
   profile: Profile
   discord?: ExternalAccount
 }
-function UserProfileSection({ user, profile, discord }: UserProfileSectionProps) {
+function UserProfileSection({
+  user,
+  unSafeprofile,
+  profile,
+  discord,
+}: UserProfileSectionProps) {
+  // 不足データ判定
+  let statusBadge: React.ReactNode = null
+  if (!unSafeprofile) {
+    statusBadge = (
+      <span className="inline-block px-3 py-1 mb-2 rounded-full bg-red-100 text-red-700 text-xs font-bold">
+        プロフィール未設定
+      </span>
+    )
+  }
+
   return (
     <div className={card({ className: "p-6 mb-6" })}>
+      {/* ステータスバッジ表示 */}
+      {statusBadge}
       <div className="flex items-center gap-4 mb-6">
         <img
           src={user.imageUrl}
@@ -490,7 +501,7 @@ function UserProfileSection({ user, profile, discord }: UserProfileSectionProps)
           <div className={info().frame()}>
             <label className={info().label()}>役職</label>
             <p className={info().value()}>
-              {Role.fromString(profile.role)?.ja || "部員"}
+              {Role.fromString(profile?.role)?.ja || "部員"}
             </p>
           </div>
           <div className={info().frame()}>
@@ -511,21 +522,24 @@ function UserProfileSection({ user, profile, discord }: UserProfileSectionProps)
   )
 }
 
-interface StatsSectionProps {
-  trainCount: number
-  totalTrains: number
+function StatsSection({
+  totalTrainCount,
+  currentGradeTrainCount,
+  grade,
+}: {
+  totalTrainCount: number
+  currentGradeTrainCount: number
   grade: number
-}
-function StatsSection({ trainCount, totalTrains, grade }: StatsSectionProps) {
+}) {
   return (
-    <div className={statsCard({ className: "mb-6" })}>
-      <div className="grid grid-cols-2 gap-4">
+    <details className={statsCard({ className: "mb-6" })}>
+      <summary className="grid grid-cols-2 gap-4">
         <div>
           <p className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">
             次の級段位まで
           </p>
           <p className="text-lg font-bold text-yellow-900 dark:text-yellow-100">
-            {trainCount}/{timeForNextGrade(grade)}回
+            {timeForNextGrade(grade) - currentGradeTrainCount}/{timeForNextGrade(grade)}回
           </p>
         </div>
         <div>
@@ -533,81 +547,90 @@ function StatsSection({ trainCount, totalTrains, grade }: StatsSectionProps) {
             累計稽古回数
           </p>
           <p className="text-lg font-bold text-purple-900 dark:text-purple-100">
-            {totalTrains}回
+            {totalTrainCount}回
           </p>
         </div>
+      </summary>
+      <hr className="mt-3" />
+      <div>
+        totalTrainCount:{totalTrainCount}/ currentGradeTrainCount:{currentGradeTrainCount}
+        /
       </div>
-    </div>
+    </details>
   )
 }
 
 interface FilterSectionProps {
-  showFilters: boolean
-  setShowFilters: (v: boolean) => void
   startValue: string
   endValue: string
 }
-function FilterSection({
-  showFilters,
-  setShowFilters,
-  startValue,
-  endValue,
-}: FilterSectionProps) {
+function FilterSection({ startValue, endValue }: FilterSectionProps) {
+  const [start, setStart] = useState(startValue)
+  const [end, setEnd] = useState(endValue)
+  const navigate = useNavigate()
+
+  // クエリを変更してページ遷移
+  const handleFilter = () => {
+    const params = new URLSearchParams()
+    if (start) params.set("start", start)
+    if (end) params.set("end", end)
+    navigate("?" + params.toString())
+  }
+  // リセットはクエリを消して遷移
+  const handleReset = () => {
+    navigate("?")
+  }
+
   return (
-    <div className={filterCard({ className: "mb-6" })}>
-      <div>
-        <button onClick={() => setShowFilters(!showFilters)} className={filterButton()}>
-          <span className="text-lg font-medium text-slate-900 dark:text-slate-50">
-            フィルター
-          </span>
-        </button>
-        {showFilters && (
-          <div className="p-6">
-            <form id="filter-form" method="GET" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="start" className={style.text.info()}>
-                    開始日
-                  </label>
-                  <input
-                    type="date"
-                    id="start"
-                    name="start"
-                    defaultValue={startValue || ""}
-                    className={input()}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="end" className={style.text.info()}>
-                    終了日
-                  </label>
-                  <input
-                    type="date"
-                    id="end"
-                    name="end"
-                    defaultValue={endValue || ""}
-                    className={input()}
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  type="submit"
-                  name="reset"
-                  value="true"
-                  className={style.button({ type: "secondary" })}
-                >
-                  リセット
-                </button>
-                <button type="submit" className={style.button()}>
-                  フィルター
-                </button>
-              </div>
-            </form>
+    <details className={filterCard({ className: "mb-6" })}>
+      <summary className="flex bg-slate-300 dark:bg-slate-600 p-4 cursor-pointer">
+        フィルター
+      </summary>
+      <div className="p-6">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="start" className={style.text.info()}>
+                開始日
+              </label>
+              <input
+                type="date"
+                id="start"
+                name="start"
+                value={start}
+                onChange={e => setStart(e.target.value)}
+                className={input()}
+              />
+            </div>
+            <div>
+              <label htmlFor="end" className={style.text.info()}>
+                終了日
+              </label>
+              <input
+                type="date"
+                id="end"
+                name="end"
+                value={end}
+                onChange={e => setEnd(e.target.value)}
+                className={input()}
+              />
+            </div>
           </div>
-        )}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              type="button"
+              className={style.button({ type: "secondary" })}
+              onClick={handleReset}
+            >
+              リセット
+            </button>
+            <button type="button" className={style.button()} onClick={handleFilter}>
+              フィルター
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+    </details>
   )
 }
 
@@ -676,7 +699,7 @@ function ActivitiesTable({ activities, page, total, limit }: ActivitiesTableProp
         <nav className="flex justify-center gap-2 py-4" aria-label="ページネーション">
           <a
             href={makePageUrl(page - 1)}
-            className={`px-3 py-1 rounded ${page <= 1 ? "pointer-events-none opacity-50" : "bg-slate-200 hover:bg-slate-300"}`}
+            className={paginationButton({ disabled: page <= 1 })}
             aria-disabled={page <= 1}
             tabIndex={page <= 1 ? -1 : 0}
           >
@@ -688,7 +711,7 @@ function ActivitiesTable({ activities, page, total, limit }: ActivitiesTableProp
               <a
                 key={p}
                 href={makePageUrl(p)}
-                className={`px-3 py-1 rounded ${p === page ? "bg-blue-600 text-white" : "bg-slate-200 hover:bg-slate-300"}`}
+                className={paginationButton({ active: p === page })}
                 aria-current={p === page ? "page" : undefined}
               >
                 {p}
@@ -697,7 +720,7 @@ function ActivitiesTable({ activities, page, total, limit }: ActivitiesTableProp
           })}
           <a
             href={makePageUrl(page + 1)}
-            className={`px-3 py-1 rounded ${page >= totalPages ? "pointer-events-none opacity-50" : "bg-slate-200 hover:bg-slate-300"}`}
+            className={paginationButton({ disabled: page >= totalPages })}
             aria-disabled={page >= totalPages}
             tabIndex={page >= totalPages ? -1 : 0}
           >
@@ -888,11 +911,7 @@ const statsCard = tv({
 })
 
 const filterCard = tv({
-  base: "bg-slate-50 dark:bg-slate-800 rounded-lg shadow-md overflow-hidden",
-})
-
-const filterButton = tv({
-  base: "w-full cursor-pointer p-4 bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors duration-200 text-left",
+  base: "bg-slate-100 dark:bg-slate-800 rounded-lg shadow-md overflow-hidden",
 })
 
 const notificationStyle = tv({
@@ -904,6 +923,18 @@ const notificationStyle = tv({
       error:
         "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200",
     },
+  },
+})
+
+const paginationButton = tv({
+  base: "px-3 py-1 rounded transition-colors duration-150 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500",
+  variants: {
+    active: {
+      true: "bg-blue-600 text-white",
+      false:
+        "bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-slate-100",
+    },
+    disabled: { true: "pointer-events-none opacity-50", false: "" },
   },
 })
 

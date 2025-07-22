@@ -60,3 +60,7 @@ export function toLocalJPString(date: Date): string {
     second: "numeric",
   })
 }
+
+export function getJST(date: Date): Date {
+  return new Date(date.toISOString().split("T").shift() + "T00:00:00+09:00")
+}
