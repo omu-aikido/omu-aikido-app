@@ -285,3 +285,39 @@ export async function deleteActivities(input: {
   })
   return results
 }
+
+// MARK: activitySummary
+export async function activitySummary({
+  userId,
+  getGradeAt,
+  env,
+}: {
+  userId: string
+  getGradeAt: Date
+  env: Env
+}) {
+  const db = createDb(env)
+  const conditions = [eq(activity.userId, userId)]
+
+  const allActivities = await db
+    .select()
+    .from(activity)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+
+  const totalTrains = Math.floor(
+    allActivities.map(a => a.period).reduce((a, b) => a + b, 0) / 1.5,
+  )
+
+  const trainFromGradeUp = Math.floor(
+    allActivities
+      .filter(a => new Date(a.date) > getGradeAt)
+      .map(a => a.period)
+      .reduce((a, b) => a + b, 0) / 1.5,
+  )
+
+  return {
+    all: allActivities as ActivityType[],
+    total: totalTrains as number,
+    done: trainFromGradeUp as number,
+  }
+}
