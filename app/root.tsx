@@ -34,7 +34,8 @@ export const links: Route.LinksFunction = () => [
 export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
   const userId = auth.userId
-  if (!new URL(args.request.url).pathname.startsWith("/sign-") && !userId) return redirect("/sign-in?redirect_url=" + args.request.url)
+  if (!new URL(args.request.url).pathname.startsWith("/sign-") && !userId)
+    return redirect("/sign-in?redirect_url=" + args.request.url)
   let links: PagePath[]
   const env = args.context.cloudflare.env
 
