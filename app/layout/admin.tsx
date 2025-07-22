@@ -18,7 +18,7 @@ export async function loader(args: Route.LoaderArgs) {
   const profile = await getProfile({ userId, env })
   if (!profile) return redirect("/")
   const role = Role.fromString(profile.role)
-  if (!role || !role.isManagement) return redirect("/")
+  if (!role || !role.isManagement()) return redirect("/")
 }
 
 // MARK: Component - 共通のレイアウトとナビゲーション
