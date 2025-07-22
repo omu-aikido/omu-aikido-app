@@ -1,107 +1,66 @@
-# 活動記録アプリ Beta
+# record-app
 
-[![Commit: a1a2ae3](https://img.shields.io/badge/Commit-a1a2ae3-blue)](https://github.com/omu-aikido/omu-aikido-app/commit/a1a2ae3b2b77112762632581e64010e11ee6358d)以降、Cloudflare PagesからWorkerに移行しました。
+`record-app`は、部活の活動を記録・管理するためのアプリケーションです。
 
-[![Preview Build on Cloudflare Worker](https://github.com/omu-aikido/omu-aikido-app/actions/workflows/preview.yml/badge.svg)](https://github.com/omu-aikido/omu-aikido-app/actions/workflows/preview.yml)
-[![Deploy to Cloudflare Worker](https://github.com/omu-aikido/omu-aikido-app/actions/workflows/deploy.yml/badge.svg)](https://github.com/omu-aikido/omu-aikido-app/actions/workflows/deploy.yml)
+## 技術スタック
 
-## 概要
-
-活動記録アプリ Betaは、部活動の稽古を記録するためのフルスタックWebアプリです。
-Astro.jsを使用して開発されています。
+- **フロントエンド**: React Router, Tailwind CSS
+- **バックエンド/データベース**: Cloudflare Workers, Drizzle ORM, Turso (libSQL)
+- **テスト**: Vitest (ユニットテスト), Playwright (E2Eテスト)
+- **その他**: TypeScript, ESLint, Prettier
 
 ## ロードマップ
 
-- [x] ユーザー登録
-- [x] ログイン
-- [x] 稽古の記録・閲覧・編集
-- [ ] 役職別機能
-  - [ ] 管理者
-    - [x] 稽古の集計などの機能
-  - [ ] 会計:精算機能 ……?
-- [ ] 稽古の記録を元にしたグラフの表示
+- [ ] アカウント
+  - [-] ユーザー登録
+  - [x] ログイン
+  - [x] ユーザー情報の編集
 
-## 主な使用技術
+- [ ] コア機能
+  - [x] 稽古の記録・閲覧・編集
 
-- **[npm](https://www.npmjs.com)**  
-   パッケージ管理
+- [ ] 管理者向け機能
+  - [ ] 稽古の集計などの機能
 
-- **[Astro.js](https://astro.build)**  
-   フレームワーク
+## セットアップ方法
 
-- **[GitHub](https://github.com)**  
-   ソースコード管理
-
-- **[Catppuccin](https://catppuccin.com)**  
-   カラーパレット
-
-- **[Clerk](https://clerk.com)**  
-   認証
-
-- **[Turso](https://turso.tech)**  
-   libSQLデータベース
-
-- **[Drizzle](https://orm.drizzle.team)**  
-   ORM
-
-- **[ts-ics](https://github.com/Neuvernetzung/ts-ics)**  
-   iCalendar生成
-
-- **[Cloudflare Workers](https://workers.cloudflare.com)**  
-   ホスティング
-
-その他、使用しているパッケージ等は`package.json`に記載されています。
-
-### ローカルでの開発方法
-
-#### Requirements
-
-- \*.db // データベースファイル (SQLite3)
-  - `turso dev --db *.db` で`http://127.0.0.1:8080`にlibSqlサーバを起動します
-- .env.development
-- .env.production
-- .dev.vars.development
-- .dev.vars.production
-
-環境変数に必要な情報は
-
-- PUBLIC_CLERK_PUBLISHABLE_KEY
-- CLERK_SECRET_KEY
-- TURSO_DATABASE_URL
-- TURSO_AUTH_TOKEN
-
-です。
+1.  **依存関係のインストール**:
 
 ```bash
-$ npx astro dev # ローカルサーバを起動します
-$ npx astro build # ビルドします
-$ npx astro preview # プレビューします
+pnpm install --frozen-lock
 ```
 
-### tursoをローカルで使う
+2.  **環境変数の設定**: `.env`ファイルに以下の環境変数を設定する必要があります。
+    - `CLERK_PUBLISHABLE_KEY`
+    - `CLERK_SECRET_KEY`
+    - `TURSO_DATABASE_URL`
+    - `TURSO_AUTH_TOKEN`
 
-Turso CLIをインストールすれば、以下の手順でローカルのlibSQLが使用可能になります。
-`migrations/0000_nasty_proemial_gods.sql` はテーブルの定義のみを行うSQL文です。
-機能追加により、データベースの構造が変化した場合などは、`turso db shell your-database .dump > dump.sql`するなどして全てをそのまま移行させるのがよいと思います。
-（レコードも全て持ってくるので、`cat hoge | sqlite3 local.db`の前に、テーブル定義のみを残すなどの修正をお勧めします。）
+    また， `ln -s .env .dev.vars` を使用して
 
-```bash
-$ cat migrations/0000_nasty_proemial_gods.sql | sqlite3 local.db
-$ turso dev -f local.db
-```
+## スクリプト
 
-## 注意
+`package.json`の`scripts`セクションには、以下の主要なスクリプトが定義されています。
 
-- Cloudflare上でのビルドは、libSQL関連のパッケージで実行時エラーが発生する可能性があるため、ローカルでビルドしてからのアップロードを推奨します。
+- `dev`: 開発サーバーを起動します。
+- `build`: プロジェクトをビルドします。
+- `deploy`: Cloudflare Workersにデプロイします（dry-runを含む）。
+- `typecheck`: 型チェックを実行します。
+- `lint`: コードのリンティングを実行します。
+- `format`: コードのフォーマットを実行します。
+- `test:unit`: ユニットテストを実行します。
+- `db:generate`: Drizzle ORMのマイグレーションファイルを生成します。
+- `db:migrate`: データベースのマイグレーションを実行します。
+- `db:studio`: Drizzle Studioを起動します。
 
-その他、各種ツールのガイドを参考にしてください。
+## ディレクトリ構造
 
-## ライセンス
+- `app/`: アプリケーションのソースコードが含まれています。
+- `migrations/`: Drizzle
+  ORMによって生成されたデータベースマイグレーションファイルが含まれています。
+- `tests/`: ユニットテスト（Vitest）およびE2Eテスト（Playwright）のコードが含まれています。
+- `workers/`: Cloudflare Workersのコードが含まれています。
 
-Copyright 2025 [omu-aikido](https://github.com/omu-aikido)
+## 貢献方法
 
-Apache License Version 2.0（「本ライセンス」）に基づいてライセンスされます。あなたがこのファイルを使用するためには、本ライセンスに従わなければなりません。本ライセンスのコピーは下記の場所から入手できます。
-
-[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
-
-適用される法律または書面での同意によって命じられない限り、本ライセンスに基づいて頒布されるソフトウェアは、明示黙示を問わず、いかなる保証も条件もなしに「現状のまま」頒布されます。本ライセンスでの権利と制限を規定した文言については、本ライセンスを参照してください。
+貢献ガイドラインについては、[`CONTRIBUTE.md`](CONTRIBUTE.md)を参照してください。

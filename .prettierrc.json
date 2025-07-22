@@ -4,8 +4,18 @@
   "jsxSingleQuote": false,
   "tabWidth": 2,
   "trailingComma": "all",
-  "printWidth": 100,
+  "printWidth": 90,
   "useTabs": false,
   "endOfLine": "lf",
-  "plugins": ["prettier-plugin-astro"]
+  "arrowParens": "avoid",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "embeddedLanguageFormatting": "auto",
+  "htmlWhitespaceSensitivity": "css",
+  "insertPragma": false,
+  "proseWrap": "always",
+  "objectWrap": "collapse",
+  "quoteProps": "as-needed",
+  "requirePragma": false,
+  "plugins": []
 }

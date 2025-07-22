@@ -1,49 +1,18 @@
-# build output
-**/dist/
+.DS_Store
+/node_modules/
+*.tsbuildinfo
 
-# generated types
-**/.astro/
-**/drizzle/
+# React Router
+/.react-router/
+/build/
 
 # Cloudflare
 .mf
 .wrangler
-**/.wrangler/
 .dev.vars*
 
-# dependencies
-node_modules/
-/node_modules/
-*.tsbuildinfo
-
-# logs
-*.log*
-
-# environment variables
+# Testing
 .env
-.env.*
-.dev.vars
-.dev.vars.*
-
-# macOS-specific files
-.DS_Store
-
-# React Router
-**/.react-router/
-/build/
-
-# Turso dev files
-dump.sql
-local.db
-local.db*
-
-# Roo Ignore
-.roo.*.md
-.roo.*.mdx
-
-# Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-**/playwright/.clerk
+test-results/*
+playwright-report/*
+playwright/.clerk/
