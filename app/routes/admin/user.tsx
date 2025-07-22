@@ -1,7 +1,7 @@
 import { createClerkClient } from "@clerk/react-router/api.server"
 import { getAuth, type ExternalAccount, type User } from "@clerk/react-router/ssr.server"
 import { useEffect, useState } from "react"
-import { redirect, useFetcher, useNavigate, useSearchParams } from "react-router"
+import { Link, redirect, useFetcher, useNavigate, useSearchParams } from "react-router"
 import { tv } from "tailwind-variants"
 
 import type { Route } from "./+types/user"
@@ -273,9 +273,9 @@ export default function AdminUser(args: Route.ComponentProps) {
           <p className="text-lg text-slate-600 dark:text-slate-400">
             ユーザー情報が見つかりませんでした。
           </p>
-          <a href="/admin" className={button({ variant: "primary", class: "mt-4" })}>
+          <Link to="/admin" className={button({ variant: "primary", class: "mt-4" })}>
             アカウント管理に戻る
-          </a>
+          </Link>
         </div>
       </div>
     )
@@ -296,10 +296,10 @@ export default function AdminUser(args: Route.ComponentProps) {
   return (
     <>
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <a href="/admin" className={button({ variant: "ghost" })}>
+      <div className="flex items-center gap-4 mb-2">
+        <Link to="/admin" className={button({ variant: "ghost" })}>
           ← アカウント管理に戻る
-        </a>
+        </Link>
       </div>
       {/* Notification */}
       {notification && (
@@ -696,36 +696,26 @@ function ActivitiesTable({ activities, page, total, limit }: ActivitiesTableProp
       </div>
       {/* ページングUI */}
       {totalPages > 1 && (
-        <nav className="flex justify-center gap-2 py-4" aria-label="ページネーション">
-          <a
-            href={makePageUrl(page - 1)}
+        <nav className="flex justify-center items-center gap-2 py-4" aria-label="ページネーション">
+          <Link
+            to={makePageUrl(page - 1)}
             className={paginationButton({ disabled: page <= 1 })}
             aria-disabled={page <= 1}
             tabIndex={page <= 1 ? -1 : 0}
           >
             前へ
-          </a>
-          {Array.from({ length: totalPages }).map((_, i) => {
-            const p = i + 1
-            return (
-              <a
-                key={p}
-                href={makePageUrl(p)}
-                className={paginationButton({ active: p === page })}
-                aria-current={p === page ? "page" : undefined}
-              >
-                {p}
-              </a>
-            )
-          })}
-          <a
-            href={makePageUrl(page + 1)}
+          </Link>
+          <div className={paginationButton({ class: "border border-slate-500/30"})}>
+            {page + "/" + totalPages}
+          </div>
+          <Link
+            to={makePageUrl(page + 1)}
             className={paginationButton({ disabled: page >= totalPages })}
             aria-disabled={page >= totalPages}
             tabIndex={page >= totalPages ? -1 : 0}
           >
             次へ
-          </a>
+          </Link>
         </nav>
       )}
     </div>
