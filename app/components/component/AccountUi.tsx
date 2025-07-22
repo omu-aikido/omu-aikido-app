@@ -11,7 +11,7 @@ interface AccountUiProps {
 }
 
 export function AccountUi({ apps }: AccountUiProps) {
-  const {user , signOut} = useClerk()
+  const { user, signOut } = useClerk()
   if (user instanceof Response || !user) {
     return null
   }
@@ -52,11 +52,9 @@ export function AccountUi({ apps }: AccountUiProps) {
             }
           }}
         >
-          <span
-            className="flex flex-row items-center justify-center"
-          >
-              サインアウト
-              <Icon icon="sign-out" />
+          <span className="flex flex-row items-center justify-center">
+            サインアウト
+            <Icon icon="sign-out" />
           </span>
         </button>
       </SignedIn>

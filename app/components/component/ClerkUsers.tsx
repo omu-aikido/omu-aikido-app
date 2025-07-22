@@ -12,7 +12,9 @@ const pagenation = tv({
     "dark:text-slate-400  dark:bg-slate-800 dark:hover:bg-slate-700",
   ],
   variants: {
-    disabled: { true: ["text-slate-500 bg-slate-100 dark:bg-slate-700 ", "cursor-not-allowed"] },
+    disabled: {
+      true: ["text-slate-500 bg-slate-100 dark:bg-slate-700 ", "cursor-not-allowed"],
+    },
   },
 })
 
@@ -83,23 +85,18 @@ export function ClerkUsers({ users, totalPages, currentPage }: Props) {
                 前へ
               </Link>
             ) : (
-                <p className={ pagenation({disabled: true})}>
-                前へ
-              </p>
+              <p className={pagenation({ disabled: true })}>前へ</p>
             )}
             <div className="m-2 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-300 bg-slate-200 border border-slate-300 dark:bg-slate-600 dark:border-slate-700">
               {currentPage + 1 + "/" + totalPages}
             </div>
             {currentPage < totalPages - 1 ? (
-              <Link
-                to={`/admin?page=${currentPage + 1}`}
-                className={pagenation()}
-              >
+              <Link to={`/admin?page=${currentPage + 1}`} className={pagenation()}>
                 次へ
               </Link>
-            ):(
-                <p className={pagenation({disabled: true})}>次ヘ</p>)
-            }
+            ) : (
+              <p className={pagenation({ disabled: true })}>次ヘ</p>
+            )}
           </nav>
         </div>
       )}

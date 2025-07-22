@@ -65,9 +65,7 @@ export default function AdminAccounts(args: Route.ComponentProps) {
   const [query, setQuery] = React.useState(currentQuery)
 
   const handleSearch = () => {
-    navigate({
-      search: `?query=${encodeURIComponent(query)}`,
-    })
+    navigate({ search: `?query=${encodeURIComponent(query)}` })
   }
 
   return (
@@ -80,7 +78,7 @@ export default function AdminAccounts(args: Route.ComponentProps) {
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={e => setQuery(e.target.value)}
             placeholder="名前・メアドで検索..."
             className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
