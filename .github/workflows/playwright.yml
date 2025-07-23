@@ -8,23 +8,21 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     services:
-      libsql:
+      sqld:
         image: ghcr.io/tursodatabase/libsql-server:latest
         ports:
           - 8080:8080
         options: >-
-          --health-cmd="curl -f http://localhost:8080/v1/status || exit 1"
-          --health-interval=2s --health-timeout=2s --health-retries=5
+          --health-cmd="curl -fs http://localhost:8080/ || exit 1"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=5
     environment: testing
     steps:
     - name: Create .env file
       run: |
         echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.env
         echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.dev.vars
-    - name: Wait for libSQL readiness
-      run: |
-        echo "Waiting for libSQL..."
-        until curl -s http://localhost:8080/v1/status; do sleep 1; done
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
