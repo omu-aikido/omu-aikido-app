@@ -12,11 +12,6 @@ jobs:
         image: ghcr.io/tursodatabase/libsql-server:latest
         ports:
           - 8080:8080
-        options: >-
-          --health-cmd="curl http://localhost:8080/health || exit 1"
-          --health-interval=5s
-          --health-timeout=3s
-          --health-retries=5
     environment: testing
     steps:
     - name: Create .env file
