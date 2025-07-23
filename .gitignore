@@ -13,6 +13,9 @@
 
 # Testing
 .env
-test-results/*
-playwright-report/*
 playwright/.clerk/
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
