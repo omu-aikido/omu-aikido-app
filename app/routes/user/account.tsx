@@ -5,6 +5,7 @@ import { Link, redirect, useFetcher, useOutletContext } from "react-router"
 
 import type { Route } from "./+types/account"
 
+import { StateButton } from "~/components/ui/StateButton"
 import type { UserLayoutComponentProps } from "~/layout/user"
 import { style } from "~/styles/component"
 
@@ -81,41 +82,11 @@ export default function ProfileForm() {
           email={user.emailAddresses?.[0]?.emailAddress || ""}
           disabled={disabled}
         />
-        <div className="flex gap-x-2">
-          {isEditing ? (
-            <>
-              <button
-                type="submit"
-                className={style.form.button({
-                  disabled: fetcher.state !== "idle",
-                  type: "green",
-                })}
-                disabled={fetcher.state !== "idle"}
-              >
-                {fetcher.state !== "idle" ? "通信中……" : "保存"}
-              </button>
-              <button
-                type="button"
-                className={style.form.button({
-                  disabled: fetcher.state !== "idle",
-                  type: "gray",
-                })}
-                disabled={fetcher.state !== "idle"}
-                onClick={() => setIsEditing(false)}
-              >
-                キャンセル
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              className={style.form.button()}
-              onClick={() => setIsEditing(true)}
-            >
-              編集
-            </button>
-          )}
-        </div>
+        <StateButton
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
+          fetcher={fetcher}
+        />
       </FormWrapper>
       <p className="mt-4">
         <Link to="/account/discord" className={style.text.link()}>

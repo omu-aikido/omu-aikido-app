@@ -1,17 +1,21 @@
 import { createClerkClient } from "@clerk/react-router/api.server"
-import { getAuth, type ExternalAccount, type User } from "@clerk/react-router/ssr.server"
+import { getAuth, type User } from "@clerk/react-router/ssr.server"
 import { useEffect, useState } from "react"
-import { Link, redirect, useFetcher, useNavigate, useSearchParams } from "react-router"
+import { Link, redirect, useFetcher } from "react-router"
 import { tv } from "tailwind-variants"
+
+import { StateButton } from "../../components/ui/StateButton"
 
 import type { Route } from "./+types/user"
 
-import { Icon } from "~/components/ui/Icon"
-import type { ActivityType } from "~/db/schema"
+import { StatsSection } from "~/components/component/AccountStatus"
+import { ActivitiesTable } from "~/components/component/UserActivitiesTable"
+import { UserProfileSection } from "~/components/component/UserProfile"
+import { FilterSection } from "~/components/component/UserRecordsFilter"
 import { activitySummary } from "~/lib/query/activity"
 import { updateProfile } from "~/lib/query/admin"
 import { getProfile } from "~/lib/query/profile"
-import { getJST, grade as gradeOptions, timeForNextGrade } from "~/lib/utils"
+import { getJST, grade as gradeOptions } from "~/lib/utils"
 import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
 import type { Profile } from "~/type"
@@ -73,7 +77,9 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
     })
 
     const totalActivitiesCount = all.length
-    const activities = all.slice((page - 1) * limit, page * limit)
+    const activities = all.slice((page - 1) * limit, page * limit).sort((a, b) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime()
+    })
 
     // 総稽古日数（ユニーク日付数）
     const uniqueDates = new Set(all.map(a => new Date(a.date).toDateString()))
@@ -94,7 +100,6 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
       page,
       totalActivitiesCount,
       limit,
-      // 追加
       totalDays,
       totalEntries,
       totalHours,
@@ -400,41 +405,11 @@ export default function AdminUser(args: Route.ComponentProps) {
             fetcherState={fetcher.state}
           />
         </div>
-        <div className="flex gap-2">
-          {isEditing ? (
-            <>
-              <button
-                type="submit"
-                className={style.form.button({
-                  disabled: fetcher.state !== "idle",
-                  type: "green",
-                })}
-                disabled={fetcher.state !== "idle"}
-              >
-                {fetcher.state !== "idle" ? "通信中" : "保存"}
-              </button>
-              <button
-                type="button"
-                className={style.form.button({
-                  disabled: fetcher.state !== "idle",
-                  type: "gray",
-                })}
-                disabled={fetcher.state !== "idle"}
-                onClick={() => setIsEditing(false)}
-              >
-                キャンセル
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              className={style.form.button()}
-              onClick={() => setIsEditing(true)}
-            >
-              編集
-            </button>
-          )}
-        </div>
+        <StateButton
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
+          fetcher={fetcher}
+        />
       </FormWrapper>
       {/* Stats Section */}
       <StatsSection
@@ -459,303 +434,6 @@ export default function AdminUser(args: Route.ComponentProps) {
 }
 
 // MARK: UI
-// Clerkのuser型はany相当でpropsを通す
-interface UserProfileSectionProps {
-  user: User
-  unSafeprofile: Profile | null
-  profile: Profile
-  discord?: ExternalAccount
-}
-function UserProfileSection({
-  user,
-  unSafeprofile,
-  profile,
-  discord,
-}: UserProfileSectionProps) {
-  // 不足データ判定
-  let statusBadge: React.ReactNode = null
-  if (!unSafeprofile) {
-    statusBadge = (
-      <span className="inline-block px-3 py-1 mb-2 rounded-full bg-red-100 text-red-700 text-xs font-bold">
-        プロフィール未設定
-      </span>
-    )
-  }
-
-  return (
-    <div className={card({ className: "p-6 mb-3" })}>
-      {/* ステータスバッジ表示 */}
-      {statusBadge}
-      <div className="flex items-center gap-4 mb-6">
-        <img
-          src={user.imageUrl}
-          alt={`${user.lastName ?? ""} ${user.firstName ?? ""}`}
-          className="w-16 h-16 rounded-full object-cover border-4 border-slate-200 dark:border-slate-600"
-        />
-        <div>
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-            {user.lastName ?? ""} {user.firstName ?? ""}
-          </h2>
-          {discord && discord.username && (
-            <p className="text-slate-600 dark:text-slate-400 flex flex-row items-center text-sm">
-              <Icon icon="discord-logo" className="!m-0 !mr-2" />
-              {discord.username}
-            </p>
-          )}
-          <p className="text-slate-600 dark:text-slate-400 flex flex-row items-center text-sm">
-            <Icon icon="envelope" className="!m-0 !mr-2" />
-            {user.emailAddresses[0]?.emailAddress || "未設定"}
-          </p>
-        </div>
-      </div>
-      <div>
-        <div className="space-y-3 flex flex-col">
-          <div className={info().frame()}>
-            <label className={info().label()}>役職</label>
-            <p className={info().value()}>
-              {Role.fromString(profile?.role)?.ja || "部員"}
-            </p>
-          </div>
-          <div className={info().frame()}>
-            <label className={info().label()}>作成日</label>
-            <p className={info().value()}>
-              {user.createdAt ? new Date(user.createdAt).toLocaleString("ja-JP") : "-"}
-            </p>
-          </div>
-          <div className={info().frame()}>
-            <label className={info().label()}>最終更新日</label>
-            <p className={info().value()}>
-              {user.updatedAt ? new Date(user.updatedAt).toLocaleString("ja-JP") : "-"}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function StatsSection({
-  totalTrainCount,
-  currentGradeTrainCount,
-  grade,
-  totalDays,
-  totalEntries,
-  totalHours,
-}: {
-  totalTrainCount: number
-  currentGradeTrainCount: number
-  grade: number
-  totalDays: number
-  totalEntries: number
-  totalHours: number
-}) {
-  return (
-    <details className={statsCard({ className: "mb-6" })}>
-      <summary className="grid grid-cols-2 gap-4 cursor-pointer">
-        <div>
-          <p className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">
-            次の級段位まで
-          </p>
-          <p className="text-lg font-bold text-yellow-900 dark:text-yellow-100">
-            {timeForNextGrade(grade) - currentGradeTrainCount}/{timeForNextGrade(grade)}回
-          </p>
-        </div>
-        <div>
-          <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">
-            累計稽古回数
-          </p>
-          <p className="text-lg font-bold text-purple-900 dark:text-purple-100">
-            {totalTrainCount}回
-          </p>
-        </div>
-      </summary>
-      <hr className="mt-3" />
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-4">
-        <div>
-          <span className="block text-xs text-slate-500">総稽古日数</span>
-          <span className="font-bold text-base">{totalDays}日</span>
-        </div>
-        <div>
-          <span className="block text-xs text-slate-500">総稽古回数</span>
-          <span className="font-bold text-base">{totalEntries}回</span>
-        </div>
-        <div>
-          <span className="block text-xs text-slate-500">総稽古時間</span>
-          <span className="font-bold text-base">{totalHours}時間</span>
-        </div>
-        <div>
-          <span className="block text-xs text-slate-500">現級段位での稽古回数</span>
-          <span className="font-bold text-base">{currentGradeTrainCount}時間</span>
-        </div>
-      </div>
-    </details>
-  )
-}
-
-interface FilterSectionProps {
-  startValue: string
-  endValue: string
-}
-function FilterSection({ startValue, endValue }: FilterSectionProps) {
-  const [start, setStart] = useState(startValue)
-  const [end, setEnd] = useState(endValue)
-  const navigate = useNavigate()
-
-  // クエリを変更してページ遷移
-  const handleFilter = () => {
-    const params = new URLSearchParams()
-    if (start) params.set("start", start)
-    if (end) params.set("end", end)
-    navigate("?" + params.toString())
-  }
-  // リセットはクエリを消して遷移
-  const handleReset = () => {
-    navigate("?")
-  }
-
-  return (
-    <details className={filterCard({ className: "mb-6" })}>
-      <summary className="flex bg-slate-300 dark:bg-slate-600 p-4 cursor-pointer">
-        フィルター
-      </summary>
-      <div className="p-6">
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="start" className={style.text.info()}>
-                開始日
-              </label>
-              <input
-                type="date"
-                id="start"
-                name="start"
-                value={start}
-                onChange={e => setStart(e.target.value)}
-                className={input()}
-              />
-            </div>
-            <div>
-              <label htmlFor="end" className={style.text.info()}>
-                終了日
-              </label>
-              <input
-                type="date"
-                id="end"
-                name="end"
-                value={end}
-                onChange={e => setEnd(e.target.value)}
-                className={input()}
-              />
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              type="button"
-              className={style.button({ type: "secondary" })}
-              onClick={handleReset}
-            >
-              リセット
-            </button>
-            <button type="button" className={style.button()} onClick={handleFilter}>
-              フィルター
-            </button>
-          </div>
-        </div>
-      </div>
-    </details>
-  )
-}
-
-interface ActivitiesTableProps {
-  activities: ActivityType[]
-  page: number
-  total: number
-  limit: number
-}
-function ActivitiesTable({ activities, page, total, limit }: ActivitiesTableProps) {
-  const totalPages = Math.max(1, Math.ceil(total / limit))
-  const [params] = useSearchParams()
-  const makePageUrl = (p: number) => {
-    if (p > 1) {
-      params.set("page", String(p))
-    } else {
-      params.delete("page")
-    }
-    // ページング時にアンカーを付与
-    return "?" + params.toString() + "#activities"
-  }
-
-  return (
-    <div className={filterCard()} id="activities">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-slate-200 dark:bg-slate-700">
-            <tr>
-              <th className={tablehead()}>日付</th>
-              <th className={tablehead()}>稽古時間</th>
-              <th className={tablehead()}>編集日</th>
-            </tr>
-          </thead>
-          <tbody className="bg-slate-50 dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
-            {activities.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={3}
-                  className="px-6 py-8 text-center text-slate-500 dark:text-slate-400"
-                >
-                  履歴はありません
-                </td>
-              </tr>
-            ) : (
-              activities.map(activity => (
-                <tr key={activity.id} className={tableRow()}>
-                  <td className={tableCell({ variant: "primary" })}>
-                    {new Date(activity.date).toLocaleDateString("ja-JP")}
-                  </td>
-                  <td className={tableCell({ variant: "primary" })}>
-                    {activity.period}時間
-                  </td>
-                  <td className={tableCell({ variant: "secondary" })}>
-                    {activity.updatedAt
-                      ? new Date(activity.updatedAt).toLocaleString("ja-JP")
-                      : "-"}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-      {/* ページングUI */}
-      {totalPages > 1 && (
-        <nav
-          className="flex justify-center items-center gap-2 py-4"
-          aria-label="ページネーション"
-        >
-          <Link
-            to={makePageUrl(page - 1)}
-            className={paginationButton({ disabled: page <= 1 })}
-            aria-disabled={page <= 1}
-            tabIndex={page <= 1 ? -1 : 0}
-          >
-            前へ
-          </Link>
-          <div className={paginationButton({ class: "border border-slate-500/30" })}>
-            {page + "/" + totalPages}
-          </div>
-          <Link
-            to={makePageUrl(page + 1)}
-            className={paginationButton({ disabled: page >= totalPages })}
-            aria-disabled={page >= totalPages}
-            tabIndex={page >= totalPages ? -1 : 0}
-          >
-            次へ
-          </Link>
-        </nav>
-      )}
-    </div>
-  )
-}
 
 function RoleSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
   const disabled = !isEditing || fetcherState === "loading"
@@ -884,23 +562,6 @@ function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
 }
 
 // MARK: Helper
-const info = tv({
-  slots: {
-    frame: "flex flex-row",
-    label: "block text-sm font-medium text-slate-700 dark:text-slate-300",
-    value:
-      "ml-auto items-end justify-center text-sm text-slate-900 dark:text-slate-100 font-mono",
-  },
-})
-
-const tablehead = tv({
-  base: "px-2 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300 bg-slate-200 dark:bg-slate-800/90 uppercase tracking-wider",
-})
-
-const card = tv({
-  base: "bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700",
-})
-
 const button = tv({
   base: "px-4 py-2 font-medium rounded-md transition-colors duration-200 focus:ring-2 focus:ring-offset-2",
   variants: {
@@ -913,32 +574,6 @@ const button = tv({
   },
 })
 
-const input = tv({
-  base: "w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-slate-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-})
-
-const tableRow = tv({
-  base: "hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150",
-})
-
-const tableCell = tv({
-  base: "px-2 py-4 whitespace-nowrap text-sm text-center",
-  variants: {
-    variant: {
-      primary: "text-slate-900 dark:text-slate-100",
-      secondary: "text-slate-500 dark:text-slate-400",
-    },
-  },
-})
-
-const statsCard = tv({
-  base: "rounded-md bg-slate-100 dark:bg-slate-800/50 p-4 shadow-md",
-})
-
-const filterCard = tv({
-  base: "bg-slate-100 dark:bg-slate-800 rounded-lg shadow-md overflow-hidden",
-})
-
 const notificationStyle = tv({
   base: "p-4 rounded-md border transition-all duration-300",
   variants: {
@@ -948,18 +583,6 @@ const notificationStyle = tv({
       error:
         "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200",
     },
-  },
-})
-
-const paginationButton = tv({
-  base: "px-3 py-1 rounded transition-colors duration-150 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500",
-  variants: {
-    active: {
-      true: "bg-blue-600 text-white",
-      false:
-        "bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-slate-100",
-    },
-    disabled: { true: "pointer-events-none opacity-50", false: "" },
   },
 })
 
