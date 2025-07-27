@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   libsql_server:
     image: ghcr.io/tursodatabase/libsql-server

@@ -14,8 +14,7 @@
     "lint:fix": "eslint . --fix",
     "lint": "eslint .",
     "prebuild": "react-router typegen && pnpm format && pnpm lint:fix",
-    "preview": "pnpm build && wrangler dev --port 4173",
-    "prepreview": "pnpm db:push",
+    "preview": "react-router build && wrangler dev --port 4173",
     "typegen": "wrangler types && react-router typegen",
     "db:push": "drizzle-kit push",
     "db:check": "drizzle-kit check",
@@ -25,8 +24,9 @@
     "test:e2e": "playwright test",
     "test:unit": "vitest",
     "typecheck": "pnpm cf-typegen && react-router typegen && tsc -b",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down"
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "postdocker:up": "pnpm db:migrate"
   },
   "dependencies": {
     "@catppuccin/palette": "^1.7.1",
