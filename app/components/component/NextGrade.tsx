@@ -14,13 +14,13 @@ export function NextGrade(gradeData: {
   const promotionType = grade <= 1 ? (grade === 0 ? "昇級" : "昇段") : "昇級"
   const progressPercentage = ((forNextGrade - needToNextGrade) / forNextGrade) * 100
 
-    const detailsRef = useRef<HTMLDetailsElement>(null)
+  const detailsRef = useRef<HTMLDetailsElement>(null)
 
-    const handleClose = () => {
-      if (detailsRef.current) {
-        detailsRef.current.open = false
-      }
+  const handleClose = () => {
+    if (detailsRef.current) {
+      detailsRef.current.open = false
     }
+  }
 
   // 進捗率に応じたコメント
   const progressComments = [
@@ -65,7 +65,8 @@ export function NextGrade(gradeData: {
           />
         </div>
         <div className="flex flex-col items-center mt-4 cursor-pointer group-open:hidden">
-          <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-1" />
+          <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-0.5" />
+          <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-0.5" />
         </div>
       </summary>
       <p className="mt-5 mb-2 border border-slate-500 p-2 rounded-md">
@@ -93,7 +94,8 @@ export function NextGrade(gradeData: {
           if (e.key === "Enter" || e.key === " ") handleClose()
         }}
       >
-        <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-1" />
+        <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-0.5" />
+        <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-0.5" />
       </div>
     </details>
   )

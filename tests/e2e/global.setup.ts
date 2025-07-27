@@ -10,8 +10,6 @@ setup("global setup", async ({ page, context: _context }) => {
   await page.goto("/sign-in", { waitUntil: "networkidle", timeout: 60000 })
   await page.waitForFunction(() => window.Clerk !== undefined, { timeout: 30000 })
 
-  console.log(process.env)
-
   try {
     await clerk.signIn({
       page,

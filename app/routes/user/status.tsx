@@ -4,6 +4,7 @@ import { redirect, useFetcher } from "react-router"
 
 import type { Route } from "./+types/status"
 
+import { StateButton } from "~/components/ui/StateButton"
 import { getProfile, updateProfile } from "~/lib/query/profile"
 import { grade as gradeOptions } from "~/lib/utils"
 import { style } from "~/styles/component"
@@ -86,41 +87,7 @@ export default function StatusForm({ loaderData }: Route.ComponentProps) {
       />
       <YearSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
 
-      <div className="flex gap-2">
-        {isEditing ? (
-          <>
-            <button
-              type="submit"
-              className={style.form.button({
-                disabled: fetcher.state !== "idle",
-                type: "green",
-              })}
-              disabled={fetcher.state !== "idle"}
-            >
-              {fetcher.state !== "idle" ? "通信中……" : "保存"}
-            </button>
-            <button
-              type="button"
-              className={style.form.button({
-                disabled: fetcher.state !== "idle",
-                type: "gray",
-              })}
-              disabled={fetcher.state !== "idle"}
-              onClick={() => setIsEditing(false)}
-            >
-              キャンセル
-            </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            className={style.form.button()}
-            onClick={() => setIsEditing(true)}
-          >
-            編集
-          </button>
-        )}
-      </div>
+      <StateButton isEditing={isEditing} setIsEditing={setIsEditing} fetcher={fetcher} />
     </FormWrapper>
   )
 }
