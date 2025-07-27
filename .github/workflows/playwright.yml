@@ -8,6 +8,17 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     environment: testing
+    services:
+      libsql_server:
+        image: ghcr.io/tursodatabase/libsql-server
+        ports:
+          - "8080:8080"
+        options: >-
+          --health-cmd="/usr/local/bin/libsql-server-health"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=5
+
     steps:
       - name: Create .env file
         run: |
@@ -31,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Set up LibSQL Server
-        run: pnpm run docker:up
+        run: pnpm run db:push
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
       - name: Run Playwright tests
@@ -42,5 +53,3 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-      - name: Stop LibSQL Server
-        run: pnpm run docker:down
