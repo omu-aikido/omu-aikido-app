@@ -1,3 +1,5 @@
+import { useRef } from "react"
+
 import { translateGrade } from "~/lib/utils"
 import { style } from "~/styles/component"
 
@@ -11,6 +13,14 @@ export function NextGrade(gradeData: {
   const targetGrade = grade >= 0 ? grade - 2 : grade - 1
   const promotionType = grade <= 1 ? (grade === 0 ? "昇級" : "昇段") : "昇級"
   const progressPercentage = ((forNextGrade - needToNextGrade) / forNextGrade) * 100
+
+  const detailsRef = useRef<HTMLDetailsElement>(null)
+
+  const handleClose = () => {
+    if (detailsRef.current) {
+      detailsRef.current.open = false
+    }
+  }
 
   // 進捗率に応じたコメント
   const progressComments = [
@@ -31,7 +41,10 @@ export function NextGrade(gradeData: {
   const progressComment = progressComments[commentIndex]
 
   return (
-    <details className={style.card.container({ class: "select-none pb-0" })}>
+    <details
+      ref={detailsRef}
+      className={style.card.container({ class: "select-none pb-0 group" })}
+    >
       <summary className="block">
         <div className="flex flex-row items-center justify-center gap-2 mb-4">
           <h2 className={style.text.sectionTitle({ class: "text-xl mb-0 mt-0.5" })}>
@@ -51,10 +64,9 @@ export function NextGrade(gradeData: {
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
-        <div className="flex flex-col items-center mt-4 cursor-pointer">
+        <div className="flex flex-col items-center mt-4 cursor-pointer group-open:hidden">
           <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-0.5" />
           <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-0.5" />
-          <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-1" />
         </div>
       </summary>
       <p className="mt-5 mb-2 border border-slate-500 p-2 rounded-md">
@@ -72,6 +84,19 @@ export function NextGrade(gradeData: {
         <br />
         稽古は1.5時間で１日分としてカウントされます。
       </p>
+      <div
+        className="flex flex-col items-center mt-4 cursor-pointer"
+        onClick={handleClose}
+        tabIndex={0}
+        role="button"
+        aria-label="閉じる"
+        onKeyDown={e => {
+          if (e.key === "Enter" || e.key === " ") handleClose()
+        }}
+      >
+        <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-0.5" />
+        <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-0.5" />
+      </div>
     </details>
   )
 }

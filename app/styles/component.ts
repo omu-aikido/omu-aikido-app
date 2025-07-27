@@ -154,4 +154,8 @@ export const style = {
       base: "bg-slate-100 dark:bg-slate-800 p-2 rounded-md text-sm font-mono text-slate-900 dark:text-slate-200",
     }),
   },
+
+  filterCard: tv({
+    base: "bg-slate-100 dark:bg-slate-800 rounded-lg shadow-md overflow-hidden",
+  }),
 }
