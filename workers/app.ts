@@ -13,6 +13,9 @@ const requestHandler = createRequestHandler(
 
 export default {
   async fetch(request, env, ctx) {
-    return requestHandler(request, { cloudflare: { env, ctx } })
+    const response = await requestHandler(request, { cloudflare: { env, ctx } })
+    response.headers.set("X-Frame-Options", "DENY")
+    response.headers.set("X-Content-Type-Options", "nosniff")
+    return response
   },
 } satisfies ExportedHandler<Env>
