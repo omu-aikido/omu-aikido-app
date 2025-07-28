@@ -7,6 +7,7 @@
     "check": "pnpm build && tsc -b && pnpm db:check && wrangler deploy --dry-run",
     "deploy": "pnpm build && wrangler deploy --dry-run",
     "dev": "react-router dev",
+    "prebuild": "react-router typegen",
     "precommit": "pnpm lint:fix && pnpm format",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
