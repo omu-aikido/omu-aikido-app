@@ -2,10 +2,9 @@ import { createClerkClient, type User } from "@clerk/react-router/api.server"
 import type { z } from "zod"
 
 import {
-  Role,
-  type createProfileInputSchema,
-  type updateProfileInputSchema,
   publicMetadataProfileSchema,
+  Role,
+  type updateProfileInputSchema
 } from "~/lib/zod"
 import type { Profile } from "~/type"
 
@@ -61,38 +60,6 @@ export async function getProfile(input: {
     }
 
     return null
-  }
-}
-
-export async function createProfile(
-  input: z.infer<typeof createProfileInputSchema>,
-  env: Env,
-): Promise<Response> {
-  const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
-
-  // 既に有効なプロフィールがある場合はエラーとする。
-  const existingProfile = await getProfile({ userId: input.id, env })
-  if (!(existingProfile instanceof Response)) {
-    return new Response("User already exists.", {
-      status: 409,
-      headers: { "Content-Type": "application/json" },
-    })
-  }
-
-  try {
-    const { id, ...metadata } = input
-    const publicMetadata = { ...metadata, role: "member" as const }
-    await clerkClient.users.updateUserMetadata(id, { publicMetadata })
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    })
-  } catch (error) {
-    return new Response("Failed to create profile", {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-      statusText: `${error instanceof Error ? error.message : "Unknown error"}`,
-    })
   }
 }
 
