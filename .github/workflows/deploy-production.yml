@@ -1,4 +1,4 @@
-name: Deploy to Production
+name: Deploy Developemnt
 
 on:
   push:
@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -33,7 +34,8 @@ jobs:
 
       - name: Build
         run: pnpm build
-      - name: Deploy to Production
+
+      - name: Deploy Preview
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
