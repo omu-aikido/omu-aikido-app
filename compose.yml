@@ -1,0 +1,10 @@
+services:
+  libsql_server:
+    image: ghcr.io/tursodatabase/libsql-server
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/libsql-server-health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
