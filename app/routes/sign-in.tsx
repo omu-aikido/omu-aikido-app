@@ -1,7 +1,9 @@
 import { useSignIn } from "@clerk/react-router"
 import { getAuth } from "@clerk/react-router/ssr.server"
+import { getLogger } from "@logtape/logtape"
 import * as React from "react"
 import { Link, redirect, useFetcher } from "react-router"
+const logger = getLogger("routes/sign-in")
 
 import { style } from "../styles/component"
 
@@ -14,8 +16,24 @@ export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
   const userId = auth.userId
 
-  if (userId)
-    return redirect(new URL(args.request.url).searchParams.get("redirect_url") ?? "/")
+  if (userId) {
+    const url = new URL(args.request.url)
+    const redirectUrl = url.searchParams.get("redirect_url")
+
+    let safeRedirectUrl = "/"
+
+    if (redirectUrl) {
+      try {
+        const parsedRedirectUrl = new URL(redirectUrl, url.origin)
+        if (parsedRedirectUrl.origin === url.origin) {
+          safeRedirectUrl = parsedRedirectUrl.pathname
+        }
+      } catch (e) {
+        logger.error(`Invalid redirect_url: ${redirectUrl}: ${e}`)
+      }
+    }
+    return redirect(safeRedirectUrl)
+  }
 }
 
 // MARK: Meta
