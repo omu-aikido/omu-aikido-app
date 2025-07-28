@@ -4,7 +4,6 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
-    "cf-typegen": "wrangler types",
     "check": "pnpm build && tsc -b && pnpm db:check && wrangler deploy --dry-run",
     "deploy": "pnpm build && wrangler deploy --dry-run",
     "dev": "react-router dev",
@@ -13,9 +12,7 @@
     "format:check": "prettier --check .",
     "lint:fix": "eslint . --fix",
     "lint": "eslint .",
-    "prebuild": "react-router typegen && pnpm format && pnpm lint:fix",
     "preview": "react-router build && wrangler dev --port 4173",
-    "typegen": "wrangler types && react-router typegen",
     "db:push": "drizzle-kit push",
     "db:check": "drizzle-kit check",
     "db:studio": "drizzle-kit studio",
@@ -23,7 +20,6 @@
     "db:generate": "drizzle-kit generate",
     "test:e2e": "playwright test",
     "test:unit": "vitest",
-    "typecheck": "pnpm cf-typegen && react-router typegen && tsc -b",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "postdocker:up": "pnpm db:migrate"
