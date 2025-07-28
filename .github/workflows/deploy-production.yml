@@ -38,6 +38,9 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Check Configuration
+        run: cat $GITHUB_WORKSPACE/worker-configuration.d.ts
+
       - name: Deploy Preview
         uses: cloudflare/wrangler-action@v3
         with:
