@@ -117,7 +117,7 @@ export default function App(args: Route.ComponentProps) {
     </html>
   )
 }
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+export function ErrorBoundary({ error, params }: Route.ErrorBoundaryProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   let message = "エラーが発生しました"
   let details = "予期しないエラーが発生しました。"
@@ -133,8 +133,12 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       : "一時的な問題が発生している可能性があります。"
   }
 
-  if (error instanceof Error) {
-    logger.error(`ErrorBoundary caught error: error=${error.message}, stack=${error.stack}`)
+  if (error instanceof Error && status !== 404) {
+    logger.error(
+      `user ${params.userId} encountered an error: error=${error.message}, stack=${error.stack}`,
+    )
+  } else {
+    logger.error(`user ${params.userId} encountered unknown error: ${error}`)
   }
 
   const handleReload = () => {
