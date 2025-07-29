@@ -1,29 +1,10 @@
 import { and, desc, eq, gte, inArray, lte } from "drizzle-orm"
-import { z } from "zod"
 
 import { activity, type ActivityType } from "~/db/schema"
 import { createDb } from "~/lib/drizzle"
-import { getProfile } from "~/lib/query/profile"
-import { Role } from "~/lib/zod"
 
 export const selectActivity = activity.$inferSelect
 export const inputActivity = activity.$inferInsert
-
-// MARK: getAllActivities
-export async function getAllActivities(input: { applicateBy: string; env: Env }) {
-  const db = createDb(input.env)
-
-  const applicateBy = await getProfile({ userId: input.applicateBy, env: input.env })
-
-  if (!applicateBy) return applicateBy
-
-  const role = Role.fromString(applicateBy.role)
-  if (!role || !role.isManagement()) {
-    throw new Error("Permission denied")
-  }
-  const activities = await db.select().from(activity)
-  return activities
-}
 
 // MARK: createActivity
 export async function createActivity(input: {
@@ -121,91 +102,6 @@ export async function recentlyActivity(input: {
     .limit(input.limit)
 
   return activityData as ActivityType[]
-}
-
-// MARK: deleteActivity
-export async function deleteActivity(input: { userId: string; id: string; env: Env }) {
-  const db = createDb(input.env)
-
-  const validatedInput = z.object({ id: z.string() }).parse(input)
-  const activity_target = (
-    await db.select().from(activity).where(eq(activity.id, validatedInput.id)).limit(1)
-  )[0].userId
-
-  if (input.userId !== activity_target) {
-    throw new Error("Invalid user ID")
-  }
-
-  const result = await db
-    .delete(activity)
-    .where(eq(activity.id, validatedInput.id))
-    .execute()
-
-  return result
-}
-
-// MARK: getActivity
-export async function getActivity(input: { id: string; env: Env }) {
-  const db = createDb(input.env)
-
-  const validatedInput = z.object({ id: z.string() }).parse(input)
-
-  const activity_any = await db
-    .select()
-    .from(activity)
-    .where(eq(activity.id, validatedInput.id))
-    .limit(1)
-
-  if (activity_any.length === 0) return null
-
-  const act = activity_any[0]
-
-  const data: typeof selectActivity = {
-    date: act.date,
-    id: act.id,
-    userId: act.userId,
-    period: act.period,
-    createAt: act.createAt,
-    updatedAt: act.updatedAt,
-  }
-
-  return data
-}
-
-// MARK: updateActivity
-export async function updateActivity(input: {
-  userId: string
-  activityId: string
-  activityData: Partial<typeof inputActivity>
-  env: Env
-}) {
-  const db = createDb(input.env)
-
-  const validatedInput = z
-    .object({ userId: z.string(), activityId: z.string() })
-    .parse(input)
-
-  const user = await getProfile({ userId: validatedInput.userId, env: input.env })
-  if (!user) {
-    return null
-  }
-
-  const setData: Partial<typeof inputActivity> = {
-    date: input.activityData.date,
-    id: input.activityData.id,
-    userId: input.activityData.userId,
-    period: input.activityData.period,
-    createAt: input.activityData.createAt,
-    updatedAt: new Date().toISOString(),
-  }
-
-  const result = await db
-    .update(activity)
-    .set(setData)
-    .where(eq(activity.id, validatedInput.activityId))
-    .execute()
-
-  return result
 }
 
 // MARK: createActivities

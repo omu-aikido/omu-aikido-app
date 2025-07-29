@@ -1,9 +1,11 @@
 import { jaJP } from "@clerk/localizations"
 import { ClerkProvider } from "@clerk/react-router"
 import { getAuth, rootAuthLoader } from "@clerk/react-router/ssr.server"
+import { getLogger } from "@logtape/logtape"
 import { useState } from "react"
 import {
   isRouteErrorResponse,
+  Link,
   Links,
   Meta,
   Outlet,
@@ -21,6 +23,8 @@ import { getProfile } from "./lib/query/profile"
 import { Role } from "./lib/zod"
 import "./styles/global.css"
 import type { PagePath } from "./type"
+
+const logger = getLogger("root")
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -113,23 +117,32 @@ export default function App(args: Route.ComponentProps) {
     </html>
   )
 }
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+export function ErrorBoundary({ error, params }: Route.ErrorBoundaryProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   let message = "エラーが発生しました"
   let details = "予期しないエラーが発生しました。"
-  let stack: string | undefined
   let status: number = 503
+  let is404 = false
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404 - ページが見つかりません" : "エラー"
-    details =
-      error.status === 404
-        ? "お探しのページは存在しないか、移動された可能性があります。"
-        : error.statusText || details
     status = error.status
-  } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message
-    stack = error.stack
+    is404 = status === 404
+    message = is404 ? "ページが見つかりません" : "エラーが発生しました"
+    details = is404
+      ? "お探しのページは存在しないか、移動された可能性があります。"
+      : "一時的な問題が発生している可能性があります。"
+  }
+
+  if (error instanceof Error && status !== 404) {
+    logger.error(
+      `user ${params.userId} encountered an error: error=${error.message}, stack=${error.stack}`,
+    )
+  } else {
+    logger.error(`user ${params.userId} encountered unknown error: ${error}`)
+  }
+
+  const handleReload = () => {
+    window.location.reload()
   }
 
   return (
@@ -145,7 +158,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         <Meta />
         <Links />
       </head>
-      <body className="h-dvh bg-gray-100 text-gray-800">
+      <body className="h-dvh bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100">
         <ReactHeader title="ポータル">
           <Sidebar
             position="right"
@@ -157,23 +170,40 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
           </Sidebar>
         </ReactHeader>
         <main className="min-h-4/5 p-6 mx-auto max-w-3xl text-center">
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-400 mb-4">
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">
             {message}
           </h1>
-          {status === 404 && <img src="/404 NotFound.png" />}
-          {status === 500 && <img src="/500 InternalServerError.png" />}
-          <p className="text-lg mb-6 text-slate-600 dark:text-slate-500">{details}</p>
-          {stack && (
-            <pre className="bg-gray-200 p-4 rounded text-left overflow-x-auto">
-              <code>{stack}</code>
-            </pre>
-          )}
-          <a
-            href="/"
-            className="inline-block mt-6 px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-          >
-            ホームに戻る
-          </a>
+          {is404 && <img src="/404 NotFound.png" alt="404エラー" />}
+          {!is404 && <img src="/500 InternalServerError.png" alt="サーバーエラー" />}
+          <p className="text-lg mb-6 text-slate-600 dark:text-slate-300">{details}</p>
+          <div className="space-y-4">
+            {is404 ? (
+              <Link
+                to="/"
+                className="inline-block px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition"
+              >
+                ホームに戻る
+              </Link>
+            ) : (
+              <>
+                <button
+                  onClick={handleReload}
+                  className="inline-block px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition mr-4"
+                >
+                  ページを再読み込み
+                </button>
+                <Link
+                  to="/"
+                  className="inline-block px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition"
+                >
+                  ホームに戻る
+                </Link>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-4">
+                  問題が解決しない場合は、管理者にお問い合わせください。
+                </p>
+              </>
+            )}
+          </div>
         </main>
         <ScrollRestoration />
         <Scripts />
