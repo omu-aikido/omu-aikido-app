@@ -23,7 +23,8 @@
     "test:unit": "vitest",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
-    "postdocker:up": "pnpm db:migrate"
+    "postdocker:up": "pnpm db:migrate",
+    "docker:db:reset": "docker compose down && docker compose up -d && pnpm db:migrate"
   },
   "dependencies": {
     "@catppuccin/palette": "^1.7.1",

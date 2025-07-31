@@ -3,39 +3,25 @@ import { expect, test } from "@playwright/test"
 test.describe("記録操作", () => {
   test("記録の追加から削除まで", async ({ page }) => {
     await page.goto("/record")
-    await expect(page.getByRole("heading", { name: "記録一覧" })).toBeVisible()
-    const listItem = await page.waitForSelector('li:has-text("記録なし")')
-    await expect(page.locator("li", { hasText: /記録なし$/ }).first()).toBeVisible()
-    await listItem.click()
-    await expect(page.getByText("この日の活動記録がありません。")).toBeVisible()
-    await page.getByRole("button", { name: "記録を追加" }).click()
-    await page.getByRole("button", { name: "一時保存" }).click()
-    const listItem2 = await page.waitForSelector('li:has-text("記録なし")')
-    await expect(page.locator("li", { hasText: /記録なし$/ }).first()).toBeVisible()
-    await listItem2.click()
-    await expect(page.getByRole("main")).toContainText("この日の活動記録がありません。")
-    await page.getByRole("button", { name: "記録を追加" }).click()
-    await expect(page.getByText("時間")).toBeVisible()
-    await page.getByRole("button", { name: "戻る" }).click()
-    await page.getByRole("button", { name: "登録" }).click()
-    await page.goto("/record")
-    const summaryElement = await page.waitForSelector("text=合計 1.5h")
-    await expect(page.getByText("合計 1.5h")).toBeVisible()
-    await summaryElement.click()
-    await expect(page.getByText("時間")).toBeVisible()
-    await page.getByRole("button", { name: "戻る" }).click()
-    await listItem2.click()
-    await expect(page.getByText("この日の活動記録がありません。")).toBeVisible()
-    await page.getByRole("button", { name: "戻る" }).click()
-    await expect(page.getByText("合計 1.5h")).toBeVisible()
-    const summaryElement2 = await page.waitForSelector("text=合計 1.5h")
-    await summaryElement2.click()
-    await page.getByRole("button", { name: "削除" }).click()
-    await page.getByRole("button", { name: "一時保存" }).click()
-    await page.getByRole("button", { name: "登録" }).click()
-    const finalListItem = await page.waitForSelector('li:has-text("記録なし")')
-    await finalListItem.click()
-    await page.getByText("この日の活動記録がありません。").click()
-    await expect(page.getByText("この日の活動記録がありません。")).toBeVisible()
+    await page.goto('http://localhost:4173/');
+     await page.getByRole('link', { name: '記録 活動の記録をつけよう 詳細を見る' }).click();
+     await expect(page.locator('h1')).toContainText('記録一覧');
+     await expect(page.getByRole('list')).toContainText('1日');
+     await expect(page.getByRole('list')).toContainText('記録なし');
+     await page.getByRole('listitem').filter({ hasText: '記録なし' }).locator('div').nth(1).click();
+     await expect(page.getByRole('main')).toContainText('この日の活動記録がありません。');
+     await page.getByRole('button', { name: '記録を追加' }).click();
+     await expect(page.getByRole('main')).toContainText('時間');
+     await page.getByRole('button', { name: '一時保存' }).click();
+     await expect(page.getByRole('main')).toContainText('登録');
+     await page.getByRole('button', { name: '登録' }).click();
+     await page.goto('http://localhost:4173/record?month=2025-07');
+     await expect(page.getByRole('list')).toContainText('合計 1.5h');
+     await page.getByText('日 (火)合計 1.5h').click();
+     await page.getByRole('button', { name: '削除' }).click();
+     await expect(page.getByRole('main')).toContainText('この日の活動記録がありません。');
+     await page.getByRole('button', { name: '一時保存' }).click();
+     await page.getByRole('button', { name: '登録' }).click();
+     await expect(page.getByRole('list')).toContainText('記録なし');
   })
 })
