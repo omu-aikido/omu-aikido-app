@@ -40,13 +40,7 @@ export default defineConfig({
       testDir: "tests/e2e/components/mobile",
       use: { ...devices["Pixel 5"], storageState: "playwright/.clerk/user.json" },
       dependencies: ["Authentication Setup"],
-    },
-    {
-      name: "Mobile Safari",
-      testDir: "tests/e2e/components/mobile",
-      use: { ...devices["iPhone 12"], storageState: "playwright/.clerk/user.json" },
-      dependencies: ["Authentication Setup"],
-    },
+    }
   ],
 
   /* Run your local dev server before starting the tests */

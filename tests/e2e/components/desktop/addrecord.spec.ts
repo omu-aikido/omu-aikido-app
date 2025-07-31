@@ -14,7 +14,8 @@ test.describe("記録操作", () => {
     await expect(page.getByText('合計 1.5h').first()).toBeVisible();
     await expect(page.getByRole('button', { name: '登録' })).toBeVisible();
     await page.getByRole('button', { name: '登録' }).click();
-    await page.goto('http://localhost:4173/record');
+    await page.waitForTimeout(1000);
+    await page.goto('/record');
     await expect(page.getByText('合計 1.5h').first()).toBeVisible();
     await page.getByText('1合計 1.5h').click();
     await expect(page.getByText('時間')).toBeVisible();
