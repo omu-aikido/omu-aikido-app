@@ -10,7 +10,7 @@ import { AppIcon } from "~/components/ui/AppIcon"
 import Grid from "~/components/ui/Grid"
 import { createActivity, recentlyActivity, userActivity } from "~/lib/query/activity"
 import { getAccount, getProfile } from "~/lib/query/profile"
-import { getJST, timeForNextGrade } from "~/lib/utils"
+import { timeForNextGrade } from "~/lib/utils"
 import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
 import type { ActionResult, PagePath } from "~/type"
@@ -39,12 +39,10 @@ export async function loader(args: Route.LoaderArgs) {
   const profile = await getProfile({ userId, env })
   const activityFromPreviousGrade = await userActivity({
     userId,
-    start: getJST(
-      profile?.getGradeAt
-        ? new Date(profile.getGradeAt)
-        : new Date(profile!.joinedAt, 3, 1),
-    ),
-    end: getJST(new Date()),
+    start: profile?.getGradeAt
+      ? new Date(profile.getGradeAt)
+      : new Date(profile!.joinedAt, 3, 1),
+    end: new Date(),
     env,
   })
   const grade = profile?.grade ? profile.grade : 0

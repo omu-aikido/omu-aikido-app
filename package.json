@@ -31,9 +31,7 @@
   },
   "dependencies": {
     "@catppuccin/palette": "^1.7.1",
-    "@clerk/localizations": "^3.18.0",
     "@clerk/react-router": "^1.7.0",
-    "@clerk/themes": "^2.2.55",
     "@clerk/types": "^4.67.0",
     "@libsql/client": "^0.15.9",
     "@logtape/logtape": "^1.0.4",
@@ -48,7 +46,9 @@
     "react-router-dom": "^7.6.3"
   },
   "devDependencies": {
+    "@clerk/testing": "^1.10.4",
     "@cloudflare/vite-plugin": "^1.0.12",
+    "@playwright/test": "^1.54.1",
     "@react-router/dev": "^7.5.3",
     "@tailwindcss/vite": "^4.1.4",
     "@types/node": "^20",
@@ -56,8 +56,6 @@
     "@types/react-dom": "^19.1.2",
     "@typescript-eslint/eslint-plugin": "^8.36.0",
     "@typescript-eslint/parser": "^8.36.0",
-    "@clerk/testing": "^1.10.4",
-    "@playwright/test": "^1.54.1",
     "drizzle-kit": "^0.31.4",
     "eslint": "^9.31.0",
     "eslint-plugin-import": "^2.32.0",

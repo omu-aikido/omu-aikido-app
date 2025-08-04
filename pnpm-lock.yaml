@@ -11,15 +11,9 @@ importers:
       '@catppuccin/palette':
         specifier: ^1.7.1
         version: 1.7.1
-      '@clerk/localizations':
-        specifier: ^3.18.0
-        version: 3.20.1
       '@clerk/react-router':
         specifier: ^1.7.0
         version: 1.8.4(react-dom@19.1.0(react@19.1.0))(react-router@7.7.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
-      '@clerk/themes':
-        specifier: ^2.2.55
-        version: 2.3.3
       '@clerk/types':
         specifier: ^4.67.0
         version: 4.68.0
@@ -37,10 +31,10 @@ importers:
         version: 17.2.0
       drizzle-orm:
         specifier: ^0.39.3
-        version: 0.39.3(@libsql/client@0.15.10)
+        version: 0.39.3(@libsql/client@0.15.10)(@opentelemetry/api@1.9.0)
       drizzle-zod:
         specifier: ^0.7.0
-        version: 0.7.1(drizzle-orm@0.39.3(@libsql/client@0.15.10))(zod@4.0.5)
+        version: 0.7.1(drizzle-orm@0.39.3(@libsql/client@0.15.10)(@opentelemetry/api@1.9.0))(zod@4.0.5)
       isbot:
         specifier: ^5.1.27
         version: 5.1.28
@@ -291,10 +285,6 @@ packages:
       react: ^18.0.0 || ^19.0.0 || ^19.0.0-0
       react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-0
 
-  '@clerk/localizations@3.20.1':
-    resolution: {integrity: sha512-nhkkvdgDeEaQSaW/lBf7/WfWzG7W1H7SBP+rO7+/Z1tiJs0YNg4M9TrOT3i3Py+w5KwhE+lLeX122WjnTWmrWg==}
-    engines: {node: '>=18.17.0'}
-
   '@clerk/react-router@1.8.4':
     resolution: {integrity: sha512-HETTc+3aovy+HoG6ULdA7xJSmukIq0e8xUJyIWjc5/qKhHEiGV9Th6dUyj7WPh7g2hTPTxWt3ignnWGaMfRsyQ==}
     engines: {node: '>=20.0.0'}
@@ -326,10 +316,6 @@ packages:
         optional: true
       cypress:
         optional: true
-
-  '@clerk/themes@2.3.3':
-    resolution: {integrity: sha512-nXVG9tyE7xhymS45Ee1XakLvT6V4WMOrYisWGwi/wAJqUuHqZufFHWV/jZ6FuJ0AAKImmIBbi8S6Y5UFkM63Ug==}
-    engines: {node: '>=18.17.0'}
 
   '@clerk/types@4.68.0':
     resolution: {integrity: sha512-3+PoGGQgyzLZibzYleByPmx6dfPVoFUjLBy+kASHzF9g3o12WchDn1aI01vN7WNm1ik1Z5sbLhzJs8d9bz38EQ==}
@@ -1261,6 +1247,10 @@ packages:
   '@npmcli/promise-spawn@6.0.2':
     resolution: {integrity: sha512-gGq0NJkIGSwdbUt4yhdF8ZrmkGKVz9vAdVzpOfnom+V8PLSmSOVhZwbNvZZS1EYcJN5hzzKBxmmVVAInM6HQLg==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
+
+  '@opentelemetry/api@1.9.0':
+    resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
+    engines: {node: '>=8.0.0'}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -3809,10 +3799,6 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
       tslib: 2.8.1
 
-  '@clerk/localizations@3.20.1':
-    dependencies:
-      '@clerk/types': 4.68.0
-
   '@clerk/react-router@1.8.4(react-dom@19.1.0(react@19.1.0))(react-router@7.7.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@clerk/backend': 2.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -3848,11 +3834,6 @@ snapshots:
     transitivePeerDependencies:
       - react
       - react-dom
-
-  '@clerk/themes@2.3.3':
-    dependencies:
-      '@clerk/types': 4.68.0
-      tslib: 2.8.1
 
   '@clerk/types@4.68.0':
     dependencies:
@@ -4485,6 +4466,9 @@ snapshots:
   '@npmcli/promise-spawn@6.0.2':
     dependencies:
       which: 3.0.1
+
+  '@opentelemetry/api@1.9.0':
+    optional: true
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -5165,13 +5149,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.39.3(@libsql/client@0.15.10):
+  drizzle-orm@0.39.3(@libsql/client@0.15.10)(@opentelemetry/api@1.9.0):
     optionalDependencies:
       '@libsql/client': 0.15.10
+      '@opentelemetry/api': 1.9.0
 
-  drizzle-zod@0.7.1(drizzle-orm@0.39.3(@libsql/client@0.15.10))(zod@4.0.5):
+  drizzle-zod@0.7.1(drizzle-orm@0.39.3(@libsql/client@0.15.10)(@opentelemetry/api@1.9.0))(zod@4.0.5):
     dependencies:
-      drizzle-orm: 0.39.3(@libsql/client@0.15.10)
+      drizzle-orm: 0.39.3(@libsql/client@0.15.10)(@opentelemetry/api@1.9.0)
       zod: 4.0.5
 
   dunder-proto@1.0.1:
