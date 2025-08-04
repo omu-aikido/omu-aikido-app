@@ -4,7 +4,7 @@ import type { z } from "zod"
 import {
   publicMetadataProfileSchema,
   Role,
-  type updateProfileInputSchema
+  type updateProfileInputSchema,
 } from "~/lib/zod"
 import type { Profile } from "~/type"
 

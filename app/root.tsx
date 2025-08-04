@@ -1,4 +1,3 @@
-import { jaJP } from "@clerk/localizations"
 import { ClerkProvider } from "@clerk/react-router"
 import { getAuth, rootAuthLoader } from "@clerk/react-router/ssr.server"
 import { getLogger } from "@logtape/logtape"
@@ -83,7 +82,7 @@ export default function App(args: Route.ComponentProps) {
 
   return (
     <html lang="ja">
-      <ClerkProvider loaderData={loaderData} localization={jaJP}>
+      <ClerkProvider loaderData={loaderData}>
         <head>
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
