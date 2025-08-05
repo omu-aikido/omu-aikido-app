@@ -1,16 +1,20 @@
 import type { User } from "@clerk/react-router/ssr.server"
+import React from "react"
 import { useNavigate } from "react-router"
 
 import { translateGrade, translateYear } from "~/lib/utils"
 import { Role } from "~/lib/zod"
 
 // MARK: UserListRow
-export function UserListRow({ key, user }: { key: string; user: User }) {
+export const UserListRow = React.memo<{ key: string; user: User }>(function UserListRow({
+  key,
+  user,
+}) {
   const navigate = useNavigate()
 
-  const handleRowClick = () => {
+  const handleRowClick = React.useCallback(() => {
     navigate(`/admin/user/${user.id}`)
-  }
+  }, [navigate, user.id])
 
   return (
     <tr
@@ -21,13 +25,15 @@ export function UserListRow({ key, user }: { key: string; user: User }) {
       <td className="px-6 py-3 whitespace-nowrap">
         <div className="flex items-center">
           <img
-            src={user.imageUrl}
-            alt={`${user.lastName} ${user.firstName}`}
+            src={typeof user.imageUrl === "string" ? user.imageUrl : ""}
+            alt={
+              `${typeof user.lastName === "string" ? user.lastName : ""} ${typeof user.firstName === "string" ? user.firstName : ""}`
+            }
             className="w-10 h-10 rounded-full object-cover border-2 border-slate-200 dark:border-slate-600"
           />
           <div className="ml-4">
             <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
-              {user.lastName} {user.firstName}
+              {typeof user.lastName === "string" ? user.lastName : ""} {typeof user.firstName === "string" ? user.firstName : ""}
             </div>
           </div>
         </div>
@@ -47,15 +53,18 @@ export function UserListRow({ key, user }: { key: string; user: User }) {
       </td>
     </tr>
   )
-}
+})
 
-// MARK: UsreCell
-export function UserCell({ key, user }: { key: string; user: User }) {
+// MARK: UserCell
+export const UserCell = React.memo<{ key: string; user: User }>(function UserCell({
+  key,
+  user,
+}) {
   const navigate = useNavigate()
 
-  const handleCellClick = () => {
+  const handleCellClick = React.useCallback(() => {
     navigate(`/admin/user/${user.id}`)
-  }
+  }, [navigate, user.id])
 
   return (
     <>
@@ -65,8 +74,10 @@ export function UserCell({ key, user }: { key: string; user: User }) {
         onClick={handleCellClick}
       >
         <img
-          src={user.imageUrl}
-          alt={`${user.lastName} ${user.firstName}`}
+          src={typeof user.imageUrl === "string" ? user.imageUrl : ""}
+          alt={
+            `${typeof user.lastName === "string" ? user.lastName : ""} ${typeof user.firstName === "string" ? user.firstName : ""}`
+          }
           className="w-12 h-12 rounded-full object-cover border-2 border-slate-200 dark:border-slate-600 mr-4"
         />
         <div className="flex-1">
@@ -90,4 +101,4 @@ export function UserCell({ key, user }: { key: string; user: User }) {
       </div>
     </>
   )
-}
+})

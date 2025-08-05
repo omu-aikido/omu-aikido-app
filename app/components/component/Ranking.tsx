@@ -13,7 +13,17 @@ interface RankingProps {
   users: User[]
 }
 
-const Ranking: React.FC<RankingProps> = ({ data, users }) => {
+const Ranking = React.memo<RankingProps>(function Ranking({ data, users }) {
+  // Sort the data by 'total' in descending order to determine ranks
+  const sortedData = React.useMemo(
+    () => (Array.isArray(data) ? [...data].sort((a, b) => b.total - a.total) : []),
+    [data],
+  )
+  const userMap = React.useMemo(
+    () => new Map(users.map(user => [user.id, `${user.lastName} ${user.firstName}`])),
+    [users],
+  )
+
   // Input Validation: Ensure data is an array
   if (!Array.isArray(data)) {
     return (
@@ -22,12 +32,6 @@ const Ranking: React.FC<RankingProps> = ({ data, users }) => {
       </p>
     )
   }
-
-  // Sort the data by 'total' in descending order to determine ranks
-  const sortedData = [...data].sort((a, b) => b.total - a.total)
-  const userMap = new Map(
-    users.map(user => [user.id, `${user.lastName} ${user.firstName}`]),
-  )
 
   return (
     <div className="w-full max-w-2xl mx-auto my-4">
@@ -81,6 +85,6 @@ const Ranking: React.FC<RankingProps> = ({ data, users }) => {
       )}
     </div>
   )
-}
+})
 
 export default Ranking

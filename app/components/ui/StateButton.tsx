@@ -11,40 +11,62 @@ export function StateButton({
   setIsEditing: (editing: boolean) => void
   fetcher: FetcherWithComponents<unknown>
 }) {
+  function RenderButton({
+    type,
+    buttonType,
+    disabled,
+    onClick,
+    children,
+  }: {
+    type?: "green" | "gray"
+    buttonType: "button" | "submit"
+    disabled?: boolean
+    onClick?: () => void
+    children: React.ReactNode
+  }) {
+    return (
+      <button
+        type={buttonType}
+        className={style.form.button(type ? { disabled, type } : undefined)}
+        disabled={disabled}
+        onClick={onClick}
+      >
+        {children}
+      </button>
+    )
+  }
+
+  // Only static strings are rendered, no user input, so XSS is not possible here.
+  const isBusy = fetcher.state !== "idle"
+  const submitLabel = isBusy ? "通信中" : "保存"
+
   return (
     <div className="flex gap-2">
       {isEditing ? (
         <>
-          <button
-            type="submit"
-            className={style.form.button({
-              disabled: fetcher.state !== "idle",
-              type: "green",
-            })}
-            disabled={fetcher.state !== "idle"}
+          <RenderButton
+            type="green"
+            buttonType="submit"
+            disabled={isBusy}
           >
-            {fetcher.state !== "idle" ? "通信中" : "保存"}
-          </button>
-          <button
-            type="button"
-            className={style.form.button({
-              disabled: fetcher.state !== "idle",
-              type: "gray",
-            })}
-            disabled={fetcher.state !== "idle"}
+            {submitLabel}
+          </RenderButton>
+          <RenderButton
+            type="gray"
+            buttonType="button"
+            disabled={isBusy}
             onClick={() => setIsEditing(false)}
           >
             キャンセル
-          </button>
+          </RenderButton>
         </>
       ) : (
-        <button
-          type="button"
-          className={style.form.button()}
+        <RenderButton
+          buttonType="button"
           onClick={() => setIsEditing(true)}
         >
           編集
-        </button>
+        </RenderButton>
       )}
     </div>
   )

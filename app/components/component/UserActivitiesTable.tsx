@@ -1,3 +1,4 @@
+import React from "react"
 import { Link, useSearchParams } from "react-router"
 import { tv } from "tailwind-variants"
 
@@ -11,23 +12,29 @@ interface ActivitiesTableProps {
   limit: number
 }
 
-export function ActivitiesTable({
+export const ActivitiesTable = React.memo<ActivitiesTableProps>(function ActivitiesTable({
   activities,
   page,
   total,
   limit,
-}: ActivitiesTableProps) {
-  const totalPages = Math.max(1, Math.ceil(total / limit))
+}) {
+  const totalPages = React.useMemo(
+    () => Math.max(1, Math.ceil(total / limit)),
+    [total, limit],
+  )
   const [params] = useSearchParams()
-  const makePageUrl = (p: number) => {
-    if (p > 1) {
-      params.set("page", String(p))
-    } else {
-      params.delete("page")
-    }
-    // ページング時にアンカーを付与
-    return "?" + params.toString() + "#activities"
-  }
+  const makePageUrl = React.useCallback(
+    (p: number) => {
+      if (p > 1) {
+        params.set("page", String(p))
+      } else {
+        params.delete("page")
+      }
+      // ページング時にアンカーを付与
+      return "?" + params.toString() + "#activities"
+    },
+    [params],
+  )
 
   return (
     <div className={style.filterCard()} id="activities">
@@ -99,7 +106,7 @@ export function ActivitiesTable({
       )}
     </div>
   )
-}
+})
 
 const tablehead = tv({
   base: "px-2 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300 bg-slate-200 dark:bg-slate-800/90 uppercase tracking-wider",

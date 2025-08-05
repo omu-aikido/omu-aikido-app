@@ -1,3 +1,4 @@
+import React from "react"
 import { Link, useLocation } from "react-router-dom"
 import { tv } from "tailwind-variants"
 
@@ -18,30 +19,32 @@ const style = {
 
 export type NavigationTabProp = { to: string; label: string }
 
-export function NavigationTab({ tabs = [] }: { tabs?: NavigationTabProp[] }) {
-  const location = useLocation()
-  return (
-    <nav
-      className="flex overflow-x-auto w-full mb-4 justify-start border-b border-slate-400 dark:border-slate-700"
-      role="tablist"
-      aria-label="タブナビゲーション"
-    >
-      {tabs.map((tab, idx) => {
-        const isActive = location.pathname === tab.to
-        return (
-          <Link
-            key={tab.to}
-            to={tab.to}
-            className={style.navigationTab.tab({ isActive })}
-            role="tab"
-            aria-selected={isActive}
-            aria-controls={`panel-${idx}`}
-            data-tab-index={idx}
-          >
-            {tab.label}
-          </Link>
-        )
-      })}
-    </nav>
-  )
-}
+export const NavigationTab = React.memo<{ tabs?: NavigationTabProp[] }>(
+  function NavigationTab({ tabs = [] }) {
+    const location = useLocation()
+    return (
+      <nav
+        className="flex overflow-x-auto w-full mb-4 justify-start border-b border-slate-400 dark:border-slate-700"
+        role="tablist"
+        aria-label="タブナビゲーション"
+      >
+        {tabs.map((tab, idx) => {
+          const isActive = location.pathname === tab.to
+          return (
+            <Link
+              key={tab.to}
+              to={tab.to}
+              className={style.navigationTab.tab({ isActive })}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`panel-${idx}`}
+              data-tab-index={idx}
+            >
+              {tab.label}
+            </Link>
+          )
+        })}
+      </nav>
+    )
+  },
+)

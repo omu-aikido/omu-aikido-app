@@ -23,7 +23,7 @@ export function StatsSection({
             次の級段位まで
           </p>
           <p className="text-lg font-bold text-yellow-900 dark:text-yellow-100">
-            {timeForNextGrade(grade) - currentGradeTrainCount}/{timeForNextGrade(grade)}回
+            {Math.max(0, Number(timeForNextGrade(grade)) - Number(currentGradeTrainCount))}/{Number(timeForNextGrade(grade))}回
           </p>
         </div>
         <div>
@@ -31,7 +31,7 @@ export function StatsSection({
             累計稽古回数
           </p>
           <p className="text-lg font-bold text-purple-900 dark:text-purple-100">
-            {totalTrainCount}回
+            {Number(totalTrainCount)}回
           </p>
         </div>
       </summary>
@@ -39,19 +39,19 @@ export function StatsSection({
       <div className="grid grid-cols-2 gap-4 py-4">
         <div>
           <span className="block text-xs text-slate-500">総稽古日数</span>
-          <span className="font-bold text-base">{totalDays}日</span>
+          <span className="font-bold text-base">{Number(totalDays)}日</span>
         </div>
         <div>
           <span className="block text-xs text-slate-500">総記録数</span>
-          <span className="font-bold text-base">{totalEntries}回</span>
+          <span className="font-bold text-base">{Number(totalEntries)}回</span>
         </div>
         <div>
           <span className="block text-xs text-slate-500">総稽古時間</span>
-          <span className="font-bold text-base">{totalHours}時間</span>
+          <span className="font-bold text-base">{Number(totalHours)}時間</span>
         </div>
         <div>
           <span className="block text-xs text-slate-500">現級段位での稽古回数</span>
-          <span className="font-bold text-base">{currentGradeTrainCount}回</span>
+          <span className="font-bold text-base">{Number(currentGradeTrainCount)}回</span>
         </div>
       </div>
     </details>

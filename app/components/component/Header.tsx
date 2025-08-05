@@ -1,3 +1,4 @@
+import React from "react"
 import { Link } from "react-router"
 
 interface AuthedHeaderProps {
@@ -5,7 +6,10 @@ interface AuthedHeaderProps {
   children: React.ReactNode
 }
 
-export function ReactHeader({ title, children }: AuthedHeaderProps) {
+export const ReactHeader = React.memo<AuthedHeaderProps>(function ReactHeader({
+  title,
+  children,
+}) {
   return (
     <>
       <header className="m-0 py-0 px-6 top-0 z-50 sticky select-none bg-slate-200/70 dark:bg-slate-800/90 text-slate-900 dark:text-slate-200 flex justify-between items-center h-20">
@@ -19,4 +23,4 @@ export function ReactHeader({ title, children }: AuthedHeaderProps) {
       <div className="backdrop-blur-md fixed top-0 left-0 w-full h-20 z-10" />
     </>
   )
-}
+})

@@ -48,15 +48,15 @@ export function Participation({ month, hour }: { month: number; hour: number }) 
   return (
     <div
       className={`flex items-center gap-3 px-5 py-3 my-5 rounded-xl border ${deco.bg} ${deco.text} ${deco.border} ${deco.effect}`}
-      title={`${month}月の参加時間: ${cappedHour}時間`}
+      title={`${Number(month)}月の参加時間: ${Number(cappedHour)}時間`}
       role="status"
-      aria-label={`${month}月の参加時間は${cappedHour}時間`}
+      aria-label={`${Number(month)}月の参加時間は${Number(cappedHour)}時間`}
     >
       <span className="text-2xl" aria-hidden="true">
         {deco.icon}
       </span>
       <span className="font-semibold text-base md:text-lg">
-        {month}月の参加時間: {cappedHour} 時間
+        {Number(month)}月の参加時間: {Number(cappedHour)} 時間
       </span>
     </div>
   )

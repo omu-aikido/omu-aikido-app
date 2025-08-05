@@ -39,20 +39,20 @@ export function Recents({ recent }: { recent: ActivityType | null }) {
         最近追加した項目:
         <small
           id="relative-time"
-          data-timestamp={new Date(recent.createAt).getTime()}
+          data-timestamp={Number(new Date(recent.createAt).getTime())}
           className="text-sm"
         >
-          {relativeTime(recent.createAt)}
+          {String(relativeTime(recent.createAt))}
         </small>
       </h2>
       <div className="flex justify-between text-sm text-slate-600 dark:text-slate-300 md:flex-row flex-col">
         <span className="mr-2">
-          追加日時: {new Date(recent.createAt).toLocaleString("ja-JP")}
+          追加日時: {String(new Date(recent.createAt).toLocaleString("ja-JP"))}
         </span>
         <span className="mr-2">
-          日付: {new Date(recent.date).toLocaleDateString("ja-JP")}
+          日付: {String(new Date(recent.date).toLocaleDateString("ja-JP"))}
         </span>
-        <span>{recent.period}時間</span>
+        <span>{Number(recent.period)}時間</span>
       </div>
     </div>
   )

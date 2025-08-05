@@ -1,5 +1,5 @@
 import { useAuth } from "@clerk/react-router"
-import { useState } from "react"
+import React, { useState } from "react"
 import type { FetcherWithComponents } from "react-router"
 
 import { style } from "~/styles/component"
@@ -8,13 +8,24 @@ interface AddRecordProps {
   fetcher: FetcherWithComponents<unknown>
 }
 
-export function AddRecord({ fetcher }: AddRecordProps) {
+export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher }) {
   const { userId } = useAuth()
   const submitting = fetcher.state === "submitting"
   const [formState, setFormState] = useState({
     date: new Date().toISOString().split("T")[0],
     period: "1.5",
   })
+
+  const handleDateChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormState(prev => ({ ...prev, date: e.target.value }))
+  }, [])
+
+  const handlePeriodChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormState(prev => ({ ...prev, period: e.target.value }))
+    },
+    [],
+  )
 
   return (
     <>
@@ -33,7 +44,7 @@ export function AddRecord({ fetcher }: AddRecordProps) {
           type="date"
           className={style.form.input({ class: "col-span-2" })}
           value={formState.date}
-          onChange={e => setFormState(prev => ({ ...prev, date: e.target.value }))}
+          onChange={handleDateChange}
         />
         <label
           htmlFor="timeInput"
@@ -51,7 +62,7 @@ export function AddRecord({ fetcher }: AddRecordProps) {
           min="1"
           max="5"
           value={formState.period}
-          onChange={e => setFormState(prev => ({ ...prev, period: e.target.value }))}
+          onChange={handlePeriodChange}
         />
         <button
           disabled={submitting}
@@ -64,4 +75,4 @@ export function AddRecord({ fetcher }: AddRecordProps) {
       </fetcher.Form>
     </>
   )
-}
+})
