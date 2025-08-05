@@ -53,12 +53,12 @@ export default function AdminAccounts(args: Route.ComponentProps) {
   const { users } = args.loaderData
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  
+
   const currentQuery = searchParams.get("query") || ""
   const sortBy = searchParams.get("sortBy") || "role"
   const sortOrder = searchParams.get("sortOrder") || "asc"
   const currentPage = parseInt(searchParams.get("page") || "0", 10)
-  
+
   const [query, setQuery] = React.useState(currentQuery)
 
   const handleSearch = () => {
@@ -109,8 +109,8 @@ export default function AdminAccounts(args: Route.ComponentProps) {
 
       switch (sortBy) {
         case "name":
-          aValue = a.fullName || `${a.firstName || ""} ${a.lastName || ""}`.trim()
-          bValue = b.fullName || `${b.firstName || ""} ${b.lastName || ""}`.trim()
+          aValue = `${a.lastName || ""} ${a.firstName || ""}`.trim()
+          bValue = `${b.lastName || ""} ${b.firstName || ""}`.trim()
           break
         case "year":
           const yearOrder = { "b1": 1, "b2": 2, "b3": 3, "b4": 4, "m1": 5, "m2": 6, "d1": 7, "d2": 8, "": 0}
@@ -120,11 +120,12 @@ export default function AdminAccounts(args: Route.ComponentProps) {
           bValue = yearOrder[bYear as keyof typeof yearOrder] ?? 999
           break
         case "grade":
-          const aGrade = a.publicMetadata.grade as unknown as number
-          const bGrade = b.publicMetadata.grade as unknown as number
+          const aGrade = a.publicMetadata.grade
+          const bGrade = b.publicMetadata.grade
           const normalizeGrade = (grade: number | null | undefined) => {
             if (grade === null || grade === undefined) return -1000 // 不明は最下位
             if (grade === 0) return -999 // 0は不明の次に下位
+            if (grade !== 0) return -grade
             return grade
           }
           aValue = normalizeGrade(aGrade)
@@ -165,9 +166,14 @@ export default function AdminAccounts(args: Route.ComponentProps) {
 
   return (
     <div className="space-y-6">
+
+      {
+        args.loaderData.ranking.length > 0 &&
+        <Ranking data={args.loaderData.ranking} users={users as User[]} />
+      }
+
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <h2 className={style.text.subtitle()}>アカウント管理</h2>
-
         {/* 検索フォーム（SPA対応） */}
         <div className="flex gap-2">
           <input
@@ -186,10 +192,7 @@ export default function AdminAccounts(args: Route.ComponentProps) {
           </button>
         </div>
       </div>
-      {
-        args.loaderData.ranking.length > 0 &&
-        <Ranking data={args.loaderData.ranking} users={users as User[]} />
-      }
+
       <ClerkUsers
         users={paginatedUsers as User[]}
         totalPages={totalPages}

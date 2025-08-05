@@ -1,4 +1,5 @@
 import type { User } from "@clerk/react-router/ssr.server"
+import React from "react"
 import { Link, useSearchParams } from "react-router"
 import { tv } from "tailwind-variants"
 
@@ -29,7 +30,14 @@ interface Props {
 
 export function ClerkUsers({ users, totalPages, currentPage, sortBy, sortOrder, onSort }: Props) {
   const [searchParams] = useSearchParams()
-  
+  const [showSort, setShowSort] = React.useState(false)
+  const sortOptions = [
+    { key: "name", label: "名前順" },
+    { key: "role", label: "役職順" },
+    { key: "year", label: "学年順" },
+    { key: "grade", label: "段位順" },
+  ]
+
   const getSortIcon = (columnKey: string) => {
     if (sortBy !== columnKey) return "↕️"
     return sortOrder === "asc" ? "↑" : "↓"
@@ -49,6 +57,7 @@ export function ClerkUsers({ users, totalPages, currentPage, sortBy, sortOrder, 
 
   return (
     <>
+      {/* PC用テーブル */}
       <div className="mt-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm hidden sm:block">
         <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
           <thead className="bg-slate-50 dark:bg-slate-900">
@@ -107,7 +116,40 @@ export function ClerkUsers({ users, totalPages, currentPage, sortBy, sortOrder, 
           </tbody>
         </table>
       </div>
+      {/* モバイル用リスト + ソートUI */}
       <div className="block sm:hidden mt-4 space-y-4">
+        <div className="flex justify-end mb-2">
+          <button
+            type="button"
+            className="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-md text-sm font-medium border border-slate-300 dark:border-slate-600"
+            onClick={() => setShowSort((v) => !v)}
+            aria-haspopup="listbox"
+            aria-expanded={showSort}
+          >
+            ソート: {sortOptions.find(opt => opt.key === sortBy)?.label || "選択"}
+          </button>
+        </div>
+        {showSort && (
+          <div className="mb-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md shadow-md z-20 absolute left-0 right-0 mx-4">
+            <ul className="divide-y divide-slate-200 dark:divide-slate-700">
+              {sortOptions.map(opt => (
+                <li key={opt.key}>
+                  <button
+                    type="button"
+                    className={`w-full text-left px-4 py-2 text-sm ${sortBy === opt.key ? "bg-blue-100 dark:bg-blue-900 font-bold" : ""}`}
+                    onClick={() => {
+                      setShowSort(false)
+                      if (onSort) onSort(opt.key)
+                    }}
+                  >
+                    {opt.label} {sortBy === opt.key ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {/* ユーザーリスト */}
         {users && users.length > 0 ? (
           users.map(user => <UserCell user={user} key={user.id} />)
         ) : (
