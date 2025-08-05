@@ -4,13 +4,19 @@ import { redirect, useFetcher } from "react-router"
 import type { Route } from "./+types/home"
 
 import { AddRecord } from "~/components/component/AddRecord"
+import { MyRanking } from "~/components/component/MyRanking"
 import { NextGrade } from "~/components/component/NextGrade"
 import Recents from "~/components/component/Recents"
 import { AppIcon } from "~/components/ui/AppIcon"
 import Grid from "~/components/ui/Grid"
-import { createActivity, recentlyActivity, userActivity } from "~/lib/query/activity"
+import {
+  createActivity,
+  getUserMonthlyRank,
+  recentlyActivity,
+  userActivity,
+} from "~/lib/query/activity"
 import { getAccount, getProfile } from "~/lib/query/profile"
-import { getJST, timeForNextGrade } from "~/lib/utils"
+import { timeForNextGrade } from "~/lib/utils"
 import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
 import type { ActionResult, PagePath } from "~/type"
@@ -39,12 +45,10 @@ export async function loader(args: Route.LoaderArgs) {
   const profile = await getProfile({ userId, env })
   const activityFromPreviousGrade = await userActivity({
     userId,
-    start: getJST(
-      profile?.getGradeAt
-        ? new Date(profile.getGradeAt)
-        : new Date(profile!.joinedAt, 3, 1),
-    ),
-    end: getJST(new Date()),
+    start: profile?.getGradeAt
+      ? new Date(profile.getGradeAt)
+      : new Date(profile!.joinedAt, 3, 1),
+    end: new Date(),
     env,
   })
   const grade = profile?.grade ? profile.grade : 0
@@ -63,7 +67,14 @@ export async function loader(args: Route.LoaderArgs) {
 
   const recent = await recentlyActivity({ userId: userId!, limit: 1, env })
 
-  return { gradeData, apps, recent }
+  const rankingdata = await getUserMonthlyRank({
+    userId,
+    year: new Date().getUTCFullYear(),
+    month: new Date().getUTCMonth(),
+    env,
+  })
+
+  return { gradeData, apps, recent, rankingdata }
 }
 
 // MARK: Meta
@@ -94,11 +105,13 @@ export async function action(args: Route.ActionArgs): Promise<ActionResult> {
 
 // MARK: Component
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { gradeData, apps, recent } = loaderData
+  const { gradeData, apps, recent, rankingdata } = loaderData
   const fetcher = useFetcher()
   return (
     <>
       <NextGrade {...gradeData} />
+
+      <MyRanking props={rankingdata} />
 
       <h1 className={style.text.sectionTitle() + " mt-4"}>記録追加</h1>
 

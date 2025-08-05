@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, lte } from "drizzle-orm"
+import { and, desc, eq, gte, inArray, lte, sql } from "drizzle-orm"
 
 import { activity, type ActivityType } from "~/db/schema"
 import { createDb } from "~/lib/drizzle"
@@ -215,5 +215,68 @@ export async function activitySummary({
     all: allActivities as ActivityType[],
     total: totalTrains as number,
     done: trainFromGradeUp as number,
+  }
+}
+
+// MARK: getMonthlyRanking
+export async function getMonthlyRanking(input: {
+  year: number
+  month: number
+  env: Env
+}) {
+  const db = createDb(input.env)
+
+  const startDate = new Date(input.year, input.month, 1)
+  const endDate = new Date(input.year, input.month + 1, 0, 23, 59, 59)
+
+  const startDateStr = startDate.toISOString()
+  const endDateStr = endDate.toISOString()
+
+  const result = await db
+    .select({ userId: activity.userId, total: sql<number>`SUM(${activity.period})` })
+    .from(activity)
+    .where(and(gte(activity.date, startDateStr), lte(activity.date, endDateStr)))
+    .groupBy(activity.userId)
+    .orderBy(desc(sql<number>`SUM(${activity.period})`))
+    .limit(5)
+
+  return result
+}
+
+// MARK: getUserMonthlyRank
+export async function getUserMonthlyRank(input: {
+  userId: string
+  year: number
+  month: number
+  env: Env
+}): Promise<{ rank: number; total: number; userTotal: number } | null> {
+  const db = createDb(input.env)
+
+  const startDate = new Date(input.year, input.month, 1)
+  const endDate = new Date(input.year, input.month + 1, 0, 23, 59, 59)
+
+  const startDateStr = startDate.toISOString()
+  const endDateStr = endDate.toISOString()
+
+  // 全ユーザーの月次合計を取得（順位付けのため）
+  const allUserTotals = await db
+    .select({ userId: activity.userId, total: sql<number>`SUM(${activity.period})` })
+    .from(activity)
+    .where(and(gte(activity.date, startDateStr), lte(activity.date, endDateStr)))
+    .groupBy(activity.userId)
+    .orderBy(desc(sql<number>`SUM(${activity.period})`))
+
+  // 指定されたユーザーの順位を計算
+  const userIndex = allUserTotals.findIndex(user => user.userId === input.userId)
+
+  if (userIndex === -1) {
+    // ユーザーが今月活動していない場合
+    return null
+  }
+
+  return {
+    rank: userIndex + 1,
+    total: allUserTotals.length,
+    userTotal: allUserTotals[userIndex].total,
   }
 }

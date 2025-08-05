@@ -34,7 +34,9 @@ export function UserListRow({ key, user }: { key: string; user: User }) {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-          {Role.fromString(user.publicMetadata.role as string)?.ja}
+          {user.publicMetadata.role && user.publicMetadata.role !== ""
+            ? Role.fromString(user.publicMetadata.role as string)?.ja
+            : "未設定"}
         </span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">
@@ -73,7 +75,9 @@ export function UserCell({ key, user }: { key: string; user: User }) {
           </div>
           <div className="flex flex-wrap gap-2 mt-1 text-xs items-center">
             <span className="inline-flex px-2 py-1 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-              {Role.fromString(user.publicMetadata.role as string)?.ja}
+              {user.publicMetadata.role && user.publicMetadata.role !== ""
+                ? Role.fromString(user.publicMetadata.role as string)?.ja
+                : "未設定"}
             </span>
             <span className="text-slate-700 dark:text-slate-300">
               {translateYear(user.publicMetadata.year as string)}
