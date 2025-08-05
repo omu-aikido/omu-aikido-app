@@ -1,5 +1,5 @@
 import type { User } from "@clerk/react-router/ssr.server"
-import { Link } from "react-router"
+import { Link, useSearchParams } from "react-router"
 import { tv } from "tailwind-variants"
 
 import { UserCell, UserListRow } from "./UserListCard"
@@ -22,26 +22,72 @@ interface Props {
   users: User[]
   totalPages: number
   currentPage: number
+  sortBy?: string
+  sortOrder?: string
+  onSort?: (sortBy: string) => void
 }
 
-export function ClerkUsers({ users, totalPages, currentPage }: Props) {
+export function ClerkUsers({ users, totalPages, currentPage, sortBy, sortOrder, onSort }: Props) {
+  const [searchParams] = useSearchParams()
+  
+  const getSortIcon = (columnKey: string) => {
+    if (sortBy !== columnKey) return "↕️"
+    return sortOrder === "asc" ? "↑" : "↓"
+  }
+
+  const handleHeaderClick = (columnKey: string) => {
+    if (onSort) {
+      onSort(columnKey)
+    }
+  }
+
+  const createPageLink = (page: number) => {
+    const params = new URLSearchParams(searchParams)
+    params.set("page", page.toString())
+    return `?${params.toString()}`
+  }
+
   return (
     <>
       <div className="mt-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm hidden sm:block">
         <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
           <thead className="bg-slate-50 dark:bg-slate-900">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                ユーザー
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
+                onClick={() => handleHeaderClick("name")}
+              >
+                <div className="flex items-center gap-1">
+                  ユーザー
+                  <span className="text-xs">{getSortIcon("name")}</span>
+                </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                役職
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
+                onClick={() => handleHeaderClick("role")}
+              >
+                <div className="flex items-center gap-1">
+                  役職
+                  <span className="text-xs">{getSortIcon("role")}</span>
+                </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                学年
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
+                onClick={() => handleHeaderClick("year")}
+              >
+                <div className="flex items-center gap-1">
+                  学年
+                  <span className="text-xs">{getSortIcon("year")}</span>
+                </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                段位
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
+                onClick={() => handleHeaderClick("grade")}
+              >
+                <div className="flex items-center gap-1">
+                  段位
+                  <span className="text-xs">{getSortIcon("grade")}</span>
+                </div>
               </th>
             </tr>
           </thead>
@@ -51,7 +97,7 @@ export function ClerkUsers({ users, totalPages, currentPage }: Props) {
             ) : (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={4}
                   className="px-6 py-4 text-center text-slate-500 dark:text-slate-400"
                 >
                   ユーザーが見つかりませんでした
@@ -81,7 +127,7 @@ export function ClerkUsers({ users, totalPages, currentPage }: Props) {
         <div className="flex gap-2 justify-center mt-4">
           <nav className="inline-flex -space-x-px">
             {currentPage > 0 ? (
-              <Link to={`/admin?page=${currentPage - 1}`} className={pagenation()}>
+              <Link to={createPageLink(currentPage - 1)} className={pagenation()}>
                 前へ
               </Link>
             ) : (
@@ -91,7 +137,7 @@ export function ClerkUsers({ users, totalPages, currentPage }: Props) {
               {currentPage + 1 + "/" + totalPages}
             </div>
             {currentPage < totalPages - 1 ? (
-              <Link to={`/admin?page=${currentPage + 1}`} className={pagenation()}>
+              <Link to={createPageLink(currentPage + 1)} className={pagenation()}>
                 次へ
               </Link>
             ) : (
