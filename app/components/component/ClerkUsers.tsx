@@ -28,7 +28,14 @@ interface Props {
   onSort?: (sortBy: string) => void
 }
 
-export function ClerkUsers({ users, totalPages, currentPage, sortBy, sortOrder, onSort }: Props) {
+export function ClerkUsers({
+  users,
+  totalPages,
+  currentPage,
+  sortBy,
+  sortOrder,
+  onSort,
+}: Props) {
   const [searchParams] = useSearchParams()
   const [showSort, setShowSort] = React.useState(false)
   const sortOptions = [
@@ -62,7 +69,7 @@ export function ClerkUsers({ users, totalPages, currentPage, sortBy, sortOrder, 
         <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
           <thead className="bg-slate-50 dark:bg-slate-900">
             <tr>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
                 onClick={() => handleHeaderClick("name")}
               >
@@ -71,7 +78,7 @@ export function ClerkUsers({ users, totalPages, currentPage, sortBy, sortOrder, 
                   <span className="text-xs">{getSortIcon("name")}</span>
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
                 onClick={() => handleHeaderClick("role")}
               >
@@ -80,7 +87,7 @@ export function ClerkUsers({ users, totalPages, currentPage, sortBy, sortOrder, 
                   <span className="text-xs">{getSortIcon("role")}</span>
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
                 onClick={() => handleHeaderClick("year")}
               >
@@ -89,7 +96,7 @@ export function ClerkUsers({ users, totalPages, currentPage, sortBy, sortOrder, 
                   <span className="text-xs">{getSortIcon("year")}</span>
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
                 onClick={() => handleHeaderClick("grade")}
               >
@@ -122,7 +129,7 @@ export function ClerkUsers({ users, totalPages, currentPage, sortBy, sortOrder, 
           <button
             type="button"
             className="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-md text-sm font-medium border border-slate-300 dark:border-slate-600"
-            onClick={() => setShowSort((v) => !v)}
+            onClick={() => setShowSort(v => !v)}
             aria-haspopup="listbox"
             aria-expanded={showSort}
           >
@@ -142,7 +149,8 @@ export function ClerkUsers({ users, totalPages, currentPage, sortBy, sortOrder, 
                       if (onSort) onSort(opt.key)
                     }}
                   >
-                    {opt.label} {sortBy === opt.key ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                    {opt.label}{" "}
+                    {sortBy === opt.key ? (sortOrder === "asc" ? "↑" : "↓") : ""}
                   </button>
                 </li>
               ))}

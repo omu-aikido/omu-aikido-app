@@ -1,8 +1,8 @@
-import type { User } from "@clerk/react-router/ssr.server";
-import { useNavigate } from "react-router";
+import type { User } from "@clerk/react-router/ssr.server"
+import { useNavigate } from "react-router"
 
-import { translateGrade, translateYear } from "~/lib/utils";
-import { Role } from "~/lib/zod";
+import { translateGrade, translateYear } from "~/lib/utils"
+import { Role } from "~/lib/zod"
 
 // MARK: UserListRow
 export function UserListRow({ key, user }: { key: string; user: User }) {
@@ -34,11 +34,9 @@ export function UserListRow({ key, user }: { key: string; user: User }) {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-          {
-            user.publicMetadata.role && user.publicMetadata.role !== ""
-              ? Role.fromString(user.publicMetadata.role as string)?.ja
-              : "未設定"
-          }
+          {user.publicMetadata.role && user.publicMetadata.role !== ""
+            ? Role.fromString(user.publicMetadata.role as string)?.ja
+            : "未設定"}
         </span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">

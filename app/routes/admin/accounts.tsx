@@ -32,11 +32,19 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const users: User[] = clerkUsers.data
 
-    const ranking = await getMonthlyRanking({year: new Date().getUTCFullYear(),month: new Date().getUTCMonth(), env: context.cloudflare.env})
+    const ranking = await getMonthlyRanking({
+      year: new Date().getUTCFullYear(),
+      month: new Date().getUTCMonth(),
+      env: context.cloudflare.env,
+    })
 
     return { users, query, ranking }
   } catch {
-    return { users: [] as User[], query, ranking: [] as { userId: string; total: number }[] }
+    return {
+      users: [] as User[],
+      query,
+      ranking: [] as { userId: string; total: number }[],
+    }
   }
 }
 
@@ -89,7 +97,7 @@ export default function AdminAccounts(args: Route.ComponentProps) {
     // 検索フィルタ（既にサーバーサイドで適用されているが、念のため）
     if (currentQuery) {
       const searchLower = currentQuery.toLowerCase()
-      filtered = users.filter((user) => {
+      filtered = users.filter(user => {
         const fullName = user.fullName || ""
         const firstName = user.firstName || ""
         const lastName = user.lastName || ""
@@ -113,7 +121,17 @@ export default function AdminAccounts(args: Route.ComponentProps) {
           bValue = `${b.lastName || ""} ${b.firstName || ""}`.trim()
           break
         case "year":
-          const yearOrder = { "b1": 1, "b2": 2, "b3": 3, "b4": 4, "m1": 5, "m2": 6, "d1": 7, "d2": 8, "": 0}
+          const yearOrder = {
+            b1: 1,
+            b2: 2,
+            b3: 3,
+            b4: 4,
+            m1: 5,
+            m2: 6,
+            d1: 7,
+            d2: 8,
+            "": 0,
+          }
           const aYear = (a.publicMetadata.year as unknown as string) || ""
           const bYear = (b.publicMetadata.year as unknown as string) || ""
           aValue = yearOrder[aYear as keyof typeof yearOrder] ?? 999
@@ -133,8 +151,8 @@ export default function AdminAccounts(args: Route.ComponentProps) {
           break
         case "role":
         default:
-          const aRole = (a.publicMetadata.role as unknown) as string
-          const bRole = (b.publicMetadata.role as unknown) as string
+          const aRole = a.publicMetadata.role as unknown as string
+          const bRole = b.publicMetadata.role as unknown as string
           const normalizeRole = (roleStr: string) => {
             const role = Role.fromString(roleStr)
             if (role === null) return 999 // 不明な役職は最下位
@@ -166,11 +184,9 @@ export default function AdminAccounts(args: Route.ComponentProps) {
 
   return (
     <div className="space-y-6">
-
-      {
-        args.loaderData.ranking.length > 0 &&
+      {args.loaderData.ranking.length > 0 && (
         <Ranking data={args.loaderData.ranking} users={users as User[]} />
-      }
+      )}
 
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <h2 className={style.text.subtitle()}>アカウント管理</h2>
