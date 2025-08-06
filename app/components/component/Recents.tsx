@@ -1,7 +1,7 @@
 import type { ActivityType } from "~/db/schema"
 import { style } from "~/styles/component" // Import style
 
-export function Recents({ recent }: { recent: ActivityType | null }) {
+export function Recents({ recent }: { recent: ActivityType | undefined }) {
   const relativeTime = (createAt: string) => {
     const now = Date.now()
     const diff = now - new Date(createAt).getTime()

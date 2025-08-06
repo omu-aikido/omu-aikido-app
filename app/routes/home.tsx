@@ -9,11 +9,11 @@ import { NextGrade } from "~/components/component/NextGrade"
 import Recents from "~/components/component/Recents"
 import { AppIcon } from "~/components/ui/AppIcon"
 import Grid from "~/components/ui/Grid"
+import type { ActivityType } from "~/db/schema"
 import {
   createActivity,
   getUserMonthlyRank,
-  recentlyActivity,
-  userActivity,
+  userActivitySummaryAndRecent,
 } from "~/lib/query/activity"
 import { getAccount, getProfile } from "~/lib/query/profile"
 import { timeForNextGrade } from "~/lib/utils"
@@ -43,14 +43,15 @@ export async function loader(args: Route.LoaderArgs) {
   }
 
   const profile = await getProfile({ userId, env })
-  const activityFromPreviousGrade = await userActivity({
+  const summary = (await userActivitySummaryAndRecent({
     userId,
     start: profile?.getGradeAt
       ? new Date(profile.getGradeAt)
       : new Date(profile!.joinedAt, 3, 1),
     end: new Date(),
     env,
-  })
+  }))
+  const activityFromPreviousGrade = summary.length > 0 ? summary[0].total / 1.5 : 0
   const grade = profile?.grade ? profile.grade : 0
   const forNextGrade = timeForNextGrade(grade ? grade : 0)
   const needToNextGrade = Math.max(
@@ -58,14 +59,11 @@ export async function loader(args: Route.LoaderArgs) {
     Math.floor(
       forNextGrade -
         activityFromPreviousGrade
-          .map(record => record.period)
-          .reduce((a, b) => a + b, 0) /
-          1.5,
     ),
   )
   const gradeData = { grade, needToNextGrade, forNextGrade }
 
-  const recent = await recentlyActivity({ userId: userId!, limit: 1, env })
+  const recent = summary.pop() as ActivityType
 
   const rankingdata = await getUserMonthlyRank({
     userId,
@@ -117,7 +115,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
       <AddRecord fetcher={fetcher} />
 
-      <Recents recent={recent[0]} />
+      <Recents recent={recent} />
 
       <hr />
       <Grid>
