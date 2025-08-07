@@ -12,7 +12,7 @@ export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher
   const { userId } = useAuth()
   const submitting = fetcher.state === "submitting"
   const [formState, setFormState] = useState({
-    date: new Date().toLocaleDateString(),
+    date: new Date().toLocaleDateString("ja-JP"),
     period: "1.5",
   })
 
