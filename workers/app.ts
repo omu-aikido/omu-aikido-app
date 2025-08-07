@@ -1,4 +1,4 @@
-import { createRequestHandler } from "react-router"
+import { createRequestHandler } from "react-router";
 
 declare module "react-router" {
   export interface AppLoadContext {
@@ -27,7 +27,16 @@ export default {
       response.headers.set("X-Content-Type-Options", "nosniff")
       response.headers.set(
         "Content-Security-Policy",
-        "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'https://clerk.omu-aikido.com' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.clerk.dev https://api.clerk.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';",
+        `
+          default-src 'self';
+          script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.omu-aikido.com https://challenges.cloudflare.com;
+          connect-src 'self' https://clerk.omu-aikido.com;
+          img-src 'self' https://img.clerk.com;
+          worker-src 'self' blob:;
+          style-src 'self' 'unsafe-inline';
+          frame-src 'self' https://challenges.cloudflare.com;
+          form-action 'self';
+        `
       )
       response.headers.set(
         "Strict-Transport-Security",
