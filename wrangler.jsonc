@@ -38,8 +38,8 @@
       "id": "96b9a7a8f5574a8eabf9472fe1ca05db",
 
       // Optional: preview_id used when running `wrangler dev` for local dev
-      "preview_id": ""
-    }
+      "preview_id": "",
+    },
   ],
 
   /**

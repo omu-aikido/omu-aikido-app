@@ -106,14 +106,14 @@ const CalendarDayCell = React.memo<{
 })
 
 // 曜日ヘッダーセルコンポーネント（Tailwind Variants対応）
-const allowedWeekdays = ["日", "月", "火", "水", "木", "金", "土"] as const;
-type AllowedWeekday = typeof allowedWeekdays[number];
+const allowedWeekdays = ["日", "月", "火", "水", "木", "金", "土"] as const
+type AllowedWeekday = (typeof allowedWeekdays)[number]
 
 const WeekdayHeaderCell = React.memo<{ day: AllowedWeekday; index: number }>(
   function WeekdayHeaderCell({ day, index }) {
     const isSunday = React.useMemo(() => index === 0, [index])
     const isSaturday = React.useMemo(() => index === 6, [index])
-    const safeDay = allowedWeekdays.includes(day) ? day : "";
+    const safeDay = allowedWeekdays.includes(day) ? day : ""
     return <div className={cell({ isSunday, isSaturday }).week()}>{safeDay}</div>
   },
 )
@@ -153,7 +153,7 @@ const MonthlyCalendarGrid = React.memo<Props>(function MonthlyCalendarGrid({
 
   const weekdays = React.useMemo(
     () => ["日", "月", "火", "水", "木", "金", "土"] as const,
-    []
+    [],
   )
 
   const emptyStartCells = React.useMemo(() => Array(firstDayCol).fill(0), [firstDayCol])

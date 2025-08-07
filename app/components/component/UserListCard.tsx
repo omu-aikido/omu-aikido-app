@@ -26,14 +26,13 @@ export const UserListRow = React.memo<{ key: string; user: User }>(function User
         <div className="flex items-center">
           <img
             src={typeof user.imageUrl === "string" ? user.imageUrl : ""}
-            alt={
-              `${typeof user.lastName === "string" ? user.lastName : ""} ${typeof user.firstName === "string" ? user.firstName : ""}`
-            }
+            alt={`${typeof user.lastName === "string" ? user.lastName : ""} ${typeof user.firstName === "string" ? user.firstName : ""}`}
             className="w-10 h-10 rounded-full object-cover border-2 border-slate-200 dark:border-slate-600"
           />
           <div className="ml-4">
             <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
-              {typeof user.lastName === "string" ? user.lastName : ""} {typeof user.firstName === "string" ? user.firstName : ""}
+              {typeof user.lastName === "string" ? user.lastName : ""}{" "}
+              {typeof user.firstName === "string" ? user.firstName : ""}
             </div>
           </div>
         </div>
@@ -75,9 +74,7 @@ export const UserCell = React.memo<{ key: string; user: User }>(function UserCel
       >
         <img
           src={typeof user.imageUrl === "string" ? user.imageUrl : ""}
-          alt={
-            `${typeof user.lastName === "string" ? user.lastName : ""} ${typeof user.firstName === "string" ? user.firstName : ""}`
-          }
+          alt={`${typeof user.lastName === "string" ? user.lastName : ""} ${typeof user.firstName === "string" ? user.firstName : ""}`}
           className="w-12 h-12 rounded-full object-cover border-2 border-slate-200 dark:border-slate-600 mr-4"
         />
         <div className="flex-1">

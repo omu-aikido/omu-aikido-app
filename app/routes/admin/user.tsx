@@ -78,7 +78,10 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
 
     const totalActivitiesCount = all.length
     const activities = all.slice((page - 1) * limit, page * limit).sort((a, b) => {
-      return new Date(b.date + "T00:00:00Z").getTime() - new Date(a.date + "T00:00:00Z").getTime()
+      return (
+        new Date(b.date + "T00:00:00Z").getTime() -
+        new Date(a.date + "T00:00:00Z").getTime()
+      )
     })
 
     // 総稽古日数（ユニーク日付数）

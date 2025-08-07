@@ -43,23 +43,20 @@ export async function loader(args: Route.LoaderArgs) {
   }
 
   const profile = await getProfile({ userId, env })
-  const summary = (await userActivitySummaryAndRecent({
+  const summary = await userActivitySummaryAndRecent({
     userId,
     start: profile?.getGradeAt
       ? new Date(profile.getGradeAt)
       : new Date(profile!.joinedAt, 3, 1),
     end: new Date(),
     env,
-  }))
+  })
   const activityFromPreviousGrade = summary.length > 0 ? summary[0].total / 1.5 : 0
   const grade = profile?.grade ? profile.grade : 0
   const forNextGrade = timeForNextGrade(grade ? grade : 0)
   const needToNextGrade = Math.max(
     0,
-    Math.floor(
-      forNextGrade -
-        activityFromPreviousGrade
-    ),
+    Math.floor(forNextGrade - activityFromPreviousGrade),
   )
   const gradeData = { grade, needToNextGrade, forNextGrade }
 

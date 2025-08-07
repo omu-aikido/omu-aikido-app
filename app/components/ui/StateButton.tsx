@@ -44,11 +44,7 @@ export function StateButton({
     <div className="flex gap-2">
       {isEditing ? (
         <>
-          <RenderButton
-            type="green"
-            buttonType="submit"
-            disabled={isBusy}
-          >
+          <RenderButton type="green" buttonType="submit" disabled={isBusy}>
             {submitLabel}
           </RenderButton>
           <RenderButton
@@ -61,10 +57,7 @@ export function StateButton({
           </RenderButton>
         </>
       ) : (
-        <RenderButton
-          buttonType="button"
-          onClick={() => setIsEditing(true)}
-        >
+        <RenderButton buttonType="button" onClick={() => setIsEditing(true)}>
           編集
         </RenderButton>
       )}

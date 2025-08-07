@@ -23,7 +23,11 @@ export function StatsSection({
             次の級段位まで
           </p>
           <p className="text-lg font-bold text-yellow-900 dark:text-yellow-100">
-            {Math.max(0, Number(timeForNextGrade(grade)) - Number(currentGradeTrainCount))}/{Number(timeForNextGrade(grade))}回
+            {Math.max(
+              0,
+              Number(timeForNextGrade(grade)) - Number(currentGradeTrainCount),
+            )}
+            /{Number(timeForNextGrade(grade))}回
           </p>
         </div>
         <div>

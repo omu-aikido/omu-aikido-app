@@ -1,4 +1,4 @@
-import { createRequestHandler } from "react-router";
+import { createRequestHandler } from "react-router"
 
 declare module "react-router" {
   export interface AppLoadContext {
@@ -17,25 +17,23 @@ export default {
     const url = new URL(request.url)
     if (env.CLERK_PUBLISHABLE_KEY.startsWith("pk_live") && url.protocol === "http:") {
       url.protocol = "https:"
-      return new Response(null, {
-        status: 301,
-        headers: {
-          Location: url.toString(),
-        },
-      })
+      return new Response(null, { status: 301, headers: { Location: url.toString() } })
     }
 
     const response = await requestHandler(request, { cloudflare: { env, ctx } })
-    response.headers.set("X-Frame-Options", "DENY")
-    response.headers.set("X-Content-Type-Options", "nosniff")
-    response.headers.set(
-      "Content-Security-Policy",
-      "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.clerk.dev https://api.clerk.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';"
-    )
-    response.headers.set(
-      "Strict-Transport-Security",
-      "max-age=63072000; includeSubDomains; preload"
-    )
+
+    if (env.CLERK_PUBLISHABLE_KEY.startsWith("pk_live")) {
+      response.headers.set("X-Frame-Options", "DENY")
+      response.headers.set("X-Content-Type-Options", "nosniff")
+      response.headers.set(
+        "Content-Security-Policy",
+        "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.clerk.dev https://api.clerk.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';",
+      )
+      response.headers.set(
+        "Strict-Transport-Security",
+        "max-age=63072000; includeSubDomains; preload",
+      )
+    }
     return response
   },
 } satisfies ExportedHandler<Env>

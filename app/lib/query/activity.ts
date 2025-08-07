@@ -71,7 +71,7 @@ export async function userActivitySummaryAndRecent(input: {
 
   // サブクエリで合計periodを取得（Drizzle SubQuery API使用）
   const totalSubQuery = db
-    .select({ total: sql<number>`SUM(${activity.period})`.as('total') })
+    .select({ total: sql<number>`SUM(${activity.period})`.as("total") })
     .from(activity)
     .where(
       and(
