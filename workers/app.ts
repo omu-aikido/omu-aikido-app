@@ -1,4 +1,4 @@
-import { createRequestHandler } from "react-router";
+import { createRequestHandler } from "react-router"
 
 declare module "react-router" {
   export interface AppLoadContext {
@@ -36,7 +36,7 @@ export default {
           style-src 'self' 'unsafe-inline';
           frame-src 'self' https://challenges.cloudflare.com;
           form-action 'self';
-        `
+        `,
       )
       response.headers.set(
         "Strict-Transport-Security",
