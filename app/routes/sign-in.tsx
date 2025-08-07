@@ -122,7 +122,7 @@ export default function SignInPage() {
         </div>
         {error && (
           <div className={style.text.error()}>
-            メールアドレスまたはパスワードが正しくありません。
+            {error}
           </div>
         )}
         <button
@@ -166,6 +166,9 @@ export default function SignInPage() {
           <Link to="/sign-up">こちら</Link>
         </span>
         からサインアップしてください。
+      </div>
+      <div className="mt-4 text-center text-sm text-slate-600 dark:text-slate-400">
+        サインインに失敗する場合は、<span className={style.text.link()}><Link to="https://accounts.omu-aikido.com">こちら</Link></span>からサインインをお試しください。
       </div>
     </div>
   )

@@ -27,7 +27,7 @@ export default {
       response.headers.set("X-Content-Type-Options", "nosniff")
       response.headers.set(
         "Content-Security-Policy",
-        "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.clerk.dev https://api.clerk.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';",
+        "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'https://clerk.omu-aikido.com' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.clerk.dev https://api.clerk.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';",
       )
       response.headers.set(
         "Strict-Transport-Security",
