@@ -1,4 +1,4 @@
-name: Deploy Developemnt
+name: Deploy Staging
 
 permissions:
   contents: read
