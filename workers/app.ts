@@ -30,7 +30,6 @@ export default {
         `
           default-src 'self';
           script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.omu-aikido.com https://challenges.cloudflare.com;
-          script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.omu-aikido.com https://challenges.cloudflare.com;
           connect-src 'self' https://clerk.omu-aikido.com;
           img-src 'self' https://img.clerk.com;
           worker-src 'self' blob:;
