@@ -47,6 +47,11 @@ export const year = [
 ]
 
 export function translateYear(year_value: string): string {
+  // Only allow known year codes
+  const allowedYears = year.map(y => y.year)
+  if (!allowedYears.includes(year_value)) {
+    return "不明"
+  }
   const year_data = year.find(y => y.year === year_value)
   return year_data ? year_data.name : "不明"
 }

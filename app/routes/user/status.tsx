@@ -17,9 +17,6 @@ export async function loader(args: Route.LoaderArgs) {
 
   const env = args.context.cloudflare.env
 
-  // 親のレイアウトで認証チェック済みだが、プロフィールデータが必要
-  if (!userId) return redirect("/sign-in?redirect_url=" + args.request.url)
-
   const profile: Profile | null = await getProfile({ userId, env })
 
   // Return profile data for the component

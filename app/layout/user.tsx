@@ -13,16 +13,21 @@ export async function loader(args: Route.LoaderArgs) {
   if (!userId) {
     return redirect("/sign-in?redirect_url=" + args.request.url)
   }
-
   const clerkClient = createClerkClient({
     secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
   })
 
   const user = await clerkClient.users.getUser(userId)
   const email = user.emailAddresses?.[0]?.emailAddress || ""
-  const discordAccount = user.externalAccounts?.find(
-    acc => acc.provider === "oauth_discord",
-  )
+  const discordAccount = Array.isArray(user.externalAccounts)
+    ? user.externalAccounts.find(
+        acc =>
+          typeof acc === "object" &&
+          acc !== null &&
+          Object.prototype.hasOwnProperty.call(acc, "provider") &&
+          acc.provider === "oauth_discord",
+      )
+    : undefined
   const username = user.username || ""
 
   return {

@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react"
+
 import type { ActivityType } from "~/db/schema"
 import { style } from "~/styles/component" // Import style
 
@@ -31,27 +33,33 @@ export function Recents({ recent }: { recent: ActivityType | undefined }) {
     return text
   }
 
+  const [date, setDate] = useState<string>("")
+  const [createAt, setCreateAt] = useState<string>("")
+
+  useEffect(() => {
+    if (recent) {
+      setDate(new Date(recent.date).toLocaleDateString())
+      setCreateAt(new Date(recent.createAt).toLocaleString())
+    }
+  }, [recent])
+
   if (!recent) return null
 
   return (
     <div className={`${style.card.container()} mt-4`}>
-      <h2 className="text-lg text-[rgb(var(--text))] mb-2 mt-0">
+      <h2 className="text-lg text-slate-600 dark:text-slate-300 mb-2 mt-0">
         最近追加した項目:
         <small
           id="relative-time"
           data-timestamp={Number(new Date(recent.createAt).getTime())}
           className="text-sm"
         >
-          {String(relativeTime(recent.createAt))}
+          {relativeTime(String(recent.createAt))}
         </small>
       </h2>
       <div className="flex justify-between text-sm text-slate-600 dark:text-slate-300 md:flex-row flex-col">
-        <span className="mr-2">
-          追加日時: {String(new Date(recent.createAt).toLocaleString("ja-JP"))}
-        </span>
-        <span className="mr-2">
-          日付: {String(new Date(recent.date).toLocaleDateString("ja-JP"))}
-        </span>
+        <span className="mr-2">日付: {date}</span>
+        <span className="mr-2">追加日時: {createAt}</span>
         <span>{Number(recent.period)}時間</span>
       </div>
     </div>

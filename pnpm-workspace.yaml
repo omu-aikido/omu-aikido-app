@@ -1,20 +1,4 @@
 onlyBuiltDependencies:
-  - " "
-  - '"'
-  - "-"
-  - /
-  - "@"
+  # External dependencies
   - "@clerk/shared"
-  - a
-  - b
-  - c
-  - d
-  - e
-  - h
-  - i
-  - k
-  - l
-  - r
-  - s
-  - u
   - workerd

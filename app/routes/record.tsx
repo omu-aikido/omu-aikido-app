@@ -333,7 +333,7 @@ function prepareBatchUpdatePayload(
   if (!userId) return null
 
   const deletedCandidates = originalActivities.filter(oa => {
-    const currentActivity = currentActivities.find(a => a.id === oa.id)
+    const currentActivity = currentActivities.find(a => String(a.id) === String(oa.id))
     return !currentActivity || currentActivity.isDeleted
   })
 
@@ -367,7 +367,9 @@ function prepareBatchUpdatePayload(
 
   const activitiesToUpdate: ActivityType[] = []
   currentActivities.forEach(currentAct => {
-    const originalAct = originalActivities.find(oa => oa.id === currentAct.id)
+    const originalAct = originalActivities.find(
+      oa => String(oa.id) === String(currentAct.id),
+    )
     if (originalAct && !currentAct.isDeleted) {
       const fieldsToCompare: (keyof DailyActivityItem)[] = ["date", "period", "userId"]
       const hasChanges = fieldsToCompare.some(

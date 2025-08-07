@@ -5,33 +5,46 @@ import * as React from "react"
 import { Link, redirect, useFetcher } from "react-router"
 const logger = getLogger("routes/sign-in")
 
-import { style } from "../styles/component"
-
 import type { Route } from "./+types/sign-in"
 
 import { Icon } from "~/components/ui/Icon"
+import { style } from "~/styles/component"
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
-  const userId = auth.userId
+  const authenticated = auth.isAuthenticated
 
-  if (userId) {
+  if (authenticated) {
     const url = new URL(args.request.url)
-    const redirectUrl = url.searchParams.get("redirect_url")
-
     let safeRedirectUrl = "/"
 
+    const redirectUrl = url.searchParams.get("redirect_url")
     if (redirectUrl) {
       try {
         const parsedRedirectUrl = new URL(redirectUrl, url.origin)
+        // 危険なURLスキームを削除
+        const dangerousSchemes = [
+          "javascript:",
+          "data:",
+          "vbscript:",
+          "file:",
+          "about:",
+          "mailto:",
+        ]
+        for (const scheme of dangerousSchemes) {
+          if (parsedRedirectUrl.href.startsWith(scheme)) {
+            break
+          }
+        }
         if (parsedRedirectUrl.origin === url.origin) {
           safeRedirectUrl = parsedRedirectUrl.pathname
         }
       } catch (e) {
-        logger.error(`Invalid redirect_url: ${redirectUrl}: ${e}`)
+        logger.error(`Invalid redirect_url: ${String(redirectUrl)}: ${String(e)}`)
       }
     }
+
     return redirect(safeRedirectUrl)
   }
 }
