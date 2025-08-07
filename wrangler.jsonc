@@ -26,6 +26,22 @@
    * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
    */
   // "vars": { "MY_VARIABLE": "production_value" },
+
+  /**
+   * KV Namespaces for caching
+   * https://developers.cloudflare.com/workers/wrangler/configuration/#kv-namespaces
+   */
+  // Add this to your wrangler.jsonc
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "96b9a7a8f5574a8eabf9472fe1ca05db",
+
+      // Optional: preview_id used when running `wrangler dev` for local dev
+      "preview_id": "",
+    },
+  ],
+
   /**
    * Note: Use secrets to store sensitive data.
    * https://developers.cloudflare.com/workers/configuration/secrets/

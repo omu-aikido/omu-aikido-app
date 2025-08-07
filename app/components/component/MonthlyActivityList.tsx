@@ -1,4 +1,5 @@
 import { format } from "date-fns"
+import React from "react"
 import { tv } from "tailwind-variants"
 
 import { style } from "~/styles/component"
@@ -26,45 +27,41 @@ const dayLabel = tv({
   },
 })
 
-function DayActivitySummary({
-  totalHours,
-  count,
-}: {
-  totalHours: number
-  count: number
-}) {
-  if (totalHours <= 0) return null
-  return (
-    <div className="flex flex-row justify-between">
-      <div
-        className={style.text.info({
-          class:
-            "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 rounded-sm font-medium text-sm",
-        })}
-      >
-        合計 {totalHours}h
+const DayActivitySummary = React.memo<{ totalHours: number; count: number }>(
+  function DayActivitySummary({ totalHours, count }) {
+    if (totalHours <= 0) return null
+    return (
+      <div className="flex flex-row justify-between">
+        <div
+          className={style.text.info({
+            class:
+              "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 rounded-sm font-medium text-sm",
+          })}
+        >
+          合計 {Number(totalHours)}h
+        </div>
+        <div className="mr-4">
+          {count >= 2 && count < 100 && (
+            <span className="place-items-center flex items-center bg-green-700 dark:bg-green-200 text-green-100 dark:text-green-800 rounded-full w-5 h-5 justify-center text-xs font-bold shadow-sm">
+              {Number(count)}
+            </span>
+          )}
+          {count >= 100 && (
+            <span className="place-items-center flex items-center bg-green-700 dark:bg-green-200 text-green-100 dark:text-green-800 rounded-full w-5 h-5 justify-center text-xs font-bold shadow-sm">
+              +99
+            </span>
+          )}
+        </div>
       </div>
-      <div className="mr-4">
-        {count >= 2 && count < 100 && (
-          <span className="place-items-center flex items-center bg-green-700 dark:bg-green-200 text-green-100 dark:text-green-800 rounded-full w-5 h-5 justify-center text-xs font-bold shadow-sm">
-            {count}
-          </span>
-        )}
-        {count >= 100 && (
-          <span className="place-items-center flex items-center bg-green-700 dark:bg-green-200 text-green-100 dark:text-green-800 rounded-full w-5 h-5 justify-center text-xs font-bold shadow-sm">
-            +99
-          </span>
-        )}
-      </div>
-    </div>
-  )
-}
+    )
+  },
+)
 
-export default function MonthlyActivityList({
+const MonthlyActivityList = React.memo<Props>(function MonthlyActivityList({
   daysInMonth,
   currentActivities,
   onDayClick,
-}: Props) {
+}) {
   return (
     <ul className="divide-y divide-slate-200 dark:divide-slate-700">
       {daysInMonth.map((day, idx) => {
@@ -109,4 +106,6 @@ export default function MonthlyActivityList({
       })}
     </ul>
   )
-}
+})
+
+export default MonthlyActivityList

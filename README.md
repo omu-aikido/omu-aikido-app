@@ -63,4 +63,4 @@ pnpm install --frozen-lock
 
 ## 貢献方法
 
-貢献ガイドラインについては、[`CONTRIBUTE.md`](CONTRIBUTE.md)を参照してください。
+貢献ガイドラインについては、[`CONTRIBUTING.md`](.github/CONTRIBUTING.md)を参照してください。

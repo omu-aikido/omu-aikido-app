@@ -29,34 +29,6 @@ export async function createActivity(input: {
   return result
 }
 
-// MARK: userActivity
-export async function userActivity(input: {
-  userId: string | null
-  start: Date | undefined
-  end: Date | undefined
-  env: Env
-}) {
-  const db = createDb(input.env)
-
-  if (!input.userId) return []
-
-  // 1970-01-01T00:00:00.000Z ~ 2100-12-31T23:59:59.999Zまでのデータを取得
-  const start = input.start ? input.start.toISOString() : new Date(0).toISOString()
-  const end = input.end ? input.end.toISOString() : new Date(4102444799999).toISOString()
-  const activityData = await db
-    .select()
-    .from(activity)
-    .where(
-      and(
-        eq(activity.userId, input.userId),
-        gte(activity.date, start),
-        lte(activity.date, end),
-      ),
-    )
-
-  return activityData
-}
-
 // MARK: getActivitiesByDateRange
 export async function getActivitiesByDateRange(input: {
   userId?: string
@@ -86,22 +58,54 @@ export async function getActivitiesByDateRange(input: {
   return activityData
 }
 
-// MARK: recentlyActivity
-export async function recentlyActivity(input: {
+// MARK: home loader helper
+export async function userActivitySummaryAndRecent(input: {
   userId: string
-  limit: number
+  start?: Date
+  end?: Date
   env: Env
 }) {
   const db = createDb(input.env)
+  const start = input.start ? input.start.toISOString() : new Date(0).toISOString()
+  const end = input.end ? input.end.toISOString() : new Date(4102444799999).toISOString()
 
-  const activityData = await db
-    .select()
+  // サブクエリで合計periodを取得（Drizzle SubQuery API使用）
+  const totalSubQuery = db
+    .select({ total: sql<number>`SUM(${activity.period})`.as("total") })
     .from(activity)
-    .where(eq(activity.userId, input.userId))
-    .orderBy(desc(activity.createAt))
-    .limit(input.limit)
+    .where(
+      and(
+        eq(activity.userId, input.userId),
+        gte(activity.date, start),
+        lte(activity.date, end),
+      ),
+    )
+    .as("total_summary")
 
-  return activityData as ActivityType[]
+  // 最新1件＋合計をJOINで取得（サブクエリをJOINで使用）
+  const recentWithTotal = await db
+    .select({
+      userId: activity.userId,
+      id: activity.id,
+      date: activity.date,
+      period: activity.period,
+      createAt: activity.createAt,
+      updatedAt: activity.updatedAt,
+      total: totalSubQuery.total,
+    })
+    .from(activity)
+    .leftJoin(totalSubQuery, sql`1=1`)
+    .where(
+      and(
+        eq(activity.userId, input.userId),
+        gte(activity.date, start),
+        lte(activity.date, end),
+      ),
+    )
+    .orderBy(desc(activity.createAt))
+    .limit(1)
+
+  return recentWithTotal
 }
 
 // MARK: createActivities
