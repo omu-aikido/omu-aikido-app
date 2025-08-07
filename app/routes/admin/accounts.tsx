@@ -138,16 +138,61 @@ export default function AdminAccounts(args: Route.ComponentProps) {
           bValue = yearOrder[bYear as keyof typeof yearOrder] ?? 999
           break
         case "grade":
-          const aGrade = a.publicMetadata.grade
-          const bGrade = b.publicMetadata.grade
-          const normalizeGrade = (grade: number | null | undefined) => {
-            if (grade === null || grade === undefined) return -1000 // 不明は最下位
-            if (grade === 0) return -999 // 0は不明の次に下位
-            if (grade !== 0) return -grade
-            return grade
+          const gradeOrder: Record<string, number> = {
+            "0": 998, // 無級
+            "5": 9,
+            "4": 8,
+            "3": 7,
+            "2": 6,
+            "1": 5,
+            "-1": 4,
+            "-2": 3,
+            "-3": 2,
+            "-4": 1,
           }
-          aValue = normalizeGrade(aGrade)
-          bValue = normalizeGrade(bGrade)
+
+          // グレード値の正規化と分類
+          const normalizeGrade = (
+            grade: unknown,
+          ): { value: number; type: "known" | "mukyu" | "unknown" } => {
+            // null, undefined, 空文字列は「不明」
+            if (
+              grade === null ||
+              grade === undefined ||
+              grade === "" ||
+              grade === "null" ||
+              grade === "undefined"
+            ) {
+              return { value: 1000, type: "unknown" }
+            }
+
+            const gradeStr = String(grade)
+
+            // "0"は「無級」
+            if (gradeStr === "0") {
+              return { value: 998, type: "mukyu" }
+            }
+
+            // その他の有効な段級位
+            if (gradeOrder[gradeStr]) {
+              return { value: gradeOrder[gradeStr], type: "known" }
+            }
+
+            // 無効な値は「不明」扱い
+            return { value: 1000, type: "unknown" }
+          }
+
+          const aGradeInfo = normalizeGrade(a.publicMetadata.grade)
+          const bGradeInfo = normalizeGrade(b.publicMetadata.grade)
+
+          aValue = aGradeInfo.value
+          bValue = bGradeInfo.value
+
+          // 同じ分類内での二次ソート（作成日時順）
+          if (aValue === bValue) {
+            aValue = new Date(a.createdAt).getTime()
+            bValue = new Date(b.createdAt).getTime()
+          }
           break
         case "role":
         default:
