@@ -10,7 +10,9 @@ export function NextGrade(gradeData: {
 }) {
   const { grade, needToNextGrade, forNextGrade } = gradeData
 
-  const targetGrade = grade >= 0 ? grade - 2 : grade - 1
+  const targetGrade = grade < 0 ? grade - 1
+                     : grade > 0 ? grade - 2
+                     : 5;
   const promotionType = grade <= 1 ? (grade === 0 ? "昇級" : "昇段") : "昇級"
   const progressPercentage = ((forNextGrade - needToNextGrade) / forNextGrade) * 100
 
