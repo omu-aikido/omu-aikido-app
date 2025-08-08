@@ -11,8 +11,13 @@ interface AddRecordProps {
 export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher }) {
   const { userId } = useAuth()
   const submitting = fetcher.state === "submitting"
+  const date = new Date()
   const [formState, setFormState] = useState({
-    date: new Date().toLocaleDateString("ja-JP"),
+    date: [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("-"),
     period: "1.5",
   })
 
