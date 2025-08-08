@@ -109,11 +109,18 @@ function ProfileImageInput({
   imageUrl: string
   isEditing: boolean
 }) {
+  // Only allow http(s) URLs or data URLs for images
+  const safeImageUrl =
+    typeof imageUrl === "string" &&
+    (/^https?:\/\/[^ "]+$/.test(imageUrl) || /^data:image\//.test(imageUrl))
+      ? imageUrl
+      : ""
+
   return (
     <div className="flex gap-2 items-center">
       <div className="w-12 h-12 mr-4 rounded-full relative group overflow-hidden flex-shrink-0">
         <img
-          src={imageUrl}
+          src={safeImageUrl}
           alt="Profile"
           className="w-full h-full object-cover rounded-full aspect-square"
         />
@@ -140,6 +147,8 @@ function ProfileImageInput({
 }
 
 function LastNameInput({ lastName, disabled }: { lastName?: string; disabled: boolean }) {
+  // Sanitize the lastName to prevent XSS
+  const safeLastName = typeof lastName === "string" ? lastName.replace(/[<>]/g, "") : ""
   return (
     <div className="w-1/2">
       <label htmlFor="lastName" className={style.form.label({ necessary: true })}>
@@ -149,7 +158,7 @@ function LastNameInput({ lastName, disabled }: { lastName?: string; disabled: bo
         type="text"
         name="lastName"
         id="lastName"
-        defaultValue={lastName ?? ""}
+        defaultValue={safeLastName}
         required
         className={style.form.input({ disabled })}
         disabled={disabled}
@@ -165,6 +174,9 @@ function FirstNameInput({
   firstName?: string
   disabled: boolean
 }) {
+  // Sanitize the firstName to prevent XSS
+  const safeFirstName =
+    typeof firstName === "string" ? firstName.replace(/[<>]/g, "") : ""
   return (
     <div className="w-1/2">
       <label htmlFor="firstName" className={style.form.label({ necessary: true })}>
@@ -174,7 +186,7 @@ function FirstNameInput({
         type="text"
         name="firstName"
         id="firstName"
-        defaultValue={firstName ?? ""}
+        defaultValue={safeFirstName}
         required
         className={style.form.input({ disabled })}
         disabled={disabled}
@@ -184,6 +196,8 @@ function FirstNameInput({
 }
 
 function UsernameInput({ username, disabled }: { username: string; disabled: boolean }) {
+  // Sanitize the username to prevent XSS
+  const safeUsername = typeof username === "string" ? username.replace(/[<>]/g, "") : ""
   return (
     <div>
       <label htmlFor="username" className={style.form.label()}>
@@ -193,7 +207,7 @@ function UsernameInput({ username, disabled }: { username: string; disabled: boo
         type="text"
         name="username"
         id="username"
-        defaultValue={username}
+        defaultValue={safeUsername}
         className={style.form.input({ disabled })}
         disabled={disabled}
       />
@@ -202,6 +216,8 @@ function UsernameInput({ username, disabled }: { username: string; disabled: boo
 }
 
 function EmailInput({ email, disabled }: { email: string; disabled: boolean }) {
+  // Sanitize the email to prevent XSS
+  const safeEmail = typeof email === "string" ? email.replace(/[<>]/g, "") : ""
   return (
     <div>
       <label htmlFor="email" className={style.form.label({ necessary: true })}>
@@ -211,7 +227,7 @@ function EmailInput({ email, disabled }: { email: string; disabled: boolean }) {
         type="email"
         name="email"
         id="email"
-        defaultValue={email}
+        defaultValue={safeEmail}
         required
         className={style.form.input({ disabled })}
         disabled={disabled}

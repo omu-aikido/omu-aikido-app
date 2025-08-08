@@ -258,7 +258,11 @@ export default function AdminUser(args: Route.ComponentProps) {
     totalEntries = 0,
     totalHours = 0,
   } = args.loaderData
-  const discord = user?.externalAccounts?.find(acc => acc.provider === "oauth_discord")
+  const discord = Array.isArray(user?.externalAccounts)
+    ? user.externalAccounts.find(
+        (acc: { provider: string }) => acc.provider === "oauth_discord",
+      )
+    : undefined
 
   const fetcher = useFetcher()
   const [isEditing, setIsEditing] = useState(false)

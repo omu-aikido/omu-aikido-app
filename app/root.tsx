@@ -8,37 +8,31 @@ import {
   Links,
   Meta,
   Outlet,
-  redirect,
   Scripts,
   ScrollRestoration,
 } from "react-router"
 
 import type { Route } from "./+types/root"
-import { AccountUi } from "./components/component/AccountUi"
-import { Footer } from "./components/component/Footer"
-import { ReactHeader } from "./components/component/Header"
-import { Sidebar } from "./components/ui/Sidebar"
-import { getProfile } from "./lib/query/profile"
-import { Role } from "./lib/zod"
-import "./styles/global.css"
-import type { PagePath } from "./type"
+
+import { AccountUi } from "~/components/component/AccountUi"
+import { Footer } from "~/components/component/Footer"
+import { ReactHeader } from "~/components/component/Header"
+import { Sidebar } from "~/components/ui/Sidebar"
+import { getProfile } from "~/lib/query/profile"
+import { Role } from "~/lib/zod"
+import "~/styles/global.css"
+import type { PagePath } from "~/type"
 
 const logger = getLogger("root")
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
 ]
 
 export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
   const userId = auth.userId
-  if (!new URL(args.request.url).pathname.startsWith("/sign-") && !userId)
-    return redirect("/sign-in?redirect_url=" + args.request.url)
   let links: PagePath[]
   const env = args.context.cloudflare.env
 

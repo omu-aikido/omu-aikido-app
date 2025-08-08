@@ -36,9 +36,8 @@ export function StateButton({
     )
   }
 
-  // Only static strings are rendered, no user input, so XSS is not possible here.
   const isBusy = fetcher.state !== "idle"
-  const submitLabel = isBusy ? "通信中" : "保存"
+  const submitLabel: string = isBusy ? "通信中" : "保存"
 
   return (
     <div className="flex gap-2">

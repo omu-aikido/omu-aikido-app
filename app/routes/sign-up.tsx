@@ -389,7 +389,11 @@ export default function SignUpPage() {
           </span>
           からサインインしてください。
         </div>
-        {error && <div className={style.text.error({ className: "mt-4" })}>{error}</div>}
+        {error && (
+          <div className={style.text.error({ className: "mt-4" })}>
+            {error && "エラーが発生しました。"}
+          </div>
+        )}
       </div>
     )
   }
@@ -464,7 +468,11 @@ export default function SignUpPage() {
             {loading ? "登録中..." : "登録する"}
           </button>
         </form>
-        {error && <div className={style.text.error({ className: "mt-4" })}>{error}</div>}
+        {error && (
+          <div className={style.text.error({ className: "mt-4" })}>
+            {error && "エラーが発生しました。"}
+          </div>
+        )}
       </div>
     )
   }
@@ -499,7 +507,11 @@ export default function SignUpPage() {
         <p className={style.text.info()}>
           認証コードが届きませんか？迷惑メールフォルダを確認してください。
         </p>
-        {error && <div className={style.text.error({ className: "mt-4" })}>{error}</div>}
+        {error && (
+          <div className={style.text.error({ className: "mt-4" })}>
+            {error && "エラーが発生しました。"}
+          </div>
+        )}
       </div>
     )
   }
