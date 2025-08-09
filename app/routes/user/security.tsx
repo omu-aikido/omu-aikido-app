@@ -82,7 +82,7 @@ export default function SecurityPage() {
           <label className="block mb-1 font-medium">現在のパスワード</label>
           <input
             type="password"
-            className={style.form.input({ disabled: true })}
+            className={style.form.input()}
             value="*****************"
             onChange={e => setCurrentPassword(e.target.value)}
             required

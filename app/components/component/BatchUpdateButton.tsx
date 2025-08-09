@@ -16,8 +16,8 @@ export default function BatchUpdateButton({
   return (
     <button
       type="submit"
+      disabled={submitting || isChanged}
       className={style.button({
-        disabled: !isChanged || submitting,
         type: isChanged ? "primary" : "secondary", // Dynamically set type based on isChanged
         className,
       })}

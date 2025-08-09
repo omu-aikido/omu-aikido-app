@@ -135,7 +135,7 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
         type="date"
         id="getGradeAt"
         name="getGradeAt"
-        className={style.form.input({ disabled })}
+        className={style.form.input()}
         defaultValue={isEditing ? value : undefined}
         value={!isEditing ? value : undefined}
         disabled={disabled}
@@ -157,7 +157,7 @@ function JoinedAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
         name="joinedAt"
         placeholder="4桁の数字"
         required
-        className={style.form.input({ disabled })}
+        className={style.form.input()}
         defaultValue={isEditing ? profile.joinedAt : undefined}
         value={!isEditing ? profile.joinedAt : undefined}
         disabled={disabled}

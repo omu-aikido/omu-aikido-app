@@ -160,7 +160,7 @@ function LastNameInput({ lastName, disabled }: { lastName?: string; disabled: bo
         id="lastName"
         defaultValue={safeLastName}
         required
-        className={style.form.input({ disabled })}
+        className={style.form.input()}
         disabled={disabled}
       />
     </div>
@@ -188,7 +188,7 @@ function FirstNameInput({
         id="firstName"
         defaultValue={safeFirstName}
         required
-        className={style.form.input({ disabled })}
+        className={style.form.input()}
         disabled={disabled}
       />
     </div>
@@ -208,7 +208,7 @@ function UsernameInput({ username, disabled }: { username: string; disabled: boo
         name="username"
         id="username"
         defaultValue={safeUsername}
-        className={style.form.input({ disabled })}
+        className={style.form.input()}
         disabled={disabled}
       />
     </div>
@@ -229,7 +229,7 @@ function EmailInput({ email, disabled }: { email: string; disabled: boolean }) {
         id="email"
         defaultValue={safeEmail}
         required
-        className={style.form.input({ disabled })}
+        className={style.form.input()}
         disabled={disabled}
       />
     </div>
