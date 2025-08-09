@@ -133,7 +133,18 @@ export default function SignInPage() {
             className={style.form.input()}
           />
         </div>
-        {error && <div className={style.text.error()}>{error}</div>}
+        {error && (
+          <>
+            <div className={style.text.error()}>{error}</div>
+            <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
+              サインインに失敗する場合は、
+              <span className={style.text.link()}>
+                <Link to="https://accounts.omu-aikido.com">こちら</Link>
+              </span>
+              からサインインをお試しください。
+            </div>
+          </>
+        )}
         <button
           type="submit"
           disabled={loading || error !== null}
@@ -171,13 +182,6 @@ export default function SignInPage() {
           <Link to="/sign-up">こちら</Link>
         </span>
         からサインアップしてください。
-      </div>
-      <div className="mt-4 text-center text-sm text-slate-600 dark:text-slate-400">
-        サインインに失敗する場合は、
-        <span className={style.text.link()}>
-          <Link to="https://accounts.omu-aikido.com">こちら</Link>
-        </span>
-        からサインインをお試しください。
       </div>
     </div>
   )
