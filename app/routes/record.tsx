@@ -207,17 +207,32 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
         />
         <div className="overflow-x-auto w-full sm:block hidden">
           <fetcher.Form method="post">
-            <button
-              type="submit"
-              className={`rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 w-full ${isChanged ? "bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-400 cursor-not-allowed"}`}
-              disabled={!isChanged || fetcher.state !== "idle"}
-            >
-              {fetcher.state === "idle"
-                ? "登録"
-                : fetcher.state === "loading"
-                  ? "読み込み中"
-                  : "送信中"}
-            </button>
+            <div className="flex flex-row items-center justify-between mb-4">
+              <button
+                type="submit"
+                className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 mx-1 w-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+                disabled={!isChanged || fetcher.state !== "idle"}
+              >
+                {fetcher.state === "idle"
+                  ? "登録"
+                  : fetcher.state === "loading"
+                    ? "読み込み中"
+                    : "送信中"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  alert("変更をリセットします。よろしいですか？")
+                  setActivities(originalActivities)
+                  setSelectedDate(null)
+                  setShowDailyActivityModal(false)
+                }}
+                className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 mx-1 w-1/4 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+                disabled={!isChanged || fetcher.state !== "idle"}
+              >
+                リセット
+              </button>
+            </div>
             <input type="hidden" name="actionType" value="batchUpdate" />
             <input
               type="hidden"
@@ -258,13 +273,34 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                 prepareBatchUpdatePayload(userId, originalActivities, currentActivities),
               )}
             />
-            <button
-              type="submit"
-              className={`rounded-lg px-5 py-2 fixed right-6 bottom-6 font-medium text-lg transition-colors duration-200 shadow-sm ${isChanged ? "bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-400 cursor-not-allowed"} `}
-              disabled={!isChanged || fetcher.state == "submitting"}
-            >
-              登録
-            </button>
+            <div className="fixed w-full right-0 bottom-0">
+              <div className="flex flex-row items-center justify-between backdrop-blur-sm pb-5 px-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    alert("変更をリセットします。よろしいですか？")
+                    setActivities(originalActivities)
+                    setSelectedDate(null)
+                    setShowDailyActivityModal(false)
+                  }}
+                  className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 my-4 mx-1 w-1/3 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+                  disabled={!isChanged || fetcher.state !== "idle"}
+                >
+                  リセット
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 my-4 mx-1 w-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+                  disabled={!isChanged || fetcher.state !== "idle"}
+                >
+                  {fetcher.state === "idle"
+                    ? "登録"
+                    : fetcher.state === "loading"
+                      ? "読み込み中"
+                      : "送信中"}
+                </button>
+              </div>
+            </div>
           </fetcher.Form>
         </div>
       </>
