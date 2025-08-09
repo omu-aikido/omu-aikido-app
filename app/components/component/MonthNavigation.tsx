@@ -1,6 +1,7 @@
 import { style } from "~/styles/component"
 
 type Props = {
+  isChanged: boolean
   currentMonth: Date
   onPrev: () => void
   onNext: () => void
@@ -8,10 +9,12 @@ type Props = {
   YearMonthSelector: React.ComponentType<{
     currentMonth: Date
     onSelect: (date: Date) => void
+    isChanged: boolean
   }>
 }
 
 export default function MonthNavigation({
+  isChanged,
   currentMonth,
   onPrev,
   onNext,
@@ -26,11 +29,16 @@ export default function MonthNavigation({
           type: "primary",
           className: "px-4 sm:px-6 py-2 sm:py-3 rounded-l-4xl",
         })}
+        disabled={isChanged}
       >
         {`${currentMonth.getMonth()}月`}
       </button>
       <div className="flex items-center gap-2 mx-auto">
-        <YearMonthSelector currentMonth={currentMonth} onSelect={onSelect} />
+        <YearMonthSelector
+          currentMonth={currentMonth}
+          onSelect={onSelect}
+          isChanged={isChanged}
+        />
       </div>
       <button
         onClick={onNext}
@@ -38,6 +46,7 @@ export default function MonthNavigation({
           type: "primary",
           className: "px-4 sm:px-6 py-2 sm:py-3 rounded-r-4xl",
         })}
+        disabled={isChanged}
       >
         {`${currentMonth.getMonth() + 2}月`}
       </button>

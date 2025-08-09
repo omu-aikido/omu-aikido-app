@@ -5,11 +5,13 @@ import { style } from "~/styles/component" // Import style
 interface YearMonthSelectorModalProps {
   currentMonth: Date
   onSelect: (date: Date) => void
+  isChanged: boolean
 }
 
 export default function YearMonthSelectorInline({
   currentMonth,
   onSelect,
+  isChanged,
 }: YearMonthSelectorModalProps) {
   const [year, setYear] = useState(currentMonth.getFullYear())
   const [month, setMonth] = useState(currentMonth.getMonth() + 1)
@@ -32,6 +34,7 @@ export default function YearMonthSelectorInline({
         value={year}
         onChange={e => setYear(Number(e.target.value))}
         className={style.form.input() + " w-20 text-center"}
+        disabled={isChanged}
       />
       <span className="mx-1">年</span>
       <select
@@ -39,6 +42,7 @@ export default function YearMonthSelectorInline({
         id={`select-${month}`}
         onChange={e => setMonth(Number(e.target.value))}
         className={style.form.input()}
+        disabled={isChanged}
       >
         {monthOptions.map(m => (
           <option key={m} value={m}>
