@@ -198,6 +198,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
           </div>
         )}
         <MonthNavigation
+          isChanged={isChanged}
           currentMonth={currentMonth}
           onPrev={handlePrevMonth}
           onNext={handleNextMonth}

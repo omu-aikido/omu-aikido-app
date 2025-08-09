@@ -27,7 +27,7 @@ export function StateButton({
     return (
       <button
         type={buttonType}
-        className={style.form.button(type ? { disabled, type } : undefined)}
+        className={style.form.button(type ? { type } : undefined)}
         disabled={disabled}
         onClick={onClick}
       >

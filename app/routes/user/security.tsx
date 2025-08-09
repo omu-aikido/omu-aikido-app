@@ -142,14 +142,14 @@ export default function SecurityPage() {
           <div className="flex gap-2">
             <button
               type="submit"
-              className={style.form.button({ disabled: loading, type: "green" })}
+              className={style.form.button({ type: "green" })}
               disabled={loading}
             >
               {loading ? "変更中..." : "保存"}
             </button>
             <button
               type="button"
-              className={style.form.button({ disabled: loading, type: "gray" })}
+              className={style.form.button({ type: "gray" })}
               disabled={loading}
               onClick={() => {
                 setIsEditing(false)

@@ -107,7 +107,7 @@ function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         id="grade"
         name="grade"
         required
-        className={style.form.select({ disabled })}
+        className={style.form.select()}
         defaultValue={profile.grade}
         disabled={disabled}
       >
@@ -177,7 +177,7 @@ function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         id="year"
         name="year"
         required
-        className={style.form.select({ disabled })}
+        className={style.form.select()}
         defaultValue={profile.year}
         disabled={disabled}
       >

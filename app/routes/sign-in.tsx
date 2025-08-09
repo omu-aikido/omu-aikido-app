@@ -136,12 +136,8 @@ export default function SignInPage() {
         {error && <div className={style.text.error()}>{error}</div>}
         <button
           type="submit"
-          disabled={loading}
-          className={style.button({
-            type: "primary",
-            disabled: loading,
-            class: "w-full",
-          })}
+          disabled={loading || error !== null}
+          className={style.button({ type: "primary", class: "w-full" })}
         >
           {loading ? "サインイン中..." : "サインイン"}
         </button>
