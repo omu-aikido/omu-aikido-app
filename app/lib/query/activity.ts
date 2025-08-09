@@ -203,6 +203,7 @@ export async function activitySummary({
     .select()
     .from(activity)
     .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(desc(activity.date))
 
   const totalTrains = Math.floor(
     allActivities.map(a => a.period).reduce((a, b) => a + b, 0) / 1.5,

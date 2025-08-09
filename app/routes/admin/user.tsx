@@ -77,12 +77,7 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
     })
 
     const totalActivitiesCount = all.length
-    const activities = all.slice((page - 1) * limit, page * limit).sort((a, b) => {
-      return (
-        new Date(b.date + "T00:00:00Z").getTime() -
-        new Date(a.date + "T00:00:00Z").getTime()
-      )
-    })
+    const activities = all.slice((page - 1) * limit, page * limit)
 
     // 総稽古日数（ユニーク日付数）
     const uniqueDates = new Set(all.map(a => new Date(a.date).toDateString()))
@@ -453,7 +448,7 @@ function RoleSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         id="role"
         name="role"
         required
-        className={style.form.select({ disabled })}
+        className={style.form.select()}
         defaultValue={profile.role}
         disabled={disabled}
       >
@@ -478,7 +473,7 @@ function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         id="grade"
         name="grade"
         required
-        className={style.form.select({ disabled })}
+        className={style.form.select()}
         defaultValue={profile.grade}
         disabled={disabled}
       >
@@ -506,7 +501,7 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
         type="date"
         id="getGradeAt"
         name="getGradeAt"
-        className={style.form.input({ disabled })}
+        className={style.form.input()}
         defaultValue={isEditing ? value : undefined}
         value={!isEditing ? value : undefined}
         disabled={disabled}
@@ -531,7 +526,7 @@ function JoinedAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
         required
         min="1950"
         max={currentYear + 1}
-        className={style.form.input({ disabled })}
+        className={style.form.input()}
         defaultValue={isEditing ? profile.joinedAt : undefined}
         value={!isEditing ? profile.joinedAt : undefined}
         disabled={disabled}
@@ -551,7 +546,7 @@ function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         id="year"
         name="year"
         required
-        className={style.form.select({ disabled })}
+        className={style.form.select()}
         defaultValue={profile.year}
         disabled={disabled}
       >

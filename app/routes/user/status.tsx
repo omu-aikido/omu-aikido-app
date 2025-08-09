@@ -107,7 +107,7 @@ function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         id="grade"
         name="grade"
         required
-        className={style.form.select({ disabled })}
+        className={style.form.select()}
         defaultValue={profile.grade}
         disabled={disabled}
       >
@@ -135,7 +135,7 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
         type="date"
         id="getGradeAt"
         name="getGradeAt"
-        className={style.form.input({ disabled })}
+        className={style.form.input()}
         defaultValue={isEditing ? value : undefined}
         value={!isEditing ? value : undefined}
         disabled={disabled}
@@ -157,7 +157,7 @@ function JoinedAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
         name="joinedAt"
         placeholder="4桁の数字"
         required
-        className={style.form.input({ disabled })}
+        className={style.form.input()}
         defaultValue={isEditing ? profile.joinedAt : undefined}
         value={!isEditing ? profile.joinedAt : undefined}
         disabled={disabled}
@@ -177,7 +177,7 @@ function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         id="year"
         name="year"
         required
-        className={style.form.select({ disabled })}
+        className={style.form.select()}
         defaultValue={profile.year}
         disabled={disabled}
       >

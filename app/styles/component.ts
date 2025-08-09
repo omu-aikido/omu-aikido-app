@@ -63,13 +63,9 @@ export const style = {
         "border border-slate-300 dark:border-slate-700 rounded-md shadow-sm",
         "bg-white dark:bg-slate-700 text-slate-900 dark:text-white",
         "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-transparent",
+        "disabled:bg-slate-100 disabled:dark:bg-slate-900 disabled:text-slate-500 disabled:dark:text-slate-400 disabled:cursor-not-allowed",
       ],
-      variants: {
-        disabled: {
-          true: "bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 cursor-not-allowed",
-        },
-        error: { true: "ring-red-400 dark:ring-red-600" },
-      },
+      variants: { error: { true: "ring-red-400 dark:ring-red-600" } },
     }),
     select: tv({
       base: [
@@ -77,21 +73,17 @@ export const style = {
         "border border-slate-300 dark:border-slate-700 rounded-md shadow-sm",
         "bg-white dark:bg-slate-700 text-slate-900 dark:text-white",
         "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+        "disabled:bg-slate-100 disabled:dark:bg-slate-900 disabled:text-slate-500 disabled:dark:text-slate-400 disabled:cursor-not-allowed",
       ],
-      variants: {
-        disabled: {
-          true: "bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 cursor-not-allowed",
-        },
-      },
     }),
     button: tv({
       base: [
         "w-full my-1 flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-md font-medium cursor-pointer",
         "text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600",
         "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-slate-800 transition duration-200",
+        "disabled:opacity-50 disabled:cursor-not-allowed",
       ],
       variants: {
-        disabled: { true: "opacity-50 cursor-not-allowed" },
         type: {
           green:
             "bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600",
@@ -117,9 +109,15 @@ export const style = {
   },
 
   button: tv({
-    base: "py-2 px-4 rounded-md font-medium transition-colors duration-200 shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-slate-800",
+    base: [
+      "py-2 px-4 rounded-md font-medium transition-colors",
+      "duration-200 shadow-sm text-white bg-blue-600",
+      " hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 ",
+      "focus:outline-none focus:ring-2 focus:ring-offset-2 ",
+      "focus:ring-blue-500 dark:focus:ring-offset-slate-800",
+      "disabled:opacity-50 disabled:cursor-not-allowed",
+    ],
     variants: {
-      disabled: { true: "opacity-50 cursor-not-allowed" },
       type: {
         primary: "", // ベーススタイルが primary に相当
         secondary:
