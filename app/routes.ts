@@ -21,4 +21,6 @@ export default [
   route("sign-in", "routes/sign-in.tsx"),
   // Sign Up
   route("sign-up", "routes/sign-up.tsx"),
+  // Email Verification
+  route("verify-email", "routes/verify-email.tsx"),
 ] satisfies RouteConfig

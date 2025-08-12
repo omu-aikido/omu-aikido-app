@@ -83,13 +83,8 @@ export default function SignInPage() {
       } else {
         setError("追加認証が必要です。")
       }
-    } catch (err) {
-      let errorMsg = "サインインに失敗しました"
-      if (typeof err === "object" && err && "errors" in err) {
-        errorMsg =
-          (err as { errors?: { message?: string }[] }).errors?.[0]?.message || errorMsg
-      }
-      setError(errorMsg)
+    } catch {
+      setError("サインインに失敗しました。入力内容をご確認ください。")
     } finally {
       setLoading(false)
     }
