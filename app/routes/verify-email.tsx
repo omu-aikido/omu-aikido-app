@@ -97,24 +97,12 @@ export async function action(args: ActionFunctionArgs) {
         ? unsafeMetadata.joinedAt
         : undefined
 
-    // getGradeAtの処理
-    let getGradeAt: string | null = null
-    if (unsafeMetadata.getGradeAt === null) {
-      getGradeAt = ""
-    } else if (
-      typeof unsafeMetadata.getGradeAt === "string" &&
-      unsafeMetadata.getGradeAt.trim() !== ""
-    ) {
+    let getGradeAt: string = ""
+    if (unsafeMetadata.getGradeAt !== null && typeof unsafeMetadata.getGradeAt === "string" && unsafeMetadata.getGradeAt.trim() !== "") {
       const dateStr = unsafeMetadata.getGradeAt.trim()
-      try {
-        const date = new Date(dateStr)
-        if (!isNaN(date.getTime())) {
-          getGradeAt = date.toISOString()
-        } else {
-          getGradeAt = ""
-        }
-      } catch {
-        getGradeAt = ""
+      const date = new Date(dateStr)
+      if (!isNaN(date.getTime())) {
+        getGradeAt = date.toISOString()
       }
     }
 
@@ -128,11 +116,11 @@ export async function action(args: ActionFunctionArgs) {
     // プロファイルデータをpublicMetadataに移動
     const profileData = { year, grade, joinedAt, getGradeAt, role: "member" as const }
 
-    // publicMetadataを更新し、unsafeMetadataをクリア
+    // publicMetadataを更新し、unsafeMetadataをクリア（1回のAPIコールで両方設定）
     await clerkClient.users.updateUserMetadata(auth.userId, {
       publicMetadata: profileData,
+      unsafeMetadata: {},
     })
-    await clerkClient.users.updateUserMetadata(auth.userId, { unsafeMetadata: {} })
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
@@ -279,7 +267,24 @@ export default function VerifyEmailPage() {
           {errors.general && (
             <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4">
               <div className="flex">
-                <div className="h-5 w-5 text-red-400">⚠️</div>
+                <div className="h-5 w-5 text-red-400" aria-hidden="true">
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <title>警告</title>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span className="sr-only" aria-label="警告">警告</span>
+                </div>
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
                     エラー
