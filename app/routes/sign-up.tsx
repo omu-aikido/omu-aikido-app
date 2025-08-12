@@ -9,11 +9,9 @@ import { Icon } from "~/components/ui/Icon"
 import { grade, year } from "~/lib/utils"
 import { style } from "~/styles/component"
 
-
-
 export async function loader(args: LoaderFunctionArgs) {
   const auth = await getAuth(args)
-  if (auth.isAuthenticated) redirect("/")
+  if (auth.isAuthenticated) return redirect("/")
 }
 
 // MARK: Meta
@@ -69,22 +67,12 @@ export async function clientAction({ request }: { request: Request }) {
     }
 
     if (Object.keys(errors).length > 0) {
-      return {
-        success: false,
-        errors,
-        step: 1
-      }
+      return { success: false, errors, step: 1 }
     }
 
     return {
       success: true,
-      data: {
-        email,
-        newPassword,
-        firstName,
-        lastName,
-        username,
-      },
+      data: { email, newPassword, firstName, lastName, username },
       step: 2,
     }
   }
@@ -116,11 +104,7 @@ export async function clientAction({ request }: { request: Request }) {
     }
 
     if (Object.keys(errors).length > 0) {
-      return {
-        success: false,
-        errors,
-        step: 2
-      }
+      return { success: false, errors, step: 2 }
     }
 
     return {
@@ -429,9 +413,7 @@ export default function SignUpPage({ actionData }: { actionData?: ClientActionDa
           からサインインしてください。
         </div>
         {errors.general && (
-          <div className={style.text.error({ className: "mt-4" })}>
-            {errors.general}
-          </div>
+          <div className={style.text.error({ className: "mt-4" })}>{errors.general}</div>
         )}
       </div>
     )
@@ -530,14 +512,12 @@ export default function SignUpPage({ actionData }: { actionData?: ClientActionDa
           </button>
         </Form>
         {errors.general && (
-          <div className={style.text.error({ className: "mt-4" })}>
-            {errors.general}
-          </div>
+          <div className={style.text.error({ className: "mt-4" })}>{errors.general}</div>
         )}
       </div>
     )
   }
-  
+
   // Step 3 (メール認証) は削除済み - verify-emailページに移動
   // 完了画面やリダイレクトはuseEffectで処理
   return null

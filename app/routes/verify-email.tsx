@@ -10,7 +10,7 @@ import { style } from "~/styles/component"
 
 export async function loader(args: LoaderFunctionArgs) {
   const auth = await getAuth(args)
-  
+
   // 認証済みの場合はホームページにリダイレクト
   if (auth.isAuthenticated) {
     return redirect("/")
@@ -62,10 +62,10 @@ export async function action(args: ActionFunctionArgs) {
     const auth = await getAuth(args)
 
     if (!auth || !auth.userId || userId !== auth.userId) {
-      return new Response(JSON.stringify({ success: false, error: "認証に失敗しました" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      })
+      return new Response(
+        JSON.stringify({ success: false, error: "認証に失敗しました" }),
+        { status: 401, headers: { "Content-Type": "application/json" } },
+      )
     }
 
     // ユーザー情報を取得
@@ -78,7 +78,7 @@ export async function action(args: ActionFunctionArgs) {
       joinedAt?: number
       getGradeAt?: string | null
     }
-    
+
     if (!unsafeMetadata || typeof unsafeMetadata !== "object") {
       return new Response(
         JSON.stringify({ success: false, error: "入力内容に誤りがあります" }),
@@ -120,10 +120,7 @@ export async function action(args: ActionFunctionArgs) {
 
     if (!year || grade === undefined || joinedAt === undefined) {
       return new Response(
-        JSON.stringify({
-          success: false,
-          error: "入力内容に誤りがあります"
-        }),
+        JSON.stringify({ success: false, error: "入力内容に誤りがあります" }),
         { status: 400, headers: { "Content-Type": "application/json" } },
       )
     }
@@ -154,7 +151,7 @@ export default function VerifyEmailPage() {
   const { isLoaded, signUp, setActive } = useSignUp()
   const navigate = useNavigate()
   const fetcher = useFetcher()
-  
+
   const [otpCode, setOtpCode] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isLoading, setIsLoading] = useState(false)
@@ -198,10 +195,7 @@ export default function VerifyEmailPage() {
         const userId = completeSignUp.createdUserId
         if (userId && signUp.emailAddress) {
           setMigrationTriggered(true)
-          fetcher.submit(
-            { email: signUp.emailAddress, userId }, 
-            { method: "POST" }
-          )
+          fetcher.submit({ email: signUp.emailAddress, userId }, { method: "POST" })
         } else {
           navigate("/")
         }
@@ -256,7 +250,9 @@ export default function VerifyEmailPage() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <p className="text-sm text-slate-600">サインアップページにリダイレクトしています...</p>
+          <p className="text-sm text-slate-600">
+            サインアップページにリダイレクトしています...
+          </p>
         </div>
       </div>
     )
@@ -264,9 +260,7 @@ export default function VerifyEmailPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-      <div
-        className="w-full max-w-md space-y-8 px-4 py-8 sm:px-6 sm:py-10 rounded-lg shadow-md bg-white dark:bg-slate-800 transition-colors duration-300 mx-2 sm:mx-0"
-      >
+      <div className="w-full max-w-md space-y-8 px-4 py-8 sm:px-6 sm:py-10 rounded-lg shadow-md bg-white dark:bg-slate-800 transition-colors duration-300 mx-2 sm:mx-0">
         <div className="text-center">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             メール認証
@@ -287,7 +281,9 @@ export default function VerifyEmailPage() {
               <div className="flex">
                 <div className="h-5 w-5 text-red-400">⚠️</div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800 dark:text-red-200">エラー</h3>
+                  <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                    エラー
+                  </h3>
                   <div className="mt-2 text-sm text-red-700 dark:text-red-100">
                     <p>{errors.general}</p>
                   </div>
@@ -297,7 +293,10 @@ export default function VerifyEmailPage() {
           )}
 
           <div>
-            <label htmlFor="otpCode" className="block text-sm font-medium text-slate-700 dark:text-slate-200">
+            <label
+              htmlFor="otpCode"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-200"
+            >
               認証コード
             </label>
             <div className="mt-1">
@@ -309,7 +308,7 @@ export default function VerifyEmailPage() {
                 required
                 maxLength={6}
                 value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                onChange={e => setOtpCode(e.target.value.replace(/\D/g, ""))}
                 className={`${style.form.input()} ${
                   errors.otpCode
                     ? "border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-500 dark:focus:border-red-400 dark:focus:ring-red-400"
@@ -320,7 +319,9 @@ export default function VerifyEmailPage() {
                 pattern="[0-9]*"
               />
               {errors.otpCode && (
-                <p className="mt-2 text-sm text-red-600 dark:text-red-300">{errors.otpCode}</p>
+                <p className="mt-2 text-sm text-red-600 dark:text-red-300">
+                  {errors.otpCode}
+                </p>
               )}
             </div>
           </div>
@@ -330,9 +331,7 @@ export default function VerifyEmailPage() {
               type="submit"
               disabled={isLoading || otpCode.length !== 6}
               className={`${style.button({ type: "primary" })} w-full ${
-                isLoading || otpCode.length !== 6
-                  ? "cursor-not-allowed opacity-50"
-                  : ""
+                isLoading || otpCode.length !== 6 ? "cursor-not-allowed opacity-50" : ""
               } dark:bg-blue-700 dark:hover:bg-blue-600 dark:text-white`}
             >
               {isLoading ? (
@@ -357,11 +356,7 @@ export default function VerifyEmailPage() {
                   : "text-slate-400 dark:text-slate-500 cursor-not-allowed"
               }`}
             >
-              {canResend ? (
-                "認証コードを再送信"
-              ) : (
-                `再送信まで ${countdown}秒`
-              )}
+              {canResend ? "認証コードを再送信" : `再送信まで ${countdown}秒`}
             </button>
           </div>
 
