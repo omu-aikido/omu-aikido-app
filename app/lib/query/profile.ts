@@ -52,13 +52,7 @@ export async function getProfile(input: {
 
     // Profile型に変換
     return { ...parsedProfile.data, id: user.id } as Profile
-  } catch (error) {
-    const status = error instanceof Error ? 422 : 303
-    const headers: Record<string, string> = { "Content-Type": "application/json" }
-    if (status === 303) {
-      headers.Location = "/account/recovery"
-    }
-
+  } catch {
     return null
   }
 }
