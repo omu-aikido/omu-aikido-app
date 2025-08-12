@@ -1,7 +1,6 @@
 import { ClerkProvider } from "@clerk/react-router"
-import { getAuth, rootAuthLoader } from "@clerk/react-router/ssr.server"
+import { rootAuthLoader } from "@clerk/react-router/ssr.server"
 import { getLogger } from "@logtape/logtape"
-import { useState } from "react"
 import {
   isRouteErrorResponse,
   Link,
@@ -14,14 +13,9 @@ import {
 
 import type { Route } from "./+types/root"
 
-import { AccountUi } from "~/components/component/AccountUi"
 import { Footer } from "~/components/component/Footer"
 import { ReactHeader } from "~/components/component/Header"
-import { Sidebar } from "~/components/ui/Sidebar"
-import { getProfile } from "~/lib/query/profile"
-import { Role } from "~/lib/zod"
 import "~/styles/global.css"
-import type { PagePath } from "~/type"
 
 const logger = getLogger("root")
 
@@ -31,48 +25,14 @@ export const links: Route.LinksFunction = () => [
 ]
 
 export async function loader(args: Route.LoaderArgs) {
-  const auth = await getAuth(args)
-  const userId = auth.userId
-  let links: PagePath[]
-  const env = args.context.cloudflare.env
-
-  const profile = await getProfile({ userId, env })
-
-  if (!profile) {
-    links = [
-      { name: "ログイン", href: "/sign-in", desc: "ログインページ" },
-      { name: "アカウント作成", href: "/sign-up", desc: "アカウント作成ページ" },
-    ]
-  } else {
-    links = [
-      { name: "ホーム", href: "/", desc: "ダッシュボード" },
-      { name: "記録", href: "/record", desc: "活動の記録をつけよう" },
-      { name: "アカウント", href: "/account", desc: "アカウント設定" },
-    ]
-
-    const isAdmin = Role.fromString(profile.role)?.isManagement()
-
-    if (isAdmin) {
-      links.push({ name: "管理者", href: "/admin", desc: "管理者ページ" })
-    }
-  }
-
-  return rootAuthLoader(
-    args,
-    () => {
-      return { links }
-    },
-    {
-      secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
-      publishableKey: args.context.cloudflare.env.CLERK_PUBLISHABLE_KEY,
-    },
-  )
+  return rootAuthLoader(args, {
+    secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
+    publishableKey: args.context.cloudflare.env.CLERK_PUBLISHABLE_KEY,
+  })
 }
 
 export default function App(args: Route.ComponentProps) {
   const loaderData = args.loaderData
-  const { links } = loaderData
-  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <html lang="ja">
@@ -89,29 +49,13 @@ export default function App(args: Route.ComponentProps) {
           <Links />
         </head>
         <body className="h-dvh">
-          <ReactHeader title="ポータル">
-            <Sidebar
-              position="right"
-              icon={"  ≡  "}
-              open={sidebarOpen}
-              onOpenChange={setSidebarOpen}
-            >
-              <AccountUi apps={links} />
-            </Sidebar>
-          </ReactHeader>
-          <main className="min-h-4/5 p-3 md:p-6 mx-auto max-w-3xl overflow-y-auto mb-auto">
-            <Outlet />
-          </main>
-          <ScrollRestoration />
-          <Scripts />
-          <Footer />
+          <Outlet />
         </body>
       </ClerkProvider>
     </html>
   )
 }
 export function ErrorBoundary({ error, params }: Route.ErrorBoundaryProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
   let message = "エラーが発生しました"
   let details = "予期しないエラーが発生しました。"
   let status: number = 503
@@ -153,14 +97,7 @@ export function ErrorBoundary({ error, params }: Route.ErrorBoundaryProps) {
       </head>
       <body className="h-dvh bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100">
         <ReactHeader title="ポータル">
-          <Sidebar
-            position="right"
-            icon={"  ≡  "}
-            open={sidebarOpen}
-            onOpenChange={setSidebarOpen}
-          >
-            <p>メニューは利用できません</p>
-          </Sidebar>
+          <></>
         </ReactHeader>
         <main className="min-h-4/5 p-6 mx-auto max-w-3xl text-center">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">
