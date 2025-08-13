@@ -345,12 +345,18 @@ function useMonthlyNavigation(loadedMonth: string) {
 
   const handlePrevMonth = () => {
     const newMonth = subMonths(currentMonth, 1)
-    window.location.href = `/record?month=${format(newMonth, "yyyy-MM")}`
+    setSearchParams({
+      ...Object.fromEntries(searchParams.entries()),
+      month: format(newMonth, "yyyy-MM"),
+    })
   }
 
   const handleNextMonth = () => {
     const newMonth = addMonths(currentMonth, 1)
-    window.location.href = `/record?month=${format(newMonth, "yyyy-MM")}`
+    setSearchParams({
+      ...Object.fromEntries(searchParams.entries()),
+      month: format(newMonth, "yyyy-MM"),
+    })
   }
 
   return {

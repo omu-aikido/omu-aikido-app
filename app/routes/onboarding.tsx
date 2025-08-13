@@ -1,17 +1,15 @@
 import { createClerkClient } from "@clerk/react-router/api.server"
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { useEffect } from "react"
-import type { LoaderFunctionArgs } from "react-router"
 import { redirect, useNavigate } from "react-router"
 
+import type { Route } from "./+types/onboarding"
+
+import { JoinedAtYearRange } from "~/lib/utils"
 import { style } from "~/styles/component"
 
 // MARK: Loader
-export async function loader(
-  args: LoaderFunctionArgs & {
-    context: { cloudflare: { env: { CLERK_SECRET_KEY: string } } }
-  },
-) {
+export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
 
   // 未認証の場合はサインアップページへ
@@ -21,7 +19,7 @@ export async function loader(
 
   try {
     const clerkClient = createClerkClient({
-      secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY!,
+      secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
     })
 
     // ユーザー情報を取得
@@ -57,8 +55,8 @@ export async function loader(
       typeof unsafeMetadata.grade === "number" ? unsafeMetadata.grade : undefined
     const joinedAt =
       typeof unsafeMetadata.joinedAt === "number" &&
-      unsafeMetadata.joinedAt >= new Date().getFullYear() - 4 &&
-      unsafeMetadata.joinedAt <= new Date().getFullYear() + 4
+      unsafeMetadata.joinedAt >= JoinedAtYearRange.min &&
+      unsafeMetadata.joinedAt <= JoinedAtYearRange.max
         ? unsafeMetadata.joinedAt
         : undefined
 

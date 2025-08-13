@@ -24,7 +24,7 @@ export default [
     route("sign-in", "routes/sign-in.tsx"),
     // Sign Up
     route("sign-up", "routes/sign-up.tsx"),
-    // Onboarding
-    route("onboarding", "routes/onboarding.tsx"),
   ]),
+  // Onboarding
+  route("onboarding", "routes/onboarding.tsx"),
 ] satisfies RouteConfig

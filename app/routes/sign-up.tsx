@@ -7,7 +7,7 @@ import { tv } from "tailwind-variants"
 
 import type { Route } from "./+types/sign-up"
 
-import { grade, year } from "~/lib/utils"
+import { grade, JoinedAtYearRange, year } from "~/lib/utils"
 import { style } from "~/styles/component"
 
 // MARK: Loader
@@ -647,8 +647,8 @@ export default function SignUpPage() {
                 }
                 required
                 className={style.form.input({ class: "col-span-2" })}
-                min={new Date().getFullYear() - 4}
-                max={new Date().getFullYear() + 4}
+                min={JoinedAtYearRange.min}
+                max={JoinedAtYearRange.max}
               />
               {errors.joinedAt && (
                 <div className={style.text.error({ className: "col-span-3" })}>

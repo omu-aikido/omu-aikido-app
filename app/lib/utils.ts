@@ -69,3 +69,13 @@ export function toLocalJPString(date: Date): string {
 export function getJST(date: Date): Date {
   return new Date(date.toISOString().split("T").shift() + "T00:00:00+09:00")
 }
+
+export class JoinedAtYearRange {
+  static RANGE = 4
+  static get min() {
+    return new Date().getFullYear() - this.RANGE
+  }
+  static get max() {
+    return new Date().getFullYear()
+  }
+}

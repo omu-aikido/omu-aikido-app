@@ -1,7 +1,7 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { Outlet, redirect, Scripts, ScrollRestoration } from "react-router"
 
-import type { Route } from "./+types/auth"
+import type { Route } from "./+types/unauth"
 
 import { Footer } from "~/components/component/Footer"
 import { ReactHeader } from "~/components/component/Header"
