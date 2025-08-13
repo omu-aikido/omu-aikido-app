@@ -335,19 +335,16 @@ export default function SignUpPage() {
 
         {loading ? (
           <div className="text-center py-8">
-            <div className={`animate-spin mx-auto mb-4 w-8 h-8 border-4 border-t-transparent rounded-full ${
-              isVerificationSuccess 
-                ? "border-green-600" 
-                : "border-blue-600"
-            }`} />
+            <div
+              className={`animate-spin mx-auto mb-4 w-8 h-8 border-4 border-t-transparent rounded-full ${
+                isVerificationSuccess ? "border-green-600" : "border-blue-600"
+              }`}
+            />
             <p className="text-slate-600 dark:text-slate-400 mb-2">
               {isVerificationSuccess ? "認証完了！" : "認証処理中..."}
             </p>
             <p className="text-sm text-slate-500 dark:text-slate-500">
-              {isVerificationSuccess 
-                ? "アカウント設定中..." 
-                : "しばらくお待ちください"
-              }
+              {isVerificationSuccess ? "アカウント設定中..." : "しばらくお待ちください"}
             </p>
           </div>
         ) : (
