@@ -31,16 +31,16 @@ export default {
       "Content-Security-Policy",
       [
         "default-src 'self'",
-        `script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: ${env.CLERK_FRONTEND_API_URL} https://challenges.cloudflare.com https://static.cloudflareinsights.com`,
-        `connect-src 'self' ${env.CLERK_FRONTEND_API_URL} https://cloudflareinsights.com https://challenges.cloudflare.com`,
-        "img-src 'self' https://img.clerk.com data:",
+        `script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: ${env.CLERK_FRONTEND_API_URL} https://challenges.cloudflare.com https://static.cloudflareinsights.com https://*.clerk.com https://*.clerk.dev`,
+        `connect-src 'self' ${env.CLERK_FRONTEND_API_URL} https://cloudflareinsights.com https://challenges.cloudflare.com https://*.clerk.com https://*.clerk.dev`,
+        "img-src 'self' https://img.clerk.com https://*.clerk.com data:",
         "worker-src 'self' blob:",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.clerk.com",
         "font-src 'self' https://fonts.gstatic.com",
-        "frame-src 'self' https://challenges.cloudflare.com",
-        "child-src 'self' blob: https://challenges.cloudflare.com",
+        "frame-src 'self' https://challenges.cloudflare.com https://*.clerk.com",
+        "child-src 'self' blob: https://challenges.cloudflare.com https://*.clerk.com",
         "form-action 'self'",
-      ].join(";"),
+      ].join("; "),
     )
 
     // STSは本番のみ
