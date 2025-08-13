@@ -2,7 +2,7 @@ import { useSignIn } from "@clerk/react-router"
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { getLogger } from "@logtape/logtape"
 import * as React from "react"
-import { Link, redirect, useFetcher } from "react-router"
+import { Link, redirect, useFetcher, useNavigate } from "react-router"
 const logger = getLogger("routes/sign-in")
 
 import type { Route } from "./+types/sign-in"
@@ -61,6 +61,7 @@ export function meta() {
 export default function SignInPage() {
   const { signIn, setActive, isLoaded } = useSignIn()
   const fetcher = useFetcher()
+  const navigate = useNavigate()
   const [email, setEmail] = React.useState("")
   const [password, setPassword] = React.useState("")
   const [error, setError] = React.useState<string | null>(null)
@@ -79,17 +80,12 @@ export default function SignInPage() {
       const result = await signIn.create({ identifier: email, password })
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId })
-        window.location.href = "/"
+        navigate("/")
       } else {
         setError("追加認証が必要です。")
       }
-    } catch (err) {
-      let errorMsg = "サインインに失敗しました"
-      if (typeof err === "object" && err && "errors" in err) {
-        errorMsg =
-          (err as { errors?: { message?: string }[] }).errors?.[0]?.message || errorMsg
-      }
-      setError(errorMsg)
+    } catch {
+      setError("サインインに失敗しました。入力内容をご確認ください。")
     } finally {
       setLoading(false)
     }
