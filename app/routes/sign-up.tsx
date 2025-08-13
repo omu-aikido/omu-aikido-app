@@ -2,7 +2,7 @@ import { useSignUp } from "@clerk/react-router"
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { getLogger } from "@logtape/logtape"
 import * as React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Form, Link, redirect, useActionData, useNavigate } from "react-router"
 import { tv } from "tailwind-variants"
 
@@ -152,6 +152,22 @@ export default function SignUpPage() {
     getGradeAt: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [captchaReady, setCaptchaReady] = useState(false)
+
+  // CAPTCHA要素の準備を確認
+  useEffect(() => {
+    const checkCaptcha = () => {
+      const captchaElement = document.getElementById("clerk-captcha")
+      if (captchaElement) {
+        setCaptchaReady(true)
+      }
+    }
+
+    if (step === "profile") {
+      // DOM更新後にチェック
+      setTimeout(checkCaptcha, 100)
+    }
+  }, [step])
 
   // サーバーサイドバリデーション成功時のClerk登録処理
   const handleClerkSignUp = React.useCallback(
@@ -181,11 +197,32 @@ export default function SignUpPage() {
         await signUp.prepareEmailAddressVerification({ strategy: "email_code" })
         setStep("verify")
       } catch (err) {
+        logger.error("Clerk sign up failed", { error: err })
+
         let errorMsg = "ユーザー登録に失敗しました"
+
+        // Clerkのエラーメッセージを安全に取得
         if (typeof err === "object" && err && "errors" in err) {
-          errorMsg =
-            (err as { errors?: { message?: string }[] }).errors?.[0]?.message || errorMsg
+          const clerkErrors = (err as { errors?: { message?: string; code?: string }[] })
+            .errors
+          if (clerkErrors && clerkErrors.length > 0) {
+            const firstError = clerkErrors[0]
+
+            // 特定のエラーコードに基づいてユーザーフレンドリーなメッセージを提供
+            if (firstError.code === "form_identifier_exists") {
+              errorMsg = "このメールアドレスは既に使用されています"
+            } else if (firstError.code === "form_password_pwned") {
+              errorMsg =
+                "このパスワードは安全ではありません。別のパスワードを使用してください"
+            } else if (firstError.code === "form_username_exists") {
+              errorMsg = "このユーザー名は既に使用されています"
+            } else if (firstError.message && firstError.message.length < 100) {
+              // メッセージが短い場合のみ表示（長いスタックトレースなどを避ける）
+              errorMsg = firstError.message
+            }
+          }
         }
+
         setErrors({ general: errorMsg })
       } finally {
         setLoading(false)
@@ -282,45 +319,29 @@ export default function SignUpPage() {
         await setActive({ session: signUpAttempt.createdSessionId })
         navigate("/onboarding")
       } else {
-        logger.error("Email verification not complete", { status: signUpAttempt.status })
+        logger.warn("Email verification incomplete", { status: signUpAttempt.status })
         setErrors({ general: "認証が完了しませんでした。再度お試しください。" })
       }
     } catch (err) {
-      logger.error("Email verification error", { error: err })
+      logger.error("Email verification failed", { error: err })
 
       let errorMessage = "認証に失敗しました。再度お試しください。"
 
-      // ネットワークエラーの検出
-      if (err instanceof TypeError && err.message.includes("fetch")) {
-        errorMessage =
-          "ネットワークエラーが発生しました。インターネット接続を確認してから再度お試しください。"
-      } else if (err instanceof Error && err.name === "TimeoutError") {
-        errorMessage =
-          "処理がタイムアウトしました。しばらく待ってから再度お試しください。"
-      }
-
-      // Clerkエラーの詳細を取得
+      // Clerkの認証エラーを安全に処理
       if (typeof err === "object" && err && "errors" in err) {
-        const clerkError = err as { errors?: { message?: string; code?: string }[] }
-        if (clerkError.errors?.[0]?.message) {
-          errorMessage = clerkError.errors[0].message
-        }
+        const clerkErrors = (err as { errors?: { message?: string; code?: string }[] })
+          .errors
+        if (clerkErrors && clerkErrors.length > 0) {
+          const firstError = clerkErrors[0]
 
-        // 特定のエラーコードに対するユーザーフレンドリーなメッセージ
-        const errorCode = clerkError.errors?.[0]?.code
-        if (errorCode === "form_code_incorrect") {
-          errorMessage =
-            "認証コードが正しくありません。メールを確認して正しいコードを入力してください。"
-        } else if (errorCode === "verification_expired") {
-          errorMessage =
-            "認証コードの有効期限が切れています。新しいコードをリクエストしてください。"
-        } else if (errorCode === "verification_failed") {
-          errorMessage = "認証に失敗しました。しばらく待ってから再度お試しください。"
-        } else if (errorCode === "rate_limit_exceeded") {
-          errorMessage =
-            "試行回数が上限に達しました。しばらく待ってから再度お試しください。"
-        } else if (errorCode === "session_token_invalid") {
-          errorMessage = "セッションが無効です。最初からやり直してください。"
+          if (firstError.code === "form_code_incorrect") {
+            errorMessage = "認証コードが正しくありません"
+          } else if (firstError.code === "verification_expired") {
+            errorMessage =
+              "認証コードの有効期限が切れています。新しいコードを取得してください"
+          } else if (firstError.message && firstError.message.length < 100) {
+            errorMessage = firstError.message
+          }
         }
       }
 
@@ -764,7 +785,14 @@ export default function SignUpPage() {
                 </div>
               )}
 
-              <div id="clerk-captcha" className="col-span-3" />
+              <div className="col-span-3 mb-4">
+                <div id="clerk-captcha" className="flex justify-center" />
+                {step === "profile" && !captchaReady && (
+                  <p className="text-xs text-slate-500 text-center mt-1">
+                    セキュリティ認証を準備中...
+                  </p>
+                )}
+              </div>
 
               <div className="col-span-3 flex gap-2">
                 <button

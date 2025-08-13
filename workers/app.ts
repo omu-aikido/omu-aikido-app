@@ -22,28 +22,35 @@ export default {
 
     const response = await requestHandler(request, { cloudflare: { env, ctx } })
 
+    console.log(env)
+
+    // CSPヘッダーを本番・開発両方に適用（開発時もブラウザエラーを防ぐため）
+    response.headers.set("X-Frame-Options", "DENY")
+    response.headers.set("X-Content-Type-Options", "nosniff")
+    response.headers.set(
+      "Content-Security-Policy",
+      [
+        "default-src 'self'",
+        `script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: ${env.CLERK_FRONTEND_API_URL} https://challenges.cloudflare.com https://static.cloudflareinsights.com`,
+        `connect-src 'self' ${env.CLERK_FRONTEND_API_URL} https://cloudflareinsights.com https://challenges.cloudflare.com`,
+        "img-src 'self' https://img.clerk.com data:",
+        "worker-src 'self' blob:",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "frame-src 'self' https://challenges.cloudflare.com",
+        "child-src 'self' blob: https://challenges.cloudflare.com",
+        "form-action 'self'",
+      ].join(";"),
+    )
+
+    // STSは本番のみ
     if (env.CLERK_PUBLISHABLE_KEY.startsWith("pk_live")) {
-      response.headers.set("X-Frame-Options", "DENY")
-      response.headers.set("X-Content-Type-Options", "nosniff")
-      response.headers.set(
-        "Content-Security-Policy",
-        [
-          "default-src 'self'",
-          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.omu-aikido.com https://challenges.cloudflare.com",
-          "connect-src 'self' https://clerk.omu-aikido.com",
-          "img-src 'self' https://img.clerk.com",
-          "worker-src 'self' blob:",
-          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-          "font-src 'self' https://fonts.gstatic.com",
-          "frame-src 'self' https://challenges.cloudflare.com",
-          "form-action 'self'",
-        ].join(";"),
-      )
       response.headers.set(
         "Strict-Transport-Security",
         "max-age=63072000; includeSubDomains; preload",
       )
     }
+
     return response
   },
 } satisfies ExportedHandler<Env>
