@@ -1,5 +1,6 @@
 import { useSignUp } from "@clerk/react-router"
 import { getAuth } from "@clerk/react-router/ssr.server"
+import { getLogger } from "@logtape/logtape"
 import * as React from "react"
 import { useState } from "react"
 import { Form, Link, redirect, useActionData, useNavigate } from "react-router"
@@ -9,6 +10,8 @@ import type { Route } from "./+types/sign-up"
 
 import { grade, JoinedAtYearRange, year } from "~/lib/utils"
 import { style } from "~/styles/component"
+
+const logger = getLogger("auth")
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
@@ -135,6 +138,7 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false)
   const [code, setCode] = useState("")
   const [isVerificationSuccess, setIsVerificationSuccess] = useState(false)
+  const [resendCooldown, setResendCooldown] = useState(0)
   const [formData, setFormData] = useState({
     email: "",
     newPassword: "",
@@ -278,13 +282,80 @@ export default function SignUpPage() {
         await setActive({ session: signUpAttempt.createdSessionId })
         navigate("/onboarding")
       } else {
+        logger.error("Email verification not complete", { status: signUpAttempt.status })
         setErrors({ general: "認証が完了しませんでした。再度お試しください。" })
       }
-    } catch {
-      setErrors({ general: "認証に失敗しました。再度お試しください。" })
+    } catch (err) {
+      logger.error("Email verification error", { error: err })
+
+      let errorMessage = "認証に失敗しました。再度お試しください。"
+
+      // ネットワークエラーの検出
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        errorMessage =
+          "ネットワークエラーが発生しました。インターネット接続を確認してから再度お試しください。"
+      } else if (err instanceof Error && err.name === "TimeoutError") {
+        errorMessage =
+          "処理がタイムアウトしました。しばらく待ってから再度お試しください。"
+      }
+
+      // Clerkエラーの詳細を取得
+      if (typeof err === "object" && err && "errors" in err) {
+        const clerkError = err as { errors?: { message?: string; code?: string }[] }
+        if (clerkError.errors?.[0]?.message) {
+          errorMessage = clerkError.errors[0].message
+        }
+
+        // 特定のエラーコードに対するユーザーフレンドリーなメッセージ
+        const errorCode = clerkError.errors?.[0]?.code
+        if (errorCode === "form_code_incorrect") {
+          errorMessage =
+            "認証コードが正しくありません。メールを確認して正しいコードを入力してください。"
+        } else if (errorCode === "verification_expired") {
+          errorMessage =
+            "認証コードの有効期限が切れています。新しいコードをリクエストしてください。"
+        } else if (errorCode === "verification_failed") {
+          errorMessage = "認証に失敗しました。しばらく待ってから再度お試しください。"
+        } else if (errorCode === "rate_limit_exceeded") {
+          errorMessage =
+            "試行回数が上限に達しました。しばらく待ってから再度お試しください。"
+        } else if (errorCode === "session_token_invalid") {
+          errorMessage = "セッションが無効です。最初からやり直してください。"
+        }
+      }
+
+      setErrors({ general: errorMessage })
       if (!isVerificationSuccess) {
         setLoading(false)
       }
+    }
+  }
+
+  // 認証コード再送機能
+  const handleResendCode = async () => {
+    if (!isLoaded || !signUp || resendCooldown > 0) return
+
+    try {
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" })
+      setResendCooldown(60) // 60秒のクールダウン
+
+      // クールダウンタイマー
+      const timer = setInterval(() => {
+        setResendCooldown(prev => {
+          if (prev <= 1) {
+            clearInterval(timer)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+
+      setErrors({})
+    } catch (err) {
+      logger.error("Failed to resend verification code", { error: err })
+      setErrors({
+        general: "認証コードの再送に失敗しました。しばらく待ってから再度お試しください。",
+      })
     }
   }
 
@@ -367,15 +438,30 @@ export default function SignUpPage() {
                 className={style.form.input({ class: "col-span-2" })}
                 required
                 disabled={loading}
+                placeholder="認証コードを入力"
               />
               <button
                 type="submit"
                 className={style.button({ type: "primary", class: "col-span-3" })}
-                disabled={loading}
+                disabled={loading || !code.trim()}
               >
                 認証する
               </button>
             </Form>
+
+            <div className="mt-4 text-center">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                認証コードが届かない場合
+              </p>
+              <button
+                type="button"
+                onClick={handleResendCode}
+                disabled={resendCooldown > 0}
+                className={style.button({ type: "secondary", class: "text-sm" })}
+              >
+                {resendCooldown > 0 ? `再送まで ${resendCooldown}秒` : "認証コードを再送"}
+              </button>
+            </div>
           </>
         )}
 
