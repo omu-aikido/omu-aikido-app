@@ -2,8 +2,5 @@ import { configure, getConsoleSink } from "@logtape/logtape"
 
 await configure({
   sinks: { console: getConsoleSink() },
-  loggers: [
-    { category: "record", lowestLevel: "debug", sinks: ["console"] },
-    { category: "auth", lowestLevel: "error", sinks: ["console"] },
-  ],
+  loggers: [{ category: "record", lowestLevel: "debug", sinks: ["console"] }],
 })

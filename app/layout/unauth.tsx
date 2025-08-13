@@ -1,5 +1,5 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
-import { Outlet, redirect, Scripts, ScrollRestoration } from "react-router"
+import { Outlet, redirect } from "react-router"
 
 import type { Route } from "./+types/unauth"
 
@@ -26,8 +26,6 @@ export default function App() {
       <main className="min-h-4/5 p-3 md:p-6 mx-auto max-w-3xl overflow-y-auto mb-auto">
         <Outlet />
       </main>
-      <ScrollRestoration />
-      <Scripts />
       <Footer />
     </div>
   )

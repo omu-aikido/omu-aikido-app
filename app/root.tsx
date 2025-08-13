@@ -50,6 +50,8 @@ export default function App(args: Route.ComponentProps) {
         </head>
         <body className="h-dvh">
           <Outlet />
+          <ScrollRestoration />
+          <Scripts />
         </body>
       </ClerkProvider>
     </html>

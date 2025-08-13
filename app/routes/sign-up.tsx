@@ -1,6 +1,5 @@
 import { useSignUp } from "@clerk/react-router"
 import { getAuth } from "@clerk/react-router/ssr.server"
-import { getLogger } from "@logtape/logtape"
 import * as React from "react"
 import { useEffect, useState } from "react"
 import { Form, Link, redirect, useActionData, useNavigate } from "react-router"
@@ -10,8 +9,6 @@ import type { Route } from "./+types/sign-up"
 
 import { grade, JoinedAtYearRange, year } from "~/lib/utils"
 import { style } from "~/styles/component"
-
-const logger = getLogger("auth")
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
@@ -158,16 +155,21 @@ export default function SignUpPage() {
   useEffect(() => {
     const checkCaptcha = () => {
       const captchaElement = document.getElementById("clerk-captcha")
-      if (captchaElement) {
+      if (captchaElement && isLoaded) {
         setCaptchaReady(true)
+        // CAPTCHAが正しく表示されるように再描画を促す
+        captchaElement.innerHTML = ""
       }
     }
 
-    if (step === "profile") {
+    if (step === "profile" && isLoaded) {
       // DOM更新後にチェック
-      setTimeout(checkCaptcha, 100)
+      const timer = setTimeout(checkCaptcha, 300)
+      return () => clearTimeout(timer)
+    } else {
+      setCaptchaReady(false)
     }
-  }, [step])
+  }, [step, isLoaded])
 
   // サーバーサイドバリデーション成功時のClerk登録処理
   const handleClerkSignUp = React.useCallback(
@@ -197,8 +199,6 @@ export default function SignUpPage() {
         await signUp.prepareEmailAddressVerification({ strategy: "email_code" })
         setStep("verify")
       } catch (err) {
-        logger.error("Clerk sign up failed", { error: err })
-
         let errorMsg = "ユーザー登録に失敗しました"
 
         // Clerkのエラーメッセージを安全に取得
@@ -319,36 +319,13 @@ export default function SignUpPage() {
         await setActive({ session: signUpAttempt.createdSessionId })
         navigate("/onboarding")
       } else {
-        logger.warn("Email verification incomplete", { status: signUpAttempt.status })
         setErrors({ general: "認証が完了しませんでした。再度お試しください。" })
-      }
-    } catch (err) {
-      logger.error("Email verification failed", { error: err })
-
-      let errorMessage = "認証に失敗しました。再度お試しください。"
-
-      // Clerkの認証エラーを安全に処理
-      if (typeof err === "object" && err && "errors" in err) {
-        const clerkErrors = (err as { errors?: { message?: string; code?: string }[] })
-          .errors
-        if (clerkErrors && clerkErrors.length > 0) {
-          const firstError = clerkErrors[0]
-
-          if (firstError.code === "form_code_incorrect") {
-            errorMessage = "認証コードが正しくありません"
-          } else if (firstError.code === "verification_expired") {
-            errorMessage =
-              "認証コードの有効期限が切れています。新しいコードを取得してください"
-          } else if (firstError.message && firstError.message.length < 100) {
-            errorMessage = firstError.message
-          }
-        }
-      }
-
-      setErrors({ general: errorMessage })
-      if (!isVerificationSuccess) {
         setLoading(false)
       }
+    } catch {
+      const errorMessage = "認証に失敗しました。再度お試しください。"
+      setErrors({ general: errorMessage })
+      setLoading(false)
     }
   }
 
@@ -372,8 +349,7 @@ export default function SignUpPage() {
       }, 1000)
 
       setErrors({})
-    } catch (err) {
-      logger.error("Failed to resend verification code", { error: err })
+    } catch {
       setErrors({
         general: "認証コードの再送に失敗しました。しばらく待ってから再度お試しください。",
       })
@@ -786,11 +762,24 @@ export default function SignUpPage() {
               )}
 
               <div className="col-span-3 mb-4">
-                <div id="clerk-captcha" className="flex justify-center" />
+                <div
+                  id="clerk-captcha"
+                  className="flex justify-center min-h-[80px]"
+                  style={{
+                    visibility: captchaReady ? "visible" : "hidden",
+                    opacity: captchaReady ? 1 : 0,
+                    transition: "opacity 0.3s ease",
+                  }}
+                />
                 {step === "profile" && !captchaReady && (
-                  <p className="text-xs text-slate-500 text-center mt-1">
-                    セキュリティ認証を準備中...
-                  </p>
+                  <div className="flex justify-center items-center min-h-[80px]">
+                    <div className="text-center">
+                      <div className="animate-spin mx-auto mb-2 w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full" />
+                      <p className="text-xs text-slate-500">
+                        セキュリティ認証を準備中...
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
 
