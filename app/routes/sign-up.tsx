@@ -764,12 +764,9 @@ export default function SignUpPage() {
               <div className="col-span-3 mb-4">
                 <div
                   id="clerk-captcha"
-                  className="flex justify-center min-h-[80px]"
-                  style={{
-                    visibility: captchaReady ? "visible" : "hidden",
-                    opacity: captchaReady ? 1 : 0,
-                    transition: "opacity 0.3s ease",
-                  }}
+                  data-cl-size="flexible"
+                  data-cl-theme={window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? "dark" : "light"}
+                  data-cl-language="ja-JP"
                 />
                 {step === "profile" && !captchaReady && (
                   <div className="flex justify-center items-center min-h-[80px]">
