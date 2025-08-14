@@ -29,7 +29,9 @@ export default function VerifyPage() {
   const navigate = useNavigate()
 
   const [code, setCode] = useState("")
-  const [errors, setErrors] = React.useState<ClerkAPIError[] | Array<Record<string, string>> | undefined>()
+  const [errors, setErrors] = React.useState<
+    ClerkAPIError[] | Array<Record<string, string>> | undefined
+  >()
   const [loading, setLoading] = useState(false)
   const [isVerificationSuccess, setIsVerificationSuccess] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
@@ -54,12 +56,10 @@ export default function VerifyPage() {
       } else {
         // eslint-disable-next-line no-console
         console.error(JSON.stringify(signUpAttempt, null, 2))
-        setErrors([{
-          general: "認証が完了しませんでした。再度お試しください。"
-        }])
+        setErrors([{ general: "認証が完了しませんでした。再度お試しください。" }])
         setLoading(false)
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       if (isClerkAPIResponseError(err)) setErrors(err.errors)
       // eslint-disable-next-line no-console
@@ -91,9 +91,12 @@ export default function VerifyPage() {
 
       setErrors(undefined)
     } catch {
-      setErrors([{
-        general: "認証コードの再送に失敗しました。しばらく待ってから再度お試しください。",
-      }])
+      setErrors([
+        {
+          general:
+            "認証コードの再送に失敗しました。しばらく待ってから再度お試しください。",
+        },
+      ])
     }
   }
 
