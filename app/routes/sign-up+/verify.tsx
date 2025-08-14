@@ -1,5 +1,7 @@
 import { useSignUp } from "@clerk/react-router"
+import { isClerkAPIResponseError } from "@clerk/react-router/errors"
 import { getAuth } from "@clerk/react-router/ssr.server"
+import type { ClerkAPIError } from "@clerk/types"
 import * as React from "react"
 import { useState } from "react"
 import type { LoaderFunctionArgs } from "react-router"
@@ -27,7 +29,7 @@ export default function VerifyPage() {
   const navigate = useNavigate()
 
   const [code, setCode] = useState("")
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [errors, setErrors] = React.useState<ClerkAPIError[] | Array<Record<string, string>> | undefined>()
   const [loading, setLoading] = useState(false)
   const [isVerificationSuccess, setIsVerificationSuccess] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
@@ -38,10 +40,10 @@ export default function VerifyPage() {
   // メール認証コード検証の処理
   const handleVerifySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!isLoaded || !signUp || loading || signUp.status === "complete") return
+    if (!isLoaded) return
 
     setLoading(true)
-    setErrors({})
+    setErrors(undefined)
 
     try {
       const signUpAttempt = await signUp.attemptEmailAddressVerification({ code })
@@ -50,16 +52,20 @@ export default function VerifyPage() {
         await setActive({ session: signUpAttempt.createdSessionId })
         navigate("/onboarding")
       } else {
-        setErrors({
-          general:
-            "認証が完了しませんでした。再度お試しください。" +
-            signUpAttempt.unverifiedFields.join(", "),
-        })
+        // eslint-disable-next-line no-console
+        console.error(JSON.stringify(signUpAttempt, null, 2))
+        setErrors([{
+          general: "認証が完了しませんでした。再度お試しください。"
+        }])
         setLoading(false)
       }
-    } catch {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      if (isClerkAPIResponseError(err)) setErrors(err.errors)
+      // eslint-disable-next-line no-console
+      console.error(JSON.stringify(err, null, 2))
       const errorMessage = "認証に失敗しました。再度お試しください。"
-      setErrors({ general: errorMessage })
+      setErrors([{ general: errorMessage }])
       setLoading(false)
     }
   }
@@ -83,11 +89,11 @@ export default function VerifyPage() {
         })
       }, 1000)
 
-      setErrors({})
+      setErrors(undefined)
     } catch {
-      setErrors({
+      setErrors([{
         general: "認証コードの再送に失敗しました。しばらく待ってから再度お試しください。",
-      })
+      }])
     }
   }
 
@@ -201,8 +207,12 @@ export default function VerifyPage() {
         )
       })()}
 
-      {errors.general && (
-        <div className={style.text.error({ className: "mt-4" })}>{errors.general}</div>
+      {errors && (
+        <ul>
+          {errors.map((el, index) => (
+            <li key={index}>{el.longMessage}</li>
+          ))}
+        </ul>
       )}
     </div>
   )
