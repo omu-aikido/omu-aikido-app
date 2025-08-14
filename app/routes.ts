@@ -1,4 +1,4 @@
-import { type RouteConfig, index, layout, route } from "@react-router/dev/routes"
+import { type RouteConfig, index, layout, prefix, route } from "@react-router/dev/routes"
 
 export default [
   layout("layout/auth.tsx", [
@@ -23,7 +23,11 @@ export default [
     // Sign In
     route("sign-in", "routes/sign-in.tsx"),
     // Sign Up
-    route("sign-up", "routes/sign-up.tsx"),
+    ...prefix("sign-up", [
+      index("routes/sign-up.tsx"),
+      route("verify", "routes/sign-up+/verify.tsx"),
+      route("sso-callback", "routes/sign-up+/sso-callback.tsx"),
+    ]),
   ]),
   // Onboarding
   route("onboarding", "routes/onboarding.tsx"),
