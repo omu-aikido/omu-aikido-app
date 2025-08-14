@@ -22,8 +22,6 @@ export default {
 
     const response = await requestHandler(request, { cloudflare: { env, ctx } })
 
-    console.log(env)
-
     // CSPヘッダーを本番・開発両方に適用（開発時もブラウザエラーを防ぐため）
     response.headers.set("X-Frame-Options", "DENY")
     response.headers.set("X-Content-Type-Options", "nosniff")
