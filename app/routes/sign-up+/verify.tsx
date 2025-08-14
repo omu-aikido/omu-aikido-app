@@ -50,7 +50,11 @@ export default function VerifyPage() {
         await setActive({ session: signUpAttempt.createdSessionId })
         navigate("/onboarding")
       } else {
-        setErrors({ general: "認証が完了しませんでした。再度お試しください。"+ signUpAttempt.unverifiedFields.join(", ") })
+        setErrors({
+          general:
+            "認証が完了しませんでした。再度お試しください。" +
+            signUpAttempt.unverifiedFields.join(", "),
+        })
         setLoading(false)
       }
     } catch {
