@@ -795,7 +795,7 @@ export default function SignUpPage() {
                     ? "dark"
                     : "light"
                 }
-                data-cl-language="ja-JP"
+                data-cl-language="ja-jp"
               />
             </div>
 
