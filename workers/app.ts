@@ -41,6 +41,8 @@ export default {
       ].join("; "),
     )
 
+    response.headers.set("Permissions-Policy", "browsing-topics=(), interest-cohort=()")
+
     // STSは本番のみ
     if (env.CLERK_PUBLISHABLE_KEY.startsWith("pk_live")) {
       response.headers.set(

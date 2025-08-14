@@ -1,12 +1,13 @@
 import { useSignUp } from "@clerk/react-router"
 import { getAuth } from "@clerk/react-router/ssr.server"
 import * as React from "react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Link, redirect, useFetcher, useNavigate } from "react-router"
 import { tv } from "tailwind-variants"
 
 import type { Route } from "./+types/sign-up"
 
+import { Icon } from "~/components/ui/Icon"
 import { grade, JoinedAtYearRange, year } from "~/lib/utils"
 import { style } from "~/styles/component"
 
@@ -110,41 +111,20 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 
 // MARK: Component
 export default function SignUpPage() {
-  const { signUp, isLoaded, setActive } = useSignUp()
+  const { signUp, isLoaded } = useSignUp()
   const fetcher = useFetcher()
   const navigate = useNavigate()
 
-  const [step, setStep] = useState<"basic" | "personal" | "profile" | "verify">("basic")
+  const [step, setStep] = useState<"basic" | "personal" | "profile">("basic")
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
-  const [code, setCode] = useState("")
-  const [isVerificationSuccess, setIsVerificationSuccess] = useState(false)
-  const [resendCooldown, setResendCooldown] = useState(0)
   const [isSignUpCreated, setIsSignUpCreated] = useState(false)
-  const [canSubmit, setCanSubmit] = useState(false) // 送信可能状態フラグ
-  const [formData, setFormData] = useState({
-    email: "",
-    newPassword: "",
-    confirmPassword: "",
-    firstName: "",
-    lastName: "",
-    username: "",
-    year: "b1",
-    grade: "0",
-    joinedAt: new Date().getFullYear().toString(),
-    getGradeAt: "",
-  })
 
-  // シンプルなClerkの準備状態確認
-  useEffect(() => {
-    if (step === "profile" && isLoaded && signUp) {
-      setCanSubmit(true) // Clerkが準備完了したら送信可能
-    } else if (step === "verify" && isLoaded && signUp) {
-      setCanSubmit(true) // 認証ステップでも送信可能
-    } else {
-      setCanSubmit(false)
-    }
-  }, [step, isLoaded, signUp])
+  // fetcher.Form用のref
+  const formRef = React.useRef<HTMLFormElement>(null)
+
+  // Clerkの準備状態確認（最終ステップのみ送信可能）
+  const canSubmit = step === "profile" && isLoaded && signUp
 
   // クライアントサイドでのClerk登録処理
   const handleClerkSignUp = React.useCallback(
@@ -187,7 +167,7 @@ export default function SignUpPage() {
 
         await signUp.create(signUpParams)
         await signUp.prepareEmailAddressVerification({ strategy: "email_code" })
-        setStep("verify")
+        navigate("/sign-up/verify")
       } catch (err) {
         setIsSignUpCreated(false) // エラー時にフラグをリセット
         let errorMsg = "ユーザー登録に失敗しました"
@@ -210,7 +190,6 @@ export default function SignUpPage() {
             } else if (firstError.code === "captcha_invalid") {
               errorMsg = "セキュリティ認証に失敗しました。再度お試しください"
             } else if (firstError.message && firstError.message.length < 100) {
-              // メッセージが短い場合のみ表示（長いスタックトレースなどを避ける）
               errorMsg = firstError.message
             }
           }
@@ -221,7 +200,7 @@ export default function SignUpPage() {
         setLoading(false)
       }
     },
-    [isLoaded, signUp, isSignUpCreated],
+    [isLoaded, signUp, isSignUpCreated, navigate],
   )
   const nextStep = () => {
     if (step === "basic") setStep("personal")
@@ -241,42 +220,56 @@ export default function SignUpPage() {
   const validateStep = (currentStep: string): boolean => {
     const newErrors: Record<string, string> = {}
 
+    if (!formRef.current) return false
+    const formData = new FormData(formRef.current)
+
     if (currentStep === "basic") {
-      if (!formData.email) {
+      const email = formData.get("email") as string
+      const newPassword = formData.get("newPassword") as string
+      const confirmPassword = formData.get("confirmPassword") as string
+
+      if (!email) {
         newErrors.email = "メールアドレスは必須です"
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         newErrors.email = "有効なメールアドレスを入力してください"
       }
 
-      if (!formData.newPassword) {
+      if (!newPassword) {
         newErrors.newPassword = "パスワードは必須です"
-      } else if (formData.newPassword.length < 8) {
+      } else if (newPassword.length < 8) {
         newErrors.newPassword = "パスワードは8文字以上である必要があります"
       }
 
-      if (!formData.confirmPassword) {
+      if (!confirmPassword) {
         newErrors.confirmPassword = "パスワード確認は必須です"
-      } else if (formData.newPassword !== formData.confirmPassword) {
+      } else if (newPassword !== confirmPassword) {
         newErrors.confirmPassword = "パスワードが一致しません"
       }
     } else if (currentStep === "personal") {
-      if (!formData.firstName) {
+      const firstName = formData.get("firstName") as string
+      const lastName = formData.get("lastName") as string
+
+      if (!firstName) {
         newErrors.firstName = "名は必須です"
       }
-      if (!formData.lastName) {
+      if (!lastName) {
         newErrors.lastName = "姓は必須です"
       }
     } else if (currentStep === "profile") {
-      if (!formData.year) {
+      const year = formData.get("year") as string
+      const grade = formData.get("grade") as string
+      const joinedAt = formData.get("joinedAt") as string
+
+      if (!year) {
         newErrors.year = "学年は必須です"
       }
-      if (!formData.grade) {
+      if (!grade) {
         newErrors.grade = "級段位は必須です"
       }
-      if (!formData.joinedAt) {
+      if (!joinedAt) {
         newErrors.joinedAt = "入部年度は必須です"
       } else {
-        const joinedAtNum = parseInt(formData.joinedAt)
+        const joinedAtNum = parseInt(joinedAt)
         if (isNaN(joinedAtNum) || joinedAtNum < 2000 || joinedAtNum > 2030) {
           newErrors.joinedAt = "入部年度は2000年から2030年の間で入力してください"
         }
@@ -287,59 +280,16 @@ export default function SignUpPage() {
     return Object.keys(newErrors).length === 0
   }
 
-  // ステップ進行処理
-  const handleNext = () => {
+  // ステップ進行処理（fetcher.Form用）
+  const handleNext = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     if (validateStep(step)) {
       if (step === "profile") {
+        // submitはfetcher.FormのonSubmitで
         setLoading(true)
-        setCanSubmit(false) // 送信後は無効化
-        fetcher.submit(
-          {
-            email: formData.email,
-            newPassword: formData.newPassword,
-            confirmPassword: formData.confirmPassword,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            username: formData.username,
-            year: formData.year,
-            grade: formData.grade,
-            joinedAt: formData.joinedAt,
-            getGradeAt: formData.getGradeAt,
-          },
-          { method: "post" },
-        )
       } else {
         nextStep()
       }
-    }
-  }
-
-  // メール認証コード検証の処理
-  const handleVerifySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!isLoaded || !signUp || loading || signUp.status === "complete" || !canSubmit)
-      return
-
-    setLoading(true)
-    setCanSubmit(false)
-    setErrors({})
-
-    try {
-      const signUpAttempt = await signUp.attemptEmailAddressVerification({ code })
-      if (signUpAttempt.status === "complete") {
-        setIsVerificationSuccess(true)
-        await setActive({ session: signUpAttempt.createdSessionId })
-        navigate("/onboarding")
-      } else {
-        setErrors({ general: "認証が完了しませんでした。再度お試しください。" })
-        setLoading(false)
-        setCanSubmit(true)
-      }
-    } catch {
-      const errorMessage = "認証に失敗しました。再度お試しください。"
-      setErrors({ general: errorMessage })
-      setLoading(false)
-      setCanSubmit(true) // エラー時は再送信可能
     }
   }
 
@@ -347,7 +297,6 @@ export default function SignUpPage() {
   React.useEffect(() => {
     if (fetcher.data && fetcher.state === "idle") {
       setLoading(false)
-
       const result = fetcher.data as {
         success: boolean
         errors?: Record<string, string>
@@ -363,11 +312,9 @@ export default function SignUpPage() {
           getGradeAt: string | null
         }
       }
-
       if (result.errors) {
         const serverErrors = result.errors
         setErrors(serverErrors)
-
         // エラーがあるステップに戻る
         if (
           serverErrors.email ||
@@ -399,209 +346,159 @@ export default function SignUpPage() {
     }
   }, [fetcher.data, fetcher.state, handleClerkSignUp])
 
-  // 認証コード再送機能
-  const handleResendCode = async () => {
-    if (!isLoaded || !signUp || resendCooldown > 0 || !isSignUpCreated) return
-
-    try {
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" })
-      setResendCooldown(60) // 60秒のクールダウン
-
-      // クールダウンタイマー
-      const timer = setInterval(() => {
-        setResendCooldown(prev => {
-          if (prev <= 1) {
-            clearInterval(timer)
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
-
-      setErrors({})
-    } catch {
-      setErrors({
-        general: "認証コードの再送に失敗しました。しばらく待ってから再度お試しください。",
-      })
-    }
-  }
-
-  if (step === "verify") {
-    return (
-      <div className={style.card.container({ class: "max-w-md mx-auto" })}>
-        <ProgressIndicator step={step} />
-        <h1 className={style.text.sectionTitle()}>メール認証</h1>
-        {(() => {
-          if (loading) {
-            return (
-              <div className="text-center py-8">
-                <div className="animate-spin mx-auto mb-4 w-8 h-8 border-4 border-t-transparent rounded-ful border-blue-600" />
-                <p className="text-slate-600 dark:text-slate-400 mb-2">処理中...</p>
-                <p className="text-sm text-slate-500 dark:text-slate-500">
-                  しばらくお待ちください
-                </p>
-              </div>
-            )
-          }
-
-          if (isVerificationSuccess) {
-            return (
-              <div className="text-center py-8">
-                <div className="animate-spin mx-auto mb-4 w-8 h-8 border-4 border-t-transparent rounded-full border-green-600" />
-                <p className="text-sm text-slate-500 dark:text-slate-500">
-                  ローディング中...
-                </p>
-              </div>
-            )
-          }
-
-          // 3. 入力フォーム
-          return (
-            <>
-              <p className="mb-4 text-slate-600 dark:text-slate-400">
-                メールに届いた認証コードを入力してください
-              </p>
-              <form
-                onSubmit={handleVerifySubmit}
-                className={style.form.container({ vertical: true })}
-              >
-                <label htmlFor="code" className={style.form.label({ necessary: true })}>
-                  認証コード
-                </label>
-                <input
-                  id="code"
-                  name="code"
-                  value={code}
-                  onChange={e => setCode(e.target.value)}
-                  className={style.form.input({ class: "col-span-2" })}
-                  required
-                  disabled={loading}
-                  placeholder="認証コードを入力"
-                />
-                <button
-                  type="submit"
-                  className={style.button({ type: "primary", class: "col-span-3" })}
-                  disabled={!canSubmit || !code.trim()}
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    {!canSubmit && (
-                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                    )}
-                    <span>
-                      {!canSubmit
-                        ? isVerificationSuccess
-                          ? "認証完了！"
-                          : "認証処理中..."
-                        : "認証する"}
-                    </span>
-                  </div>
-                </button>
-              </form>
-
-              <div className="mt-4 text-center">
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
-                  認証コードが届かない場合
-                </p>
-                <button
-                  type="button"
-                  onClick={handleResendCode}
-                  disabled={resendCooldown > 0}
-                  className={style.button({ type: "secondary", class: "text-sm" })}
-                >
-                  {resendCooldown > 0
-                    ? `再送まで ${resendCooldown}秒`
-                    : "認証コードを再送"}
-                </button>
-              </div>
-            </>
-          )
-        })()}
-
-        {errors.general && (
-          <div className={style.text.error({ className: "mt-4" })}>{errors.general}</div>
-        )}
-      </div>
-    )
-  }
-
   return (
     <div className={style.card.container({ class: "max-w-md mx-auto" })}>
-      <ProgressIndicator step={step} />
       <h1 className={style.text.sectionTitle()}>サインアップ</h1>
+      <ProgressIndicator step={step} />
+      <fetcher.Form
+        ref={formRef}
+        method="post"
+        onSubmit={e => {
+          // 最終ステップ以外はsubmitせず、step進行のみ
+          if (step !== "profile") {
+            e.preventDefault()
+            handleNext(e)
+          } else {
+            // profileステップのみsubmit許可
+            if (!canSubmit) {
+              e.preventDefault()
+            }
+          }
+        }}
+      >
+        <div
+          className={`${style.form.container({ vertical: true })} ${step === "basic" ? "" : "hidden"}`}
+        >
+          <h2 className="col-span-3 text-lg font-semibold mb-2">基本情報</h2>
+          <label htmlFor="email" className={style.form.label({ necessary: true })}>
+            メールアドレス
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            className={style.form.input({ class: "col-span-2" })}
+          />
+          {errors.email && (
+            <div className={style.text.error({ className: "col-span-3" })}>
+              {errors.email}
+            </div>
+          )}
+          <label htmlFor="password" className={style.form.label({ necessary: true })}>
+            パスワード
+          </label>
+          <input
+            id="password"
+            name="newPassword"
+            type="password"
+            autoComplete="new-password"
+            required
+            className={style.form.input({ class: "col-span-2" })}
+          />
+          {errors.newPassword && (
+            <div className={style.text.error({ className: "col-span-3" })}>
+              {errors.newPassword}
+            </div>
+          )}
+          <label
+            htmlFor="password-confirm"
+            className={style.form.label({ necessary: true })}
+          >
+            パスワード確認
+          </label>
+          <input
+            id="password-confirm"
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            required
+            className={style.form.input({ class: "col-span-2" })}
+          />
+          {errors.confirmPassword && (
+            <div className={style.text.error({ className: "col-span-3" })}>
+              {errors.confirmPassword}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={handleNext}
+            className={style.button({ type: "primary", class: "col-span-3" })}
+            disabled={loading}
+          >
+            <div className="flex items-center justify-center gap-2">
+              {loading && (
+                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+              )}
+              <span>次へ</span>
+            </div>
+          </button>
+        </div>
 
-      <div className={style.form.container({ vertical: true })}>
-        {step === "basic" && (
-          <>
-            <h2 className="col-span-3 text-lg font-semibold mb-2">基本情報</h2>
-
-            <label htmlFor="email" className={style.form.label({ necessary: true })}>
-              メールアドレス
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              autoComplete="email"
-              required
-              className={style.form.input({ class: "col-span-2" })}
-            />
-            {errors.email && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.email}
-              </div>
-            )}
-
-            <label htmlFor="password" className={style.form.label({ necessary: true })}>
-              パスワード
-            </label>
-            <input
-              id="password"
-              name="newPassword"
-              type="password"
-              value={formData.newPassword}
-              onChange={e =>
-                setFormData(prev => ({ ...prev, newPassword: e.target.value }))
-              }
-              autoComplete="new-password"
-              required
-              className={style.form.input({ class: "col-span-2" })}
-            />
-            {errors.newPassword && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.newPassword}
-              </div>
-            )}
-
-            <label
-              htmlFor="password-confirm"
-              className={style.form.label({ necessary: true })}
+        <div
+          className={`${style.form.container({ vertical: true })} ${step === "personal" ? "" : "hidden"}`}
+        >
+          <h2 className="col-span-3 text-lg font-semibold mb-2">個人情報</h2>
+          <label htmlFor="lastName" className={style.form.label({ necessary: true })}>
+            姓
+          </label>
+          <input
+            id="lastName"
+            name="lastName"
+            type="text"
+            autoComplete="family-name"
+            required
+            className={style.form.input({ class: "col-span-2" })}
+          />
+          {errors.lastName && (
+            <div className={style.text.error({ className: "col-span-3" })}>
+              {errors.lastName}
+            </div>
+          )}
+          <label htmlFor="firstName" className={style.form.label({ necessary: true })}>
+            名
+          </label>
+          <input
+            id="firstName"
+            name="firstName"
+            type="text"
+            autoComplete="given-name"
+            required
+            className={style.form.input({ class: "col-span-2" })}
+          />
+          {errors.firstName && (
+            <div className={style.text.error({ className: "col-span-3" })}>
+              {errors.firstName}
+            </div>
+          )}
+          <label htmlFor="username" className={style.form.label({ necessary: false })}>
+            ユーザー名
+          </label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            autoComplete="username"
+            className={style.form.input({ class: "col-span-2" })}
+          />
+          {errors.username && (
+            <div className={style.text.error({ className: "col-span-3" })}>
+              {errors.username}
+            </div>
+          )}
+          <div className="col-span-3 flex gap-2">
+            <button
+              type="button"
+              onClick={prevStep}
+              className={style.button({ type: "secondary", class: "flex-1" })}
             >
-              パスワード確認
-            </label>
-            <input
-              id="password-confirm"
-              name="confirmPassword"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={e =>
-                setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))
-              }
-              autoComplete="new-password"
-              required
-              className={style.form.input({ class: "col-span-2" })}
-            />
-            {errors.confirmPassword && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.confirmPassword}
-              </div>
-            )}
-
+              戻る
+            </button>
             <button
               type="button"
               onClick={handleNext}
-              className={style.button({ type: "primary", class: "col-span-3" })}
+              className={style.button({ type: "primary", class: "flex-1" })}
               disabled={loading}
             >
               <div className="flex items-center justify-center gap-2">
@@ -611,220 +508,137 @@ export default function SignUpPage() {
                 <span>次へ</span>
               </div>
             </button>
-          </>
-        )}
+          </div>
+        </div>
 
-        {step === "personal" && (
-          <>
-            <h2 className="col-span-3 text-lg font-semibold mb-2">個人情報</h2>
-
-            <label htmlFor="lastName" className={style.form.label({ necessary: true })}>
-              姓
-            </label>
-            <input
-              id="lastName"
-              name="lastName"
-              type="text"
-              value={formData.lastName}
-              onChange={e => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-              autoComplete="family-name"
-              required
-              className={style.form.input({ class: "col-span-2" })}
-            />
-            {errors.lastName && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.lastName}
-              </div>
-            )}
-
-            <label htmlFor="firstName" className={style.form.label({ necessary: true })}>
-              名
-            </label>
-            <input
-              id="firstName"
-              name="firstName"
-              type="text"
-              value={formData.firstName}
-              onChange={e =>
-                setFormData(prev => ({ ...prev, firstName: e.target.value }))
-              }
-              autoComplete="given-name"
-              required
-              className={style.form.input({ class: "col-span-2" })}
-            />
-            {errors.firstName && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.firstName}
-              </div>
-            )}
-
-            <label htmlFor="username" className={style.form.label({ necessary: false })}>
-              ユーザー名
-            </label>
-            <input
-              id="username"
-              name="username"
-              type="text"
-              value={formData.username}
-              onChange={e => setFormData(prev => ({ ...prev, username: e.target.value }))}
-              autoComplete="username"
-              className={style.form.input({ class: "col-span-2" })}
-            />
-            {errors.username && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.username}
-              </div>
-            )}
-
-            <div className="col-span-3 flex gap-2">
-              <button
-                type="button"
-                onClick={prevStep}
-                className={style.button({ type: "secondary", class: "flex-1" })}
-              >
-                戻る
-              </button>
-              <button
-                type="button"
-                onClick={handleNext}
-                className={style.button({ type: "primary", class: "flex-1" })}
-                disabled={loading}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  {loading && (
-                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                  )}
-                  <span>次へ</span>
-                </div>
-              </button>
+        <div
+          className={`${style.form.container({ vertical: true })} ${step === "profile" ? "" : "hidden"}`}
+        >
+          <h2 className="col-span-3 text-lg font-semibold mb-2">プロファイル情報</h2>
+          <label htmlFor="year" className={style.form.label({ necessary: true })}>
+            学年
+          </label>
+          <select
+            id="year"
+            name="year"
+            defaultValue="b1"
+            required
+            className={style.form.input({ class: "col-span-2" })}
+          >
+            {yearOptions()}
+          </select>
+          {errors.year && (
+            <div className={style.text.error({ className: "col-span-3" })}>
+              {errors.year}
             </div>
-          </>
-        )}
-
-        {step === "profile" && (
-          <>
-            <h2 className="col-span-3 text-lg font-semibold mb-2">プロファイル情報</h2>
-
-            <label htmlFor="year" className={style.form.label({ necessary: true })}>
-              学年
-            </label>
-            <select
-              id="year"
-              name="year"
-              value={formData.year}
-              onChange={e => setFormData(prev => ({ ...prev, year: e.target.value }))}
-              required
-              className={style.form.input({ class: "col-span-2" })}
-            >
-              {yearOptions()}
-            </select>
-            {errors.year && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.year}
-              </div>
-            )}
-
-            <label htmlFor="grade" className={style.form.label({ necessary: true })}>
-              現在の級段位
-            </label>
-            <select
-              id="grade"
-              name="grade"
-              value={formData.grade}
-              onChange={e => setFormData(prev => ({ ...prev, grade: e.target.value }))}
-              required
-              className={style.form.input({ class: "col-span-2" })}
-            >
-              {gradeOptions()}
-            </select>
-            {errors.grade && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.grade}
-              </div>
-            )}
-
-            <label htmlFor="joinedAt" className={style.form.label({ necessary: true })}>
-              入部年度
-            </label>
-            <input
-              id="joinedAt"
-              name="joinedAt"
-              type="number"
-              value={formData.joinedAt}
-              onChange={e => setFormData(prev => ({ ...prev, joinedAt: e.target.value }))}
-              required
-              className={style.form.input({ class: "col-span-2" })}
-              min={JoinedAtYearRange.min}
-              max={JoinedAtYearRange.max}
-            />
-            {errors.joinedAt && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.joinedAt}
-              </div>
-            )}
-
-            <label
-              htmlFor="getGradeAt"
-              className={style.form.label({ necessary: false })}
-            >
-              級段位取得日
-            </label>
-            <input
-              id="getGradeAt"
-              name="getGradeAt"
-              type="date"
-              value={formData.getGradeAt}
-              onChange={e =>
-                setFormData(prev => ({ ...prev, getGradeAt: e.target.value }))
-              }
-              className={style.form.input({ class: "col-span-2" })}
-            />
-            {errors.getGradeAt && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.getGradeAt}
-              </div>
-            )}
-
-            <div className="col-span-3 mb-4">
-              <div
-                id="clerk-captcha"
-                data-cl-size="flexible"
-                data-cl-theme={
-                  window.matchMedia &&
-                  window.matchMedia("(prefers-color-scheme: dark)").matches
-                    ? "dark"
-                    : "light"
-                }
-                data-cl-language="ja-JP"
-              />
+          )}
+          <label htmlFor="grade" className={style.form.label({ necessary: true })}>
+            現在の級段位
+          </label>
+          <select
+            id="grade"
+            name="grade"
+            defaultValue="0"
+            required
+            className={style.form.input({ class: "col-span-2" })}
+          >
+            {gradeOptions()}
+          </select>
+          {errors.grade && (
+            <div className={style.text.error({ className: "col-span-3" })}>
+              {errors.grade}
             </div>
-
-            <div className="col-span-3 flex gap-2">
-              <button
-                type="button"
-                onClick={prevStep}
-                className={style.button({ type: "secondary", class: "flex-1" })}
-              >
-                戻る
-              </button>
-              <button
-                type="button"
-                onClick={handleNext}
-                className={style.button({ type: "primary", class: "flex-1" })}
-                disabled={!canSubmit}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  {!canSubmit && (
-                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                  )}
-                  <span>{canSubmit ? "アカウントを作成" : "処理中..."}</span>
-                </div>
-              </button>
+          )}
+          <label htmlFor="joinedAt" className={style.form.label({ necessary: true })}>
+            入部年度
+          </label>
+          <input
+            id="joinedAt"
+            name="joinedAt"
+            type="number"
+            defaultValue={new Date().getFullYear().toString()}
+            required
+            className={style.form.input({ class: "col-span-2" })}
+            min={JoinedAtYearRange.min}
+            max={JoinedAtYearRange.max}
+          />
+          {errors.joinedAt && (
+            <div className={style.text.error({ className: "col-span-3" })}>
+              {errors.joinedAt}
             </div>
-          </>
-        )}
-      </div>
-
+          )}
+          <label htmlFor="getGradeAt" className={style.form.label({ necessary: false })}>
+            級段位取得日
+          </label>
+          <input
+            id="getGradeAt"
+            name="getGradeAt"
+            type="date"
+            className={style.form.input({ class: "col-span-2" })}
+          />
+          {errors.getGradeAt && (
+            <div className={style.text.error({ className: "col-span-3" })}>
+              {errors.getGradeAt}
+            </div>
+          )}
+          <div className="col-span-3 flex gap-2">
+            <button
+              type="button"
+              onClick={prevStep}
+              className={style.button({ type: "secondary", class: "flex-1" })}
+            >
+              戻る
+            </button>
+            <button
+              type="submit"
+              className={style.button({ type: "primary", class: "flex-1" })}
+              disabled={!canSubmit}
+            >
+              <div className="flex items-center justify-center gap-2">
+                {!canSubmit && (
+                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                )}
+                <span>{canSubmit ? "アカウントを作成" : "処理中..."}</span>
+              </div>
+            </button>
+          </div>
+        </div>
+        <div className="col-span-3 my-2">
+          <div
+            id="clerk-captcha"
+            data-cl-size="flexible"
+            data-cl-theme={
+              window.matchMedia &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light"
+            }
+            data-cl-language="ja-jp"
+          />
+        </div>
+      </fetcher.Form>
+      <hr className="my-6" />
+      <button
+        type="button"
+        className="w-full py-2 px-4 bg-[#5865F2] dark:bg-[#4752C4] text-white font-semibold rounded flex items-center justify-center gap-2 hover:bg-[#4752C4] dark:hover:bg-[#36418C] transition disabled:opacity-50"
+        onClick={async () => {
+          if (!isLoaded || !signUp) return
+          setLoading(true)
+          try {
+            await signUp.authenticateWithRedirect({
+              strategy: "oauth_discord",
+              redirectUrl: "/sign-up/sso-callback",
+              redirectUrlComplete: "/onboarding",
+            })
+          } finally {
+            setLoading(false)
+          }
+        }}
+        disabled={loading}
+      >
+        <Icon icon={"discord-logo"} size="24" />
+        Discordで認証
+      </button>
       <div className="mt-4 text-center text-sm text-slate-600 dark:text-slate-400">
         既にアカウントをお持ちですか？
         <br />
@@ -833,7 +647,6 @@ export default function SignUpPage() {
         </span>
         からサインインしてください。
       </div>
-
       {errors.general && (
         <div className={style.text.error({ className: "mt-4" })}>{errors.general}</div>
       )}
@@ -858,14 +671,10 @@ function gradeOptions() {
   ))
 }
 
-const ProgressIndicator = ({
-  step,
-}: {
-  step: "basic" | "personal" | "profile" | "verify"
-}) => {
-  const steps = ["基本情報", "個人情報", "プロファイル", "認証"]
+const ProgressIndicator = ({ step }: { step: "basic" | "personal" | "profile" }) => {
+  const steps = ["基本情報", "個人情報", "プロファイル"]
   const currentIndex =
-    step === "basic" ? 0 : step === "personal" ? 1 : step === "profile" ? 2 : 3
+    step === "basic" ? 0 : step === "personal" ? 1 : step === "profile" ? 2 : 2
 
   const indicator = tv({
     base: "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",

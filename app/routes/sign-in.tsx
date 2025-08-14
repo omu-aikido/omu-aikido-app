@@ -149,7 +149,7 @@ export default function SignInPage() {
           {loading ? "サインイン中..." : "サインイン"}
         </button>
       </fetcher.Form>
-      <div className="my-6 border-t border-slate-200 dark:border-slate-700" />
+      <hr className="my-6" />
       <button
         type="button"
         className="w-full py-2 px-4 bg-[#5865F2] dark:bg-[#4752C4] text-white font-semibold rounded flex items-center justify-center gap-2 hover:bg-[#4752C4] dark:hover:bg-[#36418C] transition disabled:opacity-50"

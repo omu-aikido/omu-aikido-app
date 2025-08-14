@@ -5,7 +5,7 @@ import { redirect, useFetcher, useNavigate } from "react-router"
 
 import type { Route } from "./+types/onboarding"
 
-import { JoinedAtYearRange } from "~/lib/utils"
+import { grade, JoinedAtYearRange, year } from "~/lib/utils"
 import { style } from "~/styles/component"
 
 // MARK: Loader
@@ -44,9 +44,9 @@ export async function loader(args: Route.LoaderArgs) {
 
     if (!unsafeMetadata || typeof unsafeMetadata !== "object") {
       return {
-        hasError: true,
-        error: "プロファイル情報が見つかりません。再度サインアップしてください。",
-        requiresReSignup: true,
+        hasError: false,
+        needsProfileSetup: true,
+        message: "プロファイル情報を設定してください。",
       }
     }
 
@@ -76,9 +76,9 @@ export async function loader(args: Route.LoaderArgs) {
 
     if (!year || grade === undefined || joinedAt === undefined) {
       return {
-        hasError: true,
-        error: "プロファイル情報が不正です。再度サインアップしてください。",
-        requiresReSignup: true,
+        hasError: false,
+        needsProfileSetup: true,
+        message: "プロファイル情報を設定してください。",
       }
     }
 
@@ -206,6 +206,80 @@ export async function action(args: Route.ActionArgs) {
     }
   }
 
+  if (actionType === "setupProfile") {
+    try {
+      const year = formData.get("year") as string
+      const gradeStr = formData.get("grade") as string
+      const joinedAtStr = formData.get("joinedAt") as string
+      const getGradeAt = formData.get("getGradeAt") as string
+
+      // バリデーション
+      const errors: Record<string, string> = {}
+
+      if (!year) {
+        errors.year = "学年は必須です"
+      }
+
+      if (!gradeStr) {
+        errors.grade = "級段位は必須です"
+      }
+
+      if (!joinedAtStr) {
+        errors.joinedAt = "入部年度は必須です"
+      } else {
+        const joinedAtNum = parseInt(joinedAtStr)
+        if (
+          isNaN(joinedAtNum) ||
+          joinedAtNum < JoinedAtYearRange.min ||
+          joinedAtNum > JoinedAtYearRange.max
+        ) {
+          errors.joinedAt = `入部年度は${JoinedAtYearRange.min}年から${JoinedAtYearRange.max}年の間で入力してください`
+        }
+      }
+
+      if (Object.keys(errors).length > 0) {
+        return Response.json({ success: false, errors })
+      }
+
+      const grade = parseInt(gradeStr)
+      const joinedAt = parseInt(joinedAtStr)
+
+      let processedGetGradeAt: string = ""
+      if (getGradeAt && getGradeAt.trim() !== "") {
+        const dateStr = getGradeAt.trim()
+        const date = new Date(dateStr)
+        if (!isNaN(date.getTime())) {
+          processedGetGradeAt = date.toISOString()
+        }
+      }
+
+      const clerkClient = createClerkClient({
+        secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
+      })
+
+      // プロファイルデータをpublicMetadataに設定
+      const profileData = {
+        year,
+        grade,
+        joinedAt,
+        getGradeAt: processedGetGradeAt,
+        role: "member" as const,
+      }
+
+      // publicMetadataを更新
+      await clerkClient.users.updateUserMetadata(auth.userId, {
+        publicMetadata: profileData,
+      })
+
+      return Response.json({ success: true, redirect: "/" })
+    } catch {
+      return Response.json({
+        success: false,
+        error: "アカウントの設定に失敗しました。しばらくしてから再度お試しください。",
+      })
+    }
+  }
+
   return Response.json({ success: false, error: "無効なアクションです" }, { status: 400 })
 }
 
@@ -214,12 +288,16 @@ export default function OnboardingPage(args: Route.ComponentProps) {
   const navigate = useNavigate()
   const fetcher = useFetcher()
   const [hasRetried, setHasRetried] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const { loaderData } = args
 
-  // loaderからエラー情報を取得
+  // loaderからの状態を判定
   const hasLoaderError = loaderData && "hasError" in loaderData && loaderData.hasError
+  const needsProfileSetup =
+    loaderData && "needsProfileSetup" in loaderData && loaderData.needsProfileSetup
   const errorMessage = hasLoaderError ? loaderData.error : null
   const requiresReSignup = hasLoaderError ? loaderData.requiresReSignup : false
+  const setupMessage = needsProfileSetup ? loaderData.message : null
 
   // fetcher.dataからサーバーアクションの結果を監視
   useEffect(() => {
@@ -229,15 +307,20 @@ export default function OnboardingPage(args: Route.ComponentProps) {
         error?: string
         redirect?: string
         requiresReSignup?: boolean
+        errors?: Record<string, string>
       }
 
       if (result.success && result.redirect) {
         navigate(result.redirect, { replace: true })
-      } else if (!result.success && result.requiresReSignup) {
-        // 再サインアップが必要な場合
-        setTimeout(() => {
-          navigate("/sign-up", { replace: true })
-        }, 3000)
+      } else if (!result.success) {
+        if (result.errors) {
+          setErrors(result.errors)
+        } else if (result.requiresReSignup) {
+          // 再サインアップが必要な場合
+          setTimeout(() => {
+            navigate("/sign-up", { replace: true })
+          }, 3000)
+        }
       }
     }
   }, [fetcher.data, navigate])
@@ -256,6 +339,129 @@ export default function OnboardingPage(args: Route.ComponentProps) {
   const handleRetry = () => {
     setHasRetried(true)
     fetcher.submit({ actionType: "retry" }, { method: "post" })
+  }
+
+  const handleProfileSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setErrors({}) // エラーをクリア
+
+    const formData = new FormData(e.currentTarget as HTMLFormElement)
+    formData.set("actionType", "setupProfile")
+
+    fetcher.submit(formData, { method: "post" })
+  }
+
+  // プロファイル設定が必要な場合のフォーム表示
+  if (needsProfileSetup) {
+    return (
+      <div className={style.card.container({ class: "max-w-md mx-auto" })}>
+        <h1 className={style.text.sectionTitle()}>プロファイル設定</h1>
+        <p className="mt-4 text-slate-600 dark:text-slate-400 mb-6 text-center">
+          {setupMessage}
+        </p>
+
+        <form onSubmit={handleProfileSubmit}>
+          <div className={style.form.container({ vertical: true })}>
+            <label htmlFor="year" className={style.form.label({ necessary: true })}>
+              学年
+            </label>
+            <select
+              id="year"
+              name="year"
+              defaultValue="b1"
+              required
+              className={style.form.input({ class: "col-span-2" })}
+            >
+              {yearOptions()}
+            </select>
+            {errors.year && (
+              <div className={style.text.error({ className: "col-span-3" })}>
+                {errors.year}
+              </div>
+            )}
+
+            <label htmlFor="grade" className={style.form.label({ necessary: true })}>
+              現在の級段位
+            </label>
+            <select
+              id="grade"
+              name="grade"
+              defaultValue="0"
+              required
+              className={style.form.input({ class: "col-span-2" })}
+            >
+              {gradeOptions()}
+            </select>
+            {errors.grade && (
+              <div className={style.text.error({ className: "col-span-3" })}>
+                {errors.grade}
+              </div>
+            )}
+
+            <label htmlFor="joinedAt" className={style.form.label({ necessary: true })}>
+              入部年度
+            </label>
+            <input
+              id="joinedAt"
+              name="joinedAt"
+              type="number"
+              defaultValue={new Date().getFullYear().toString()}
+              required
+              className={style.form.input({ class: "col-span-2" })}
+              min={JoinedAtYearRange.min}
+              max={JoinedAtYearRange.max}
+            />
+            {errors.joinedAt && (
+              <div className={style.text.error({ className: "col-span-3" })}>
+                {errors.joinedAt}
+              </div>
+            )}
+
+            <label
+              htmlFor="getGradeAt"
+              className={style.form.label({ necessary: false })}
+            >
+              級段位取得日
+            </label>
+            <input
+              id="getGradeAt"
+              name="getGradeAt"
+              type="date"
+              className={style.form.input({ class: "col-span-2" })}
+            />
+            {errors.getGradeAt && (
+              <div className={style.text.error({ className: "col-span-3" })}>
+                {errors.getGradeAt}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={fetcher.state === "submitting"}
+              className={style.button({ type: "primary", class: "col-span-3" })}
+            >
+              <div className="flex items-center justify-center gap-2">
+                {fetcher.state === "submitting" && (
+                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                )}
+                <span>
+                  {fetcher.state === "submitting" ? "設定中..." : "プロファイルを設定"}
+                </span>
+              </div>
+            </button>
+          </div>
+        </form>
+
+        {fetcher.data &&
+          typeof fetcher.data === "object" &&
+          !fetcher.data.success &&
+          fetcher.data.error && (
+            <div className={style.text.error({ className: "mt-4 text-center" })}>
+              {fetcher.data.error}
+            </div>
+          )}
+      </div>
+    )
   }
 
   // ローダーでエラーが発生している場合の表示
@@ -335,4 +541,21 @@ export default function OnboardingPage(args: Route.ComponentProps) {
       </p>
     </div>
   )
+}
+
+// 学年・級の選択肢生成（sign-upと同じ関数）
+function yearOptions() {
+  return year.map(y => (
+    <option key={y.year} value={y.year}>
+      {y.name}
+    </option>
+  ))
+}
+
+function gradeOptions() {
+  return grade.map(g => (
+    <option key={g.grade} value={g.grade}>
+      {g.name}
+    </option>
+  ))
 }

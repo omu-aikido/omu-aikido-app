@@ -37,8 +37,8 @@ export function Icon({
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="40" // Default width/height, can be overridden by 'size' prop via style
-      height="40" // Default width/height, can be overridden by 'size' prop via style
+      width={style.width} // Default width/height, can be overridden by 'size' prop via style
+      height={style.height} // Default width/height, can be overridden by 'size' prop via style
       viewBox="0 0 256 256"
       aria-hidden="true"
       stroke={gradient ? `url(#${gradientId})` : color}
