@@ -31,11 +31,7 @@ export async function action(args: Route.ActionArgs) {
   const client = createClerkClient({
     secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
   })
-  const params: Partial<{
-    firstName: string
-    lastName: string
-    username: string
-  }> = {}
+  const params: Partial<{ firstName: string; lastName: string; username: string }> = {}
   if (firstName) params.firstName = firstName
   if (lastName) params.lastName = lastName
   if (username) params.username = username
@@ -55,7 +51,9 @@ export default function ProfileForm() {
   const user = context.loaderData.user
   const primaryEmail =
     user.emailAddresses.find((e: EmailAddress) => e.id === user.primaryEmailAddressId)
-      ?.emailAddress || user.emailAddresses[0]?.emailAddress || ""
+      ?.emailAddress ||
+    user.emailAddresses[0]?.emailAddress ||
+    ""
   const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
@@ -78,7 +76,7 @@ export default function ProfileForm() {
           <FirstNameInput firstName={user.firstName ?? undefined} disabled={disabled} />
         </div>
         <UsernameInput username={user.username || ""} disabled={disabled} />
-  <EmailInput email={primaryEmail} />
+        <EmailInput email={primaryEmail} />
         <StateButton
           isEditing={isEditing}
           setIsEditing={setIsEditing}
@@ -218,7 +216,13 @@ function EmailInput({ email }: { email: string }) {
   return (
     <div>
       <label className={style.form.label({ necessary: true })}>メールアドレス</label>
-      <input className={style.form.input()} aria-readonly="true" value={safeEmail} readOnly disabled />
+      <input
+        className={style.form.input()}
+        aria-readonly="true"
+        value={safeEmail}
+        readOnly
+        disabled
+      />
     </div>
   )
 }
