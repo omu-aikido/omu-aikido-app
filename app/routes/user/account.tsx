@@ -1,5 +1,5 @@
 import { createClerkClient } from "@clerk/react-router/api.server"
-import { getAuth } from "@clerk/react-router/ssr.server"
+import { getAuth, type EmailAddress } from "@clerk/react-router/ssr.server"
 import { useEffect, useState } from "react"
 import { Link, redirect, useFetcher, useOutletContext } from "react-router"
 
@@ -27,21 +27,14 @@ export async function action(args: Route.ActionArgs) {
   const lastName = formData.get("lastName")?.toString()
   const firstName = formData.get("firstName")?.toString()
   const username = formData.get("username")?.toString()
-  const email = formData.get("email")?.toString()
   const imageFile = formData.get("profileImage")
   const client = createClerkClient({
     secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
   })
-  const params: Partial<{
-    firstName: string
-    lastName: string
-    emailAddress: string
-    username: string
-  }> = {}
+  const params: Partial<{ firstName: string; lastName: string; username: string }> = {}
   if (firstName) params.firstName = firstName
   if (lastName) params.lastName = lastName
   if (username) params.username = username
-  if (email) params.emailAddress = email
   await client.users.updateUser(userId, params)
   if (imageFile && typeof imageFile !== "string") {
     await client.users.updateUserProfileImage(userId, { file: imageFile })
@@ -56,6 +49,11 @@ export default function ProfileForm() {
 
   const context = useOutletContext<UserLayoutComponentProps>()
   const user = context.loaderData.user
+  const primaryEmail =
+    user.emailAddresses.find((e: EmailAddress) => e.id === user.primaryEmailAddressId)
+      ?.emailAddress ||
+    user.emailAddresses[0]?.emailAddress ||
+    ""
   const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
@@ -78,10 +76,7 @@ export default function ProfileForm() {
           <FirstNameInput firstName={user.firstName ?? undefined} disabled={disabled} />
         </div>
         <UsernameInput username={user.username || ""} disabled={disabled} />
-        <EmailInput
-          email={user.emailAddresses?.[0]?.emailAddress || ""}
-          disabled={disabled}
-        />
+        <EmailInput email={primaryEmail} />
         <StateButton
           isEditing={isEditing}
           setIsEditing={setIsEditing}
@@ -215,22 +210,18 @@ function UsernameInput({ username, disabled }: { username: string; disabled: boo
   )
 }
 
-function EmailInput({ email, disabled }: { email: string; disabled: boolean }) {
-  // Sanitize the email to prevent XSS
+function EmailInput({ email }: { email: string }) {
+  // Sanitize the email to prevent XSS and render as read-only display
   const safeEmail = typeof email === "string" ? email.replace(/[<>]/g, "") : ""
   return (
     <div>
-      <label htmlFor="email" className={style.form.label({ necessary: true })}>
-        メールアドレス
-      </label>
+      <label className={style.form.label({ necessary: true })}>メールアドレス</label>
       <input
-        type="email"
-        name="email"
-        id="email"
-        defaultValue={safeEmail}
-        required
         className={style.form.input()}
-        disabled={disabled}
+        aria-readonly="true"
+        value={safeEmail}
+        readOnly
+        disabled
       />
     </div>
   )

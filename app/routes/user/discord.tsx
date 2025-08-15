@@ -73,7 +73,7 @@ export default function Discord() {
       <div className="max-w-lg mx-auto p-4">
         {loaderData.discordAccount ? (
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-4 border rounded-lg bg-indigo-50 border-indigo-200">
+            <div className="flex items-center gap-3 p-4 border rounded-lg bg-indigo-50 border-indigo-200 dark:bg-indigo-950 dark:border-indigo-800">
               {loaderData.discordAccount.imageUrl ? (
                 <img
                   src={loaderData.discordAccount.imageUrl}
@@ -81,16 +81,16 @@ export default function Discord() {
                   className="w-10 h-10 rounded-full"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-indigo-500 dark:bg-indigo-700 flex items-center justify-center">
                   <span className="text-white font-medium text-sm">D</span>
                 </div>
               )}
               <div>
-                <span className="font-medium text-indigo-800 flex flex-row items-center">
+                <span className="font-medium text-indigo-800 dark:text-indigo-200 flex flex-row items-center">
                   <Icon icon="discord-logo" />
                   {loaderData.discordAccount.username || "Discord ユーザー"}
                 </span>
-                <p className="text-sm text-indigo-600">
+                <p className="text-sm text-indigo-600 dark:text-indigo-300">
                   {loaderData.discordAccount.emailAddress || "連携済み"}
                 </p>
               </div>
@@ -99,7 +99,7 @@ export default function Discord() {
               type="button"
               onClick={handleDisconnectDiscord}
               disabled={isDisconnecting}
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-red-500 dark:bg-red-700 text-white px-4 py-2 rounded hover:bg-red-600 dark:hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isDisconnecting ? "解除中..." : "Discord連携を解除"}
             </button>
@@ -110,7 +110,7 @@ export default function Discord() {
               type="button"
               onClick={handleConnectDiscord}
               disabled={isConnecting}
-              className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="bg-indigo-500 dark:bg-indigo-700 text-white px-4 py-2 rounded hover:bg-indigo-600 dark:hover:bg-indigo-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isConnecting ? (
                 <>
