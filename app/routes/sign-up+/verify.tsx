@@ -54,16 +54,12 @@ export default function VerifyPage() {
         await setActive({ session: signUpAttempt.createdSessionId })
         navigate("/onboarding")
       } else {
-        // eslint-disable-next-line no-console
-        console.error(JSON.stringify(signUpAttempt, null, 2))
         setErrors([{ general: "認証が完了しませんでした。再度お試しください。" }])
         setLoading(false)
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       if (isClerkAPIResponseError(err)) setErrors(err.errors)
-      // eslint-disable-next-line no-console
-      console.error(JSON.stringify(err, null, 2))
       const errorMessage = "認証に失敗しました。再度お試しください。"
       setErrors([{ general: errorMessage }])
       setLoading(false)

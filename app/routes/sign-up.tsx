@@ -7,9 +7,21 @@ import { tv } from "tailwind-variants"
 
 import type { Route } from "./+types/sign-up"
 
-import { Icon } from "~/components/ui/Icon"
 import { grade, JoinedAtYearRange, year } from "~/lib/utils"
 import { style } from "~/styles/component"
+
+type FormData = {
+  email: string
+  newPassword: string
+  firstName: string
+  lastName: string
+  username?: string
+  year: string
+  grade: number
+  joinedAt: number
+  getGradeAt: string | null
+  legalAccepted: boolean
+}
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
@@ -41,6 +53,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
   const grade = formData.get("grade") as string
   const joinedAt = formData.get("joinedAt") as string
   const getGradeAt = formData.get("getGradeAt") as string
+  const legalAccepted = formData.get("legalAccepted") === "on"
 
   const errors: Record<string, string> = {}
 
@@ -89,6 +102,10 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
     }
   }
 
+  if (!legalAccepted) {
+    errors.legalAccepted = "利用規約とプライバシーポリシーに同意する必要があります"
+  }
+
   if (Object.keys(errors).length > 0) {
     return { success: false, errors }
   }
@@ -105,7 +122,8 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
       grade: parseInt(grade),
       joinedAt: parseInt(joinedAt),
       getGradeAt: getGradeAt.trim() === "" ? null : getGradeAt,
-    },
+      legalAccepted,
+    } as FormData,
   }
 }
 
@@ -128,19 +146,8 @@ export default function SignUpPage() {
 
   // クライアントサイドでのClerk登録処理
   const handleClerkSignUp = React.useCallback(
-    async (validatedData: {
-      email: string
-      newPassword: string
-      firstName: string
-      lastName: string
-      username?: string
-      year: string
-      grade: number
-      joinedAt: number
-      getGradeAt: string | null
-    }) => {
+    async (validatedData: FormData) => {
       if (!isLoaded || !signUp || !validatedData || isSignUpCreated) {
-        // CAPTCHAが関与する可能性がある場合はエラーを表示しない
         if (!isSignUpCreated) {
           setErrors({ general: "認証サービスが利用できません" })
         }
@@ -274,6 +281,11 @@ export default function SignUpPage() {
           newErrors.joinedAt = "入部年度は2000年から2030年の間で入力してください"
         }
       }
+
+      const legalAccepted = formData.get("legalAccepted") === "on"
+      if (!legalAccepted) {
+        newErrors.legalAccepted = "利用規約とプライバシーポリシーに同意する必要があります"
+      }
     }
 
     setErrors(newErrors)
@@ -300,17 +312,7 @@ export default function SignUpPage() {
       const result = fetcher.data as {
         success: boolean
         errors?: Record<string, string>
-        formData?: {
-          email: string
-          newPassword: string
-          firstName: string
-          lastName: string
-          username?: string
-          year: string
-          grade: number
-          joinedAt: number
-          getGradeAt: string | null
-        }
+        formData?: FormData
       }
       if (result.errors) {
         const serverErrors = result.errors
@@ -334,7 +336,8 @@ export default function SignUpPage() {
           serverErrors.year ||
           serverErrors.grade ||
           serverErrors.joinedAt ||
-          serverErrors.getGradeAt
+          serverErrors.getGradeAt ||
+          serverErrors.legalAccepted
         ) {
           setStep("profile")
           setIsSignUpCreated(false)
@@ -581,6 +584,45 @@ export default function SignUpPage() {
               {errors.getGradeAt}
             </div>
           )}
+
+          <div className="col-span-3 flex items-start gap-3 mt-4">
+            <input
+              id="legalAccepted"
+              name="legalAccepted"
+              type="checkbox"
+              required
+              className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            />
+            <label
+              htmlFor="legalAccepted"
+              className="text-sm text-gray-900 dark:text-gray-300"
+            >
+              <a
+                href="https://omu-aikido.com/terms-of-service/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+              >
+                利用規約
+              </a>
+              および
+              <a
+                href="https://omu-aikido.com/privacy-policy/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+              >
+                プライバシーポリシー
+              </a>
+              に同意します
+            </label>
+          </div>
+          {errors.legalAccepted && (
+            <div className={style.text.error({ className: "col-span-3" })}>
+              {errors.legalAccepted}
+            </div>
+          )}
+
           <div className="col-span-3 flex gap-2">
             <button
               type="button"
@@ -617,28 +659,91 @@ export default function SignUpPage() {
           />
         </div>
       </fetcher.Form>
+      {/*
       <hr className="my-6" />
-      <button
-        type="button"
-        className="w-full py-2 px-4 bg-[#5865F2] dark:bg-[#4752C4] text-white font-semibold rounded flex items-center justify-center gap-2 hover:bg-[#4752C4] dark:hover:bg-[#36418C] transition disabled:opacity-50"
-        onClick={async () => {
-          if (!isLoaded || !signUp) return
-          setLoading(true)
-          try {
-            await signUp.authenticateWithRedirect({
-              strategy: "oauth_discord",
-              redirectUrl: "/sign-up/sso-callback",
-              redirectUrlComplete: "/onboarding",
-            })
-          } finally {
-            setLoading(false)
-          }
-        }}
-        disabled={loading}
-      >
-        <Icon icon={"discord-logo"} size="24" />
-        Discordで認証
-      </button>
+      {step === "basic" ? (
+        <>
+          <div className="mb-4">
+            <div className="flex items-start gap-3">
+              <input
+                id="discordLegalAccepted"
+                type="checkbox"
+                className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label
+                htmlFor="discordLegalAccepted"
+                className="text-sm text-gray-900 dark:text-gray-300"
+              >
+                <a
+                  href="https://omu-aikido.com/terms-of-service/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                >
+                  利用規約
+                </a>
+                および
+                <a
+                  href="https://omu-aikido.com/privacy-policy/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                >
+                  プライバシーポリシー
+                </a>
+                に同意します
+              </label>
+            </div>
+            {errors.discordLegalAccepted && (
+              <div className={style.text.error({ className: "mt-2" })}>
+                {errors.discordLegalAccepted}
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            className="w-full py-2 px-4 bg-[#5865F2] dark:bg-[#4752C4] text-white font-semibold rounded flex items-center justify-center gap-2 hover:bg-[#4752C4] dark:hover:bg-[#36418C] transition disabled:opacity-50"
+            onClick={async () => {
+              if (!isLoaded || !signUp) return
+              const discordLegalCheckbox = document.getElementById(
+                "discordLegalAccepted",
+              ) as HTMLInputElement
+              if (!discordLegalCheckbox?.checked) {
+                setErrors(prev => ({
+                  ...prev,
+                  discordLegalAccepted:
+                    "利用規約とプライバシーポリシーに同意する必要があります",
+                }))
+                return
+              }
+
+              // エラーをクリア
+              setErrors(prev => {
+                const newErrors = { ...prev }
+                delete newErrors.discordLegalAccepted
+                return newErrors
+              })
+
+              setLoading(true)
+              try {
+                await signUp.authenticateWithRedirect({
+                  strategy: "oauth_discord",
+                  redirectUrl: "/sign-up/sso-callback",
+                  redirectUrlComplete: "/onboarding",
+                })
+              } finally {
+                setLoading(false)
+              }
+            }}
+            disabled={loading}
+          >
+            <Icon icon={"discord-logo"} size="24" />
+            Discordで認証
+          </button>
+        </>
+      ) : null}
+      */}
       <div className="mt-4 text-center text-sm text-slate-600 dark:text-slate-400">
         既にアカウントをお持ちですか？
         <br />
