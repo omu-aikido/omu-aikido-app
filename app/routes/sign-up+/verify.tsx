@@ -209,18 +209,13 @@ export default function VerifyPage() {
                 type="button"
                 className={style.button({ type: "danger", class: "text-sm" })}
                 onClick={() => {
-                  if (
-                    window.confirm(
-                      "サインアップページに戻りますか？進捗はリセットされます。",
-                    )
-                  ) {
-                    history.replaceState("", "/sign-up")
+                  if (window.confirm("入力はリセットされます。よろしいですか？")) {
+                    navigate("/sign-up")
                   }
                 }}
               >
-                サインアップページに戻る
+                最初からやり直す
               </button>
-              <p className={style.text.info({ class: "mt-2" })}>進捗がリセットされます</p>
             </div>
           </>
         )
