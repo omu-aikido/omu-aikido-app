@@ -40,7 +40,7 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Deploy Preview
+      - name: Deploy Development
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}

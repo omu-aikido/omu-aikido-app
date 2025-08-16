@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - 'main'
-  workflow_dispatch:
 
 jobs:
   deploy-production:
@@ -39,10 +38,7 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Check Configuration
-        run: cat $GITHUB_WORKSPACE/worker-configuration.d.ts
-
-      - name: Deploy Preview
+      - name: Deploy Production
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
