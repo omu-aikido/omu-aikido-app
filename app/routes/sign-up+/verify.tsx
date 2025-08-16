@@ -209,9 +209,7 @@ export default function VerifyPage() {
                 type="button"
                 className={style.button({ type: "danger", class: "text-sm" })}
                 onClick={() => {
-                  if (
-                    window.confirm("入力はリセットされます。よろしいですか？")
-                  ) {
+                  if (window.confirm("入力はリセットされます。よろしいですか？")) {
                     navigate("/sign-up")
                   }
                 }}

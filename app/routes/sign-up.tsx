@@ -182,10 +182,18 @@ export default function SignUpPage(props: Route.ComponentProps) {
   const [state, dispatch] = useReducer(formReducer, getInitialFormState(currentYear))
   const { step, clerkErrors, formErrors, formValues, isSignUpCreated } = state
 
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => { setHydrated(true); }, []);
-  const disabled = !hydrated || step !== "profile" || !isLoaded || !signUp || fetcher.state !== "idle" || isSignUpCreated;
-  const canSubmit = !disabled;
+  const [hydrated, setHydrated] = useState(false)
+  useEffect(() => {
+    setHydrated(true)
+  }, [])
+  const disabled =
+    !hydrated ||
+    step !== "profile" ||
+    !isLoaded ||
+    !signUp ||
+    fetcher.state !== "idle" ||
+    isSignUpCreated
+  const canSubmit = !disabled
 
   // クライアントサイドでのClerk登録処理
   const handleClerkSignUp = useCallback(
