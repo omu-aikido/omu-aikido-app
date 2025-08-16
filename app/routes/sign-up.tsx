@@ -1,34 +1,76 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useSignUp } from "@clerk/react-router"
 import { getAuth } from "@clerk/react-router/ssr.server"
 import type { ClerkAPIError } from "@clerk/types"
-import * as React from "react"
-import { useState } from "react"
+import { useCallback, useEffect, useReducer, useState } from "react"
 import { Link, redirect, useFetcher, useNavigate } from "react-router"
 import { tv } from "tailwind-variants"
+import z from "zod"
 
 import type { Route } from "./+types/sign-up"
 
-// import SignUpWithDiscord from "~/components/component/SignUpWithDiscord"
 import { grade, JoinedAtYearRange, year } from "~/lib/utils"
 import { style } from "~/styles/component"
+type ClientActionReturn =
+  | { success: true; formData: z.infer<typeof formDataSchema> }
+  | { success: false; errors: Record<string, string> }
 
-type FormData = {
-  email: string
-  newPassword: string
-  firstName: string
-  lastName: string
-  username?: string
-  year: string
-  grade: number
-  joinedAt: number
-  getGradeAt: string | null
-  legalAccepted: boolean
-}
+const formDataSchema = z.object({
+  email: z.email("有効なメールアドレスを入力してください"),
+  newPassword: z.string().min(8, "パスワードは8文字以上である必要があります"),
+  firstName: z.string().min(1, "名は必須です"),
+  lastName: z.string().min(1, "姓は必須です"),
+  username: z.string().optional(),
+  year: z.enum(year.map(y => y.year)),
+  grade: z.number().min(-4).max(5),
+  joinedAt: z
+    .number()
+    .min(JoinedAtYearRange.min, "入部年度は2000年から2030年の間で入力してください")
+    .max(JoinedAtYearRange.max, "入部年度は2000年から2030年の間で入力してください"),
+  getGradeAt: z
+    .string()
+    .optional()
+    .nullable()
+    .transform(val => {
+      if (!val || val === "") return null
+      // 日付の形式を検証
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+      if (!dateRegex.test(val)) return null
+      return val
+    }),
+  legalAccepted: z
+    .boolean()
+    .refine(
+      val => val === true,
+      "利用規約とプライバシーポリシーに同意する必要があります",
+    ),
+})
+
+const localformState = formDataSchema
+  .omit({ joinedAt: true, getGradeAt: true })
+  .extend({
+    joinedAt: z.string(),
+    getGradeAt: z.string(),
+    confirmPassword: z.string(),
+    grade: z.number().min(-4).max(5).default(0),
+  })
+  .superRefine((data, ctx) => {
+    if (data.newPassword !== data.confirmPassword) {
+      ctx.addIssue({
+        code: "custom",
+        message: "パスワードが一致しません",
+        path: ["confirmPassword"],
+      })
+    }
+  })
+
+type LocalFormState = z.infer<typeof localformState>
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
   if (auth.isAuthenticated) return redirect("/")
+  return { currentYear: new Date().getFullYear() }
 }
 
 // MARK: Meta
@@ -39,128 +81,127 @@ export function meta() {
   ]
 }
 
-// MARK: Client Action
-// eslint-disable-next-line react-refresh/only-export-components
-export async function clientAction({ request }: Route.ClientActionArgs) {
+export async function clientAction({
+  request,
+}: Route.ClientActionArgs): Promise<ClientActionReturn> {
   const formData = await request.formData()
+  const data = Object.fromEntries(formData)
 
-  // 全フィールドを取得
-  const email = formData.get("email") as string
-  const newPassword = formData.get("newPassword") as string
-  const confirmPassword = formData.get("confirmPassword") as string
-  const firstName = formData.get("firstName") as string
-  const lastName = formData.get("lastName") as string
-  const username = formData.get("username") as string
-  const year = formData.get("year") as string
-  const grade = formData.get("grade") as string
-  const joinedAt = formData.get("joinedAt") as string
-  const getGradeAt = formData.get("getGradeAt") as string
-  const legalAccepted = formData.get("legalAccepted") === "on"
+  const parsed = formDataSchema.safeParse({
+    email: data.email || "",
+    newPassword: data.newPassword || "",
+    firstName: data.firstName || "",
+    lastName: data.lastName || "",
+    username: data.username || undefined,
+    year: data.year || "b1",
+    grade: data.grade ? Number(data.grade) : 0,
+    joinedAt: data.joinedAt ? Number(data.joinedAt) : new Date().getFullYear(),
+    getGradeAt: data.getGradeAt && data.getGradeAt !== "" ? data.getGradeAt : null,
+    legalAccepted: data.legalAccepted === "on",
+  })
 
-  const errors: Record<string, string> = {}
-
-  // クライアントサイドバリデーション
-  if (!email) {
-    errors.email = "メールアドレスは必須です"
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errors.email = "有効なメールアドレスを入力してください"
-  }
-
-  if (!newPassword) {
-    errors.newPassword = "パスワードは必須です"
-  } else if (newPassword.length < 8) {
-    errors.newPassword = "パスワードは8文字以上である必要があります"
-  }
-
-  if (!confirmPassword) {
-    errors.confirmPassword = "パスワード確認は必須です"
-  } else if (newPassword !== confirmPassword) {
-    errors.confirmPassword = "パスワードが一致しません"
-  }
-
-  if (!firstName || firstName.trim() === "") {
-    errors.firstName = "名は必須です"
-  }
-
-  if (!lastName || lastName.trim() === "") {
-    errors.lastName = "姓は必須です"
-  }
-
-  // プロファイル情報のバリデーション
-  if (!year) {
-    errors.year = "学年は必須です"
-  }
-
-  if (!grade) {
-    errors.grade = "級段位は必須です"
-  }
-
-  if (!joinedAt) {
-    errors.joinedAt = "入部年度は必須です"
-  } else {
-    const joinedAtNum = parseInt(joinedAt)
-    if (isNaN(joinedAtNum) || joinedAtNum < 2000 || joinedAtNum > 2030) {
-      errors.joinedAt = "入部年度は2000年から2030年の間で入力してください"
+  if (!parsed.success) {
+    const errors: Record<string, string> = {}
+    for (const issue of parsed.error.issues) {
+      if (issue.path.length > 0) {
+        errors[issue.path[0] as string] = issue.message // 型キャストを追加
+      }
     }
-  }
-
-  if (!legalAccepted) {
-    errors.legalAccepted = "利用規約とプライバシーポリシーに同意する必要があります"
-  }
-
-  if (Object.keys(errors).length > 0) {
     return { success: false, errors }
   }
 
-  return {
-    success: true,
-    formData: {
-      email,
-      newPassword,
-      firstName,
-      lastName,
-      username: username || undefined,
-      year,
-      grade: parseInt(grade),
-      joinedAt: parseInt(joinedAt),
-      getGradeAt: getGradeAt.trim() === "" ? null : getGradeAt,
-      legalAccepted,
-    } as FormData,
+  return { success: true, formData: parsed.data }
+}
+// Stateの型定義
+type FormState = {
+  step: "basic" | "personal" | "profile"
+  clerkErrors: ClerkAPIError[]
+  formErrors: Record<string, string>
+  formValues: LocalFormState
+  isSignUpCreated: boolean // Clerkサインアップ処理の重複防止フラグ
+}
+
+// Actionの型定義
+type FormAction =
+  | { type: "SET_STEP"; payload: "basic" | "personal" | "profile" }
+  | { type: "SET_FORM_VALUES"; payload: Partial<LocalFormState> }
+  | { type: "SET_FORM_ERRORS"; payload: Record<string, string> }
+  | { type: "SET_CLERK_ERRORS"; payload: ClerkAPIError[] }
+  | { type: "SET_IS_SIGN_UP_CREATED"; payload: boolean }
+  | { type: "RESET_STATE" } // 状態を初期値に戻すアクション
+
+// Reducer関数
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SET_STEP":
+      return { ...state, step: action.payload }
+    case "SET_FORM_VALUES":
+      return { ...state, formValues: { ...state.formValues, ...action.payload } }
+    case "SET_FORM_ERRORS":
+      return { ...state, formErrors: action.payload }
+    case "SET_CLERK_ERRORS":
+      return { ...state, clerkErrors: action.payload }
+    case "SET_IS_SIGN_UP_CREATED":
+      return { ...state, isSignUpCreated: action.payload }
+    case "RESET_STATE":
+      // formValuesは維持して他をリセット
+      const initialFormStateForReset = getInitialFormState(new Date().getFullYear())
+      return { ...initialFormStateForReset, formValues: state.formValues }
+    default:
+      return state
   }
 }
 
+const getInitialFormState = (currentYear: number): FormState => ({
+  step: "basic",
+  clerkErrors: [],
+  formErrors: {},
+  formValues: {
+    email: "",
+    newPassword: "",
+    confirmPassword: "",
+    firstName: "",
+    lastName: "",
+    username: "",
+    year: "b1",
+    grade: 0,
+    joinedAt: currentYear.toString(),
+    getGradeAt: "",
+    legalAccepted: false,
+  },
+  isSignUpCreated: false,
+})
+
 // MARK: Component
-export default function SignUpPage() {
+export default function SignUpPage(props: Route.ComponentProps) {
   const { signUp, isLoaded } = useSignUp()
+  const { currentYear } = props.loaderData
   const fetcher = useFetcher()
   const navigate = useNavigate()
 
-  const [step, setStep] = useState<"basic" | "personal" | "profile">("basic")
-  const [clerkErrors, setClerkErrors] = React.useState<ClerkAPIError[]>([])
-  const [formErrors, setFormErrors] = React.useState<Record<string, string>>({})
-  const [loading, setLoading] = useState(false)
-  const [isSignUpCreated, setIsSignUpCreated] = useState(false)
+  const [state, dispatch] = useReducer(formReducer, getInitialFormState(currentYear))
+  const { step, clerkErrors, formErrors, formValues, isSignUpCreated } = state
 
-  // fetcher.Form用のref
-  const formRef = React.useRef<HTMLFormElement>(null)
-
-  // Clerkの準備状態確認（最終ステップのみ送信可能）
-  const canSubmit = step === "profile" && isLoaded && signUp
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true); }, []);
+  const disabled = !hydrated || step !== "profile" || !isLoaded || !signUp || fetcher.state !== "idle" || isSignUpCreated;
+  const canSubmit = !disabled;
 
   // クライアントサイドでのClerk登録処理
-  const handleClerkSignUp = React.useCallback(
-    async (validatedData: FormData) => {
+  const handleClerkSignUp = useCallback(
+    async (validatedData: z.infer<typeof formDataSchema>) => {
+      dispatch({ type: "SET_IS_SIGN_UP_CREATED", payload: true })
       if (!isLoaded || !signUp || !validatedData || isSignUpCreated) {
         if (!isSignUpCreated) {
-          setFormErrors({ general: "認証サービスが利用できません" })
+          dispatch({
+            type: "SET_FORM_ERRORS",
+            payload: { general: "認証サービスが利用できません" },
+          })
         }
-        setLoading(false)
         return
       }
 
       try {
-        setIsSignUpCreated(true) // 重複防止フラグを設定
-
         const signUpParams = {
           emailAddress: validatedData.email,
           password: validatedData.newPassword,
@@ -180,161 +221,134 @@ export default function SignUpPage() {
         await signUp.prepareEmailAddressVerification({ strategy: "email_code" })
         navigate("/sign-up/verify")
       } catch (err) {
-        setIsSignUpCreated(false) // エラー時にフラグをリセット
-        let errorMsg = "ユーザー登録に失敗しました"
+        dispatch({ type: "SET_IS_SIGN_UP_CREATED", payload: false }) // エラー時にフラグをリセット
+        const errorMsg = "ユーザー登録に失敗しました"
 
         // Clerkのエラーメッセージを安全に取得
         if (typeof err === "object" && err && "errors" in err) {
           const extracted = (err as { errors?: ClerkAPIError[] }).errors
           if (extracted && extracted.length > 0) {
-            // 保存しておく
-            setClerkErrors(extracted)
-            const firstError = extracted[0]
-
-            // 特定のエラーコードに基づいてユーザーフレンドリーなメッセージを提供
-            if (firstError.code === "form_identifier_exists") {
-              errorMsg = "このメールアドレスは既に使用されています"
-            } else if (firstError.code === "form_password_pwned") {
-              errorMsg =
-                "このパスワードは安全ではありません。別のパスワードを使用してください"
-            } else if (firstError.code === "form_username_exists") {
-              errorMsg = "このユーザー名は既に使用されています"
-            } else if (firstError.code === "captcha_invalid") {
-              errorMsg = "セキュリティ認証に失敗しました。再度お試しください"
-            } else if (firstError.message && firstError.message.length < 100) {
-              errorMsg = firstError.message
-            }
+            dispatch({ type: "SET_CLERK_ERRORS", payload: extracted })
           }
+        } else {
+          dispatch({ type: "SET_FORM_ERRORS", payload: { general: errorMsg } })
         }
-
-        setFormErrors({ general: errorMsg })
-      } finally {
-        setLoading(false)
       }
     },
-    [isLoaded, signUp, isSignUpCreated, navigate],
+    [isLoaded, signUp, isSignUpCreated, navigate, dispatch],
   )
   const nextStep = () => {
-    if (step === "basic") setStep("personal")
-    else if (step === "personal") setStep("profile")
+    if (step === "basic") dispatch({ type: "SET_STEP", payload: "personal" })
+    else if (step === "personal") dispatch({ type: "SET_STEP", payload: "profile" })
   }
 
   const prevStep = () => {
     if (step === "personal") {
-      setStep("basic")
+      dispatch({ type: "SET_STEP", payload: "basic" })
     } else if (step === "profile") {
-      setStep("personal")
-      setIsSignUpCreated(false)
+      dispatch({ type: "SET_STEP", payload: "personal" })
+      dispatch({ type: "SET_IS_SIGN_UP_CREATED", payload: false })
     }
   }
 
   // 各ステップのバリデーション
   const validateStep = (currentStep: string): boolean => {
-    const newErrors: Record<string, string> = {}
-
-    if (!formRef.current) return false
-    const formData = new FormData(formRef.current)
+    let schema: z.ZodSchema
 
     if (currentStep === "basic") {
-      const email = formData.get("email") as string
-      const newPassword = formData.get("newPassword") as string
-      const confirmPassword = formData.get("confirmPassword") as string
-
-      if (!email) {
-        newErrors.email = "メールアドレスは必須です"
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        newErrors.email = "有効なメールアドレスを入力してください"
-      }
-
-      if (!newPassword) {
-        newErrors.newPassword = "パスワードは必須です"
-      } else if (newPassword.length < 8) {
-        newErrors.newPassword = "パスワードは8文字以上である必要があります"
-      }
-
-      if (!confirmPassword) {
-        newErrors.confirmPassword = "パスワード確認は必須です"
-      } else if (newPassword !== confirmPassword) {
-        newErrors.confirmPassword = "パスワードが一致しません"
-      }
+      schema = localformState.pick({
+        email: true,
+        newPassword: true,
+        confirmPassword: true,
+      })
     } else if (currentStep === "personal") {
-      const firstName = formData.get("firstName") as string
-      const lastName = formData.get("lastName") as string
-
-      if (!firstName) {
-        newErrors.firstName = "名は必須です"
-      }
-      if (!lastName) {
-        newErrors.lastName = "姓は必須です"
-      }
+      schema = localformState.pick({ firstName: true, lastName: true, username: true })
     } else if (currentStep === "profile") {
-      const year = formData.get("year") as string
-      const grade = formData.get("grade") as string
-      const joinedAt = formData.get("joinedAt") as string
-
-      if (!year) {
-        newErrors.year = "学年は必須です"
-      }
-      if (!grade) {
-        newErrors.grade = "級段位は必須です"
-      }
-      if (!joinedAt) {
-        newErrors.joinedAt = "入部年度は必須です"
-      } else {
-        const joinedAtNum = parseInt(joinedAt)
-        if (isNaN(joinedAtNum) || joinedAtNum < 2000 || joinedAtNum > 2030) {
-          newErrors.joinedAt = "入部年度は2000年から2030年の間で入力してください"
-        }
-      }
-
-      const legalAccepted = formData.get("legalAccepted") === "on"
-      if (!legalAccepted) {
-        newErrors.legalAccepted = "利用規約とプライバシーポリシーに同意する必要があります"
-      }
+      schema = localformState.pick({
+        year: true,
+        grade: true,
+        joinedAt: true,
+        getGradeAt: true,
+        legalAccepted: true,
+      })
+    } else {
+      dispatch({ type: "SET_FORM_ERRORS", payload: { general: "不明なステップです" } })
+      return false
     }
 
-    setFormErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    const parsed = schema.safeParse(formValues)
+    if (!parsed.success) {
+      const newErrors: Record<string, string> = {}
+      for (const issue of parsed.error.issues) {
+        if (issue.path.length > 0) {
+          newErrors[issue.path[0] as string] = issue.message // 型キャストを追加
+        }
+      }
+      dispatch({ type: "SET_FORM_ERRORS", payload: newErrors })
+      return false
+    }
+
+    dispatch({ type: "SET_FORM_ERRORS", payload: {} })
+    return true
   }
 
-  // ステップ進行処理（fetcher.Form用）
+  // ステップ進行処理
   const handleNext = (e?: React.FormEvent) => {
     if (e) e.preventDefault()
     if (validateStep(step)) {
       if (step === "profile") {
-        setLoading(true)
-      } else {
-        nextStep()
+        return
       }
+      nextStep()
     }
   }
 
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+
+    if (step !== "profile") {
+      nextStep()
+      return
+    }
+    if (!validateStep("profile")) return
+    if (!canSubmit) return
+
+    const fd = new FormData()
+    fd.append("email", formValues.email)
+    fd.append("newPassword", formValues.newPassword)
+    fd.append("firstName", formValues.firstName)
+    fd.append("lastName", formValues.lastName)
+    if (formValues.username) fd.append("username", formValues.username)
+    fd.append("year", formValues.year)
+    fd.append("grade", formValues.grade.toString())
+    fd.append("joinedAt", formValues.joinedAt)
+    fd.append("getGradeAt", formValues.getGradeAt)
+    if (formValues.legalAccepted) fd.append("legalAccepted", "on")
+    fetcher.submit(fd, { method: "post" })
+  }
+
   // clientActionの結果を処理
-  React.useEffect(() => {
+  useEffect(() => {
     if (fetcher.data && fetcher.state === "idle") {
-      setLoading(false)
-      const result = fetcher.data as {
-        success: boolean
-        errors?: Record<string, string>
-        formData?: FormData
-      }
-      if (result.errors) {
+      const result = fetcher.data as ClientActionReturn
+
+      if (!result.success) {
         const serverErrors = result.errors
-        setFormErrors(serverErrors)
+        dispatch({ type: "SET_FORM_ERRORS", payload: serverErrors })
         if (
           serverErrors.email ||
           serverErrors.newPassword ||
           serverErrors.confirmPassword
         ) {
-          setStep("basic")
-          setIsSignUpCreated(false)
+          dispatch({ type: "SET_STEP", payload: "basic" })
+          dispatch({ type: "SET_IS_SIGN_UP_CREATED", payload: false })
         } else if (
           serverErrors.firstName ||
           serverErrors.lastName ||
           serverErrors.username
         ) {
-          setStep("personal")
-          setIsSignUpCreated(false)
+          dispatch({ type: "SET_STEP", payload: "personal" })
+          dispatch({ type: "SET_IS_SIGN_UP_CREATED", payload: false })
         } else if (
           serverErrors.year ||
           serverErrors.grade ||
@@ -342,36 +356,29 @@ export default function SignUpPage() {
           serverErrors.getGradeAt ||
           serverErrors.legalAccepted
         ) {
-          setStep("profile")
-          setIsSignUpCreated(false)
+          dispatch({ type: "SET_STEP", payload: "profile" })
+          dispatch({ type: "SET_IS_SIGN_UP_CREATED", payload: false })
         }
-      } else if (result.success && result.formData) {
-        setLoading(true)
-        handleClerkSignUp(result.formData)
+      } else {
+        // result.formData should already be a plain object from clientAction — validate with zod
+        try {
+          const parsed = formDataSchema.parse(result.formData)
+          handleClerkSignUp(parsed)
+        } catch {
+          dispatch({
+            type: "SET_FORM_ERRORS",
+            payload: { general: "無効なフォームデータが返されました" },
+          })
+        }
       }
     }
-  }, [fetcher.data, fetcher.state, handleClerkSignUp])
+  }, [fetcher.data, fetcher.state, handleClerkSignUp, dispatch])
 
   return (
     <div className={style.card.container({ class: "max-w-md mx-auto" })}>
       <h1 className={style.text.sectionTitle()}>サインアップ</h1>
       <ProgressIndicator step={step} />
-      <fetcher.Form
-        ref={formRef}
-        method="post"
-        onSubmit={e => {
-          // 最終ステップ以外はsubmitせず、step進行のみ
-          if (step !== "profile") {
-            e.preventDefault()
-            handleNext(e)
-          } else {
-            // profileステップのみsubmit許可
-            if (!canSubmit) {
-              e.preventDefault()
-            }
-          }
-        }}
-      >
+      <fetcher.Form method="post" onSubmit={handleSubmit}>
         <div
           className={`${style.form.container({ vertical: true })} ${step === "basic" ? "" : "hidden"}`}
         >
@@ -386,6 +393,10 @@ export default function SignUpPage() {
             autoComplete="email"
             required
             className={style.form.input({ class: "col-span-2" })}
+            value={formValues.email}
+            onChange={e =>
+              dispatch({ type: "SET_FORM_VALUES", payload: { email: e.target.value } })
+            }
           />
           {formErrors.email && (
             <div className={style.text.error({ className: "col-span-3" })}>
@@ -402,6 +413,13 @@ export default function SignUpPage() {
             autoComplete="new-password"
             required
             className={style.form.input({ class: "col-span-2" })}
+            value={formValues.newPassword}
+            onChange={e =>
+              dispatch({
+                type: "SET_FORM_VALUES",
+                payload: { newPassword: e.target.value },
+              })
+            }
           />
           {formErrors.newPassword && (
             <div className={style.text.error({ className: "col-span-3" })}>
@@ -421,6 +439,13 @@ export default function SignUpPage() {
             autoComplete="new-password"
             required
             className={style.form.input({ class: "col-span-2" })}
+            value={formValues.confirmPassword}
+            onChange={e =>
+              dispatch({
+                type: "SET_FORM_VALUES",
+                payload: { confirmPassword: e.target.value },
+              })
+            }
           />
           {formErrors.confirmPassword && (
             <div className={style.text.error({ className: "col-span-3" })}>
@@ -431,10 +456,10 @@ export default function SignUpPage() {
             type="button"
             onClick={handleNext}
             className={style.button({ type: "primary", class: "col-span-3" })}
-            disabled={loading}
+            disabled={fetcher.state !== "idle" || isSignUpCreated}
           >
             <div className="flex items-center justify-center gap-2">
-              {loading && (
+              {(fetcher.state !== "idle" || isSignUpCreated) && (
                 <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
               )}
               <span>次へ</span>
@@ -456,6 +481,10 @@ export default function SignUpPage() {
             autoComplete="family-name"
             required
             className={style.form.input({ class: "col-span-2" })}
+            value={formValues.lastName}
+            onChange={e =>
+              dispatch({ type: "SET_FORM_VALUES", payload: { lastName: e.target.value } })
+            }
           />
           {formErrors.lastName && (
             <div className={style.text.error({ className: "col-span-3" })}>
@@ -472,6 +501,13 @@ export default function SignUpPage() {
             autoComplete="given-name"
             required
             className={style.form.input({ class: "col-span-2" })}
+            value={formValues.firstName}
+            onChange={e =>
+              dispatch({
+                type: "SET_FORM_VALUES",
+                payload: { firstName: e.target.value },
+              })
+            }
           />
           {formErrors.firstName && (
             <div className={style.text.error({ className: "col-span-3" })}>
@@ -487,6 +523,10 @@ export default function SignUpPage() {
             type="text"
             autoComplete="username"
             className={style.form.input({ class: "col-span-2" })}
+            value={formValues.username}
+            onChange={e =>
+              dispatch({ type: "SET_FORM_VALUES", payload: { username: e.target.value } })
+            }
           />
           {formErrors.username && (
             <div className={style.text.error({ className: "col-span-3" })}>
@@ -505,10 +545,10 @@ export default function SignUpPage() {
               type="button"
               onClick={handleNext}
               className={style.button({ type: "primary", class: "flex-1" })}
-              disabled={loading}
+              disabled={fetcher.state !== "idle" || isSignUpCreated}
             >
               <div className="flex items-center justify-center gap-2">
-                {loading && (
+                {(fetcher.state !== "idle" || isSignUpCreated) && (
                   <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
                 )}
                 <span>次へ</span>
@@ -527,9 +567,12 @@ export default function SignUpPage() {
           <select
             id="year"
             name="year"
-            defaultValue="b1"
             required
             className={style.form.input({ class: "col-span-2" })}
+            value={formValues.year}
+            onChange={e =>
+              dispatch({ type: "SET_FORM_VALUES", payload: { year: e.target.value } })
+            }
           >
             {yearOptions()}
           </select>
@@ -544,9 +587,15 @@ export default function SignUpPage() {
           <select
             id="grade"
             name="grade"
-            defaultValue="0"
             required
             className={style.form.input({ class: "col-span-2" })}
+            value={formValues.grade}
+            onChange={e =>
+              dispatch({
+                type: "SET_FORM_VALUES",
+                payload: { grade: Number(e.target.value) },
+              })
+            }
           >
             {gradeOptions()}
           </select>
@@ -562,11 +611,14 @@ export default function SignUpPage() {
             id="joinedAt"
             name="joinedAt"
             type="number"
-            defaultValue={new Date().getFullYear().toString()}
             required
             className={style.form.input({ class: "col-span-2" })}
             min={JoinedAtYearRange.min}
             max={JoinedAtYearRange.max}
+            value={formValues.joinedAt}
+            onChange={e =>
+              dispatch({ type: "SET_FORM_VALUES", payload: { joinedAt: e.target.value } })
+            }
           />
           {formErrors.joinedAt && (
             <div className={style.text.error({ className: "col-span-3" })}>
@@ -581,6 +633,13 @@ export default function SignUpPage() {
             name="getGradeAt"
             type="date"
             className={style.form.input({ class: "col-span-2" })}
+            value={formValues.getGradeAt}
+            onChange={e =>
+              dispatch({
+                type: "SET_FORM_VALUES",
+                payload: { getGradeAt: e.target.value },
+              })
+            }
           />
           {formErrors.getGradeAt && (
             <div className={style.text.error({ className: "col-span-3" })}>
@@ -595,6 +654,13 @@ export default function SignUpPage() {
               type="checkbox"
               required
               className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              checked={formValues.legalAccepted}
+              onChange={e =>
+                dispatch({
+                  type: "SET_FORM_VALUES",
+                  payload: { legalAccepted: e.target.checked },
+                })
+              }
             />
             <label
               htmlFor="legalAccepted"
@@ -634,30 +700,30 @@ export default function SignUpPage() {
             >
               戻る
             </button>
+
             <button
               type="submit"
               className={style.button({ type: "primary", class: "flex-1" })}
-              disabled={!canSubmit}
+              disabled={disabled}
             >
               <div className="flex items-center justify-center gap-2">
-                {!canSubmit && (
+                {(fetcher.state !== "idle" || isSignUpCreated) && (
                   <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
                 )}
-                <span>{canSubmit ? "アカウントを作成" : "処理中..."}</span>
+                <span>
+                  {fetcher.state !== "idle" || isSignUpCreated
+                    ? "処理中..."
+                    : "アカウントを作成"}
+                </span>
               </div>
             </button>
           </div>
         </div>
-        <div className="col-span-3 my-2">
+        <div className="col-span-3 my-4">
           <div
             id="clerk-captcha"
             data-cl-size="flexible"
-            data-cl-theme={
-              window.matchMedia &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches
-                ? "dark"
-                : "light"
-            }
+            data-cl-theme={usePreferredTheme()}
             data-cl-language="ja-jp"
           />
         </div>
@@ -752,4 +818,25 @@ const ProgressIndicator = ({ step }: { step: "basic" | "personal" | "profile" })
       ))}
     </div>
   )
+}
+
+function usePreferredTheme() {
+  const [theme, setTheme] = useState<"light" | "dark">("light") // サーバーと一致させる安全な初期値
+
+  useEffect(() => {
+    const m = window.matchMedia?.("(prefers-color-scheme: dark)")
+    if (!m) return
+
+    const apply = () => setTheme(m.matches ? "dark" : "light")
+    apply()
+
+    const handler = (e: MediaQueryListEvent) => setTheme(e.matches ? "dark" : "light")
+    if (m.addEventListener) m.addEventListener("change", handler)
+
+    return () => {
+      if (m.removeEventListener) m.removeEventListener("change", handler)
+    }
+  }, [])
+
+  return theme
 }
