@@ -29,9 +29,8 @@ export default function VerifyPage() {
   const navigate = useNavigate()
 
   const [code, setCode] = useState("")
-  const [errors, setErrors] = React.useState<
-    ClerkAPIError[] | Array<Record<string, string>> | undefined
-  >()
+  const [clerkErrors, setClerkErrors] = React.useState<ClerkAPIError[]>([])
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const [isVerificationSuccess, setIsVerificationSuccess] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
@@ -45,7 +44,8 @@ export default function VerifyPage() {
     if (!isLoaded) return
 
     setLoading(true)
-    setErrors(undefined)
+    setClerkErrors([])
+    setFormErrors({})
 
     try {
       const signUpAttempt = await signUp.attemptEmailAddressVerification({ code })
@@ -54,14 +54,18 @@ export default function VerifyPage() {
         await setActive({ session: signUpAttempt.createdSessionId })
         navigate("/onboarding")
       } else {
-        setErrors([{ general: "認証が完了しませんでした。再度お試しください。" }])
+        // eslint-disable-next-line no-console
+        console.error("認証が完了しませんでした。", signUpAttempt.missingFields)
+        setFormErrors({ general: "認証が完了しませんでした。再度お試しください。" })
         setLoading(false)
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      if (isClerkAPIResponseError(err)) setErrors(err.errors)
+      // eslint-disable-next-line no-console
+      console.error("認証コードの検証に失敗しました。", err)
+      if (isClerkAPIResponseError(err)) setClerkErrors(err.errors)
       const errorMessage = "認証に失敗しました。再度お試しください。"
-      setErrors([{ general: errorMessage }])
+      setFormErrors({ general: errorMessage })
       setLoading(false)
     }
   }
@@ -85,14 +89,11 @@ export default function VerifyPage() {
         })
       }, 1000)
 
-      setErrors(undefined)
+      setFormErrors({})
     } catch {
-      setErrors([
-        {
-          general:
-            "認証コードの再送に失敗しました。しばらく待ってから再度お試しください。",
-        },
-      ])
+      setFormErrors({
+        general: "認証コードの再送に失敗しました。しばらく待ってから再度お試しください。",
+      })
     }
   }
 
@@ -202,14 +203,38 @@ export default function VerifyPage() {
                 {resendCooldown > 0 ? `再送まで ${resendCooldown}秒` : "認証コードを再送"}
               </button>
             </div>
+            <hr />
+            <div className="text-center">
+              <button
+                type="button"
+                className={style.button({ type: "danger", class: "text-sm" })}
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      "サインアップページに戻りますか？進捗はリセットされます。",
+                    )
+                  ) {
+                    history.replaceState("", "/sign-up")
+                  }
+                }}
+              >
+                サインアップページに戻る
+              </button>
+              <p className={style.text.info({ class: "mt-2" })}>進捗がリセットされます</p>
+            </div>
           </>
         )
       })()}
 
-      {errors && (
+      {formErrors && formErrors.general && (
+        <div className={style.text.error({ className: "mt-4" })}>
+          {formErrors.general}
+        </div>
+      )}
+      {clerkErrors && (
         <ul>
-          {errors.map((el, index) => (
-            <li key={index}>{el.longMessage}</li>
+          {clerkErrors.map((el, index) => (
+            <li key={index}>{el.longMessage ?? el.message}</li>
           ))}
         </ul>
       )}

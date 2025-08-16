@@ -1,4 +1,4 @@
-name: Deploy Staging
+name: Deploy Test
 
 permissions:
   contents: read
@@ -10,7 +10,7 @@ on:
     branches: [main]
 
 jobs:
-  deploy-staging:
+  deploy-dry-run:
     runs-on: ubuntu-latest
     environment: staging
     env:

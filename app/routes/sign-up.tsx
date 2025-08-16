@@ -1,5 +1,6 @@
 import { useSignUp } from "@clerk/react-router"
 import { getAuth } from "@clerk/react-router/ssr.server"
+import type { ClerkAPIError } from "@clerk/types"
 import * as React from "react"
 import { useState } from "react"
 import { Link, redirect, useFetcher, useNavigate } from "react-router"
@@ -7,6 +8,7 @@ import { tv } from "tailwind-variants"
 
 import type { Route } from "./+types/sign-up"
 
+// import SignUpWithDiscord from "~/components/component/SignUpWithDiscord"
 import { grade, JoinedAtYearRange, year } from "~/lib/utils"
 import { style } from "~/styles/component"
 
@@ -134,7 +136,8 @@ export default function SignUpPage() {
   const navigate = useNavigate()
 
   const [step, setStep] = useState<"basic" | "personal" | "profile">("basic")
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [clerkErrors, setClerkErrors] = React.useState<ClerkAPIError[]>([])
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const [isSignUpCreated, setIsSignUpCreated] = useState(false)
 
@@ -149,7 +152,7 @@ export default function SignUpPage() {
     async (validatedData: FormData) => {
       if (!isLoaded || !signUp || !validatedData || isSignUpCreated) {
         if (!isSignUpCreated) {
-          setErrors({ general: "認証サービスが利用できません" })
+          setFormErrors({ general: "認証サービスが利用できません" })
         }
         setLoading(false)
         return
@@ -170,6 +173,7 @@ export default function SignUpPage() {
             joinedAt: validatedData.joinedAt,
             getGradeAt: validatedData.getGradeAt,
           },
+          legalAccepted: validatedData.legalAccepted,
         }
 
         await signUp.create(signUpParams)
@@ -181,10 +185,11 @@ export default function SignUpPage() {
 
         // Clerkのエラーメッセージを安全に取得
         if (typeof err === "object" && err && "errors" in err) {
-          const clerkErrors = (err as { errors?: { message?: string; code?: string }[] })
-            .errors
-          if (clerkErrors && clerkErrors.length > 0) {
-            const firstError = clerkErrors[0]
+          const extracted = (err as { errors?: ClerkAPIError[] }).errors
+          if (extracted && extracted.length > 0) {
+            // 保存しておく
+            setClerkErrors(extracted)
+            const firstError = extracted[0]
 
             // 特定のエラーコードに基づいてユーザーフレンドリーなメッセージを提供
             if (firstError.code === "form_identifier_exists") {
@@ -202,7 +207,7 @@ export default function SignUpPage() {
           }
         }
 
-        setErrors({ general: errorMsg })
+        setFormErrors({ general: errorMsg })
       } finally {
         setLoading(false)
       }
@@ -288,7 +293,7 @@ export default function SignUpPage() {
       }
     }
 
-    setErrors(newErrors)
+    setFormErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
@@ -297,7 +302,6 @@ export default function SignUpPage() {
     if (e) e.preventDefault()
     if (validateStep(step)) {
       if (step === "profile") {
-        // submitはfetcher.FormのonSubmitで
         setLoading(true)
       } else {
         nextStep()
@@ -316,8 +320,7 @@ export default function SignUpPage() {
       }
       if (result.errors) {
         const serverErrors = result.errors
-        setErrors(serverErrors)
-        // エラーがあるステップに戻る
+        setFormErrors(serverErrors)
         if (
           serverErrors.email ||
           serverErrors.newPassword ||
@@ -384,9 +387,9 @@ export default function SignUpPage() {
             required
             className={style.form.input({ class: "col-span-2" })}
           />
-          {errors.email && (
+          {formErrors.email && (
             <div className={style.text.error({ className: "col-span-3" })}>
-              {errors.email}
+              {formErrors.email}
             </div>
           )}
           <label htmlFor="password" className={style.form.label({ necessary: true })}>
@@ -400,9 +403,9 @@ export default function SignUpPage() {
             required
             className={style.form.input({ class: "col-span-2" })}
           />
-          {errors.newPassword && (
+          {formErrors.newPassword && (
             <div className={style.text.error({ className: "col-span-3" })}>
-              {errors.newPassword}
+              {formErrors.newPassword}
             </div>
           )}
           <label
@@ -419,9 +422,9 @@ export default function SignUpPage() {
             required
             className={style.form.input({ class: "col-span-2" })}
           />
-          {errors.confirmPassword && (
+          {formErrors.confirmPassword && (
             <div className={style.text.error({ className: "col-span-3" })}>
-              {errors.confirmPassword}
+              {formErrors.confirmPassword}
             </div>
           )}
           <button
@@ -454,9 +457,9 @@ export default function SignUpPage() {
             required
             className={style.form.input({ class: "col-span-2" })}
           />
-          {errors.lastName && (
+          {formErrors.lastName && (
             <div className={style.text.error({ className: "col-span-3" })}>
-              {errors.lastName}
+              {formErrors.lastName}
             </div>
           )}
           <label htmlFor="firstName" className={style.form.label({ necessary: true })}>
@@ -470,9 +473,9 @@ export default function SignUpPage() {
             required
             className={style.form.input({ class: "col-span-2" })}
           />
-          {errors.firstName && (
+          {formErrors.firstName && (
             <div className={style.text.error({ className: "col-span-3" })}>
-              {errors.firstName}
+              {formErrors.firstName}
             </div>
           )}
           <label htmlFor="username" className={style.form.label({ necessary: false })}>
@@ -485,9 +488,9 @@ export default function SignUpPage() {
             autoComplete="username"
             className={style.form.input({ class: "col-span-2" })}
           />
-          {errors.username && (
+          {formErrors.username && (
             <div className={style.text.error({ className: "col-span-3" })}>
-              {errors.username}
+              {formErrors.username}
             </div>
           )}
           <div className="col-span-3 flex gap-2">
@@ -530,9 +533,9 @@ export default function SignUpPage() {
           >
             {yearOptions()}
           </select>
-          {errors.year && (
+          {formErrors.year && (
             <div className={style.text.error({ className: "col-span-3" })}>
-              {errors.year}
+              {formErrors.year}
             </div>
           )}
           <label htmlFor="grade" className={style.form.label({ necessary: true })}>
@@ -547,9 +550,9 @@ export default function SignUpPage() {
           >
             {gradeOptions()}
           </select>
-          {errors.grade && (
+          {formErrors.grade && (
             <div className={style.text.error({ className: "col-span-3" })}>
-              {errors.grade}
+              {formErrors.grade}
             </div>
           )}
           <label htmlFor="joinedAt" className={style.form.label({ necessary: true })}>
@@ -565,9 +568,9 @@ export default function SignUpPage() {
             min={JoinedAtYearRange.min}
             max={JoinedAtYearRange.max}
           />
-          {errors.joinedAt && (
+          {formErrors.joinedAt && (
             <div className={style.text.error({ className: "col-span-3" })}>
-              {errors.joinedAt}
+              {formErrors.joinedAt}
             </div>
           )}
           <label htmlFor="getGradeAt" className={style.form.label({ necessary: false })}>
@@ -579,9 +582,9 @@ export default function SignUpPage() {
             type="date"
             className={style.form.input({ class: "col-span-2" })}
           />
-          {errors.getGradeAt && (
+          {formErrors.getGradeAt && (
             <div className={style.text.error({ className: "col-span-3" })}>
-              {errors.getGradeAt}
+              {formErrors.getGradeAt}
             </div>
           )}
 
@@ -595,7 +598,7 @@ export default function SignUpPage() {
             />
             <label
               htmlFor="legalAccepted"
-              className="text-sm text-gray-900 dark:text-gray-300"
+              className="text-sm text-gray-898 dark:text-gray-300"
             >
               <a
                 href="https://omu-aikido.com/terms-of-service/"
@@ -617,9 +620,9 @@ export default function SignUpPage() {
               に同意します
             </label>
           </div>
-          {errors.legalAccepted && (
+          {formErrors.legalAccepted && (
             <div className={style.text.error({ className: "col-span-3" })}>
-              {errors.legalAccepted}
+              {formErrors.legalAccepted}
             </div>
           )}
 
@@ -659,91 +662,16 @@ export default function SignUpPage() {
           />
         </div>
       </fetcher.Form>
-      {/*
+
       <hr className="my-6" />
-      {step === "basic" ? (
-        <>
-          <div className="mb-4">
-            <div className="flex items-start gap-3">
-              <input
-                id="discordLegalAccepted"
-                type="checkbox"
-                className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              />
-              <label
-                htmlFor="discordLegalAccepted"
-                className="text-sm text-gray-900 dark:text-gray-300"
-              >
-                <a
-                  href="https://omu-aikido.com/terms-of-service/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
-                >
-                  利用規約
-                </a>
-                および
-                <a
-                  href="https://omu-aikido.com/privacy-policy/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
-                >
-                  プライバシーポリシー
-                </a>
-                に同意します
-              </label>
-            </div>
-            {errors.discordLegalAccepted && (
-              <div className={style.text.error({ className: "mt-2" })}>
-                {errors.discordLegalAccepted}
-              </div>
-            )}
-          </div>
-
-          <button
-            type="button"
-            className="w-full py-2 px-4 bg-[#5865F2] dark:bg-[#4752C4] text-white font-semibold rounded flex items-center justify-center gap-2 hover:bg-[#4752C4] dark:hover:bg-[#36418C] transition disabled:opacity-50"
-            onClick={async () => {
-              if (!isLoaded || !signUp) return
-              const discordLegalCheckbox = document.getElementById(
-                "discordLegalAccepted",
-              ) as HTMLInputElement
-              if (!discordLegalCheckbox?.checked) {
-                setErrors(prev => ({
-                  ...prev,
-                  discordLegalAccepted:
-                    "利用規約とプライバシーポリシーに同意する必要があります",
-                }))
-                return
-              }
-
-              // エラーをクリア
-              setErrors(prev => {
-                const newErrors = { ...prev }
-                delete newErrors.discordLegalAccepted
-                return newErrors
-              })
-
-              setLoading(true)
-              try {
-                await signUp.authenticateWithRedirect({
-                  strategy: "oauth_discord",
-                  redirectUrl: "/sign-up/sso-callback",
-                  redirectUrlComplete: "/onboarding",
-                })
-              } finally {
-                setLoading(false)
-              }
-            }}
-            disabled={loading}
-          >
-            <Icon icon={"discord-logo"} size="24" />
-            Discordで認証
-          </button>
-        </>
-      ) : null}
-      */}
+      {/*{step === "basic" ? (
+        <SignUpWithDiscord
+          signUp={signUp}
+          loading={loading}
+          setLoading={setLoading}
+          isLoaded={isLoaded}
+        />
+      ) : null}*/}
       <div className="mt-4 text-center text-sm text-slate-600 dark:text-slate-400">
         既にアカウントをお持ちですか？
         <br />
@@ -752,8 +680,17 @@ export default function SignUpPage() {
         </span>
         からサインインしてください。
       </div>
-      {errors.general && (
-        <div className={style.text.error({ className: "mt-4" })}>{errors.general}</div>
+      {formErrors.general && (
+        <div className={style.text.error({ className: "mt-4" })}>
+          {formErrors.general}
+        </div>
+      )}
+      {clerkErrors && clerkErrors.length > 0 && (
+        <div className={style.text.error({ className: "mt-4" })}>
+          {clerkErrors.map((e, i) => (
+            <div key={i}>{e.longMessage ?? e.message ?? JSON.stringify(e)}</div>
+          ))}
+        </div>
       )}
     </div>
   )
