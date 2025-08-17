@@ -1,4 +1,5 @@
 onlyBuiltDependencies:
-  # External dependencies
   - "@clerk/shared"
+  - "@tailwindcss/oxide"
+  - esbuild
   - workerd
