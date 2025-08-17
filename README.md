@@ -1,7 +1,6 @@
 # record-app
 
-`record-app`は、部活の活動を記録・管理するためのWebアプリケーションです。
-活動記録・集計・ユーザー管理などを安全かつ効率的に行えます。
+`record-app`は、部活の活動を記録・管理するためのWebアプリケーションです。活動記録・集計・ユーザー管理などを安全かつ効率的に行えます。
 
 ---
 
@@ -43,12 +42,12 @@
 ## セットアップ方法
 
 1. **依存関係のインストール**
+
    ```bash
    pnpm install --frozen-lock
    ```
 
-2. **環境変数の設定**
-   `.env`ファイルに以下を設定してください。
+2. **環境変数の設定** `.env`ファイルに以下を設定してください。
    - `CLERK_PUBLISHABLE_KEY`
    - `CLERK_SECRET_KEY`
    - `CLERK_FRONTEND_API_URL`
@@ -61,6 +60,7 @@
    - `E2E_CLERK_USER_ID`
 
    開発環境用:
+
    ```bash
    ln -s .env .dev.vars
    ```
@@ -70,15 +70,18 @@
 ## 主要コマンド一覧
 
 ### 開発
+
 - `pnpm dev` - 開発サーバー起動
 - `pnpm preview` - プロダクションビルドのプレビュー
 
 ### ビルド・デプロイ
+
 - `pnpm build` - プロジェクトビルド
 - `pnpm deploy` - Cloudflare Workersへデプロイ（dry-run含む）
 - `pnpm check` - ビルド＋型チェック＋DB確認＋デプロイdry-run
 
 ### コード品質
+
 - `pnpm lint` - ESLintでリンティング
 - `pnpm lint:fix` - ESLint自動修正
 - `pnpm format` - Prettierでフォーマット
@@ -86,10 +89,12 @@
 - `pnpm precommit` - コミット前処理（lint:fix＋format）
 
 ### テスト
+
 - `pnpm test:unit` - Vitestでユニットテスト
 - `pnpm test:e2e` - PlaywrightでE2Eテスト
 
 ### データベース
+
 - `pnpm db:generate` - Drizzleマイグレーション生成
 - `pnpm db:migrate` - マイグレーション実行
 - `pnpm db:push` - スキーマをDBにプッシュ
@@ -97,6 +102,7 @@
 - `pnpm db:check` - スキーマチェック
 
 ### Docker（開発用）
+
 - `pnpm docker:up` - Docker環境起動
 - `pnpm docker:down` - Docker環境停止
 - `pnpm docker:db:reset` - DB環境リセット
@@ -133,6 +139,7 @@
 ## 開発・テスト・デプロイ手順
 
 ### コード変更後の必須チェックリスト
+
 1. **リンティング・フォーマット**
    ```bash
    pnpm lint:fix
@@ -166,6 +173,7 @@
    ```
 
 ### 推奨ワークフロー
+
 1. 開発: `pnpm dev`
 2. コード変更
 3. 保存時: 自動フォーマット（エディタ設定推奨）

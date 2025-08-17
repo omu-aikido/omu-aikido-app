@@ -25,7 +25,7 @@ export async function loader(args: Route.LoaderArgs) {
 
   const profile = await getProfile({ userId, env })
 
-  if (!profile) return redirect("/sign-in")
+  if (!profile) return redirect("/sign-in" + `?redirect_url=${encodeURIComponent(args.request.url)}`)
 
   const links: PagePath[] = [
     { name: "ホーム", href: "/", desc: "ダッシュボード" },

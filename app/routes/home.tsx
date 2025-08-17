@@ -1,5 +1,5 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
-import { redirect, useFetcher } from "react-router"
+import { useFetcher } from "react-router"
 
 import type { Route } from "./+types/home"
 
@@ -25,7 +25,7 @@ import type { ActionResult, PagePath } from "~/type"
 export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
   const userId = auth.userId
-  if (!userId) return redirect("/sign-in?redirect_url=" + args.request.url)
+  if (!userId) throw new Error("User not authenticated")
 
   const env = args.context.cloudflare.env
 

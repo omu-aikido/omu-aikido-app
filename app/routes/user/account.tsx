@@ -1,7 +1,7 @@
 import { createClerkClient } from "@clerk/react-router/api.server"
 import { getAuth, type EmailAddress } from "@clerk/react-router/ssr.server"
 import { useEffect, useState } from "react"
-import { Link, redirect, useFetcher, useOutletContext } from "react-router"
+import { Link, useFetcher, useOutletContext } from "react-router"
 
 import type { Route } from "./+types/account"
 
@@ -20,9 +20,7 @@ export function meta({}: Route.MetaArgs) {
 // MARK: Action
 export async function action(args: Route.ActionArgs) {
   const { userId } = await getAuth(args)
-  if (!userId) {
-    return redirect("/sign-in?redirect_url=" + args.request.url)
-  }
+  if (!userId) throw new Error("User not authenticated")
   const formData = await args.request.formData()
   const lastName = formData.get("lastName")?.toString()
   const firstName = formData.get("firstName")?.toString()

@@ -34,7 +34,7 @@ export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
   const userId = auth.userId!
 
-  if (!userId) return redirect("/sign-in?redirect_url=" + args.request.url)
+  if (!userId) throw new Error("User not authenticated")
 
   const url = new URL(request.url)
   const currentMonth = url.searchParams.get("month") || format(new Date(), "yyyy-MM")

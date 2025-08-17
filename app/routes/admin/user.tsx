@@ -38,9 +38,7 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
   const startParam = url.searchParams.get("start")
   const endParam = url.searchParams.get("end")
   // If reset parameter exists, redirect to clear query params
-  if (url.searchParams.get("reset")) {
-    return new Response(null, { status: 302, headers: { Location: url.pathname } })
-  }
+  if (url.searchParams.get("reset")) return redirect(url.pathname)
 
   try {
     let startValue: Date | undefined
@@ -147,7 +145,10 @@ export function meta(args: Route.MetaArgs) {
 export async function action(args: Route.ActionArgs) {
   const { userId } = await getAuth(args)
   if (!userId) {
-    return redirect("/sign-in?redirect_url=" + args.request.url)
+    return new Response(
+      JSON.stringify({ success: false, error: "認証されていません" }),
+      { status: 401, headers: { "Content-Type": "application/json" } },
+    )
   }
 
   const formData = await args.request.formData()
