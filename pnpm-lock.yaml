@@ -87,9 +87,6 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.39.1
         version: 8.39.1(eslint@9.33.0(jiti@2.5.1))(typescript@5.9.2)
-      dotenv:
-        specifier: ^17.2.1
-        version: 17.2.1
       drizzle-kit:
         specifier: ^0.31.4
         version: 0.31.4
