@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { useLocation }     from 'react-router-dom'
+import { useLocation } from "react-router-dom"
 
 interface SidebarProps {
   position: "left" | "right"
@@ -39,7 +39,7 @@ export function Sidebar({
   }, [open, setOpen])
 
   useEffect(() => {
-      setOpen(false)
+    setOpen(false)
   }, [setOpen, location])
 
   function handleOpenClick() {

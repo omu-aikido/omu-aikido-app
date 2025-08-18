@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { Link, redirect, useFetcher } from "react-router"
 import { tv } from "tailwind-variants"
 
-
 import type { Route } from "./+types/user"
 
 import { StatsSection } from "~/components/component/AccountStatus"
