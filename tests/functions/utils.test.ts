@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest"
 
-import { timeForNextGrade, translateGrade, translateYear } from "../../app/lib/utils"
+import {
+  getJST,
+  JoinedAtYearRange,
+  timeForNextGrade,
+  toLocalJPString,
+  translateGrade,
+  translateYear,
+} from "@/app/lib/utils"
 
 describe("translateGrade", () => {
   it("should return the correct grade name for a given grade value", () => {
@@ -51,5 +58,29 @@ describe("translateYear", () => {
 
   it("should return '不明' for an unknown year value", () => {
     expect(translateYear("unknown")).toBe("不明")
+  })
+})
+
+describe("toLocalJPString", () => {
+  it("should format date to Japanese locale string", () => {
+    const date = new Date("2023-04-01T15:30:45")
+    const result = toLocalJPString(date)
+    expect(result).toMatch(/4月.*1日.*15:30.*45/)
+  })
+})
+
+describe("getJST", () => {
+  it("should return a Date object set to JST midnight for the given date", () => {
+    const date = new Date("2023-04-01T10:20:30Z")
+    const jstDate = getJST(date)
+    expect(jstDate.toISOString()).toContain("2023-04-01T00:00:00.000Z")
+  })
+})
+
+describe("JoinedAtYearRange", () => {
+  it("should calculate min and max year correctly", () => {
+    const currentYear = new Date().getFullYear()
+    expect(JoinedAtYearRange.max).toBe(currentYear)
+    expect(JoinedAtYearRange.min).toBe(currentYear - JoinedAtYearRange.RANGE)
   })
 })
