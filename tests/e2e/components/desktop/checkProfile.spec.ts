@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test"
 
-test("test", async ({ page }) => {
+test("Profile Navigation", async ({ page }) => {
   await page.goto("/account")
   await page.getByRole("link", { name: "ポータル" }).click()
   await page
