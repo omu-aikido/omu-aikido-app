@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { Link, redirect, useFetcher } from "react-router"
 import { tv } from "tailwind-variants"
 
-import { StateButton } from "../../components/ui/StateButton"
 
 import type { Route } from "./+types/user"
 
@@ -12,6 +11,7 @@ import { StatsSection } from "~/components/component/AccountStatus"
 import { ActivitiesTable } from "~/components/component/UserActivitiesTable"
 import { UserProfileSection } from "~/components/component/UserProfile"
 import { FilterSection } from "~/components/component/UserRecordsFilter"
+import { StateButton } from "~/components/ui/StateButton"
 import { activitySummary } from "~/lib/query/activity"
 import { updateProfile } from "~/lib/query/admin"
 import { getProfile } from "~/lib/query/profile"

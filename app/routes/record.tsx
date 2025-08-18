@@ -10,14 +10,13 @@ import {
 import { useEffect, useMemo, useState } from "react"
 import { redirect, useActionData, useFetcher, useSearchParams } from "react-router"
 
-import MonthlyActivityList from "../components/component/MonthlyActivityList"
-import MonthlyCalendarGrid from "../components/component/MonthlyCalendarGrid"
-import MonthNavigation from "../components/component/MonthNavigation"
-
 import type { Route } from "./+types/record"
 
 import DailyActivity from "~/components/component/DailyActivity"
-import TabBarScrollHide  from "~/components/component/TabBarScrollHide"
+import MonthlyActivityList from "~/components/component/MonthlyActivityList"
+import MonthlyCalendarGrid from "~/components/component/MonthlyCalendarGrid"
+import MonthNavigation from "~/components/component/MonthNavigation"
+import TabBarScrollHide from "~/components/component/TabBarScrollHide"
 import YearMonthSelectorInline from "~/components/component/YearMonthSelector"
 import type { ActivityType } from "~/db/schema"
 import {

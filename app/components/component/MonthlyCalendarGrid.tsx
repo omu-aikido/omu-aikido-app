@@ -2,8 +2,7 @@ import { format, isSameDay } from "date-fns"
 import React from "react"
 import { tv } from "tailwind-variants"
 
-import { style } from "../../styles/component"
-
+import { style } from "~/styles/component"
 import type { DailyActivityItem } from "~/type"
 
 type Props = {

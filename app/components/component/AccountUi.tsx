@@ -1,8 +1,7 @@
 import { SignedIn, useClerk } from "@clerk/react-router"
 import { Link } from "react-router"
 
-import { Icon } from "../ui/Icon"
-
+import { Icon } from "~/components/ui/Icon"
 import { style } from "~/styles/component"
 import type { PagePath } from "~/type"
 

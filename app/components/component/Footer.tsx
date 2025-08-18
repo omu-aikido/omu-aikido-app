@@ -1,8 +1,7 @@
 import { Link } from "react-router"
 import { tv } from "tailwind-variants"
 
-import { Icon } from "../ui/Icon"
-
+import { Icon } from "~/components/ui/Icon"
 import { style } from "~/styles/component"
 
 const footer = {

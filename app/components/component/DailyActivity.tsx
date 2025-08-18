@@ -1,9 +1,8 @@
 import { format } from "date-fns"
 import React, { useEffect, useState } from "react"
 
-import { toLocalJPString } from "../../lib/utils"
-
 import type { ActivityType } from "~/db/schema"
+import { toLocalJPString } from "~/lib/utils"
 import { style } from "~/styles/component"
 
 interface DailyActivityItem extends ActivityType {

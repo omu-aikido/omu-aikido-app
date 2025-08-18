@@ -1,10 +1,9 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { Outlet, redirect } from "react-router"
 
-import { getProfile } from "../lib/query/profile"
-
 import type { Route } from "./+types/admin"
 
+import { getProfile } from "~/lib/query/profile"
 import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
 
