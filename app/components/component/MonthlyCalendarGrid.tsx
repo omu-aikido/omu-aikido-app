@@ -96,6 +96,7 @@ const CalendarDayCell = React.memo<{
         isFirstCol: colIndex === 0,
       }).date()}
       onClick={handleClick}
+      data-testid={`day-${format(day, "d")}`}
     >
       <div className="font-semibold mb-1 sm:mb-2">{format(day, "d")}</div>
       <div className="space-y-1">
@@ -127,6 +128,7 @@ const DayActivitySummary = React.memo<{ totalHours: number; count: number }>(
           class:
             "flex justify-between md:text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded-sm font-medium",
         })}
+        data-testid={`day-summary-${totalHours}`}
       >
         合計 {Number(totalHours)}h
         {count >= 2 && count < 100 && (
@@ -164,9 +166,17 @@ const MonthlyCalendarGrid = React.memo<Props>(function MonthlyCalendarGrid({
   }, [daysInMonth])
 
   return (
-    <div className="min-w-[700px] grid grid-cols-7 gap-0 mb-6">
+    <div
+      className="min-w-[700px] grid grid-cols-7 gap-0 mb-6"
+      data-testid="monthly-activity-grid"
+    >
       {weekdays.map((day, index) => (
-        <WeekdayHeaderCell key={day} day={day} index={index} />
+        <WeekdayHeaderCell
+          key={day}
+          day={day}
+          index={index}
+          data-testid={`weekday-${day}`}
+        />
       ))}
       {/* 月初の曜日分だけ空白セルを追加 */}
       {emptyStartCells.map((_, i) => (
@@ -178,6 +188,7 @@ const MonthlyCalendarGrid = React.memo<Props>(function MonthlyCalendarGrid({
             isFirstCol: i === 0,
           }).date()}
           aria-disabled="true"
+          data-testid="empty-start-cell"
         />
       ))}
       {daysInMonth.map((day, idx) => {
@@ -203,6 +214,7 @@ const MonthlyCalendarGrid = React.memo<Props>(function MonthlyCalendarGrid({
             isFirstCol: (daysInMonth[daysInMonth.length - 1].getDay() + 1 + i) % 7 === 0,
           }).date()}
           aria-disabled="true"
+          data-testid="empty-end-cell"
         />
       ))}
     </div>

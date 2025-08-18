@@ -17,6 +17,7 @@ import MonthNavigation from "../components/component/MonthNavigation"
 import type { Route } from "./+types/record"
 
 import DailyActivity from "~/components/component/DailyActivity"
+import TabBarScrollHide  from "~/components/component/TabBarScrollHide"
 import YearMonthSelectorInline from "~/components/component/YearMonthSelector"
 import type { ActivityType } from "~/db/schema"
 import {
@@ -189,12 +190,25 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
     : []
 
   return (
-    <div className="min-h-screen transition-colors duration-200 relative">
+    <div
+      className="min-h-screen transition-colors duration-200 relative"
+      data-testid="record-page-container"
+    >
       <>
-        <h1 className={style.text.sectionTitle()}>記録一覧</h1>
+        <h1 className={style.text.sectionTitle()} data-testid="record-title">
+          記録一覧
+        </h1>
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-800 rounded-lg p-4 mb-6">
-            <p className="text-red-600 dark:text-red-400 text-center">エラー: {error}</p>
+          <div
+            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-800 rounded-lg p-4 mb-6"
+            data-testid="record-error-container"
+          >
+            <p
+              className="text-red-600 dark:text-red-400 text-center"
+              data-testid="record-error-message"
+            >
+              エラー: {error}
+            </p>
           </div>
         )}
         <MonthNavigation
@@ -212,6 +226,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                 type="submit"
                 className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 mx-1 w-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
                 disabled={!isChanged || fetcher.state !== "idle"}
+                data-testid="submit-button"
               >
                 {fetcher.state === "idle"
                   ? "登録"
@@ -229,6 +244,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                 }}
                 className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 mx-1 w-1/4 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
                 disabled={!isChanged || fetcher.state !== "idle"}
+                data-testid="record-button-reset"
               >
                 リセット
               </button>
@@ -258,6 +274,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
             daysInMonth={daysInMonth}
             currentActivities={currentActivities}
             onDayClick={handleDayClick}
+            data-testid="monthly-activity-list"
           />
           <fetcher.Form method="post">
             <input type="hidden" name="actionType" value="batchUpdate" />

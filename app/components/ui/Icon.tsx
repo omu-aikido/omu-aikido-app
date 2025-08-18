@@ -45,6 +45,7 @@ export function Icon({
       fill={gradient ? `url(#${gradientId})` : color}
       className={className}
       style={style}
+      data-testid={`icon-${icon}`}
     >
       {gradient && (
         <defs>

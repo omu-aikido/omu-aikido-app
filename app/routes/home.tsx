@@ -104,17 +104,26 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   const fetcher = useFetcher()
   return (
     <>
-      <NextGrade {...gradeData} />
+      <div data-testid="home-next-grade">
+        <NextGrade {...gradeData} />
+      </div>
 
-      <MyRanking props={rankingdata} />
+      <div data-testid="home-my-ranking">
+        <MyRanking props={rankingdata} />
+      </div>
 
-      <h1 className={style.text.sectionTitle() + " mt-4"}>記録追加</h1>
+      <h1
+        className={style.text.sectionTitle() + " mt-4"}
+        data-testid="home-section-add-record"
+      >
+        記録追加
+      </h1>
 
       <AddRecord fetcher={fetcher} />
 
       <Recents recent={recent} />
 
-      <hr />
+      <hr data-testid="home-divider" />
       <Grid>
         {apps.map((app: PagePath) => (
           <AppIcon key={app.href} title={app.name} id={app.href} desc={app.desc} />

@@ -16,8 +16,14 @@ export function StatsSection({
   totalHours: number
 }) {
   return (
-    <details className="p-4 mb-6  shadow-md rounded-md bg-slate-100 dark:bg-slate-800/50">
-      <summary className="grid grid-cols-2 gap-4 cursor-pointer">
+    <details
+      className="p-4 mb-6  shadow-md rounded-md bg-slate-100 dark:bg-slate-800/50"
+      data-testid="stats-section"
+    >
+      <summary
+        className="grid grid-cols-2 gap-4 cursor-pointer"
+        data-testid="stats-summary"
+      >
         <div>
           <p className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">
             次の級段位まで
@@ -40,7 +46,7 @@ export function StatsSection({
         </div>
       </summary>
       <hr className="mt-3" />
-      <div className="grid grid-cols-2 gap-4 py-4">
+      <div className="grid grid-cols-2 gap-4 py-4" data-testid="stats-details">
         <div>
           <span className="block text-xs text-slate-500">総稽古日数</span>
           <span className="font-bold text-base">{Number(totalDays)}日</span>

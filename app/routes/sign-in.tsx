@@ -92,15 +92,25 @@ export default function SignInPage() {
   }
 
   return (
-    <div className={style.card.container({ class: "max-w-md mx-auto" })}>
-      <h1 className={style.text.sectionTitle()}>サインイン</h1>
+    <div
+      className={style.card.container({ class: "max-w-md mx-auto" })}
+      data-testid="sign-in-container"
+    >
+      <h1 className={style.text.sectionTitle()} data-testid="sign-in-title">
+        サインイン
+      </h1>
       <fetcher.Form
         method="post"
         onSubmit={handleSubmit}
         className={style.form.container()}
+        data-testid="sign-in-form"
       >
         <div>
-          <label htmlFor="email" className={style.form.label({ necessary: true })}>
+          <label
+            htmlFor="email"
+            className={style.form.label({ necessary: true })}
+            data-testid="sign-in-label-email"
+          >
             メールアドレス
           </label>
           <input
@@ -112,10 +122,15 @@ export default function SignInPage() {
             required
             autoComplete="email"
             className={style.form.input()}
+            data-testid="sign-in-input-email"
           />
         </div>
         <div>
-          <label htmlFor="password" className={style.form.label({ necessary: true })}>
+          <label
+            htmlFor="password"
+            className={style.form.label({ necessary: true })}
+            data-testid="sign-in-label-password"
+          >
             パスワード
           </label>
           <input
@@ -127,24 +142,33 @@ export default function SignInPage() {
             required
             autoComplete="current-password"
             className={style.form.input()}
+            data-testid="sign-in-input-password"
           />
         </div>
         {error && (
-          <>
-            <div className={style.text.error()}>{error}</div>
+          <div data-testid="sign-in-error-container">
+            <div className={style.text.error()} data-testid="sign-in-error-message">
+              {error}
+            </div>
             <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
               サインインに失敗する場合は、
               <span className={style.text.link()}>
-                <Link to="https://accounts.omu-aikido.com">こちら</Link>
+                <Link
+                  to="https://accounts.omu-aikido.com"
+                  data-testid="sign-in-link-external"
+                >
+                  こちら
+                </Link>
               </span>
               からサインインをお試しください。
             </div>
-          </>
+          </div>
         )}
         <button
           type="submit"
           disabled={loading || error !== null}
           className={style.button({ type: "primary", class: "w-full" })}
+          data-testid="sign-in-button-submit"
         >
           {loading ? "サインイン中..." : "サインイン"}
         </button>
@@ -167,15 +191,21 @@ export default function SignInPage() {
           }
         }}
         disabled={loading}
+        data-testid="sign-in-button-discord"
       >
         <Icon icon={"discord-logo"} size="24" />
         Discordで認証
       </button>
-      <div className="mt-4 text-center text-sm text-slate-600 dark:text-slate-400">
+      <div
+        className="mt-4 text-center text-sm text-slate-600 dark:text-slate-400"
+        data-testid="sign-in-signup-link-container"
+      >
         まだアカウントがありませんか？
         <br />
         <span className={style.text.link()}>
-          <Link to="/sign-up">こちら</Link>
+          <Link to="/sign-up" data-testid="sign-in-link-signup">
+            こちら
+          </Link>
         </span>
         からサインアップしてください。
       </div>

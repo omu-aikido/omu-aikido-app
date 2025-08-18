@@ -383,10 +383,15 @@ export default function SignUpPage(props: Route.ComponentProps) {
   }, [fetcher.data, fetcher.state, handleClerkSignUp, dispatch])
 
   return (
-    <div className={style.card.container({ class: "max-w-md mx-auto" })}>
-      <h1 className={style.text.sectionTitle()}>サインアップ</h1>
+    <div
+      className={style.card.container({ class: "max-w-md mx-auto" })}
+      data-testid="sign-up-container"
+    >
+      <h1 className={style.text.sectionTitle()} data-testid="sign-up-title">
+        サインアップ
+      </h1>
       <ProgressIndicator step={step} />
-      <fetcher.Form method="post" onSubmit={handleSubmit}>
+      <fetcher.Form method="post" onSubmit={handleSubmit} data-testid="sign-up-form">
         <div
           className={`${style.form.container({ vertical: true })} ${step === "basic" ? "" : "hidden"}`}
         >
@@ -465,6 +470,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
             onClick={handleNext}
             className={style.button({ type: "primary", class: "col-span-3" })}
             disabled={fetcher.state !== "idle" || isSignUpCreated}
+            data-testid="sign-up-button-next-basic"
           >
             <div className="flex items-center justify-center gap-2">
               {(fetcher.state !== "idle" || isSignUpCreated) && (
@@ -546,6 +552,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
               type="button"
               onClick={prevStep}
               className={style.button({ type: "secondary", class: "flex-1" })}
+              data-testid="sign-up-button-back-personal"
             >
               戻る
             </button>
@@ -554,6 +561,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
               onClick={handleNext}
               className={style.button({ type: "primary", class: "flex-1" })}
               disabled={fetcher.state !== "idle" || isSignUpCreated}
+              data-testid="sign-up-button-next-personal"
             >
               <div className="flex items-center justify-center gap-2">
                 {(fetcher.state !== "idle" || isSignUpCreated) && (
@@ -705,6 +713,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
               type="button"
               onClick={prevStep}
               className={style.button({ type: "secondary", class: "flex-1" })}
+              data-testid="sign-up-button-back-profile"
             >
               戻る
             </button>
@@ -713,6 +722,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
               type="submit"
               className={style.button({ type: "primary", class: "flex-1" })}
               disabled={disabled}
+              data-testid="sign-up-button-submit"
             >
               <div className="flex items-center justify-center gap-2">
                 {(fetcher.state !== "idle" || isSignUpCreated) && (

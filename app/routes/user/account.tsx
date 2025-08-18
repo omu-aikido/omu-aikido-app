@@ -67,14 +67,31 @@ export default function ProfileForm() {
         method="post"
         className={style.form.container()}
         encType={isEditing ? "multipart/form-data" : undefined}
+        data-testid="profile-form"
       >
-        <div className="flex gap-2">
-          <ProfileImageInput imageUrl={user.imageUrl} isEditing={isEditing} />
-          <LastNameInput lastName={user.lastName ?? undefined} disabled={disabled} />
-          <FirstNameInput firstName={user.firstName ?? undefined} disabled={disabled} />
+        <div className="flex gap-2" data-testid="profile-inputs">
+          <ProfileImageInput
+            imageUrl={user.imageUrl}
+            isEditing={isEditing}
+            data-testid="profile-image-input"
+          />
+          <LastNameInput
+            lastName={user.lastName ?? undefined}
+            disabled={disabled}
+            data-testid="last-name-input"
+          />
+          <FirstNameInput
+            firstName={user.firstName ?? undefined}
+            disabled={disabled}
+            data-testid="first-name-input"
+          />
         </div>
-        <UsernameInput username={user.username || ""} disabled={disabled} />
-        <EmailInput email={primaryEmail} />
+        <UsernameInput
+          username={user.username || ""}
+          disabled={disabled}
+          data-testid="username-input"
+        />
+        <EmailInput email={primaryEmail} data-testid="email-input" />
         <StateButton
           isEditing={isEditing}
           setIsEditing={setIsEditing}

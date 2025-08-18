@@ -34,11 +34,21 @@ export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher
 
   return (
     <>
-      <fetcher.Form method="post" className={style.form.container({ vertical: true })}>
-        <input type="hidden" name="userId" value={userId ?? ""} />
+      <fetcher.Form
+        method="post"
+        className={style.form.container({ vertical: true })}
+        data-testid="add-record-form"
+      >
+        <input
+          type="hidden"
+          name="userId"
+          value={userId ?? ""}
+          data-testid="add-record-input-userid"
+        />
         <label
           htmlFor="dateDaypicker"
           className={style.form.label({ necessary: true, class: "col-span-1" })}
+          data-testid="add-record-label-date"
         >
           日付
         </label>
@@ -50,10 +60,12 @@ export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher
           className={style.form.input({ class: "col-span-2" })}
           value={formState.date}
           onChange={handleDateChange}
+          data-testid="add-record-input-date"
         />
         <label
           htmlFor="timeInput"
           className={style.form.label({ necessary: true, class: "col-span-1" })}
+          data-testid="add-record-label-period"
         >
           稽古時間
         </label>
@@ -68,12 +80,14 @@ export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher
           max="5"
           value={formState.period}
           onChange={handlePeriodChange}
+          data-testid="add-record-input-period"
         />
         <button
           disabled={submitting}
           type="submit"
           id="submitAddRecord"
           className={style.form.button({ class: "col-span-3 mt-2" })}
+          data-testid="add-record-button-submit"
         >
           {submitting ? "送信中..." : "追加"}
         </button>

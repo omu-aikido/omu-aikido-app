@@ -145,10 +145,10 @@ export function meta(args: Route.MetaArgs) {
 export async function action(args: Route.ActionArgs) {
   const { userId } = await getAuth(args)
   if (!userId) {
-    return new Response(
-      JSON.stringify({ success: false, error: "認証されていません" }),
-      { status: 401, headers: { "Content-Type": "application/json" } },
-    )
+    return new Response(JSON.stringify({ success: false, error: "認証されていません" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    })
   }
 
   const formData = await args.request.formData()

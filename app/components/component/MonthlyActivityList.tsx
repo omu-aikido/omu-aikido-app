@@ -37,6 +37,7 @@ const DayActivitySummary = React.memo<{ totalHours: number; count: number }>(
             class:
               "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 rounded-sm font-medium text-sm",
           })}
+          data-testid={`day-summary-${totalHours}`}
         >
           合計 {Number(totalHours)}h
         </div>
@@ -63,7 +64,10 @@ const MonthlyActivityList = React.memo<Props>(function MonthlyActivityList({
   onDayClick,
 }) {
   return (
-    <ul className="divide-y divide-slate-200 dark:divide-slate-700">
+    <ul
+      className="divide-y divide-slate-200 dark:divide-slate-700"
+      data-testid="monthly-activity-list"
+    >
       {daysInMonth.map((day, idx) => {
         const acts = currentActivities.filter(
           act => act.date === format(day, "yyyy-MM-dd") && !act.isDeleted,
@@ -79,6 +83,7 @@ const MonthlyActivityList = React.memo<Props>(function MonthlyActivityList({
         return (
           <li
             key={idx}
+            data-testid={`day-${format(day, "d")}`}
             className={listItem({ today: isToday })}
             onClick={() => onDayClick(day)}
           >
@@ -86,12 +91,16 @@ const MonthlyActivityList = React.memo<Props>(function MonthlyActivityList({
               {`${format(day, "d日")}
                 (${["日", "月", "火", "水", "木", "金", "土"][day.getDay()]})`}
             </div>
-            <div className="flex-1 space-y-1">
+            <div
+              className="flex-1 space-y-1"
+              data-testid={`day-${format(day, "d")}-content`}
+            >
               {acts.length === 0 ? (
                 <span
                   className={style.text.info({
                     class: "text-sm text-slate-400 dark:text-slate-500",
                   })}
+                  data-testid="no-record"
                 >
                   記録なし
                 </span>

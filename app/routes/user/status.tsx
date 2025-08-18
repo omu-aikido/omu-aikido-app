@@ -70,21 +70,51 @@ export default function StatusForm({ loaderData }: Route.ComponentProps) {
       method="post"
       className={style.form.container()}
       encType={isEditing ? "multipart/form-data" : undefined}
+      data-testid={
+        isEditing ? "status-form-wrapper-editing" : "status-form-wrapper-viewing"
+      }
     >
-      <GradeSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
+      <GradeSelect
+        profile={profile}
+        isEditing={isEditing}
+        fetcherState={fetcher.state}
+        data-testid={
+          isEditing ? "grade-select-wrapper-editing" : "grade-selector-wrapper-viewing"
+        }
+      />
       <GetGradeAtInput
         profile={profile}
         isEditing={isEditing}
         fetcherState={fetcher.state}
+        data-testid={
+          isEditing ? "grade-at-input-wrapper-editing" : "grade-at-input-wrapper-viewing"
+        }
       />
       <JoinedAtInput
         profile={profile}
         isEditing={isEditing}
         fetcherState={fetcher.state}
+        data-testid={
+          isEditing
+            ? "joined-at-input-wrapper-editing"
+            : "joined-at-input-wrapper-viewing"
+        }
       />
-      <YearSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
+      <YearSelect
+        profile={profile}
+        isEditing={isEditing}
+        fetcherState={fetcher.state}
+        data-testid={
+          isEditing ? "year-selector-wrapper-editing" : "year-selector-wrapper-viewing"
+        }
+      />
 
-      <StateButton isEditing={isEditing} setIsEditing={setIsEditing} fetcher={fetcher} />
+      <StateButton
+        isEditing={isEditing}
+        setIsEditing={setIsEditing}
+        fetcher={fetcher}
+        data-testid={isEditing ? "state-button-editing" : "state-button-viewing"}
+      />
     </FormWrapper>
   )
 }
@@ -110,9 +140,18 @@ function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         className={style.form.select()}
         defaultValue={profile.grade}
         disabled={disabled}
+        data-testid={isEditing ? "grade-select-editing" : "grade-select-viewing"}
       >
         {gradeOptions.map(g => (
-          <option key={g.grade} value={g.grade}>
+          <option
+            key={g.grade}
+            value={g.grade}
+            data-testid={
+              isEditing
+                ? "grade-select-option-editing-" + g.grade
+                : "grade-select-option-viewing-" + g.grade
+            }
+          >
             {g.name}
           </option>
         ))}
@@ -139,6 +178,7 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
         defaultValue={isEditing ? value : undefined}
         value={!isEditing ? value : undefined}
         disabled={disabled}
+        data-testid={isEditing ? "getGradeAt-input-editing" : "getGradeAt-input-viewing"}
       />
     </div>
   )
@@ -161,6 +201,7 @@ function JoinedAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
         defaultValue={isEditing ? profile.joinedAt : undefined}
         value={!isEditing ? profile.joinedAt : undefined}
         disabled={disabled}
+        data-testid={isEditing ? "joinedAt-input-editing" : "joinedAt-input-viewing"}
       />
     </div>
   )
@@ -180,15 +221,32 @@ function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         className={style.form.select()}
         defaultValue={profile.year}
         disabled={disabled}
+        data-testid={isEditing ? "year-select-editing" : "year-select-viewing"}
       >
-        <option value="b1">学部 1年</option>
-        <option value="b2">学部 2年</option>
-        <option value="b3">学部 3年</option>
-        <option value="b4">学部 4年</option>
-        <option value="m1">修士 1年</option>
-        <option value="m2">修士 2年</option>
-        <option value="d1">博士 1年</option>
-        <option value="d2">博士 2年</option>
+        <option value="b1" data-testid="year-select-option-b1">
+          学部 1年
+        </option>
+        <option value="b2" data-testid="year-select-option-b2">
+          学部 2年
+        </option>
+        <option value="b3" data-testid="year-select-option-b3">
+          学部 3年
+        </option>
+        <option value="b4" data-testid="year-select-option-b4">
+          学部 4年
+        </option>
+        <option value="m1" data-testid="year-select-option-m1">
+          修士 1年
+        </option>
+        <option value="m2" data-testid="year-select-option-m2">
+          修士 2年
+        </option>
+        <option value="d1" data-testid="year-select-option-d1">
+          博士 1年
+        </option>
+        <option value="d2" data-testid="year-select-option-d2">
+          博士 2年
+        </option>
       </select>
     </div>
   )

@@ -25,7 +25,7 @@ export default function YearMonthSelectorInline({
   }, [year, month])
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex gap-2 items-center" data-testid="year-month-selector-container">
       <input
         type="number"
         id="select-year"
@@ -35,6 +35,7 @@ export default function YearMonthSelectorInline({
         onChange={e => setYear(Number(e.target.value))}
         className={style.form.input() + " w-20 text-center"}
         disabled={isChanged}
+        data-testid="year-month-selector-year"
       />
       <span className="mx-1">年</span>
       <select
@@ -43,6 +44,7 @@ export default function YearMonthSelectorInline({
         onChange={e => setMonth(Number(e.target.value))}
         className={style.form.input()}
         disabled={isChanged}
+        data-testid="year-month-selector-month"
       >
         {monthOptions.map(m => (
           <option key={m} value={m}>
