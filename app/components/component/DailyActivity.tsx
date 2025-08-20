@@ -160,6 +160,7 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
           <button
             onClick={onClose}
             className={style.button({ type: "secondary", className: "mr-auto" })}
+            data-testid="back-button"
           >
             戻る
           </button>

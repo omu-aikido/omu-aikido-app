@@ -98,7 +98,14 @@ const CalendarDayCell = React.memo<{
       data-testid={`day-${format(day, "d")}`}
     >
       <div className="font-semibold mb-1 sm:mb-2">{format(day, "d")}</div>
-      <div className="space-y-1">
+      <div
+        className="space-y-1"
+        data-testid={
+          count === 0
+            ? `day-${format(day, "d")}-no-record`
+            : `day-${format(day, "d")}-has-record`
+        }
+      >
         <DayActivitySummary totalHours={totalHours} count={count} />
       </div>
     </div>
@@ -120,14 +127,15 @@ const WeekdayHeaderCell = React.memo<{ day: AllowedWeekday; index: number }>(
 
 const DayActivitySummary = React.memo<{ totalHours: number; count: number }>(
   function DayActivitySummary({ totalHours, count }) {
-    if (totalHours <= 0) return null
+    if (totalHours <= 0)
+      return <div className="text-transparent select-none">記録なし</div>
     return (
       <div
         className={style.text.info({
           class:
             "flex justify-between md:text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded-sm font-medium",
         })}
-        data-testid={`day-summary-${totalHours}`}
+        data-testid="day-has-record"
       >
         合計 {Number(totalHours)}h
         {count >= 2 && count < 100 && (

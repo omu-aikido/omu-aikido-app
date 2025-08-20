@@ -13,10 +13,15 @@ import { defineConfig, devices } from "@playwright/test"
  */
 export default defineConfig({
   testDir: "./tests/e2e",
-  fullyParallel: false,
-  workers: 1,
+  fullyParallel: true,
+  workers: 2,
+  retries: 1,
   reporter: "html",
-  use: { baseURL: "http://localhost:4173", trace: "on-first-retry" },
+  use: {
+    baseURL: "http://localhost:4173",
+    trace: "on-first-retry",
+    video: { mode: "retain-on-failure", size: { width: 960, height: 540 } },
+  },
 
   projects: [
     { name: "Authentication Setup", testMatch: "tests/e2e/global.setup.ts" },
@@ -29,20 +34,22 @@ export default defineConfig({
     },
     {
       name: "Chromium",
-      testDir: "tests/e2e/components/desktop",
-      use: { ...devices["Desktop Chrome"], storageState: "playwright/.clerk/user.json" },
-      dependencies: ["Authentication Setup"],
-    },
-    {
-      name: "Mobile Chrome",
-      testDir: "tests/e2e/components/mobile",
-      use: { ...devices["Pixel 5"], storageState: "playwright/.clerk/user.json" },
+      testMatch: /tests\/e2e\/.*(desktop|common)\/.*\.spec\.ts$/,
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: "playwright/.clerk/user.json",
+        isMobile: false,
+      },
       dependencies: ["Authentication Setup"],
     },
     {
       name: "Mobile Safari",
-      testDir: "tests/e2e/components/mobile",
-      use: { ...devices["iPhone 12"], storageState: "playwright/.clerk/user.json" },
+      testMatch: /tests\/e2e\/.*(mobile|common)\/.*\.spec\.ts$/,
+      use: {
+        ...devices["iPhone 12"],
+        storageState: "playwright/.clerk/user.json",
+        isMobile: true,
+      },
       dependencies: ["Authentication Setup"],
     },
   ],

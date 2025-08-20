@@ -5,8 +5,8 @@ permissions:
 
 on:
   push:
-      branches-ignore:
-        - main
+    branches-ignore:
+      - main
   workflow_dispatch:
 
 concurrency:
@@ -151,3 +151,5 @@ jobs:
 
       - name: Run Unit Tests
         run: pnpm test:unit
+  e2e-test:
+    uses: ./.playwright.yml

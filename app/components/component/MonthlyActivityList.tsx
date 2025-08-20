@@ -31,13 +31,12 @@ const DayActivitySummary = React.memo<{ totalHours: number; count: number }>(
   function DayActivitySummary({ totalHours, count }) {
     if (totalHours <= 0) return null
     return (
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-row justify-between" data-testid="day-has-record">
         <div
           className={style.text.info({
             class:
               "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 rounded-sm font-medium text-sm",
           })}
-          data-testid={`day-summary-${totalHours}`}
         >
           合計 {Number(totalHours)}h
         </div>
@@ -93,19 +92,25 @@ const MonthlyActivityList = React.memo<Props>(function MonthlyActivityList({
             </div>
             <div
               className="flex-1 space-y-1"
-              data-testid={`day-${format(day, "d")}-content`}
+              data-testid={
+                acts.length === 0
+                  ? `day-${format(day, "d")}-no-record`
+                  : `day-${format(day, "d")}-has-record`
+              }
             >
               {acts.length === 0 ? (
                 <span
                   className={style.text.info({
                     class: "text-sm text-slate-400 dark:text-slate-500",
                   })}
-                  data-testid="no-record"
                 >
                   記録なし
                 </span>
               ) : (
-                <span className={style.text.info("text-sm")}>
+                <span
+                  className={style.text.info("text-sm")}
+                  data-testid={`day-has-record`}
+                >
                   <DayActivitySummary totalHours={total} count={acts.length} />
                 </span>
               )}

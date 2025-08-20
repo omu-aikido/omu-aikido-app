@@ -26,6 +26,7 @@
     "postdocker:up": "pnpm db:migrate",
     "docker:db:reset": "docker compose down && docker compose up -d && pnpm db:migrate",
     "pretest:e2e": "pnpm docker:down && pnpm docker:up && pnpm db:migrate",
+    "posttest:e2e": "pnpm docker:down",
     "playwright:install": "playwright install"
   },
   "dependencies": {

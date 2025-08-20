@@ -225,7 +225,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                 type="submit"
                 className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 mx-1 w-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
                 disabled={!isChanged || fetcher.state !== "idle"}
-                data-testid="submit-button"
+                data-testid="record-button-submit"
               >
                 {fetcher.state === "idle"
                   ? "登録"
@@ -236,10 +236,11 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
               <button
                 type="button"
                 onClick={() => {
-                  alert("変更をリセットします。よろしいですか？")
-                  setActivities(originalActivities)
-                  setSelectedDate(null)
-                  setShowDailyActivityModal(false)
+                  if (window.confirm("変更をリセットします。よろしいですか？")) {
+                    setActivities(originalActivities)
+                    setSelectedDate(null)
+                    setShowDailyActivityModal(false)
+                  }
                 }}
                 className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 mx-1 w-1/4 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
                 disabled={!isChanged || fetcher.state !== "idle"}
@@ -295,14 +296,15 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                   <button
                     type="button"
                     onClick={() => {
-                      alert("変更をリセットします。よろしいですか？")
-                      setActivities(originalActivities)
-                      setSelectedDate(null)
-                      setShowDailyActivityModal(false)
+                      if (window.confirm("変更をリセットします。よろしいですか？")) {
+                        setActivities(originalActivities)
+                        setSelectedDate(null)
+                        setShowDailyActivityModal(false)
+                      }
                     }}
                     className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 my-4 mx-1 w-1/3 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
                     disabled={!isChanged || fetcher.state !== "idle"}
-                    data-testid="reset-button"
+                    data-testid="record-button-reset-mobile"
                   >
                     リセット
                   </button>
@@ -310,7 +312,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                     type="submit"
                     className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 my-4 mx-1 w-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
                     disabled={!isChanged || fetcher.state !== "idle"}
-                    data-testid="submit-button"
+                    data-testid="record-button-submit-mobile"
                   >
                     {fetcher.state === "idle"
                       ? "登録"
