@@ -7,7 +7,7 @@ import {
   toLocalJPString,
   translateGrade,
   translateYear,
-} from "@/app/lib/utils"
+} from "~/lib/utils"
 
 describe("translateGrade", () => {
   it("should return the correct grade name for a given grade value", () => {
@@ -70,10 +70,31 @@ describe("toLocalJPString", () => {
 })
 
 describe("getJST", () => {
-  it("should return a Date object set to JST midnight for the given date", () => {
-    const date = new Date("2023-04-01T10:20:30Z")
+  it("should convert UTC time to JST time (UTC + 9 hours)", () => {
+    // エッジ環境のUTC midnight
+    const date = new Date("2023-04-01T00:00:00Z")
     const jstDate = getJST(date)
-    expect(jstDate.toISOString()).toContain("2023-04-01T00:00:00.000Z")
+
+    // UTC 00:00 + 9時間 = JST 09:00
+    expect(jstDate.toISOString()).toBe("2023-04-01T09:00:00.000Z")
+  })
+
+  it("should handle UTC afternoon time correctly", () => {
+    // UTC 15:30
+    const date = new Date("2023-04-01T15:30:45Z")
+    const jstDate = getJST(date)
+
+    // UTC 15:30 + 9時間 = JST 00:30 (翌日)
+    expect(jstDate.toISOString()).toBe("2023-04-02T00:30:45.000Z")
+  })
+
+  it("should handle date boundary crossing", () => {
+    // UTC 18:00
+    const date = new Date("2023-04-01T18:00:00Z")
+    const jstDate = getJST(date)
+
+    // UTC 18:00 + 9時間 = JST 03:00 (翌日)
+    expect(jstDate.toISOString()).toBe("2023-04-02T03:00:00.000Z")
   })
 })
 
