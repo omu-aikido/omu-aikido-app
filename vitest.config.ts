@@ -9,18 +9,9 @@ export default defineConfig({
       {
         extends: true,
         test: {
-          name: { label: "unit", color: "blue" },
-          include: ["**/*.edge.{test,spec}.{js,ts}"],
-          exclude: ['tests/**', 'node_modules'],
-          environment: "edge-runtime",
-        },
-      },
-      {
-        extends: true,
-        test: {
           name: { label: "unit", color: "cyan" },
-          include: ["**/*.client.{test,spec}.{js,ts}"],
-          exclude: ['tests/**', 'node_modules'],
+          include: ["**/*.{test,spec}.{js,ts}"],
+          exclude: ["tests/**", "node_modules"],
           environment: "happy-dom",
         },
       },
