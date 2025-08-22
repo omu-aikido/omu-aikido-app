@@ -19,11 +19,14 @@ export async function loader(args: Route.LoaderArgs) {
 
 export default function App() {
   return (
-    <div className="h-dvh">
+    <div className="h-dvh" data-testid="unauth-layout-container">
       <ReactHeader title="ポータル">
         <></>
       </ReactHeader>
-      <main className="min-h-4/5 p-3 md:p-6 mx-auto max-w-3xl overflow-y-auto mb-auto">
+      <main
+        className="min-h-4/5 p-3 md:p-6 mt-20 mx-auto max-w-3xl overflow-y-auto mb-auto"
+        data-testid="unauth-layout-main"
+      >
         <Outlet />
       </main>
       <Footer />

@@ -66,8 +66,14 @@ export function toLocalJPString(date: Date): string {
   })
 }
 
+/**
+ * エッジ環境とクライアント環境での時刻の補正
+ * @param date UTCでの時刻を期待
+ * @returns 9時間足したもの
+ */
 export function getJST(date: Date): Date {
-  return new Date(date.toISOString().split("T").shift() + "T00:00:00+09:00")
+  const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000)
+  return jstDate
 }
 
 export class JoinedAtYearRange {

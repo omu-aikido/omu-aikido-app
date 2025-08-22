@@ -10,13 +10,13 @@ import {
 import { useEffect, useMemo, useState } from "react"
 import { redirect, useActionData, useFetcher, useSearchParams } from "react-router"
 
-import MonthlyActivityList from "../components/component/MonthlyActivityList"
-import MonthlyCalendarGrid from "../components/component/MonthlyCalendarGrid"
-import MonthNavigation from "../components/component/MonthNavigation"
-
 import type { Route } from "./+types/record"
 
 import DailyActivity from "~/components/component/DailyActivity"
+import MonthlyActivityList from "~/components/component/MonthlyActivityList"
+import MonthlyCalendarGrid from "~/components/component/MonthlyCalendarGrid"
+import MonthNavigation from "~/components/component/MonthNavigation"
+import TabBarScrollHide from "~/components/component/TabBarScrollHide"
 import YearMonthSelectorInline from "~/components/component/YearMonthSelector"
 import type { ActivityType } from "~/db/schema"
 import {
@@ -34,7 +34,7 @@ export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
   const userId = auth.userId!
 
-  if (!userId) return redirect("/sign-in?redirect_url=" + args.request.url)
+  if (!userId) throw new Error("User not authenticated")
 
   const url = new URL(request.url)
   const currentMonth = url.searchParams.get("month") || format(new Date(), "yyyy-MM")
@@ -189,12 +189,25 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
     : []
 
   return (
-    <div className="min-h-screen transition-colors duration-200 relative">
+    <div
+      className="min-h-screen transition-colors duration-200 relative"
+      data-testid="record-page-container"
+    >
       <>
-        <h1 className={style.text.sectionTitle()}>記録一覧</h1>
+        <h1 className={style.text.sectionTitle()} data-testid="record-title">
+          記録一覧
+        </h1>
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-800 rounded-lg p-4 mb-6">
-            <p className="text-red-600 dark:text-red-400 text-center">エラー: {error}</p>
+          <div
+            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-800 rounded-lg p-4 mb-6"
+            data-testid="record-error-container"
+          >
+            <p
+              className="text-red-600 dark:text-red-400 text-center"
+              data-testid="record-error-message"
+            >
+              エラー: {error}
+            </p>
           </div>
         )}
         <MonthNavigation
@@ -212,6 +225,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                 type="submit"
                 className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 mx-1 w-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
                 disabled={!isChanged || fetcher.state !== "idle"}
+                data-testid="record-button-submit"
               >
                 {fetcher.state === "idle"
                   ? "登録"
@@ -222,13 +236,15 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
               <button
                 type="button"
                 onClick={() => {
-                  alert("変更をリセットします。よろしいですか？")
-                  setActivities(originalActivities)
-                  setSelectedDate(null)
-                  setShowDailyActivityModal(false)
+                  if (window.confirm("変更をリセットします。よろしいですか？")) {
+                    setActivities(originalActivities)
+                    setSelectedDate(null)
+                    setShowDailyActivityModal(false)
+                  }
                 }}
                 className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 mx-1 w-1/4 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
                 disabled={!isChanged || fetcher.state !== "idle"}
+                data-testid="record-button-reset"
               >
                 リセット
               </button>
@@ -258,6 +274,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
             daysInMonth={daysInMonth}
             currentActivities={currentActivities}
             onDayClick={handleDayClick}
+            data-testid="monthly-activity-list"
           />
           <fetcher.Form method="post">
             <input type="hidden" name="actionType" value="batchUpdate" />
@@ -274,32 +291,37 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
               )}
             />
             <div className="fixed w-full right-0 bottom-0">
-              <div className="flex flex-row items-center justify-between backdrop-blur-sm pb-5 px-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    alert("変更をリセットします。よろしいですか？")
-                    setActivities(originalActivities)
-                    setSelectedDate(null)
-                    setShowDailyActivityModal(false)
-                  }}
-                  className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 my-4 mx-1 w-1/3 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
-                  disabled={!isChanged || fetcher.state !== "idle"}
-                >
-                  リセット
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 my-4 mx-1 w-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
-                  disabled={!isChanged || fetcher.state !== "idle"}
-                >
-                  {fetcher.state === "idle"
-                    ? "登録"
-                    : fetcher.state === "loading"
-                      ? "読み込み中"
-                      : "送信中"}
-                </button>
-              </div>
+              <TabBarScrollHide>
+                <div className="flex flex-row items-center justify-between pb-5 px-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm("変更をリセットします。よろしいですか？")) {
+                        setActivities(originalActivities)
+                        setSelectedDate(null)
+                        setShowDailyActivityModal(false)
+                      }
+                    }}
+                    className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 my-4 mx-1 w-1/3 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+                    disabled={!isChanged || fetcher.state !== "idle"}
+                    data-testid="record-button-reset-mobile"
+                  >
+                    リセット
+                  </button>
+                  <button
+                    type="submit"
+                    className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 my-4 mx-1 w-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+                    disabled={!isChanged || fetcher.state !== "idle"}
+                    data-testid="record-button-submit-mobile"
+                  >
+                    {fetcher.state === "idle"
+                      ? "登録"
+                      : fetcher.state === "loading"
+                        ? "読み込み中"
+                        : "送信中"}
+                  </button>
+                </div>
+              </TabBarScrollHide>
             </div>
           </fetcher.Form>
         </div>

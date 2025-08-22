@@ -1,10 +1,9 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { Outlet, redirect } from "react-router"
 
-import { getProfile } from "../lib/query/profile"
-
 import type { Route } from "./+types/admin"
 
+import { getProfile } from "~/lib/query/profile"
 import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
 
@@ -24,11 +23,13 @@ export async function loader(args: Route.LoaderArgs) {
 // MARK: Component - 共通のレイアウトとナビゲーション
 export default function AccountLayout() {
   return (
-    <>
-      <h1 className={style.text.sectionTitle()}>管理ページ</h1>
-      <div className="mt-6">
+    <div data-testid="admin-layout-container">
+      <h1 className={style.text.sectionTitle()} data-testid="admin-layout-title">
+        管理ページ
+      </h1>
+      <div className="mt-6" data-testid="admin-layout-content">
         <Outlet />
       </div>
-    </>
+    </div>
   )
 }

@@ -25,7 +25,8 @@ export async function loader(args: Route.LoaderArgs) {
 
   const profile = await getProfile({ userId, env })
 
-  if (!profile) return redirect("/sign-in")
+  if (!profile)
+    return redirect("/sign-in" + `?redirect_url=${encodeURIComponent(args.request.url)}`)
 
   const links: PagePath[] = [
     { name: "ホーム", href: "/", desc: "ダッシュボード" },
@@ -47,7 +48,7 @@ export default function App(args: Route.ComponentProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="h-dvh">
+    <div className="h-dvh" data-testid="auth-layout-container">
       <ReactHeader title="ポータル">
         <Sidebar
           position="right"
@@ -58,7 +59,10 @@ export default function App(args: Route.ComponentProps) {
           <AccountUi apps={links} />
         </Sidebar>
       </ReactHeader>
-      <main className="min-h-4/5 p-3 md:p-6 mx-auto max-w-3xl overflow-y-auto mb-auto">
+      <main
+        className="min-h-4/5 p-3 md:p-6 mt-20 mx-auto max-w-3xl overflow-y-auto mb-auto"
+        data-testid="auth-layout-main"
+      >
         <Outlet />
       </main>
       <Footer />

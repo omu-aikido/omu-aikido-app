@@ -21,6 +21,7 @@ export default function BatchUpdateButton({
         type: isChanged ? "primary" : "secondary", // Dynamically set type based on isChanged
         className,
       })}
+      data-testid="batch-update-button"
     >
       {children}
     </button>

@@ -1,9 +1,8 @@
 import { format } from "date-fns"
 import React, { useEffect, useState } from "react"
 
-import { toLocalJPString } from "../../lib/utils"
-
 import type { ActivityType } from "~/db/schema"
+import { toLocalJPString } from "~/lib/utils"
 import { style } from "~/styles/component"
 
 interface DailyActivityItem extends ActivityType {
@@ -64,14 +63,25 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-600/50 dark:bg-slate-900/75 flex justify-center items-center z-50">
-      <div className={style.card.container({ class: "max-w-md w-full mx-4" })}>
+    <div
+      className="fixed inset-0 bg-slate-600/50 dark:bg-slate-900/75 flex justify-center items-center z-50"
+      data-testid="daily-activity-modal"
+    >
+      <div
+        className={style.card.container({ class: "max-w-md w-full mx-4" })}
+        data-testid="daily-activity-card"
+      >
         <h2 className={style.text.sectionTitle({ class: "text-xl mb-4" })}>
           {date ? format(date, "yyyy年MM月dd日") : "日付不明"} の記録
         </h2>
-        <div className="flex flex-col max-h-80 overflow-y-auto mb-4">
+        <div
+          className="flex flex-col max-h-80 overflow-y-auto mb-4"
+          data-testid="daily-activity-list"
+        >
           {dailyActivities.filter(act => !act.isDeleted).length === 0 && (
-            <p className={style.text.info()}>この日の活動記録がありません。</p>
+            <p className={style.text.info()} data-testid="daily-activity-empty">
+              この日の活動記録がありません。
+            </p>
           )}
           {dailyActivities
             .filter(act => !act.isDeleted)
@@ -79,11 +89,13 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
               <div
                 key={act.id}
                 className="flex items-center py-0.5 border-b border-slate-200 dark:border-slate-600"
+                data-testid={`daily-activity-item-${index}`}
               >
                 <button
                   onClick={() => handleDeleteActivity(act.id)}
                   className="p-1 mx-1 sm:mx-3 rounded-full hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors"
                   title="削除"
+                  data-testid="delete-record"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -107,6 +119,7 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
                   id={act.id}
                   onChange={e => handlePeriodChange(index, parseFloat(e.target.value))}
                   className={style.form.input({ className: "w-20 mr-2" })}
+                  data-testid={`input-record`}
                 />
                 <span className="text-slate-900 dark:text-white">時間</span>
                 <span
@@ -122,6 +135,7 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
             onClick={handleAddActivity}
             className="flex items-center py-0.5 border-b border-slate-200 dark:border-slate-600 cursor-pointer"
             style={{ minHeight: "48px" }}
+            data-testid={`add-record`}
           >
             <div className="p-1 mx-1 sm:mx-3 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors">
               <svg
@@ -146,12 +160,14 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
           <button
             onClick={onClose}
             className={style.button({ type: "secondary", className: "mr-auto" })}
+            data-testid="back-button"
           >
             戻る
           </button>
           <button
             onClick={handleSave}
             className={style.button({ type: "primary", className: "place-items-start" })}
+            data-testid="save-record"
           >
             一時保存
           </button>

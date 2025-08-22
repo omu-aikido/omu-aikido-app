@@ -17,12 +17,14 @@ export function StateButton({
     disabled,
     onClick,
     children,
+    testId,
   }: {
     type?: "green" | "gray"
     buttonType: "button" | "submit"
     disabled?: boolean
     onClick?: () => void
     children: React.ReactNode
+    testId?: string
   }) {
     return (
       <button
@@ -30,6 +32,7 @@ export function StateButton({
         className={style.form.button(type ? { type } : undefined)}
         disabled={disabled}
         onClick={onClick}
+        data-testid={testId}
       >
         {children}
       </button>
@@ -40,10 +43,15 @@ export function StateButton({
   const submitLabel: string = isBusy ? "通信中" : "保存"
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2" data-testid="state-button-container">
       {isEditing ? (
         <>
-          <RenderButton type="green" buttonType="submit" disabled={isBusy}>
+          <RenderButton
+            type="green"
+            buttonType="submit"
+            disabled={isBusy}
+            testId="state-button-submit"
+          >
             {submitLabel}
           </RenderButton>
           <RenderButton
@@ -51,12 +59,17 @@ export function StateButton({
             buttonType="button"
             disabled={isBusy}
             onClick={() => setIsEditing(false)}
+            testId="state-button-cancel"
           >
             キャンセル
           </RenderButton>
         </>
       ) : (
-        <RenderButton buttonType="button" onClick={() => setIsEditing(true)}>
+        <RenderButton
+          buttonType="button"
+          onClick={() => setIsEditing(true)}
+          testId="state-button-edit"
+        >
           編集
         </RenderButton>
       )}

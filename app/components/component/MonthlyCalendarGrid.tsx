@@ -2,8 +2,7 @@ import { format, isSameDay } from "date-fns"
 import React from "react"
 import { tv } from "tailwind-variants"
 
-import { style } from "../../styles/component"
-
+import { style } from "~/styles/component"
 import type { DailyActivityItem } from "~/type"
 
 type Props = {
@@ -96,9 +95,17 @@ const CalendarDayCell = React.memo<{
         isFirstCol: colIndex === 0,
       }).date()}
       onClick={handleClick}
+      data-testid={`day-${format(day, "d")}`}
     >
       <div className="font-semibold mb-1 sm:mb-2">{format(day, "d")}</div>
-      <div className="space-y-1">
+      <div
+        className="space-y-1"
+        data-testid={
+          count === 0
+            ? `day-${format(day, "d")}-no-record`
+            : `day-${format(day, "d")}-has-record`
+        }
+      >
         <DayActivitySummary totalHours={totalHours} count={count} />
       </div>
     </div>
@@ -120,13 +127,15 @@ const WeekdayHeaderCell = React.memo<{ day: AllowedWeekday; index: number }>(
 
 const DayActivitySummary = React.memo<{ totalHours: number; count: number }>(
   function DayActivitySummary({ totalHours, count }) {
-    if (totalHours <= 0) return null
+    if (totalHours <= 0)
+      return <div className="text-transparent select-none">記録なし</div>
     return (
       <div
         className={style.text.info({
           class:
             "flex justify-between md:text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded-sm font-medium",
         })}
+        data-testid="day-has-record"
       >
         合計 {Number(totalHours)}h
         {count >= 2 && count < 100 && (
@@ -164,9 +173,17 @@ const MonthlyCalendarGrid = React.memo<Props>(function MonthlyCalendarGrid({
   }, [daysInMonth])
 
   return (
-    <div className="min-w-[700px] grid grid-cols-7 gap-0 mb-6">
+    <div
+      className="min-w-[700px] grid grid-cols-7 gap-0 mb-6"
+      data-testid="monthly-activity-grid"
+    >
       {weekdays.map((day, index) => (
-        <WeekdayHeaderCell key={day} day={day} index={index} />
+        <WeekdayHeaderCell
+          key={day}
+          day={day}
+          index={index}
+          data-testid={`weekday-${day}`}
+        />
       ))}
       {/* 月初の曜日分だけ空白セルを追加 */}
       {emptyStartCells.map((_, i) => (
@@ -178,6 +195,7 @@ const MonthlyCalendarGrid = React.memo<Props>(function MonthlyCalendarGrid({
             isFirstCol: i === 0,
           }).date()}
           aria-disabled="true"
+          data-testid="empty-start-cell"
         />
       ))}
       {daysInMonth.map((day, idx) => {
@@ -203,6 +221,7 @@ const MonthlyCalendarGrid = React.memo<Props>(function MonthlyCalendarGrid({
             isFirstCol: (daysInMonth[daysInMonth.length - 1].getDay() + 1 + i) % 7 === 0,
           }).date()}
           aria-disabled="true"
+          data-testid="empty-end-cell"
         />
       ))}
     </div>

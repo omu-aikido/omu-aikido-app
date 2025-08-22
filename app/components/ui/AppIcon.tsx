@@ -8,8 +8,15 @@ interface AppIconProps {
 
 export function AppIcon({ title, id, desc }: AppIconProps) {
   return (
-    <Link to={id} className="group block touch-manipulation">
-      <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-xl hover:border hover:border-blue-400 shadow-md active:shadow-lg transition-all duration-200 ease-out active:scale-[0.98] border border-slate-200 dark:border-slate-700 min-h-[120px]">
+    <Link
+      to={id}
+      className="group block touch-manipulation"
+      data-testid={`app-icon-link-${id.replace(/\//g, "")}`}
+    >
+      <div
+        className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-xl hover:border hover:border-blue-400 shadow-md active:shadow-lg transition-all duration-200 ease-out active:scale-[0.98] border border-slate-200 dark:border-slate-700 min-h-[120px]"
+        data-testid={`app-icon-card-${id.replace(/\//g, "")}`}
+      >
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-800 dark:to-slate-900 opacity-0 group-active:opacity-100 transition-opacity duration-200" />
         <div className="relative p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">

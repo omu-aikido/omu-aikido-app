@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest"
 
-import { timeForNextGrade, translateGrade, translateYear } from "../../app/lib/utils"
+import {
+  getJST,
+  JoinedAtYearRange,
+  timeForNextGrade,
+  toLocalJPString,
+  translateGrade,
+  translateYear,
+} from "~/lib/utils"
 
 describe("translateGrade", () => {
   it("should return the correct grade name for a given grade value", () => {
@@ -51,5 +58,50 @@ describe("translateYear", () => {
 
   it("should return '不明' for an unknown year value", () => {
     expect(translateYear("unknown")).toBe("不明")
+  })
+})
+
+describe("toLocalJPString", () => {
+  it("should format date to Japanese locale string", () => {
+    const date = new Date("2023-04-01T15:30:45")
+    const result = toLocalJPString(date)
+    expect(result).toMatch(/4月.*1日.*15:30.*45/)
+  })
+})
+
+describe("getJST", () => {
+  it("should convert UTC time to JST time (UTC + 9 hours)", () => {
+    // エッジ環境のUTC midnight
+    const date = new Date("2023-04-01T00:00:00Z")
+    const jstDate = getJST(date)
+
+    // UTC 00:00 + 9時間 = JST 09:00
+    expect(jstDate.toISOString()).toBe("2023-04-01T09:00:00.000Z")
+  })
+
+  it("should handle UTC afternoon time correctly", () => {
+    // UTC 15:30
+    const date = new Date("2023-04-01T15:30:45Z")
+    const jstDate = getJST(date)
+
+    // UTC 15:30 + 9時間 = JST 00:30 (翌日)
+    expect(jstDate.toISOString()).toBe("2023-04-02T00:30:45.000Z")
+  })
+
+  it("should handle date boundary crossing", () => {
+    // UTC 18:00
+    const date = new Date("2023-04-01T18:00:00Z")
+    const jstDate = getJST(date)
+
+    // UTC 18:00 + 9時間 = JST 03:00 (翌日)
+    expect(jstDate.toISOString()).toBe("2023-04-02T03:00:00.000Z")
+  })
+})
+
+describe("JoinedAtYearRange", () => {
+  it("should calculate min and max year correctly", () => {
+    const currentYear = new Date().getFullYear()
+    expect(JoinedAtYearRange.max).toBe(currentYear)
+    expect(JoinedAtYearRange.min).toBe(currentYear - JoinedAtYearRange.RANGE)
   })
 })

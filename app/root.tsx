@@ -1,6 +1,5 @@
 import { ClerkProvider } from "@clerk/react-router"
 import { rootAuthLoader } from "@clerk/react-router/ssr.server"
-import { getLogger } from "@logtape/logtape"
 import {
   isRouteErrorResponse,
   Link,
@@ -16,8 +15,6 @@ import type { Route } from "./+types/root"
 import { Footer } from "~/components/component/Footer"
 import { ReactHeader } from "~/components/component/Header"
 import "~/styles/global.css"
-
-const logger = getLogger("root")
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -57,7 +54,8 @@ export default function App(args: Route.ComponentProps) {
     </html>
   )
 }
-export function ErrorBoundary({ error, params }: Route.ErrorBoundaryProps) {
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "エラーが発生しました"
   let details = "予期しないエラーが発生しました。"
   let status: number = 503
@@ -70,14 +68,6 @@ export function ErrorBoundary({ error, params }: Route.ErrorBoundaryProps) {
     details = is404
       ? "お探しのページは存在しないか、移動された可能性があります。"
       : "一時的な問題が発生している可能性があります。"
-  }
-
-  if (error instanceof Error && status !== 404) {
-    logger.error(
-      `user ${params.userId} encountered an error: error=${error.message}, stack=${error.stack}`,
-    )
-  } else {
-    logger.error(`user ${params.userId} encountered unknown error: ${error}`)
   }
 
   const handleReload = () => {

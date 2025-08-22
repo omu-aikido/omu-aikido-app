@@ -1,8 +1,7 @@
 import { Link } from "react-router"
 import { tv } from "tailwind-variants"
 
-import { Icon } from "../ui/Icon"
-
+import { Icon } from "~/components/ui/Icon"
 import { style } from "~/styles/component"
 
 const footer = {
@@ -21,8 +20,11 @@ const footer = {
 
 export function Footer() {
   return (
-    <footer className="flex flex-col items-center justify-center p-4 bg-slate-300 dark:bg-slate-800">
-      <div className="text-center items-center p-4">
+    <footer
+      className="flex flex-col items-center justify-center p-4 bg-slate-300 dark:bg-slate-800"
+      data-testid="footer-container"
+    >
+      <div className="text-center items-center p-4" data-testid="footer-info">
         <p className={style.text.info({ class: "text-center" })}>
           © OMU Aikido Club All Rights Reserved.
           <br />
@@ -30,22 +32,34 @@ export function Footer() {
         </p>
       </div>
 
-      <div>
-        <Link to="https://omu-aikido.com/privacy-policy" className={footer.link()}>
+      <div data-testid="footer-links">
+        <Link
+          to="https://omu-aikido.com/privacy-policy"
+          className={footer.link()}
+          data-testid="footer-link-privacy"
+        >
           プライバシーポリシー
         </Link>
-        <Link to="https://omu-aikido.com/terms-of-service" className={footer.link()}>
+        <Link
+          to="https://omu-aikido.com/terms-of-service"
+          className={footer.link()}
+          data-testid="footer-link-terms"
+        >
           利用規約
         </Link>
       </div>
 
-      <div className="flex flex-row items-center justify-center p-4">
+      <div
+        className="flex flex-row items-center justify-center p-4"
+        data-testid="footer-social"
+      >
         <a
           href="https://twitter.com/fudaiaiki"
           aria-label="旧府大合氣道部 Twitter"
           className={footer.social.link()}
           target="_blank"
           rel="noopener noreferrer"
+          data-testid="footer-social-fudai-twitter"
         >
           <Icon icon="twitter-logo" />
           <span className={footer.social.text()}>旧府大Twitter</span>
@@ -56,6 +70,7 @@ export function Footer() {
           className={footer.social.link()}
           target="_blank"
           rel="noopener noreferrer"
+          data-testid="footer-social-ocu-twitter"
         >
           <Icon icon="twitter-logo" />
           <span className={footer.social.text()}>旧市大Twitter</span>
@@ -66,6 +81,7 @@ export function Footer() {
           className={footer.social.link()}
           target="_blank"
           rel="noopener noreferrer"
+          data-testid="footer-social-instagram"
         >
           <Icon icon="instagram-logo" />
           <span className={footer.social.text()}>Instagram</span>
@@ -76,6 +92,7 @@ export function Footer() {
           className={footer.social.link()}
           target="_blank"
           rel="noopener noreferrer"
+          data-testid="footer-social-github"
         >
           <Icon icon="github-logo" />
           <span className={footer.social.text()}>GitHub</span>

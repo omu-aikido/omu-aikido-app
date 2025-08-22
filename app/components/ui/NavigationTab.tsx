@@ -27,6 +27,7 @@ export const NavigationTab = React.memo<{ tabs?: NavigationTabProp[] }>(
         className="flex overflow-x-auto w-full mb-4 justify-start border-b border-slate-400 dark:border-slate-700"
         role="tablist"
         aria-label="タブナビゲーション"
+        data-testid="navigation-tab-container"
       >
         {tabs.map((tab, idx) => {
           const isActive = location.pathname === tab.to
@@ -39,6 +40,7 @@ export const NavigationTab = React.memo<{ tabs?: NavigationTabProp[] }>(
               aria-selected={isActive}
               aria-controls={`panel-${idx}`}
               data-tab-index={idx}
+              data-testid={`navigation-tab-link-${tab.to.replace(/\//g, "-")}`}
             >
               {tab.label}
             </Link>
