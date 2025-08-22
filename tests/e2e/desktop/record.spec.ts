@@ -20,7 +20,7 @@ test.describe("record page - desktop", () => {
   })
 
   test("add record", async ({ page }) => {
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 27,
@@ -45,7 +45,7 @@ test.describe("record page - desktop", () => {
     await helpers.verifySubmitButtonState(false, "登録")
     await helpers.verifyDayHasRecord(27)
 
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 27,
@@ -53,12 +53,12 @@ test.describe("record page - desktop", () => {
   })
 
   test("reset edit with accept", async ({ page }) => {
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 23,
     })
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 24,
@@ -108,7 +108,7 @@ test.describe("record page - desktop", () => {
     // 削除確認と送信
     await helpers.submitRecords()
     await helpers.verifyDayHasNoRecord(25)
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 25,
@@ -116,7 +116,7 @@ test.describe("record page - desktop", () => {
   })
 
   test("cancel add record", async ({ page }) => {
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 26,
@@ -135,7 +135,7 @@ test.describe("record page - desktop", () => {
     // キャンセル後確認
     await helpers.clickDay(26)
     await helpers.verifyDayHasNoRecord(26)
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 26,

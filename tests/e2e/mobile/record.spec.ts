@@ -30,7 +30,7 @@ test.describe("record page - mobile", () => {
   })
 
   test("add record", async ({ page }) => {
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 1,
@@ -55,7 +55,7 @@ test.describe("record page - mobile", () => {
   })
 
   test("reset edit with accept", async ({ page }) => {
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 2,
@@ -78,12 +78,12 @@ test.describe("record page - mobile", () => {
     // リセット後確認
     await helpers.verifyDayHasNoRecord(2)
     await helpers.verifyDayHasNoRecord(3)
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 2,
     })
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 3,
@@ -109,7 +109,7 @@ test.describe("record page - mobile", () => {
     // 削除確認と送信
     await helpers.submitRecords()
     await helpers.verifyDayHasNoRecord(5)
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 5,
@@ -117,7 +117,7 @@ test.describe("record page - mobile", () => {
   })
 
   test("cancel add record", async ({ page }) => {
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 4,
@@ -136,7 +136,7 @@ test.describe("record page - mobile", () => {
     // キャンセル後確認
     await helpers.clickDay(4)
     await helpers.verifyDayHasNoRecord(4)
-    await testDb.dalete({
+    await testDb.delete({
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       date: 4,

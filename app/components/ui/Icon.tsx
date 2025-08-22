@@ -15,7 +15,13 @@ export function Icon({
   size,
   className,
 }: IconProps) {
+  // Restrict icon to only keys present in iconPaths
   const iconPath = iconPaths[icon]
+
+  // iconPathがiconPaths key に含まれているか検証
+  if (!(icon in iconPaths)) {
+    throw new Error(`Icon "${icon}" is not a valid key of iconPaths.`)
+  }
 
   // For React, you typically pass styles as an object
   const style: React.CSSProperties = {}

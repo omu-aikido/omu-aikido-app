@@ -41,7 +41,7 @@ export class db {
    * 指定した日付以降のactivityレコードを削除します。
    * @param date 削除対象となる日付(Date型)
    */
-  dalete = async ({
+  delete = async ({
     year,
     month,
     date,
