@@ -2,7 +2,7 @@ import { format, isSameDay } from "date-fns"
 import React from "react"
 import { tv } from "tailwind-variants"
 
-import { style } from "~/styles/component"
+import DayActivitySummary from "~/components/component/DayActivitySummary" // 新しいインポートパス
 import type { DailyActivityItem } from "~/type"
 
 type Props = {
@@ -70,15 +70,73 @@ const CalendarDayCell = React.memo<{
   const isSaturday = React.useMemo(() => day.getDay() === 6, [day])
   const isSunday = React.useMemo(() => day.getDay() === 0, [day])
 
-  const { totalHours, count } = React.useMemo(() => {
-    const activities = currentActivities.filter(
-      act => act.date === format(day, "yyyy-MM-dd") && !act.isDeleted,
+  const { totalHours, count, status } = React.useMemo(() => {
+    const dayActivities = currentActivities.filter(
+      act => act.date === format(day, "yyyy-MM-dd"),
     )
-    const hours = activities.reduce(
-      (sum, act) => sum + (typeof act.period === "number" ? act.period : 0),
+
+    // 活動の振る舞いを判定するフラグ
+    const hasDeleted = dayActivities.some(
+      act => act.status === "deleted" || act.isDeleted,
+    )
+    const hasAdded = dayActivities.some(act => act.status === "added")
+    const hasUpdated = dayActivities.some(act => act.status === "updated")
+    // 追加と削除の合計を算出し、相殺判定を行う
+    const addedSum = dayActivities
+      .filter(act => act.status === "added" && !act.isDeleted)
+      .reduce(
+        (sum, act) =>
+          sum +
+          (typeof act.period === "number" ? act.period : parseFloat(String(act.period))),
+        0,
+      )
+    const deletedSum = dayActivities
+      .filter(act => act.status === "deleted" || act.isDeleted)
+      .reduce(
+        (sum, act) =>
+          sum +
+          (typeof act.period === "number" ? act.period : parseFloat(String(act.period))),
+        0,
+      )
+
+    // 削除扱いのものを除いた合計時間・件数
+    const activeActivities = dayActivities.filter(
+      act => !(act.isDeleted || act.status === "deleted"),
+    )
+    const totalHoursForDay = activeActivities.reduce(
+      (sum, act) =>
+        sum +
+        (typeof act.period === "number" ? act.period : parseFloat(String(act.period))),
       0,
     )
-    return { totalHours: hours, count: activities.length }
+    const countForDay = activeActivities.length
+
+    let activityStatus: DailyActivityItem["status"] = "unchanged"
+
+    if (totalHoursForDay <= 0) {
+      // 合計が0の場合、追加と削除が相殺しているときは unchanged にする
+      if (hasAdded && hasDeleted && !hasUpdated && addedSum === deletedSum) {
+        activityStatus = "unchanged"
+      } else {
+        activityStatus = hasDeleted ? "deleted" : "unchanged"
+      }
+    } else {
+      // 合計がある場合の優先順位:
+      // - 純粋に新規追加のみ → 'added'
+      // - 既存と混在（新規+既存）や update/deleted がある場合 → 'updated'
+      // - それ以外 → 'unchanged'
+      // 新規追加が含まれていて、既存のアイテムが編集されておらず削除もない場合は added とする。
+      // 既存アイテムの更新や削除がある場合は updated を優先する。
+      if (hasAdded && !hasUpdated && !hasDeleted) {
+        activityStatus = "added"
+      } else if (hasUpdated || hasDeleted) {
+        activityStatus = "updated"
+      } else {
+        activityStatus = "unchanged"
+      }
+    }
+
+    return { totalHours: totalHoursForDay, count: countForDay, status: activityStatus }
   }, [currentActivities, day])
 
   const handleClick = React.useCallback(() => {
@@ -106,7 +164,7 @@ const CalendarDayCell = React.memo<{
             : `day-${format(day, "d")}-has-record`
         }
       >
-        <DayActivitySummary totalHours={totalHours} count={count} />
+        <DayActivitySummary totalHours={totalHours} count={count} status={status} />
       </div>
     </div>
   )
@@ -122,34 +180,6 @@ const WeekdayHeaderCell = React.memo<{ day: AllowedWeekday; index: number }>(
     const isSaturday = React.useMemo(() => index === 6, [index])
     const safeDay = allowedWeekdays.includes(day) ? day : ""
     return <div className={cell({ isSunday, isSaturday }).week()}>{safeDay}</div>
-  },
-)
-
-const DayActivitySummary = React.memo<{ totalHours: number; count: number }>(
-  function DayActivitySummary({ totalHours, count }) {
-    if (totalHours <= 0)
-      return <div className="text-transparent select-none">記録なし</div>
-    return (
-      <div
-        className={style.text.info({
-          class:
-            "flex justify-between md:text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded-sm font-medium",
-        })}
-        data-testid="day-has-record"
-      >
-        合計 {Number(totalHours)}h
-        {count >= 2 && count < 100 && (
-          <span className="place-items-center flex items-center bg-green-700 dark:bg-green-200 text-green-100 dark:text-green-800 rounded-full w-4 h-4 justify-center text-xs font-bold shadow-sm">
-            {Number(count)}
-          </span>
-        )}
-        {count >= 100 && (
-          <span className="place-items-center flex items-center bg-green-700 dark:bg-green-200 text-green-100 dark:text-green-800 rounded-full w-4 h-4 justify-center text-xs font-bold shadow-sm">
-            +99
-          </span>
-        )}
-      </div>
-    )
   },
 )
 

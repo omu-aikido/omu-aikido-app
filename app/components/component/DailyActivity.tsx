@@ -1,13 +1,9 @@
 import { format } from "date-fns"
 import React, { useEffect, useState } from "react"
 
-import type { ActivityType } from "~/db/schema"
 import { toLocalJPString } from "~/lib/utils"
 import { style } from "~/styles/component"
-
-interface DailyActivityItem extends ActivityType {
-  isDeleted?: boolean
-}
+import type { DailyActivityItem } from "~/type"
 
 interface DailyActivityProps {
   userId: string
@@ -27,40 +23,202 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
   const [dailyActivities, setDailyActivities] = useState<DailyActivityItem[]>(activities)
 
   useEffect(() => {
-    setDailyActivities(activities)
+    // 保持している activities を受け取ったとき、元の period を originalPeriod に保存しておく
+    setDailyActivities(
+      activities.map(act => ({
+        ...act,
+        originalPeriod: act.originalPeriod ?? act.period,
+      })),
+    )
   }, [activities])
 
-  const handlePeriodChange = (index: number, newPeriod: number) => {
-    setDailyActivities(prev =>
-      prev.map((act, i) => (i === index ? { ...act, period: newPeriod } : act)),
-    )
+  const handlePeriodChange = (id: DailyActivityItem["id"], newPeriod: number) => {
+    setDailyActivities(prev => {
+      const updated = prev.map(act =>
+        act.id === id
+          ? {
+              ...act,
+              period: newPeriod,
+              originalPeriod: act.originalPeriod ?? act.period,
+              status: act.status === "added" ? "added" : "updated",
+            }
+          : act,
+      ) as DailyActivityItem[]
+
+      // もし編集したのが一時追加エントリで、値が既に存在する "削除済み" の persisted エントリと一致するなら、
+      // - 一時エントリを完全に破棄
+      // - 該当する persisted エントリの isDeleted を false に戻す（削除取り消し）
+      const edited = updated.find(act => act.id === id)
+      if (edited && String(edited.id).startsWith("tmp-") && !edited.isDeleted) {
+        const matchIndex = updated.findIndex(
+          act =>
+            !String(act.id).startsWith("tmp-") && // persisted
+            (act.isDeleted || act.status === "deleted") &&
+            act.userId === edited.userId &&
+            act.date === edited.date &&
+            act.period === edited.period,
+        )
+
+        if (matchIndex !== -1) {
+          // remove the temp entry and restore the persisted one
+          const matchId = updated[matchIndex].id
+          return updated
+            .filter(act => act.id !== id)
+            .map(act => {
+              if (act.id === matchId) {
+                return {
+                  ...act,
+                  isDeleted: false,
+                  status: "unchanged",
+                  updatedAt: new Date().toISOString(),
+                }
+              }
+              return act
+            }) as DailyActivityItem[]
+        }
+      }
+
+      return updated as DailyActivityItem[]
+    })
+  }
+
+  const handleDeleteActivity = (id: DailyActivityItem["id"]) => {
+    setDailyActivities(prev => {
+      // 未保存の一時エントリは id が `tmp-` で始まるため、削除時に完全に除去する
+      if (String(id).startsWith("tmp-")) {
+        return prev.filter(act => act.id !== id)
+      }
+      // 永続化済みエントリは削除フラグを付ける。ただし、編集によって period が変わっている場合は
+      // originalPeriod があれば period を元に戻してから削除フラグを付与する。
+      return prev.map(act => {
+        if (act.id !== id) return act
+        const restoredPeriod = act.originalPeriod ?? act.period
+        return { ...act, period: restoredPeriod, isDeleted: true, status: "deleted" }
+      })
+    })
   }
 
   const handleAddActivity = () => {
     if (!date) return
-    setDailyActivities(prev => [
-      ...prev,
-      {
-        id: `tmp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        userId,
-        date: format(date, "yyyy-MM-dd"),
-        period: 1.5,
-        createAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        isDeleted: false,
-      } as DailyActivityItem,
-    ])
-  }
+    setDailyActivities(prev => {
+      const newDate = format(date, "yyyy-MM-dd")
+      const defaultPeriod = 1.5
 
-  const handleDeleteActivity = (id: DailyActivityItem["id"]) => {
-    setDailyActivities(prev =>
-      prev.map(act => (act.id === id ? { ...act, isDeleted: true } : act)),
-    )
+      // もし既存の（永続化された）エントリが同じ日・同じ時間で削除済みなら、
+      // その削除を取り消して編集可能状態に戻す（追加は行わない）。
+      const idx = prev.findIndex(
+        act =>
+          !String(act.id).startsWith("tmp-") && // 永続化済み
+          (act.isDeleted || act.status === "deleted") &&
+          act.userId === userId &&
+          act.date === newDate &&
+          act.period === defaultPeriod,
+      )
+
+      if (idx !== -1) {
+        return prev.map((act, i) => {
+          if (i === idx) {
+            return {
+              ...act,
+              isDeleted: false,
+              status: "unchanged",
+              updatedAt: new Date().toISOString(),
+            }
+          }
+          return act
+        })
+      }
+
+      // 該当する削除済み persisted がなければ通常どおり一時追加する
+      return [
+        ...prev,
+        {
+          id: `tmp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          userId,
+          date: newDate,
+          period: defaultPeriod,
+          createAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          isDeleted: false,
+          status: "added",
+        } as DailyActivityItem,
+      ]
+    })
   }
 
   const handleSave = () => {
     onSave(dailyActivities)
   }
+
+  // 表示用の活動を生成するロジック
+  const displayItems: DailyActivityItem[] = []
+  const groupedByPeriod = new Map<number, DailyActivityItem[]>()
+
+  dailyActivities.forEach(act => {
+    if (!groupedByPeriod.has(act.period)) {
+      groupedByPeriod.set(act.period, [])
+    }
+    groupedByPeriod.get(act.period)?.push(act)
+  })
+
+  // periodでソート
+  const sortedPeriods = Array.from(groupedByPeriod.keys()).sort((a, b) => a - b)
+
+  sortedPeriods.forEach(period => {
+    const group = groupedByPeriod.get(period)!
+    const allDeletedInGroup = group.every(
+      act => act.isDeleted || act.status === "deleted",
+    )
+
+    if (allDeletedInGroup) {
+      // グループ内の全ての活動が削除済みの場合、
+      // - ただし "added" (一時追加) の活動は元の記録ではないため合算に含めない
+      // - 元の（persisted）活動が存在する場合のみマージされた削除表示を行う
+      // 一時追加レコードは id が `tmp-` で始まるので、それを基準に除外する。
+      // なぜなら、追加後に削除操作で status が 'deleted' に変わると元の 'added' 情報が失われるため。
+      const persistedItems = group.filter(act => !String(act.id).startsWith("tmp-"))
+      const persistedDeletedSum = persistedItems.reduce(
+        (sum, act) => sum + (act.period || 0),
+        0,
+      )
+
+      // もし persisted な活動が一つもなければ（すべて一時追加→削除されたケース）表示しない
+      if (persistedDeletedSum > 0) {
+        const mergedDeletedActivity: DailyActivityItem = {
+          ...group[0], // ベースにする（表示用）
+          id: `merged-deleted-${period}-${group.map(a => a.id).join("-")}`,
+          period: persistedDeletedSum, // persisted な削除分のみ合算
+          isDeleted: true,
+          status: "deleted",
+          // persistedItems に基づいて最終更新・作成時刻を決定
+          updatedAt: persistedItems.reduce((latest, current) => {
+            const latestDate = latest || ""
+            const currentDate = current.updatedAt || ""
+            return new Date(latestDate) > new Date(currentDate) ? latestDate : currentDate
+          }, persistedItems[0].updatedAt || ""),
+          createAt: persistedItems.reduce((earliest, current) => {
+            const earliestDate = earliest || ""
+            const currentDate = current.createAt || ""
+            return new Date(earliestDate) < new Date(currentDate)
+              ? earliestDate
+              : currentDate
+          }, persistedItems[0].createAt),
+        }
+        displayItems.push(mergedDeletedActivity)
+      }
+    } else {
+      // グループ内にアクティブな活動が1つでも含まれる場合、個々の活動をそのまま表示
+      displayItems.push(...group)
+    }
+  })
+
+  // 個々の活動も元の順番を保つために、表示前に再度ソートする
+  displayItems.sort((a, b) => {
+    if (a.createAt === b.createAt) {
+      return 0
+    }
+    return new Date(a.createAt).getTime() - new Date(b.createAt).getTime()
+  })
 
   return (
     <div
@@ -78,48 +236,62 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
           className="flex flex-col max-h-80 overflow-y-auto mb-4"
           data-testid="daily-activity-list"
         >
-          {dailyActivities.filter(act => !act.isDeleted).length === 0 && (
+          {dailyActivities.filter(act => !act.isDeleted && act.status !== "deleted")
+            .length === 0 && (
             <p className={style.text.info()} data-testid="daily-activity-empty">
               この日の活動記録がありません。
             </p>
           )}
-          {dailyActivities
-            .filter(act => !act.isDeleted)
-            .map((act, index) => (
+          {displayItems.map((act, index) => {
+            const isMergedDeletedDisplay = act.id.startsWith("merged-deleted-")
+
+            return (
               <div
                 key={act.id}
-                className="flex items-center py-0.5 border-b border-slate-200 dark:border-slate-600"
+                className={style.record.activityStatusStyles({
+                  class:
+                    "flex items-center py-0.5 border-b border-slate-200 dark:border-slate-600",
+                  status:
+                    act.isDeleted || act.status === "deleted"
+                      ? "deleted"
+                      : act.status || "unchanged",
+                })}
                 data-testid={`daily-activity-item-${index}`}
               >
-                <button
-                  onClick={() => handleDeleteActivity(act.id)}
-                  className="p-1 mx-1 sm:mx-3 rounded-full hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors"
-                  title="削除"
-                  data-testid="delete-record"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-red-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                {!isMergedDeletedDisplay && ( // マージされた削除活動でない場合のみ表示
+                  <button
+                    onClick={() => handleDeleteActivity(act.id)}
+                    className="p-1 mx-1 sm:mx-3 rounded-full hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors"
+                    title="削除"
+                    data-testid="delete-record"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-red-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                )}
                 <input
                   type="number"
                   step="0.5"
                   value={act.period}
                   id={act.id}
-                  onChange={e => handlePeriodChange(index, parseFloat(e.target.value))}
+                  onChange={e => handlePeriodChange(act.id, parseFloat(e.target.value))}
                   className={style.form.input({ className: "w-20 mr-2" })}
                   data-testid={`input-record`}
+                  disabled={
+                    act.isDeleted || act.status === "deleted" || isMergedDeletedDisplay
+                  } // 個別の削除活動またはマージされた削除活動の場合無効化
                 />
                 <span className="text-slate-900 dark:text-white">時間</span>
                 <span
@@ -130,7 +302,8 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
                   )}
                 </span>
               </div>
-            ))}
+            )
+          })}
           <button
             onClick={handleAddActivity}
             className="flex items-center py-0.5 border-b border-slate-200 dark:border-slate-600 cursor-pointer"
