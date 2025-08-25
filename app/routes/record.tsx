@@ -87,16 +87,18 @@ export async function action(args: Route.ActionArgs) {
 
     try {
       if (payload.added && payload.added.length > 0) {
+        const activitiesToCreate = payload.added
         await createActivities({
           userId,
-          activities: payload.added,
+          activities: activitiesToCreate,
           env: context.cloudflare.env,
         })
       }
       if (payload.updated && payload.updated.length > 0) {
+        const activitiesToUpdate = payload.updated
         await updateActivities({
           userId,
-          activities: payload.updated,
+          activities: activitiesToUpdate,
           env: context.cloudflare.env,
         })
       }
@@ -130,16 +132,25 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
   const fetcher = useFetcher()
 
   const [originalActivities, setOriginalActivities] = useState<DailyActivityItem[]>(
-    initialActivities || [],
+    initialActivities?.map(act => ({ ...act, status: "unchanged" })) || [],
   )
   const [currentActivities, setActivities] = useState<DailyActivityItem[]>(
-    initialActivities || [],
+    initialActivities?.map(act => ({ ...act, status: "unchanged" })) || [],
   )
 
   useEffect(() => {
-    setOriginalActivities(initialActivities || [])
-    setActivities(initialActivities || [])
+    setOriginalActivities(
+      initialActivities?.map(act => ({ ...act, status: "unchanged" })) || [],
+    )
+    setActivities(initialActivities?.map(act => ({ ...act, status: "unchanged" })) || [])
   }, [initialActivities])
+
+  useEffect(() => {
+    if (fetcher.data && fetcher.data.updatedActivitiesWithStatus) {
+      setActivities(fetcher.data.updatedActivitiesWithStatus)
+      setOriginalActivities(fetcher.data.updatedActivitiesWithStatus)
+    }
+  }, [fetcher.data])
 
   const error = loaderError || actionData?.error || null
   const [showDailyActivityModal, setShowDailyActivityModal] = useState(false)
@@ -255,13 +266,24 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
               name="currentMonth"
               value={format(currentMonth, "yyyy-MM")}
             />
-            <input
-              type="hidden"
-              name="payload"
-              value={JSON.stringify(
-                prepareBatchUpdatePayload(userId, originalActivities, currentActivities),
-              )}
-            />
+            {(() => {
+              const payload = prepareBatchUpdatePayload(
+                userId,
+                originalActivities,
+                currentActivities,
+              )
+              return (
+                <input
+                  type="hidden"
+                  name="payload"
+                  value={JSON.stringify({
+                    added: payload?.added || [],
+                    updated: payload?.updated || [],
+                    deleted: payload?.deleted || [],
+                  })}
+                />
+              )
+            })()}
             <MonthlyCalendarGrid
               daysInMonth={daysInMonth}
               currentActivities={currentActivities}
@@ -283,13 +305,24 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
               name="currentMonth"
               value={format(currentMonth, "yyyy-MM")}
             />
-            <input
-              type="hidden"
-              name="payload"
-              value={JSON.stringify(
-                prepareBatchUpdatePayload(userId, originalActivities, currentActivities),
-              )}
-            />
+            {(() => {
+              const payload = prepareBatchUpdatePayload(
+                userId,
+                originalActivities,
+                currentActivities,
+              )
+              return (
+                <input
+                  type="hidden"
+                  name="payload"
+                  value={JSON.stringify({
+                    added: payload?.added || [],
+                    updated: payload?.updated || [],
+                    deleted: payload?.deleted || [],
+                  })}
+                />
+              )
+            })()}
             <div className="fixed w-full right-0 bottom-0">
               <TabBarScrollHide>
                 <div className="flex flex-row items-center justify-between pb-5 px-3">
@@ -397,73 +430,95 @@ function prepareBatchUpdatePayload(
 ) {
   if (!userId) return null
 
-  const deletedCandidates = originalActivities.filter(oa => {
-    const currentActivity = currentActivities.find(a => String(a.id) === String(oa.id))
-    return !currentActivity || currentActivity.isDeleted
-  })
+  const activitiesToAdd: DailyActivityItem[] = []
+  const activitiesToUpdate: DailyActivityItem[] = []
+  const activitiesToDelete: string[] = []
+  const updatedActivitiesWithStatus: DailyActivityItem[] = []
 
-  const addedCandidates = currentActivities.filter(
-    a =>
-      (!a.id ||
-        (typeof a.id === "string" && a.id.startsWith("tmp-")) ||
-        !originalActivities.some(oa => oa.id === a.id)) &&
-      !a.isDeleted,
-  )
-
-  const matchedPairs: { delIdx: number; addIdx: number }[] = []
-  deletedCandidates.forEach((del, delIdx) => {
-    const addIdx = addedCandidates.findIndex(add => isContentEqual(add, del))
-    if (addIdx !== -1) {
-      matchedPairs.push({ delIdx, addIdx })
+  // originalActivities にのみ存在するものは deleted
+  originalActivities.forEach(originalAct => {
+    const currentAct = currentActivities.find(
+      ca => String(ca.id) === String(originalAct.id) && !ca.isDeleted,
+    )
+    if (!currentAct) {
+      // currentActivities に存在しない、または isDeleted が true の場合は削除
+      activitiesToDelete.push(originalAct.id!)
+      updatedActivitiesWithStatus.push({
+        ...originalAct,
+        status: "deleted",
+        isDeleted: true,
+      })
     }
   })
 
-  const filteredDeleted = deletedCandidates.filter(
-    (_, idx) => !matchedPairs.some(m => m.delIdx === idx),
-  )
-  const filteredAdded = addedCandidates.filter(
-    (_, idx) => !matchedPairs.some(m => m.addIdx === idx),
-  )
-
-  const activitiesToAdd: ActivityType[] = filteredAdded.map(a => ({
-    ...stripIsDeleted(a),
-    id: typeof a.id === "string" && a.id.startsWith("tmp-") ? "" : a.id,
-  }))
-
-  const activitiesToUpdate: ActivityType[] = []
   currentActivities.forEach(currentAct => {
     const originalAct = originalActivities.find(
       oa => String(oa.id) === String(currentAct.id),
     )
-    if (originalAct && !currentAct.isDeleted) {
+
+    if (currentAct.isDeleted) {
+      // UI で isDeleted が true に設定されたものは削除対象
+      if (originalAct && !activitiesToDelete.includes(originalAct.id!)) {
+        activitiesToDelete.push(originalAct.id!)
+        updatedActivitiesWithStatus.push({
+          ...originalAct,
+          status: "deleted",
+          isDeleted: true,
+        })
+      } else if (!originalAct) {
+        // 新規追加されたものがすぐに削除された場合は、追加も更新も不要
+        return
+      }
+    } else if (originalAct) {
+      // 既存の活動が更新されたかチェック
       const fieldsToCompare: (keyof DailyActivityItem)[] = ["date", "period", "userId"]
       const hasChanges = fieldsToCompare.some(
         field => originalAct[field] !== currentAct[field],
       )
       if (hasChanges) {
-        activitiesToUpdate.push(stripIsDeleted(currentAct))
+        activitiesToUpdate.push({ ...currentAct, id: originalAct.id })
+        updatedActivitiesWithStatus.push({ ...currentAct, status: "updated" })
+      } else {
+        updatedActivitiesWithStatus.push({ ...currentAct, status: "unchanged" })
       }
+    } else {
+      // 新規追加
+      activitiesToAdd.push(currentAct)
+      updatedActivitiesWithStatus.push({ ...currentAct, status: "added" })
     }
   })
 
-  const activitiesToDelete: string[] = filteredDeleted.map(a => a.id!).filter(Boolean)
+  // activitiesToDelete に含まれない originalActivities の要素を追加
+  originalActivities.forEach(originalAct => {
+    if (
+      !activitiesToDelete.includes(originalAct.id!) &&
+      !updatedActivitiesWithStatus.some(ua => String(ua.id) === String(originalAct.id))
+    ) {
+      updatedActivitiesWithStatus.push({ ...originalAct, status: "unchanged" })
+    }
+  })
+
+  // updatedActivitiesWithStatus 内で重複するエントリを削除し、最新のステータスを優先
+  const finalUpdatedActivitiesWithStatusMap = new Map<string, DailyActivityItem>()
+  updatedActivitiesWithStatus.forEach(activity => {
+    if (activity.id) {
+      finalUpdatedActivitiesWithStatusMap.set(String(activity.id), activity)
+    } else {
+      // IDがない場合は、そのまま追加（新規追加アクティビティ）
+      finalUpdatedActivitiesWithStatusMap.set(
+        Date.now().toString() + Math.random().toString(),
+        activity,
+      ) // ユニークなキーを生成
+    }
+  })
 
   return {
     userId,
     added: activitiesToAdd,
     updated: activitiesToUpdate,
     deleted: activitiesToDelete,
+    updatedActivitiesWithStatus: Array.from(finalUpdatedActivitiesWithStatusMap.values()),
   }
-}
-function stripIsDeleted(obj: DailyActivityItem): ActivityType {
-  return {
-    id: obj.id,
-    userId: obj.userId,
-    date: obj.date,
-    period: obj.period,
-    createAt: obj.createAt,
-    updatedAt: obj.updatedAt,
-  } as ActivityType
 }
 
 const groupByDate = (arr: DailyActivityItem[]) => {
@@ -481,7 +536,3 @@ const groupByDate = (arr: DailyActivityItem[]) => {
     })
   return map
 }
-
-const compareFields: (keyof DailyActivityItem)[] = ["date", "period", "userId"]
-const isContentEqual = (a: DailyActivityItem, b: DailyActivityItem) =>
-  compareFields.every(key => a[key] === b[key])

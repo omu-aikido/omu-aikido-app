@@ -21,7 +21,7 @@ export function timeForNextGrade(grade_value: string | number): number {
   grade_value = parseInt(String(grade_value))
   switch (grade_value) {
     case 0:
-      return 30
+      return 40
     case 5:
       return 60
     case 3:
@@ -31,7 +31,7 @@ export function timeForNextGrade(grade_value: string | number): number {
     case -1:
       return 200
     default:
-      return 30
+      return 300
   }
 }
 
