@@ -87,18 +87,16 @@ export async function action(args: Route.ActionArgs) {
 
     try {
       if (payload.added && payload.added.length > 0) {
-        const activitiesToCreate = payload.added
         await createActivities({
           userId,
-          activities: activitiesToCreate,
+          activities: payload.added,
           env: context.cloudflare.env,
         })
       }
       if (payload.updated && payload.updated.length > 0) {
-        const activitiesToUpdate = payload.updated
         await updateActivities({
           userId,
-          activities: activitiesToUpdate,
+          activities: payload.updated,
           env: context.cloudflare.env,
         })
       }

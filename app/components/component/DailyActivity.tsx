@@ -133,7 +133,7 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
       return [
         ...prev,
         {
-          id: `tmp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          id: `tmp-${crypto.randomUUID()}`,
           userId,
           date: newDate,
           period: defaultPeriod,
