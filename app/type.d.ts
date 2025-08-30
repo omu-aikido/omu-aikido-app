@@ -14,4 +14,10 @@ type ActionResult<T = unknown> = { data: T; result: boolean }
 
 export interface DailyActivityItem extends ActivityType {
   isDeleted?: boolean
+  status: "added" | "updated" | "deleted" | "unchanged"
+  /**
+   * UI only: 編集前の元の period を保持するためのフィールド。
+   * 削除したときに period を元に戻すために使用します。
+   */
+  originalPeriod?: number
 }

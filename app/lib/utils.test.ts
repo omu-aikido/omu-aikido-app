@@ -31,16 +31,16 @@ describe("translateGrade", () => {
 
 describe("timeForNextGrade", () => {
   it("should return the correct time for the next grade based on current grade", () => {
-    expect(timeForNextGrade(0)).toBe(30)
+    expect(timeForNextGrade(0)).toBe(40)
     expect(timeForNextGrade(5)).toBe(60)
     expect(timeForNextGrade(3)).toBe(100)
     expect(timeForNextGrade(1)).toBe(100)
     expect(timeForNextGrade(-1)).toBe(200)
   })
 
-  it("should return 30 for unknown grade values", () => {
-    expect(timeForNextGrade(99)).toBe(30)
-    expect(timeForNextGrade("unknown")).toBe(30)
+  it("should return 100 for unknown grade values", () => {
+    expect(timeForNextGrade(99)).toBe(300)
+    expect(timeForNextGrade("unknown")).toBe(300)
   })
 })
 

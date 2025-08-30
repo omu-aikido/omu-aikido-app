@@ -2,6 +2,7 @@ import { format } from "date-fns"
 import React from "react"
 import { tv } from "tailwind-variants"
 
+import DayActivitySummary from "~/components/component/DayActivitySummary" // 正しいインポートパス
 import { style } from "~/styles/component"
 import type { DailyActivityItem } from "~/type"
 
@@ -27,36 +28,6 @@ const dayLabel = tv({
   },
 })
 
-const DayActivitySummary = React.memo<{ totalHours: number; count: number }>(
-  function DayActivitySummary({ totalHours, count }) {
-    if (totalHours <= 0) return null
-    return (
-      <div className="flex flex-row justify-between" data-testid="day-has-record">
-        <div
-          className={style.text.info({
-            class:
-              "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 rounded-sm font-medium text-sm",
-          })}
-        >
-          合計 {Number(totalHours)}h
-        </div>
-        <div className="mr-4">
-          {count >= 2 && count < 100 && (
-            <span className="place-items-center flex items-center bg-green-700 dark:bg-green-200 text-green-100 dark:text-green-800 rounded-full w-5 h-5 justify-center text-xs font-bold shadow-sm">
-              {Number(count)}
-            </span>
-          )}
-          {count >= 100 && (
-            <span className="place-items-center flex items-center bg-green-700 dark:bg-green-200 text-green-100 dark:text-green-800 rounded-full w-5 h-5 justify-center text-xs font-bold shadow-sm">
-              +99
-            </span>
-          )}
-        </div>
-      </div>
-    )
-  },
-)
-
 const MonthlyActivityList = React.memo<Props>(function MonthlyActivityList({
   daysInMonth,
   currentActivities,
@@ -69,7 +40,10 @@ const MonthlyActivityList = React.memo<Props>(function MonthlyActivityList({
     >
       {daysInMonth.map((day, idx) => {
         const acts = currentActivities.filter(
-          act => act.date === format(day, "yyyy-MM-dd") && !act.isDeleted,
+          act =>
+            act.date === format(day, "yyyy-MM-dd") &&
+            !act.isDeleted &&
+            act.status !== "deleted", // isDeleted と status: 'deleted' の活動を除外
         )
         const isToday = format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd")
         const dayOfWeek =
@@ -79,6 +53,78 @@ const MonthlyActivityList = React.memo<Props>(function MonthlyActivityList({
             sum + (typeof act.period === "number" ? act.period : parseFloat(act.period)),
           0,
         )
+
+        // Determine the overall status for the day based on its activities
+        let dayStatus: DailyActivityItem["status"] = "unchanged"
+        const dayActivities = currentActivities.filter(
+          act => act.date === format(day, "yyyy-MM-dd"),
+        )
+
+        const hasDeleted = dayActivities.some(
+          act => act.status === "deleted" || act.isDeleted,
+        )
+        const hasAdded = dayActivities.some(act => act.status === "added")
+        const hasUpdated = dayActivities.some(act => act.status === "updated")
+
+        // 追加された期間と削除された期間の合計を比較して相殺を判定
+        const addedSum = dayActivities
+          .filter(act => act.status === "added" && !act.isDeleted)
+          .reduce(
+            (sum, act) =>
+              sum +
+              (typeof act.period === "number"
+                ? act.period
+                : parseFloat(String(act.period))),
+            0,
+          )
+        const deletedSum = dayActivities
+          .filter(act => act.status === "deleted" || act.isDeleted)
+          .reduce(
+            (sum, act) =>
+              sum +
+              (typeof act.period === "number"
+                ? act.period
+                : parseFloat(String(act.period))),
+            0,
+          )
+
+        const totalHoursForDay = dayActivities
+          .filter(act => !(act.isDeleted || act.status === "deleted")) // 削除された活動は合計時間に含めない
+          .reduce(
+            (sum, act) =>
+              sum +
+              (typeof act.period === "number"
+                ? act.period
+                : parseFloat(String(act.period))),
+            0,
+          )
+
+        if (totalHoursForDay > 0) {
+          // 追加と削除が同時にあり、期間合計が相殺される場合は変更なしとする
+          if (hasAdded && hasDeleted && !hasUpdated && addedSum === deletedSum) {
+            dayStatus = "unchanged"
+          } else if (hasAdded && !hasUpdated && !hasDeleted) {
+            // 新規追加のみ
+            dayStatus = "added"
+          } else if (hasUpdated || hasDeleted) {
+            // 更新または削除がある場合は更新扱い
+            dayStatus = "updated"
+          } else {
+            dayStatus = "unchanged"
+          }
+        } else {
+          // 表示上合計が0または無い場合
+          // 追加と削除が相殺している場合は変更なしとする
+          if (hasAdded && hasDeleted && !hasUpdated && addedSum === deletedSum) {
+            dayStatus = "unchanged"
+          } else if (hasDeleted) {
+            // 削除のみ
+            dayStatus = "deleted"
+          } else {
+            dayStatus = "unchanged"
+          }
+        }
+
         return (
           <li
             key={idx}
@@ -98,22 +144,13 @@ const MonthlyActivityList = React.memo<Props>(function MonthlyActivityList({
                   : `day-${format(day, "d")}-has-record`
               }
             >
-              {acts.length === 0 ? (
-                <span
-                  className={style.text.info({
-                    class: "text-sm text-slate-400 dark:text-slate-500",
-                  })}
-                >
-                  記録なし
-                </span>
-              ) : (
-                <span
-                  className={style.text.info("text-sm")}
-                  data-testid={`day-has-record`}
-                >
-                  <DayActivitySummary totalHours={total} count={acts.length} />
-                </span>
-              )}
+              <span className={style.text.info("text-sm")} data-testid={`day-has-record`}>
+                <DayActivitySummary
+                  totalHours={total}
+                  count={acts.length}
+                  status={dayStatus}
+                />
+              </span>
             </div>
           </li>
         )

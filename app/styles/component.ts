@@ -156,4 +156,31 @@ export const style = {
   filterCard: tv({
     base: "bg-slate-100 dark:bg-slate-800 rounded-lg shadow-md overflow-hidden",
   }),
+
+  record: {
+    activityStatusStyles: tv({
+      base: "",
+      variants: {
+        status: {
+          deleted: "opacity-60 after:content-[' -']",
+          added: "font-bold after:content-[' +']",
+          updated: "after:content-[' *']",
+          unchanged: "font-normal",
+        },
+      },
+    }),
+
+    dayActivitySummaryStyles: tv({
+      base: "flex justify-between md:text-xs px-2 py-1 rounded-sm font-medium items-center",
+      variants: {
+        status: {
+          deleted: "text-red-500 dark:text-red-500 opacity-70",
+          added:
+            "border border-green-500 rounded-sm text-green-700 dark:text-green-400 font-bold",
+          updated: "font-bold text-blue-600 dark:text-blue-400",
+          unchanged: "text-slate-700 dark:text-slate-300 font-normal",
+        },
+      },
+    }),
+  },
 }
