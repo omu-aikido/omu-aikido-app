@@ -14,6 +14,7 @@ import type { Route } from "./+types/root"
 
 import { Footer } from "~/components/component/Footer"
 import { ReactHeader } from "~/components/component/Header"
+import { NotificationContainer } from "~/components/ui/NotificationContainer"
 import "~/styles/global.css"
 
 export const links: Route.LinksFunction = () => [
@@ -46,6 +47,7 @@ export default function App(args: Route.ComponentProps) {
           <Links />
         </head>
         <body className="h-dvh">
+          <NotificationContainer />
           <Outlet />
           <ScrollRestoration />
           <Scripts />

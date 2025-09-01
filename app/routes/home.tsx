@@ -1,4 +1,5 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
+import { useEffect } from "react"
 import { useFetcher } from "react-router"
 
 import type { Route } from "./+types/home"
@@ -10,16 +11,17 @@ import Recents from "~/components/component/Recents"
 import { AppIcon } from "~/components/ui/AppIcon"
 import Grid from "~/components/ui/Grid"
 import type { ActivityType } from "~/db/schema"
+import { useNotificationStore } from "~/hook/notification"
 import {
   createActivity,
   getUserMonthlyRank,
   userActivitySummaryAndRecent,
 } from "~/lib/query/activity"
 import { getAccount, getProfile } from "~/lib/query/profile"
-import { timeForNextGrade } from "~/lib/utils"
+import { getJST, timeForNextGrade } from "~/lib/utils"
 import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
-import type { ActionResult, PagePath } from "~/type"
+import type { PagePath } from "~/type"
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
@@ -43,16 +45,17 @@ export async function loader(args: Route.LoaderArgs) {
   }
 
   const profile = await getProfile({ userId, env })
+  if (!profile) throw new Error("Profile not found")
   const summary = await userActivitySummaryAndRecent({
     userId,
-    start: profile?.getGradeAt
-      ? new Date(profile.getGradeAt)
-      : new Date(profile!.joinedAt, 3, 1),
-    end: new Date(),
+    start: profile.getGradeAt
+      ? getJST(new Date(profile.getGradeAt))
+      : getJST(new Date(profile.joinedAt, 3, 1)),
+    end: getJST(new Date()),
     env,
   })
   const activityFromPreviousGrade = summary.length > 0 ? summary[0].total / 1.5 : 0
-  const grade = profile?.grade ? profile.grade : 0
+  const grade = profile.grade
   const forNextGrade = timeForNextGrade(grade ? grade : 0)
   const needToNextGrade = Math.max(
     0,
@@ -81,7 +84,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 // MARK: Action
-export async function action(args: Route.ActionArgs): Promise<ActionResult> {
+export async function action(args: Route.ActionArgs) {
   const request = args.request
   const env = args.context.cloudflare.env
   const formData = await request.formData()
@@ -95,13 +98,25 @@ export async function action(args: Route.ActionArgs): Promise<ActionResult> {
     env,
   })
   const result = { row: response.rows, count: response.rowsAffected }
-  return { data: result, result: result.count == 1 }
+  return { data: result.row, result: result.count == 1 }
 }
 
 // MARK: Component
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { gradeData, apps, recent, rankingdata } = loaderData
-  const fetcher = useFetcher()
+  const fetcher = useFetcher<typeof action>()
+  const { showNotification } = useNotificationStore()
+
+  useEffect(() => {
+    if (fetcher.data?.result) {
+      showNotification({
+        title: "成功",
+        message: "記録が追加されました。",
+        type: "success",
+      })
+    }
+  }, [fetcher.data, showNotification])
+
   return (
     <>
       <div data-testid="home-next-grade">
