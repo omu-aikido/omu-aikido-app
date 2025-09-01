@@ -28,7 +28,6 @@ export function Notification({
       }, duration)
       return () => clearTimeout(timer)
     }
-    return
   }, [duration, handleClose])
 
   const handleAnimationEnd = () => {
