@@ -11,7 +11,7 @@ import Recents from "~/components/component/Recents"
 import { AppIcon } from "~/components/ui/AppIcon"
 import Grid from "~/components/ui/Grid"
 import type { ActivityType } from "~/db/schema"
-import { useNotificationStore } from "~/hook/notification"
+import { useNotificationStore } from "~/hooks/notification"
 import {
   createActivity,
   getUserMonthlyRank,
