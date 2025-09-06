@@ -2,7 +2,7 @@ import { createClerkClient } from "@clerk/react-router/api.server"
 import { getAuth, type User } from "@clerk/react-router/ssr.server"
 import { useEffect, useState } from "react"
 import { Link, redirect, useFetcher } from "react-router"
-import { tv } from "tailwind-variants"
+import { toast } from "sonner"
 
 import type { Route } from "./+types/user"
 
@@ -10,6 +10,16 @@ import { StatsSection } from "~/components/component/AccountStatus"
 import { ActivitiesTable } from "~/components/component/UserActivitiesTable"
 import { UserProfileSection } from "~/components/component/UserProfile"
 import { FilterSection } from "~/components/component/UserRecordsFilter"
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select"
 import { StateButton } from "~/components/ui/StateButton"
 import { activitySummary } from "~/lib/query/activity"
 import { updateProfile } from "~/lib/query/admin"
@@ -261,10 +271,6 @@ export default function AdminUser(args: Route.ComponentProps) {
 
   const fetcher = useFetcher()
   const [isEditing, setIsEditing] = useState(false)
-  const [notification, setNotification] = useState<{
-    type: "success" | "error"
-    message: string
-  } | null>(null)
 
   useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data) {
@@ -272,16 +278,11 @@ export default function AdminUser(args: Route.ComponentProps) {
         const response =
           typeof fetcher.data === "string" ? JSON.parse(fetcher.data) : fetcher.data
         if (response?.error) {
-          setNotification({ type: "error", message: response.error })
-          const timer = setTimeout(() => setNotification(null), 5000)
-          return () => clearTimeout(timer)
-        } else {
+          toast.error(response.error)
         }
       } catch {
         if (fetcher.data instanceof Error) {
-          setNotification({ type: "error", message: "エラーが発生しました" })
-          const timer = setTimeout(() => setNotification(null), 5000)
-          return () => clearTimeout(timer)
+          toast.error("エラーが発生しました")
         }
       }
     }
@@ -295,9 +296,9 @@ export default function AdminUser(args: Route.ComponentProps) {
           <p className="text-lg text-slate-600 dark:text-slate-400">
             ユーザー情報が見つかりませんでした。
           </p>
-          <Link to="/admin" className={button({ variant: "primary", class: "mt-4" })}>
-            アカウント管理に戻る
-          </Link>
+          <Button asChild className="mt-4">
+            <Link to="/admin">アカウント管理に戻る</Link>
+          </Button>
         </div>
       </div>
     )
@@ -317,23 +318,7 @@ export default function AdminUser(args: Route.ComponentProps) {
 
   return (
     <>
-      {/* Notification */}
-      {notification && (
-        <div
-          className={notificationStyle({ type: notification.type, className: "mb-6" })}
-        >
-          <div className="flex items-center justify-between">
-            <span>{notification.message}</span>
-            <button
-              onClick={() => setNotification(null)}
-              className="ml-4 text-current hover:opacity-70"
-              aria-label="通知を閉じる"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-      )}
+
       {/* User Profile Section */}
       <UserProfileSection
         user={user as User}
@@ -356,10 +341,9 @@ export default function AdminUser(args: Route.ComponentProps) {
 
             if (joinedAt < 1950 || joinedAt > currentYear + 1) {
               e.preventDefault()
-              setNotification({
-                type: "error",
-                message: `入部年度は1950年から${currentYear + 1}年の間で入力してください`,
-              })
+              toast.error(
+                `入部年度は1950年から${currentYear + 1}年の間で入力してください`,
+              )
               return
             }
 
@@ -368,10 +352,7 @@ export default function AdminUser(args: Route.ComponentProps) {
               const getGradeAt = new Date(getGradeAtStr)
               if (isNaN(getGradeAt.getTime())) {
                 e.preventDefault()
-                setNotification({
-                  type: "error",
-                  message: "級段位取得日の形式が正しくありません",
-                })
+                toast.error("級段位取得日の形式が正しくありません")
                 return
               }
             }
@@ -440,24 +421,27 @@ export default function AdminUser(args: Route.ComponentProps) {
 function RoleSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
   const disabled = !isEditing || fetcherState === "loading"
   return (
-    <div>
-      <label htmlFor="role" className={style.form.label({ necessary: true })}>
-        役職
-      </label>
-      <select
-        id="role"
+    <div className="space-y-2">
+      <Label htmlFor="role">
+        役職<span className="text-red-500">*</span>
+      </Label>
+      <Select
         name="role"
         required
-        className={style.form.select()}
         defaultValue={profile.role}
         disabled={disabled}
       >
-        {Role.ALL.map(r => (
-          <option key={r.role} value={r.role}>
-            {r.ja}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger id="role">
+          <SelectValue placeholder="役職を選択" />
+        </SelectTrigger>
+        <SelectContent>
+          {Role.ALL.map(r => (
+            <SelectItem key={r.role} value={r.role}>
+              {r.ja}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
 }
@@ -465,24 +449,27 @@ function RoleSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
 function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
   const disabled = !isEditing || fetcherState === "loading"
   return (
-    <div>
-      <label htmlFor="grade" className={style.form.label({ necessary: true })}>
-        所持級段位
-      </label>
-      <select
-        id="grade"
+    <div className="space-y-2">
+      <Label htmlFor="grade">
+        所持級段位<span className="text-red-500">*</span>
+      </Label>
+      <Select
         name="grade"
         required
-        className={style.form.select()}
-        defaultValue={profile.grade}
+        defaultValue={String(profile.grade)}
         disabled={disabled}
       >
-        {gradeOptions.map(g => (
-          <option key={g.grade} value={g.grade}>
-            {g.name}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger id="grade">
+          <SelectValue placeholder="級段位を選択" />
+        </SelectTrigger>
+        <SelectContent>
+          {gradeOptions.map(g => (
+            <SelectItem key={g.grade} value={String(g.grade)}>
+              {g.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
 }
@@ -493,15 +480,12 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
     ? new Date(profile.getGradeAt).toISOString().split("T")[0]
     : ""
   return (
-    <div>
-      <label htmlFor="getGradeAt" className={style.form.label()}>
-        級段位取得日
-      </label>
-      <input
+    <div className="space-y-2">
+      <Label htmlFor="getGradeAt">級段位取得日</Label>
+      <Input
         type="date"
         id="getGradeAt"
         name="getGradeAt"
-        className={style.form.input()}
         defaultValue={isEditing ? value : undefined}
         value={!isEditing ? value : undefined}
         disabled={disabled}
@@ -514,11 +498,11 @@ function JoinedAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
   const disabled = !isEditing || fetcherState === "loading"
   const currentYear = new Date().getFullYear()
   return (
-    <div>
-      <label htmlFor="joinedAt" className={style.form.label({ necessary: true })}>
-        入部年度
-      </label>
-      <input
+    <div className="space-y-2">
+      <Label htmlFor="joinedAt">
+        入部年度<span className="text-red-500">*</span>
+      </Label>
+      <Input
         type="number"
         id="joinedAt"
         name="joinedAt"
@@ -526,7 +510,6 @@ function JoinedAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
         required
         min="1950"
         max={currentYear + 1}
-        className={style.form.input()}
         defaultValue={isEditing ? profile.joinedAt : undefined}
         value={!isEditing ? profile.joinedAt : undefined}
         disabled={disabled}
@@ -537,56 +520,43 @@ function JoinedAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
 
 function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
   const disabled = !isEditing || fetcherState === "loading"
+  const yearOptions = [
+    { value: "b1", label: "学部 1年" },
+    { value: "b2", label: "学部 2年" },
+    { value: "b3", label: "学部 3年" },
+    { value: "b4", label: "学部 4年" },
+    { value: "m1", label: "修士 1年" },
+    { value: "m2", label: "修士 2年" },
+    { value: "d1", label: "博士 1年" },
+    { value: "d2", label: "博士 2年" },
+  ]
   return (
-    <div>
-      <label htmlFor="year" className={style.form.label({ necessary: true })}>
-        学年
-      </label>
-      <select
-        id="year"
+    <div className="space-y-2">
+      <Label htmlFor="year">
+        学年<span className="text-red-500">*</span>
+      </Label>
+      <Select
         name="year"
         required
-        className={style.form.select()}
         defaultValue={profile.year}
         disabled={disabled}
       >
-        <option value="b1">学部 1年</option>
-        <option value="b2">学部 2年</option>
-        <option value="b3">学部 3年</option>
-        <option value="b4">学部 4年</option>
-        <option value="m1">修士 1年</option>
-        <option value="m2">修士 2年</option>
-        <option value="d1">博士 1年</option>
-        <option value="d2">博士 2年</option>
-      </select>
+        <SelectTrigger>
+          <SelectValue placeholder="学年を選択" />
+        </SelectTrigger>
+        <SelectContent>
+          {yearOptions.map(y => (
+            <SelectItem key={y.value} value={y.value}>
+              {y.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
 }
 
-// MARK: Helper
-const button = tv({
-  base: "px-4 py-2 font-medium rounded-md transition-colors duration-200 focus:ring-2 focus:ring-offset-2",
-  variants: {
-    variant: {
-      primary: "bg-blue-600 hover:bg-blue-700 text-slate-50 focus:ring-blue-500",
-      secondary: "bg-slate-500 hover:bg-slate-600 text-slate-50 focus:ring-slate-500",
-      ghost:
-        "text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300",
-    },
-  },
-})
 
-const notificationStyle = tv({
-  base: "p-4 rounded-md border transition-all duration-300",
-  variants: {
-    type: {
-      success:
-        "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200",
-      error:
-        "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200",
-    },
-  },
-})
 
 // MARK: Form Components
 interface FormFieldProps {

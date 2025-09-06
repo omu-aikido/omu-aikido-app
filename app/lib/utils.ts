@@ -1,3 +1,6 @@
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
 export const grade = [
   { name: "無級", grade: 0 },
   { name: "五級", grade: 5 },
@@ -84,4 +87,8 @@ export class JoinedAtYearRange {
   static get max() {
     return new Date().getFullYear()
   }
+}
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }

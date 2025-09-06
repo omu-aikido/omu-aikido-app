@@ -7,7 +7,14 @@ import type { Route } from "./+types/auth"
 import { AccountUi } from "~/components/component/AccountUi"
 import { Footer } from "~/components/component/Footer"
 import { ReactHeader } from "~/components/component/Header"
-import { Sidebar } from "~/components/ui/Sidebar"
+import { Button } from "~/components/ui/button"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "~/components/ui/sheet"
 import { getProfile } from "~/lib/query/profile"
 import { Role } from "~/lib/zod"
 import "~/styles/global.css"
@@ -50,14 +57,21 @@ export default function App(args: Route.ComponentProps) {
   return (
     <div className="h-dvh" data-testid="auth-layout-container">
       <ReactHeader title="ポータル">
-        <Sidebar
-          position="right"
-          icon={"  ≡  "}
-          open={sidebarOpen}
-          onOpenChange={setSidebarOpen}
-        >
-          <AccountUi apps={links} />
-        </Sidebar>
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="cursor-pointer p-2 mx-3 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors flex items-center justify-center h-10 w-10">
+              ≡
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-80 p-4">
+            <SheetHeader>
+              <SheetTitle>メニュー</SheetTitle>
+            </SheetHeader>
+            <div className="mt-4">
+              <AccountUi apps={links} />
+            </div>
+          </SheetContent>
+        </Sheet>
       </ReactHeader>
       <main
         className="min-h-4/5 p-3 md:p-6 mt-20 mx-auto max-w-3xl overflow-y-auto mb-auto"

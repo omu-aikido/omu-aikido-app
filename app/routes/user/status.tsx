@@ -4,10 +4,18 @@ import { redirect, useFetcher } from "react-router"
 
 import type { Route } from "./+types/status"
 
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select"
 import { StateButton } from "~/components/ui/StateButton"
 import { getProfile, updateProfile } from "~/lib/query/profile"
 import { grade as gradeOptions } from "~/lib/utils"
-import { style } from "~/styles/component"
 import type { Profile } from "~/type"
 
 // MARK: Loader
@@ -68,7 +76,7 @@ export default function StatusForm({ loaderData }: Route.ComponentProps) {
   return (
     <FormWrapper
       method="post"
-      className={style.form.container()}
+      className="space-y-4"
       encType={isEditing ? "multipart/form-data" : undefined}
       data-testid={
         isEditing ? "status-form-wrapper-editing" : "status-form-wrapper-viewing"
@@ -78,35 +86,21 @@ export default function StatusForm({ loaderData }: Route.ComponentProps) {
         profile={profile}
         isEditing={isEditing}
         fetcherState={fetcher.state}
-        data-testid={
-          isEditing ? "grade-select-wrapper-editing" : "grade-selector-wrapper-viewing"
-        }
       />
       <GetGradeAtInput
         profile={profile}
         isEditing={isEditing}
         fetcherState={fetcher.state}
-        data-testid={
-          isEditing ? "grade-at-input-wrapper-editing" : "grade-at-input-wrapper-viewing"
-        }
       />
       <JoinedAtInput
         profile={profile}
         isEditing={isEditing}
         fetcherState={fetcher.state}
-        data-testid={
-          isEditing
-            ? "joined-at-input-wrapper-editing"
-            : "joined-at-input-wrapper-viewing"
-        }
       />
       <YearSelect
         profile={profile}
         isEditing={isEditing}
         fetcherState={fetcher.state}
-        data-testid={
-          isEditing ? "year-selector-wrapper-editing" : "year-selector-wrapper-viewing"
-        }
       />
 
       <StateButton
@@ -129,33 +123,25 @@ interface FormFieldProps {
 function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
   const disabled = !isEditing || fetcherState === "loading"
   return (
-    <div>
-      <label htmlFor="grade" className={style.form.label({ necessary: true })}>
-        所持級段位
-      </label>
-      <select
-        id="grade"
+    <div className="space-y-2">
+      <Label htmlFor="grade">所持級段位</Label>
+      <Select
         name="grade"
         required
-        className={style.form.select()}
-        defaultValue={profile.grade}
+        defaultValue={String(profile.grade)}
         disabled={disabled}
-        data-testid={isEditing ? "grade-select-editing" : "grade-select-viewing"}
       >
-        {gradeOptions.map(g => (
-          <option
-            key={g.grade}
-            value={g.grade}
-            data-testid={
-              isEditing
-                ? "grade-select-option-editing-" + g.grade
-                : "grade-select-option-viewing-" + g.grade
-            }
-          >
-            {g.name}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger id="grade">
+          <SelectValue placeholder="級段位を選択" />
+        </SelectTrigger>
+        <SelectContent>
+          {gradeOptions.map(g => (
+            <SelectItem key={g.grade} value={String(g.grade)}>
+              {g.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
 }
@@ -166,19 +152,15 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
     ? new Date(profile.getGradeAt).toISOString().split("T")[0]
     : ""
   return (
-    <div>
-      <label htmlFor="getGradeAt" className={style.form.label()}>
-        級段位取得日
-      </label>
-      <input
+    <div className="space-y-2">
+      <Label htmlFor="getGradeAt">級段位取得日</Label>
+      <Input
         type="date"
         id="getGradeAt"
         name="getGradeAt"
-        className={style.form.input()}
         defaultValue={isEditing ? value : undefined}
         value={!isEditing ? value : undefined}
         disabled={disabled}
-        data-testid={isEditing ? "getGradeAt-input-editing" : "getGradeAt-input-viewing"}
       />
     </div>
   )
@@ -187,21 +169,17 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
 function JoinedAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
   const disabled = !isEditing || fetcherState === "loading"
   return (
-    <div>
-      <label htmlFor="joinedAt" className={style.form.label({ necessary: true })}>
-        入部年度
-      </label>
-      <input
+    <div className="space-y-2">
+      <Label htmlFor="joinedAt">入部年度</Label>
+      <Input
         type="number"
         id="joinedAt"
         name="joinedAt"
         placeholder="4桁の数字"
         required
-        className={style.form.input()}
         defaultValue={isEditing ? profile.joinedAt : undefined}
         value={!isEditing ? profile.joinedAt : undefined}
         disabled={disabled}
-        data-testid={isEditing ? "joinedAt-input-editing" : "joinedAt-input-viewing"}
       />
     </div>
   )
@@ -209,45 +187,36 @@ function JoinedAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
 
 function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
   const disabled = !isEditing || fetcherState === "loading"
+  const yearOptions = [
+    { value: "b1", label: "学部 1年" },
+    { value: "b2", label: "学部 2年" },
+    { value: "b3", label: "学部 3年" },
+    { value: "b4", label: "学部 4年" },
+    { value: "m1", label: "修士 1年" },
+    { value: "m2", label: "修士 2年" },
+    { value: "d1", label: "博士 1年" },
+    { value: "d2", label: "博士 2年" },
+  ]
   return (
-    <div>
-      <label htmlFor="year" className={style.form.label({ necessary: true })}>
-        学年
-      </label>
-      <select
-        id="year"
+    <div className="space-y-2">
+      <Label htmlFor="year">学年</Label>
+      <Select
         name="year"
         required
-        className={style.form.select()}
         defaultValue={profile.year}
         disabled={disabled}
-        data-testid={isEditing ? "year-select-editing" : "year-select-viewing"}
       >
-        <option value="b1" data-testid="year-select-option-b1">
-          学部 1年
-        </option>
-        <option value="b2" data-testid="year-select-option-b2">
-          学部 2年
-        </option>
-        <option value="b3" data-testid="year-select-option-b3">
-          学部 3年
-        </option>
-        <option value="b4" data-testid="year-select-option-b4">
-          学部 4年
-        </option>
-        <option value="m1" data-testid="year-select-option-m1">
-          修士 1年
-        </option>
-        <option value="m2" data-testid="year-select-option-m2">
-          修士 2年
-        </option>
-        <option value="d1" data-testid="year-select-option-d1">
-          博士 1年
-        </option>
-        <option value="d2" data-testid="year-select-option-d2">
-          博士 2年
-        </option>
-      </select>
+        <SelectTrigger id="year">
+          <SelectValue placeholder="学年を選択" />
+        </SelectTrigger>
+        <SelectContent>
+          {yearOptions.map(y => (
+            <SelectItem key={y.value} value={y.value}>
+              {y.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
 }

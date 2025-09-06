@@ -8,6 +8,8 @@ import type { Route } from "./+types/accounts"
 
 import ClerkUsers from "~/components/component/ClerkUsers"
 import Ranking from "~/components/component/Ranking"
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
 import { getMonthlyRanking } from "~/lib/query/activity"
 import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
@@ -237,20 +239,16 @@ export default function AdminAccounts(args: Route.ComponentProps) {
         <h2 className={style.text.subtitle()}>アカウント管理</h2>
         {/* 検索フォーム（SPA対応） */}
         <div className="flex gap-2">
-          <input
+          <Input
             type="text"
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="名前・メアドで検索..."
-            className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="max-w-sm"
           />
-          <button
-            type="button"
-            onClick={handleSearch}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
-          >
+          <Button type="button" onClick={handleSearch}>
             検索
-          </button>
+          </Button>
         </div>
       </div>
 

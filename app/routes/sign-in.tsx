@@ -7,7 +7,10 @@ const logger = getLogger("routes/sign-in")
 
 import type { Route } from "./+types/sign-in"
 
+import { Button } from "~/components/ui/button"
 import { Icon } from "~/components/ui/Icon"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
 import { style } from "~/styles/component"
 
 // MARK: Loader
@@ -102,18 +105,12 @@ export default function SignInPage() {
       <fetcher.Form
         method="post"
         onSubmit={handleSubmit}
-        className={style.form.container()}
+        className="space-y-4"
         data-testid="sign-in-form"
       >
-        <div>
-          <label
-            htmlFor="email"
-            className={style.form.label({ necessary: true })}
-            data-testid="sign-in-label-email"
-          >
-            メールアドレス
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="email">メールアドレス</Label>
+          <Input
             id="email"
             type="email"
             name="email"
@@ -121,19 +118,12 @@ export default function SignInPage() {
             onChange={e => setEmail(e.target.value)}
             required
             autoComplete="email"
-            className={style.form.input()}
             data-testid="sign-in-input-email"
           />
         </div>
-        <div>
-          <label
-            htmlFor="password"
-            className={style.form.label({ necessary: true })}
-            data-testid="sign-in-label-password"
-          >
-            パスワード
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="password">パスワード</Label>
+          <Input
             id="password"
             type="password"
             name="password"
@@ -141,42 +131,45 @@ export default function SignInPage() {
             onChange={e => setPassword(e.target.value)}
             required
             autoComplete="current-password"
-            className={style.form.input()}
             data-testid="sign-in-input-password"
           />
         </div>
         {error && (
           <div data-testid="sign-in-error-container">
-            <div className={style.text.error()} data-testid="sign-in-error-message">
+            <p
+              className="text-sm font-medium text-destructive"
+              data-testid="sign-in-error-message"
+            >
               {error}
-            </div>
+            </p>
             <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
               サインインに失敗する場合は、
-              <span className={style.text.link()}>
+              <Button variant="link" asChild className="p-0">
                 <Link
                   to="https://accounts.omu-aikido.com"
                   data-testid="sign-in-link-external"
                 >
                   こちら
                 </Link>
-              </span>
+              </Button>
               からサインインをお試しください。
             </div>
           </div>
         )}
-        <button
+        <Button
           type="submit"
           disabled={loading || error !== null}
-          className={style.button({ type: "primary", class: "w-full" })}
+          className="w-full cursor-pointer"
           data-testid="sign-in-button-submit"
         >
           {loading ? "サインイン中..." : "サインイン"}
-        </button>
+        </Button>
       </fetcher.Form>
       <hr className="my-6" />
-      <button
+      <Button
         type="button"
-        className="w-full py-2 px-4 bg-[#5865F2] dark:bg-[#4752C4] text-white font-semibold rounded flex items-center justify-center gap-2 hover:bg-[#4752C4] dark:hover:bg-[#36418C] transition disabled:opacity-50"
+        className="w-full"
+        variant="outline"
         onClick={async () => {
           if (!isLoaded || !signIn) return
           setLoading(true)
@@ -193,9 +186,9 @@ export default function SignInPage() {
         disabled={loading}
         data-testid="sign-in-button-discord"
       >
-        <Icon icon={"discord-logo"} size="24" />
+        <Icon icon={"discord-logo"} size="24" className="mr-2" />
         Discordで認証
-      </button>
+      </Button>
       <div
         className="mt-4 text-center text-sm text-slate-600 dark:text-slate-400"
         data-testid="sign-in-signup-link-container"

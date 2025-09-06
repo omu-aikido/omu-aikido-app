@@ -7,6 +7,9 @@ import { useState } from "react"
 import type { LoaderFunctionArgs } from "react-router"
 import { redirect, useNavigate } from "react-router"
 
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
 import { style } from "~/styles/component"
 
 // MARK: Loader
@@ -153,61 +156,53 @@ export default function VerifyPage() {
             <p className="mb-4 text-slate-600 dark:text-slate-400">
               メールに届いた認証コードを入力してください
             </p>
-            <form
-              onSubmit={handleVerifySubmit}
-              className={style.form.container({ vertical: true })}
-            >
-              <label htmlFor="code" className={style.form.label({ necessary: true })}>
-                認証コード
-              </label>
-              <input
-                id="code"
-                name="code"
-                value={code}
-                onChange={e => setCode(e.target.value)}
-                className={style.form.input({ class: "col-span-2" })}
-                required
-                disabled={loading}
-                placeholder="認証コードを入力"
-              />
-              <button
+            <form onSubmit={handleVerifySubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="code">認証コード</Label>
+                <Input
+                  id="code"
+                  name="code"
+                  value={code}
+                  onChange={e => setCode(e.target.value)}
+                  required
+                  disabled={loading}
+                  placeholder="認証コードを入力"
+                />
+              </div>
+              <Button
                 type="submit"
-                className={style.button({ type: "primary", class: "col-span-3" })}
+                className="w-full"
                 disabled={!canSubmit || !code.trim()}
               >
-                <div className="flex items-center justify-center gap-2">
-                  {!canSubmit && (
-                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                  )}
-                  <span>
-                    {!canSubmit
-                      ? isVerificationSuccess
-                        ? "認証完了！"
-                        : "認証処理中..."
-                      : "認証する"}
-                  </span>
-                </div>
-              </button>
+                {!canSubmit && (
+                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                )}
+                {!canSubmit
+                  ? isVerificationSuccess
+                    ? "認証完了！"
+                    : "認証処理中..."
+                  : "認証する"}
+              </Button>
             </form>
 
             <div className="mt-4 text-center">
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
                 認証コードが届かない場合
               </p>
-              <button
+              <Button
                 type="button"
+                variant="secondary"
                 onClick={handleResendCode}
                 disabled={resendCooldown > 0}
-                className={style.button({ type: "secondary", class: "text-sm" })}
               >
                 {resendCooldown > 0 ? `再送まで ${resendCooldown}秒` : "認証コードを再送"}
-              </button>
+              </Button>
             </div>
             <hr />
             <div className="text-center">
-              <button
+              <Button
                 type="button"
-                className={style.button({ type: "danger", class: "text-sm" })}
+                variant="destructive"
                 onClick={() => {
                   if (window.confirm("入力はリセットされます。よろしいですか？")) {
                     navigate("/sign-up")
@@ -215,7 +210,7 @@ export default function VerifyPage() {
                 }}
               >
                 最初からやり直す
-              </button>
+              </Button>
             </div>
           </>
         )

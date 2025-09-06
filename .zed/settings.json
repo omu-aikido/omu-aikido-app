@@ -2,4 +2,13 @@
 //
 // For a full list of overridable settings, and general information on folder-specific settings,
 // see the documentation: https://zed.dev/docs/configuring-zed#settings-files
-{ "language_servers": ["!biome", "..."] }
+{
+  "language_servers": ["!biome", "..."],
+  "context_servers": {
+    "shadcn":{
+      "source": "custom",
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    }
+  }
+}

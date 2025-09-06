@@ -79,9 +79,6 @@ export default tseslint.config(
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
 
-      // React Refresh rules (for HMR)
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-
       "import/no-unresolved": "off",
       "import/order": [
         "error",
@@ -135,7 +132,7 @@ export default tseslint.config(
         "warn",
         {
           allowConstantExport: true,
-          allowExportNames: ["meta", "links", "headers", "loader", "action", "default"],
+          allowExportNames: ["meta", "links", "headers", "loader", "action", "default", "buttonVariants", "useSidebar"],
         },
       ],
     },

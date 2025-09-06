@@ -1,6 +1,6 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { useEffect } from "react"
-import { useFetcher } from "react-router"
+import { Link, useFetcher } from "react-router"
 
 import type { Route } from "./+types/home"
 
@@ -8,8 +8,7 @@ import { AddRecord } from "~/components/component/AddRecord"
 import { MyRanking } from "~/components/component/MyRanking"
 import { NextGrade } from "~/components/component/NextGrade"
 import Recents from "~/components/component/Recents"
-import { AppIcon } from "~/components/ui/AppIcon"
-import Grid from "~/components/ui/Grid"
+import { Button } from "~/components/ui/button"
 import type { ActivityType } from "~/db/schema"
 import { useNotificationStore } from "~/hooks/notification"
 import {
@@ -139,11 +138,19 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <Recents recent={recent} />
 
       <hr data-testid="home-divider" />
-      <Grid>
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {apps.map((app: PagePath) => (
-          <AppIcon key={app.href} title={app.name} id={app.href} desc={app.desc} />
+          <Button asChild variant="outline" className="h-24" key={app.href}>
+            <Link
+              to={app.href}
+              className="flex flex-col items-center justify-center gap-2"
+            >
+              <span className="text-lg font-semibold">{app.name}</span>
+              <p className="text-sm text-muted-foreground">{app.desc}</p>
+            </Link>
+          </Button>
         ))}
-      </Grid>
+      </div>
     </>
   )
 }

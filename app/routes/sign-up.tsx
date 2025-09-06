@@ -9,6 +9,17 @@ import z from "zod"
 
 import type { Route } from "./+types/sign-up"
 
+import { Button } from "~/components/ui/button"
+import { Checkbox } from "~/components/ui/checkbox"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select"
 import { grade, JoinedAtYearRange, year } from "~/lib/utils"
 import { style } from "~/styles/component"
 type ClientActionReturn =
@@ -392,295 +403,257 @@ export default function SignUpPage(props: Route.ComponentProps) {
       </h1>
       <ProgressIndicator step={step} />
       <fetcher.Form method="post" onSubmit={handleSubmit} data-testid="sign-up-form">
-        <div
-          className={`${style.form.container({ vertical: true })} ${step === "basic" ? "" : "hidden"}`}
-        >
-          <h2 className="col-span-3 text-lg font-semibold mb-2">基本情報</h2>
-          <label htmlFor="email" className={style.form.label({ necessary: true })}>
-            メールアドレス
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            className={style.form.input({ class: "col-span-2" })}
-            value={formValues.email}
-            onChange={e =>
-              dispatch({ type: "SET_FORM_VALUES", payload: { email: e.target.value } })
-            }
-          />
-          {formErrors.email && (
-            <div className={style.text.error({ className: "col-span-3" })}>
-              {formErrors.email}
-            </div>
-          )}
-          <label htmlFor="password" className={style.form.label({ necessary: true })}>
-            パスワード
-          </label>
-          <input
-            id="password"
-            name="newPassword"
-            type="password"
-            autoComplete="new-password"
-            required
-            className={style.form.input({ class: "col-span-2" })}
-            value={formValues.newPassword}
-            onChange={e =>
-              dispatch({
-                type: "SET_FORM_VALUES",
-                payload: { newPassword: e.target.value },
-              })
-            }
-          />
-          {formErrors.newPassword && (
-            <div className={style.text.error({ className: "col-span-3" })}>
-              {formErrors.newPassword}
-            </div>
-          )}
-          <label
-            htmlFor="password-confirm"
-            className={style.form.label({ necessary: true })}
-          >
-            パスワード確認
-          </label>
-          <input
-            id="password-confirm"
-            name="confirmPassword"
-            type="password"
-            autoComplete="new-password"
-            required
-            className={style.form.input({ class: "col-span-2" })}
-            value={formValues.confirmPassword}
-            onChange={e =>
-              dispatch({
-                type: "SET_FORM_VALUES",
-                payload: { confirmPassword: e.target.value },
-              })
-            }
-          />
-          {formErrors.confirmPassword && (
-            <div className={style.text.error({ className: "col-span-3" })}>
-              {formErrors.confirmPassword}
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={handleNext}
-            className={style.button({ type: "primary", class: "col-span-3" })}
-            disabled={fetcher.state !== "idle" || isSignUpCreated}
-            data-testid="sign-up-button-next-basic"
-          >
-            <div className="flex items-center justify-center gap-2">
-              {(fetcher.state !== "idle" || isSignUpCreated) && (
-                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-              )}
-              <span>次へ</span>
-            </div>
-          </button>
-        </div>
-
-        <div
-          className={`${style.form.container({ vertical: true })} ${step === "personal" ? "" : "hidden"}`}
-        >
-          <h2 className="col-span-3 text-lg font-semibold mb-2">個人情報</h2>
-          <label htmlFor="lastName" className={style.form.label({ necessary: true })}>
-            姓
-          </label>
-          <input
-            id="lastName"
-            name="lastName"
-            type="text"
-            autoComplete="family-name"
-            required
-            className={style.form.input({ class: "col-span-2" })}
-            value={formValues.lastName}
-            onChange={e =>
-              dispatch({ type: "SET_FORM_VALUES", payload: { lastName: e.target.value } })
-            }
-          />
-          {formErrors.lastName && (
-            <div className={style.text.error({ className: "col-span-3" })}>
-              {formErrors.lastName}
-            </div>
-          )}
-          <label htmlFor="firstName" className={style.form.label({ necessary: true })}>
-            名
-          </label>
-          <input
-            id="firstName"
-            name="firstName"
-            type="text"
-            autoComplete="given-name"
-            required
-            className={style.form.input({ class: "col-span-2" })}
-            value={formValues.firstName}
-            onChange={e =>
-              dispatch({
-                type: "SET_FORM_VALUES",
-                payload: { firstName: e.target.value },
-              })
-            }
-          />
-          {formErrors.firstName && (
-            <div className={style.text.error({ className: "col-span-3" })}>
-              {formErrors.firstName}
-            </div>
-          )}
-          <label htmlFor="username" className={style.form.label({ necessary: false })}>
-            ユーザー名
-          </label>
-          <input
-            id="username"
-            name="username"
-            type="text"
-            autoComplete="username"
-            className={style.form.input({ class: "col-span-2" })}
-            value={formValues.username}
-            onChange={e =>
-              dispatch({ type: "SET_FORM_VALUES", payload: { username: e.target.value } })
-            }
-          />
-          {formErrors.username && (
-            <div className={style.text.error({ className: "col-span-3" })}>
-              {formErrors.username}
-            </div>
-          )}
-          <div className="col-span-3 flex gap-2">
-            <button
-              type="button"
-              onClick={prevStep}
-              className={style.button({ type: "secondary", class: "flex-1" })}
-              data-testid="sign-up-button-back-personal"
-            >
-              戻る
-            </button>
-            <button
-              type="button"
-              onClick={handleNext}
-              className={style.button({ type: "primary", class: "flex-1" })}
-              disabled={fetcher.state !== "idle" || isSignUpCreated}
-              data-testid="sign-up-button-next-personal"
-            >
-              <div className="flex items-center justify-center gap-2">
-                {(fetcher.state !== "idle" || isSignUpCreated) && (
-                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                )}
-                <span>次へ</span>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        <div
-          className={`${style.form.container({ vertical: true })} ${step === "profile" ? "" : "hidden"}`}
-        >
-          <h2 className="col-span-3 text-lg font-semibold mb-2">プロファイル情報</h2>
-          <label htmlFor="year" className={style.form.label({ necessary: true })}>
-            学年
-          </label>
-          <select
-            id="year"
-            name="year"
-            required
-            className={style.form.input({ class: "col-span-2" })}
-            value={formValues.year}
-            onChange={e =>
-              dispatch({ type: "SET_FORM_VALUES", payload: { year: e.target.value } })
-            }
-          >
-            {yearOptions()}
-          </select>
-          {formErrors.year && (
-            <div className={style.text.error({ className: "col-span-3" })}>
-              {formErrors.year}
-            </div>
-          )}
-          <label htmlFor="grade" className={style.form.label({ necessary: true })}>
-            現在の級段位
-          </label>
-          <select
-            id="grade"
-            name="grade"
-            required
-            className={style.form.input({ class: "col-span-2" })}
-            value={formValues.grade}
-            onChange={e =>
-              dispatch({
-                type: "SET_FORM_VALUES",
-                payload: { grade: Number(e.target.value) },
-              })
-            }
-          >
-            {gradeOptions()}
-          </select>
-          {formErrors.grade && (
-            <div className={style.text.error({ className: "col-span-3" })}>
-              {formErrors.grade}
-            </div>
-          )}
-          <label htmlFor="joinedAt" className={style.form.label({ necessary: true })}>
-            入部年度
-          </label>
-          <input
-            id="joinedAt"
-            name="joinedAt"
-            type="number"
-            required
-            className={style.form.input({ class: "col-span-2" })}
-            min={JoinedAtYearRange.min}
-            max={JoinedAtYearRange.max}
-            value={formValues.joinedAt}
-            onChange={e =>
-              dispatch({ type: "SET_FORM_VALUES", payload: { joinedAt: e.target.value } })
-            }
-          />
-          {formErrors.joinedAt && (
-            <div className={style.text.error({ className: "col-span-3" })}>
-              {formErrors.joinedAt}
-            </div>
-          )}
-          <label htmlFor="getGradeAt" className={style.form.label({ necessary: false })}>
-            級段位取得日
-          </label>
-          <input
-            id="getGradeAt"
-            name="getGradeAt"
-            type="date"
-            className={style.form.input({ class: "col-span-2" })}
-            value={formValues.getGradeAt}
-            onChange={e =>
-              dispatch({
-                type: "SET_FORM_VALUES",
-                payload: { getGradeAt: e.target.value },
-              })
-            }
-          />
-          {formErrors.getGradeAt && (
-            <div className={style.text.error({ className: "col-span-3" })}>
-              {formErrors.getGradeAt}
-            </div>
-          )}
-
-          <div className="col-span-3 flex items-start gap-3 mt-4">
-            <input
-              id="legalAccepted"
-              name="legalAccepted"
-              type="checkbox"
+        <div className={`space-y-4 ${step === "basic" ? "" : "hidden"}`}>
+          <h2 className="text-lg font-semibold">基本情報</h2>
+          <div className="space-y-2">
+            <Label htmlFor="email">メールアドレス</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
               required
-              className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              checked={formValues.legalAccepted}
+              value={formValues.email}
+              onChange={e =>
+                dispatch({ type: "SET_FORM_VALUES", payload: { email: e.target.value } })
+              }
+            />
+            {formErrors.email && (
+              <p className="text-sm font-medium text-destructive">{formErrors.email}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">パスワード</Label>
+            <Input
+              id="password"
+              name="newPassword"
+              type="password"
+              autoComplete="new-password"
+              required
+              value={formValues.newPassword}
               onChange={e =>
                 dispatch({
                   type: "SET_FORM_VALUES",
-                  payload: { legalAccepted: e.target.checked },
+                  payload: { newPassword: e.target.value },
                 })
               }
             />
-            <label
+            {formErrors.newPassword && (
+              <p className="text-sm font-medium text-destructive">{formErrors.newPassword}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password-confirm">パスワード確認</Label>
+            <Input
+              id="password-confirm"
+              name="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              required
+              value={formValues.confirmPassword}
+              onChange={e =>
+                dispatch({
+                  type: "SET_FORM_VALUES",
+                  payload: { confirmPassword: e.target.value },
+                })
+              }
+            />
+            {formErrors.confirmPassword && (
+              <p className="text-sm font-medium text-destructive">
+                {formErrors.confirmPassword}
+              </p>
+            )}
+          </div>
+          <Button
+            type="button"
+            onClick={handleNext}
+            className="w-full"
+            disabled={fetcher.state !== "idle" || isSignUpCreated}
+            data-testid="sign-up-button-next-basic"
+          >
+            {(fetcher.state !== "idle" || isSignUpCreated) && (
+              <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+            )}
+            次へ
+          </Button>
+        </div>
+
+        <div className={`space-y-4 ${step === "personal" ? "" : "hidden"}`}>
+          <h2 className="text-lg font-semibold">個人情報</h2>
+          <div className="space-y-2">
+            <Label htmlFor="lastName">姓</Label>
+            <Input
+              id="lastName"
+              name="lastName"
+              type="text"
+              autoComplete="family-name"
+              required
+              value={formValues.lastName}
+              onChange={e =>
+                dispatch({ type: "SET_FORM_VALUES", payload: { lastName: e.target.value } })
+              }
+            />
+            {formErrors.lastName && (
+              <p className="text-sm font-medium text-destructive">{formErrors.lastName}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="firstName">名</Label>
+            <Input
+              id="firstName"
+              name="firstName"
+              type="text"
+              autoComplete="given-name"
+              required
+              value={formValues.firstName}
+              onChange={e =>
+                dispatch({
+                  type: "SET_FORM_VALUES",
+                  payload: { firstName: e.target.value },
+                })
+              }
+            />
+            {formErrors.firstName && (
+              <p className="text-sm font-medium text-destructive">{formErrors.firstName}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="username">ユーザー名</Label>
+            <Input
+              id="username"
+              name="username"
+              type="text"
+              autoComplete="username"
+              value={formValues.username}
+              onChange={e =>
+                dispatch({ type: "SET_FORM_VALUES", payload: { username: e.target.value } })
+              }
+            />
+            {formErrors.username && (
+              <p className="text-sm font-medium text-destructive">{formErrors.username}</p>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={prevStep}
+              className="flex-1"
+              data-testid="sign-up-button-back-personal"
+            >
+              戻る
+            </Button>
+            <Button
+              type="button"
+              onClick={handleNext}
+              className="flex-1"
+              disabled={fetcher.state !== "idle" || isSignUpCreated}
+              data-testid="sign-up-button-next-personal"
+            >
+              {(fetcher.state !== "idle" || isSignUpCreated) && (
+                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+              )}
+              次へ
+            </Button>
+          </div>
+        </div>
+
+        <div className={`space-y-4 ${step === "profile" ? "" : "hidden"}`}>
+          <h2 className="text-lg font-semibold">プロファイル情報</h2>
+          <div className="space-y-2">
+            <Label htmlFor="year">学年</Label>
+            <Select
+              name="year"
+              required
+              value={formValues.year}
+              onValueChange={value =>
+                dispatch({ type: "SET_FORM_VALUES", payload: { year: value } })
+              }
+            >
+              <SelectTrigger id="year">
+                <SelectValue placeholder="学年を選択" />
+              </SelectTrigger>
+              <SelectContent>{yearOptions()}</SelectContent>
+            </Select>
+            {formErrors.year && (
+              <p className="text-sm font-medium text-destructive">{formErrors.year}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="grade">現在の級段位</Label>
+            <Select
+              name="grade"
+              required
+              value={String(formValues.grade)}
+              onValueChange={value =>
+                dispatch({
+                  type: "SET_FORM_VALUES",
+                  payload: { grade: Number(value) },
+                })
+              }
+            >
+              <SelectTrigger id="grade">
+                <SelectValue placeholder="級段位を選択" />
+              </SelectTrigger>
+              <SelectContent>{gradeOptions()}</SelectContent>
+            </Select>
+            {formErrors.grade && (
+              <p className="text-sm font-medium text-destructive">{formErrors.grade}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="joinedAt">入部年度</Label>
+            <Input
+              id="joinedAt"
+              name="joinedAt"
+              type="number"
+              required
+              min={JoinedAtYearRange.min}
+              max={JoinedAtYearRange.max}
+              value={formValues.joinedAt}
+              onChange={e =>
+                dispatch({ type: "SET_FORM_VALUES", payload: { joinedAt: e.target.value } })
+              }
+            />
+            {formErrors.joinedAt && (
+              <p className="text-sm font-medium text-destructive">{formErrors.joinedAt}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="getGradeAt">級段位取得日</Label>
+            <Input
+              id="getGradeAt"
+              name="getGradeAt"
+              type="date"
+              value={formValues.getGradeAt}
+              onChange={e =>
+                dispatch({
+                  type: "SET_FORM_VALUES",
+                  payload: { getGradeAt: e.target.value },
+                })
+              }
+            />
+            {formErrors.getGradeAt && (
+              <p className="text-sm font-medium text-destructive">{formErrors.getGradeAt}</p>
+            )}
+          </div>
+
+          <div className="flex items-start gap-3 mt-4">
+            <Checkbox
+              id="legalAccepted"
+              name="legalAccepted"
+              required
+              checked={formValues.legalAccepted}
+              onCheckedChange={checked =>
+                dispatch({
+                  type: "SET_FORM_VALUES",
+                  payload: { legalAccepted: !!checked },
+                })
+              }
+            />
+            <Label
               htmlFor="legalAccepted"
-              className="text-sm text-gray-898 dark:text-gray-300"
+              className="text-sm font-normal text-gray-898 dark:text-gray-300"
             >
               <a
                 href="https://omu-aikido.com/terms-of-service/"
@@ -700,41 +673,36 @@ export default function SignUpPage(props: Route.ComponentProps) {
                 プライバシーポリシー
               </a>
               に同意します
-            </label>
+            </Label>
           </div>
           {formErrors.legalAccepted && (
-            <div className={style.text.error({ className: "col-span-3" })}>
-              {formErrors.legalAccepted}
-            </div>
+            <p className="text-sm font-medium text-destructive">{formErrors.legalAccepted}</p>
           )}
 
-          <div className="col-span-3 flex gap-2">
-            <button
+          <div className="flex gap-2">
+            <Button
               type="button"
+              variant="secondary"
               onClick={prevStep}
-              className={style.button({ type: "secondary", class: "flex-1" })}
+              className="flex-1"
               data-testid="sign-up-button-back-profile"
             >
               戻る
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="submit"
-              className={style.button({ type: "primary", class: "flex-1" })}
+              className="flex-1"
               disabled={disabled}
               data-testid="sign-up-button-submit"
             >
-              <div className="flex items-center justify-center gap-2">
-                {(fetcher.state !== "idle" || isSignUpCreated) && (
-                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                )}
-                <span>
-                  {fetcher.state !== "idle" || isSignUpCreated
-                    ? "処理中..."
-                    : "アカウントを作成"}
-                </span>
-              </div>
-            </button>
+              {(fetcher.state !== "idle" || isSignUpCreated) && (
+                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+              )}
+              {fetcher.state !== "idle" || isSignUpCreated
+                ? "処理中..."
+                : "アカウントを作成"}
+            </Button>
           </div>
         </div>
         <div className="col-span-3 my-4">
@@ -783,17 +751,17 @@ export default function SignUpPage(props: Route.ComponentProps) {
 // 学年・級の選択肢生成
 function yearOptions() {
   return year.map(y => (
-    <option key={y.year} value={y.year}>
+    <SelectItem key={y.year} value={y.year}>
       {y.name}
-    </option>
+    </SelectItem>
   ))
 }
 
 function gradeOptions() {
   return grade.map(g => (
-    <option key={g.grade} value={g.grade}>
+    <SelectItem key={g.grade} value={String(g.grade)}>
       {g.name}
-    </option>
+    </SelectItem>
   ))
 }
 

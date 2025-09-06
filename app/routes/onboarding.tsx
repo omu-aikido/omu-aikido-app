@@ -5,6 +5,16 @@ import { redirect, useFetcher, useNavigate } from "react-router"
 
 import type { Route } from "./+types/onboarding"
 
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select"
 import { grade, JoinedAtYearRange, year } from "~/lib/utils"
 import { style } from "~/styles/component"
 
@@ -360,96 +370,67 @@ export default function OnboardingPage(args: Route.ComponentProps) {
           {setupMessage}
         </p>
 
-        <form onSubmit={handleProfileSubmit}>
-          <div className={style.form.container({ vertical: true })}>
-            <label htmlFor="year" className={style.form.label({ necessary: true })}>
-              学年
-            </label>
-            <select
-              id="year"
-              name="year"
-              defaultValue="b1"
-              required
-              className={style.form.input({ class: "col-span-2" })}
-            >
-              {yearOptions()}
-            </select>
+        <form onSubmit={handleProfileSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="year">学年</Label>
+            <Select name="year" defaultValue="b1" required>
+              <SelectTrigger id="year">
+                <SelectValue placeholder="学年を選択" />
+              </SelectTrigger>
+              <SelectContent>{yearOptions()}</SelectContent>
+            </Select>
             {errors.year && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.year}
-              </div>
+              <p className="text-sm font-medium text-destructive">{errors.year}</p>
             )}
+          </div>
 
-            <label htmlFor="grade" className={style.form.label({ necessary: true })}>
-              現在の級段位
-            </label>
-            <select
-              id="grade"
-              name="grade"
-              defaultValue="0"
-              required
-              className={style.form.input({ class: "col-span-2" })}
-            >
-              {gradeOptions()}
-            </select>
+          <div className="space-y-2">
+            <Label htmlFor="grade">現在の級段位</Label>
+            <Select name="grade" defaultValue="0" required>
+              <SelectTrigger id="grade">
+                <SelectValue placeholder="級段位を選択" />
+              </SelectTrigger>
+              <SelectContent>{gradeOptions()}</SelectContent>
+            </Select>
             {errors.grade && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.grade}
-              </div>
+              <p className="text-sm font-medium text-destructive">{errors.grade}</p>
             )}
+          </div>
 
-            <label htmlFor="joinedAt" className={style.form.label({ necessary: true })}>
-              入部年度
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="joinedAt">入部年度</Label>
+            <Input
               id="joinedAt"
               name="joinedAt"
               type="number"
               defaultValue={new Date().getFullYear().toString()}
               required
-              className={style.form.input({ class: "col-span-2" })}
               min={JoinedAtYearRange.min}
               max={JoinedAtYearRange.max}
             />
             {errors.joinedAt && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.joinedAt}
-              </div>
+              <p className="text-sm font-medium text-destructive">{errors.joinedAt}</p>
             )}
-
-            <label
-              htmlFor="getGradeAt"
-              className={style.form.label({ necessary: false })}
-            >
-              級段位取得日
-            </label>
-            <input
-              id="getGradeAt"
-              name="getGradeAt"
-              type="date"
-              className={style.form.input({ class: "col-span-2" })}
-            />
-            {errors.getGradeAt && (
-              <div className={style.text.error({ className: "col-span-3" })}>
-                {errors.getGradeAt}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={fetcher.state === "submitting"}
-              className={style.button({ type: "primary", class: "col-span-3" })}
-            >
-              <div className="flex items-center justify-center gap-2">
-                {fetcher.state === "submitting" && (
-                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                )}
-                <span>
-                  {fetcher.state === "submitting" ? "設定中..." : "プロファイルを設定"}
-                </span>
-              </div>
-            </button>
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="getGradeAt">級段位取得日</Label>
+            <Input id="getGradeAt" name="getGradeAt" type="date" />
+            {errors.getGradeAt && (
+              <p className="text-sm font-medium text-destructive">{errors.getGradeAt}</p>
+            )}
+          </div>
+
+          <Button
+            type="submit"
+            disabled={fetcher.state === "submitting"}
+            className="w-full"
+          >
+            {fetcher.state === "submitting" && (
+              <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+            )}
+            {fetcher.state === "submitting" ? "設定中..." : "プロファイルを設定"}
+          </Button>
         </form>
 
         {fetcher.data &&
@@ -546,16 +527,16 @@ export default function OnboardingPage(args: Route.ComponentProps) {
 // 学年・級の選択肢生成（sign-upと同じ関数）
 function yearOptions() {
   return year.map(y => (
-    <option key={y.year} value={y.year}>
+    <SelectItem key={y.year} value={y.year}>
       {y.name}
-    </option>
+    </SelectItem>
   ))
 }
 
 function gradeOptions() {
   return grade.map(g => (
-    <option key={g.grade} value={g.grade}>
+    <SelectItem key={g.grade} value={String(g.grade)}>
       {g.name}
-    </option>
+    </SelectItem>
   ))
 }

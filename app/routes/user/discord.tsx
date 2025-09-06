@@ -2,6 +2,7 @@ import { useUser } from "@clerk/react-router"
 import { useState } from "react"
 import { useOutletContext } from "react-router"
 
+import { Button } from "~/components/ui/button"
 import { Icon } from "~/components/ui/Icon"
 import type { UserLayoutComponentProps } from "~/layout/user"
 
@@ -95,22 +96,22 @@ export default function Discord() {
                 </p>
               </div>
             </div>
-            <button
+            <Button
               type="button"
+              variant="destructive"
               onClick={handleDisconnectDiscord}
               disabled={isDisconnecting}
-              className="bg-red-500 dark:bg-red-700 text-white px-4 py-2 rounded hover:bg-red-600 dark:hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isDisconnecting ? "解除中..." : "Discord連携を解除"}
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="space-y-4">
-            <button
+            <Button
               type="button"
               onClick={handleConnectDiscord}
               disabled={isConnecting}
-              className="bg-indigo-500 dark:bg-indigo-700 text-white px-4 py-2 rounded hover:bg-indigo-600 dark:hover:bg-indigo-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="flex items-center gap-2"
             >
               {isConnecting ? (
                 <>
@@ -120,7 +121,7 @@ export default function Discord() {
               ) : (
                 "Discord連携する"
               )}
-            </button>
+            </Button>
           </div>
         )}
       </div>

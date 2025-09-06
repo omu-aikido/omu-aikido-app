@@ -16,8 +16,8 @@ import DailyActivity from "~/components/component/DailyActivity"
 import MonthlyActivityList from "~/components/component/MonthlyActivityList"
 import MonthlyCalendarGrid from "~/components/component/MonthlyCalendarGrid"
 import MonthNavigation from "~/components/component/MonthNavigation"
-import TabBarScrollHide from "~/components/component/TabBarScrollHide"
 import YearMonthSelectorInline from "~/components/component/YearMonthSelector"
+import { Button } from "~/components/ui/button"
 import type { ActivityType } from "~/db/schema"
 import {
   createActivities,
@@ -230,9 +230,9 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
         <div className="overflow-x-auto w-full sm:block hidden">
           <fetcher.Form method="post">
             <div className="flex flex-row items-center justify-between mb-4">
-              <button
+              <Button
                 type="submit"
-                className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 mx-1 w-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+                className="w-full mx-1 mb-4"
                 disabled={!isChanged || fetcher.state !== "idle"}
                 data-testid="record-button-submit"
               >
@@ -241,9 +241,10 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                   : fetcher.state === "loading"
                     ? "読み込み中"
                     : "送信中"}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="destructive"
                 onClick={() => {
                   if (window.confirm("変更をリセットします。よろしいですか？")) {
                     setActivities(originalActivities)
@@ -251,12 +252,12 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                     setShowDailyActivityModal(false)
                   }
                 }}
-                className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 mb-4 mx-1 w-1/4 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+                className="w-1/4 mx-1 mb-4"
                 disabled={!isChanged || fetcher.state !== "idle"}
                 data-testid="record-button-reset"
               >
                 リセット
-              </button>
+              </Button>
             </div>
             <input type="hidden" name="actionType" value="batchUpdate" />
             <input
@@ -322,37 +323,36 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
               )
             })()}
             <div className="fixed w-full right-0 bottom-0">
-              <TabBarScrollHide>
-                <div className="flex flex-row items-center justify-between pb-5 px-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (window.confirm("変更をリセットします。よろしいですか？")) {
-                        setActivities(originalActivities)
-                        setSelectedDate(null)
-                        setShowDailyActivityModal(false)
-                      }
-                    }}
-                    className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 my-4 mx-1 w-1/3 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
-                    disabled={!isChanged || fetcher.state !== "idle"}
-                    data-testid="record-button-reset-mobile"
-                  >
-                    リセット
-                  </button>
-                  <button
-                    type="submit"
-                    className="rounded-lg font-medium transition-colors duration-200 shadow-sm p-3 my-4 mx-1 w-full bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
-                    disabled={!isChanged || fetcher.state !== "idle"}
-                    data-testid="record-button-submit-mobile"
-                  >
-                    {fetcher.state === "idle"
-                      ? "登録"
-                      : fetcher.state === "loading"
-                        ? "読み込み中"
-                        : "送信中"}
-                  </button>
-                </div>
-              </TabBarScrollHide>
+              <div className="flex flex-row items-center justify-between pb-5 px-3">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => {
+                    if (window.confirm("変更をリセットします。よろしいですか？")) {
+                      setActivities(originalActivities)
+                      setSelectedDate(null)
+                      setShowDailyActivityModal(false)
+                    }
+                  }}
+                  className="w-1/3 mx-1 my-4"
+                  disabled={!isChanged || fetcher.state !== "idle"}
+                  data-testid="record-button-reset-mobile"
+                >
+                  リセット
+                </Button>
+                <Button
+                  type="submit"
+                  className="w-full mx-1 my-4"
+                  disabled={!isChanged || fetcher.state !== "idle"}
+                  data-testid="record-button-submit-mobile"
+                >
+                  {fetcher.state === "idle"
+                    ? "登録"
+                    : fetcher.state === "loading"
+                      ? "読み込み中"
+                      : "送信中"}
+                </Button>
+              </div>
             </div>
           </fetcher.Form>
         </div>

@@ -1,6 +1,6 @@
 import type { FetcherWithComponents } from "react-router"
 
-import { style } from "~/styles/component"
+import { Button } from "~/components/ui/button"
 
 export function StateButton({
   isEditing,
@@ -11,34 +11,6 @@ export function StateButton({
   setIsEditing: (editing: boolean) => void
   fetcher: FetcherWithComponents<unknown>
 }) {
-  function RenderButton({
-    type,
-    buttonType,
-    disabled,
-    onClick,
-    children,
-    testId,
-  }: {
-    type?: "green" | "gray"
-    buttonType: "button" | "submit"
-    disabled?: boolean
-    onClick?: () => void
-    children: React.ReactNode
-    testId?: string
-  }) {
-    return (
-      <button
-        type={buttonType}
-        className={style.form.button(type ? { type } : undefined)}
-        disabled={disabled}
-        onClick={onClick}
-        data-testid={testId}
-      >
-        {children}
-      </button>
-    )
-  }
-
   const isBusy = fetcher.state !== "idle"
   const submitLabel: string = isBusy ? "通信中" : "保存"
 
@@ -46,32 +18,33 @@ export function StateButton({
     <div className="flex gap-2" data-testid="state-button-container">
       {isEditing ? (
         <>
-          <RenderButton
-            type="green"
-            buttonType="submit"
+          <Button
+            type="submit"
+            variant="default"
             disabled={isBusy}
-            testId="state-button-submit"
+            data-testid="state-button-submit"
           >
             {submitLabel}
-          </RenderButton>
-          <RenderButton
-            type="gray"
-            buttonType="button"
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
             disabled={isBusy}
             onClick={() => setIsEditing(false)}
-            testId="state-button-cancel"
+            data-testid="state-button-cancel"
           >
             キャンセル
-          </RenderButton>
+          </Button>
         </>
       ) : (
-        <RenderButton
-          buttonType="button"
+        <Button
+          type="button"
+          variant="outline"
           onClick={() => setIsEditing(true)}
-          testId="state-button-edit"
+          data-testid="state-button-edit"
         >
           編集
-        </RenderButton>
+        </Button>
       )}
     </div>
   )
