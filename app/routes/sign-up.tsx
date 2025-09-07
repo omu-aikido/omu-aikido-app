@@ -59,14 +59,9 @@ const formDataSchema = z.object({
 })
 
 const localformState = formDataSchema
-  .extend({
-    confirmPassword: z.string(),
-  })
+  .extend({ confirmPassword: z.string() })
   .omit({ getGradeAt: true })
-  .extend({
-    getGradeAt: z.string(),
-    grade: z.number().int().min(-4).max(5).default(0),
-  })
+  .extend({ getGradeAt: z.string(), grade: z.number().int().min(-4).max(5).default(0) })
 
 type LocalFormState = z.infer<typeof localformState>
 
@@ -100,7 +95,8 @@ export async function clientAction({
     year: data.year || "b1",
     grade: data.grade ? Number(data.grade) : 0,
     joinedAt: data.joinedAt ? Number(data.joinedAt) : new Date().getFullYear(),
-    getGradeAt: data.getGradeAt && data.getGradeAt !== "" ? String(data.getGradeAt) : null,
+    getGradeAt:
+      data.getGradeAt && data.getGradeAt !== "" ? String(data.getGradeAt) : null,
     legalAccepted: data.legalAccepted === "on",
   })
 
@@ -108,11 +104,8 @@ export async function clientAction({
     return {
       success: false,
       errors: Object.fromEntries(
-        parsed.error.issues.map(issue => [
-          issue.path[0] || 'general',
-          issue.message
-        ])
-      )
+        parsed.error.issues.map(issue => [issue.path[0] || "general", issue.message]),
+      ),
     }
   }
 
@@ -180,28 +173,17 @@ const getInitialFormState = (currentYear: number): FormState => ({
 // 統一化されたバリデーション関数
 const validateFormData = (
   formValues: LocalFormState,
-  step?: "basic" | "personal" | "profile"
+  step?: "basic" | "personal" | "profile",
 ): { success: true } | { success: false; errors: Record<string, string> } => {
   // ステップ別のスキーマを定義
   const stepSchemas = {
     basic: localformState
-      .pick({
-        email: true,
-        newPassword: true,
-        confirmPassword: true,
-      })
-      .refine(
-        (data) => data.newPassword === data.confirmPassword,
-        {
-          message: "パスワードが一致しません",
-          path: ["confirmPassword"],
-        }
-      ),
-    personal: localformState.pick({
-      firstName: true,
-      lastName: true,
-      username: true,
-    }),
+      .pick({ email: true, newPassword: true, confirmPassword: true })
+      .refine(data => data.newPassword === data.confirmPassword, {
+        message: "パスワードが一致しません",
+        path: ["confirmPassword"],
+      }),
+    personal: localformState.pick({ firstName: true, lastName: true, username: true }),
     profile: localformState.pick({
       year: true,
       grade: true,
@@ -218,11 +200,8 @@ const validateFormData = (
     return {
       success: false,
       errors: Object.fromEntries(
-        parsed.error.issues.map(issue => [
-          issue.path[0] || 'general',
-          issue.message
-        ])
-      )
+        parsed.error.issues.map(issue => [issue.path[0] || "general", issue.message]),
+      ),
     }
   }
 
@@ -321,7 +300,10 @@ export default function SignUpPage(props: Route.ComponentProps) {
       return false
     }
 
-    const validation = validateFormData(formValues, currentStep as "basic" | "personal" | "profile")
+    const validation = validateFormData(
+      formValues,
+      currentStep as "basic" | "personal" | "profile",
+    )
 
     if (!validation.success) {
       dispatch({ type: "SET_FORM_ERRORS", payload: validation.errors })
@@ -428,7 +410,9 @@ export default function SignUpPage(props: Route.ComponentProps) {
           <h2 className="text-lg font-semibold">基本情報</h2>
           <div className="space-y-2">
             <div>
-              <Label htmlFor="email" className={style.label.required()}>メールアドレス</Label>
+              <Label htmlFor="email" className={style.label.required()}>
+                メールアドレス
+              </Label>
               <Input
                 id="email"
                 name="email"
@@ -437,7 +421,10 @@ export default function SignUpPage(props: Route.ComponentProps) {
                 required
                 value={formValues.email}
                 onChange={e =>
-                  dispatch({ type: "SET_FORM_VALUES", payload: { email: e.target.value } })
+                  dispatch({
+                    type: "SET_FORM_VALUES",
+                    payload: { email: e.target.value },
+                  })
                 }
               />
             </div>
@@ -446,7 +433,9 @@ export default function SignUpPage(props: Route.ComponentProps) {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" className={style.label.required()}>パスワード</Label>
+            <Label htmlFor="password" className={style.label.required()}>
+              パスワード
+            </Label>
             <Input
               id="password"
               name="newPassword"
@@ -468,7 +457,9 @@ export default function SignUpPage(props: Route.ComponentProps) {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password-confirm" className={style.label.required()}>パスワード確認</Label>
+            <Label htmlFor="password-confirm" className={style.label.required()}>
+              パスワード確認
+            </Label>
             <Input
               id="password-confirm"
               name="confirmPassword"
@@ -492,7 +483,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
           <Button
             type="button"
             onClick={e => {
-              if (!z.email(formValues.email).safeParse(formValues.email).success){
+              if (!z.email(formValues.email).safeParse(formValues.email).success) {
                 dispatch({
                   type: "SET_FORM_ERRORS",
                   payload: { email: "メールアドレスの形式が正しくありません" },
@@ -522,7 +513,9 @@ export default function SignUpPage(props: Route.ComponentProps) {
         <div className={`space-y-4 ${step === "personal" ? "" : "hidden"}`}>
           <h2 className="text-lg font-semibold">個人情報</h2>
           <div className="space-y-2">
-            <Label htmlFor="lastName" className={style.label.required()}>姓</Label>
+            <Label htmlFor="lastName" className={style.label.required()}>
+              姓
+            </Label>
             <Input
               id="lastName"
               name="lastName"
@@ -544,7 +537,9 @@ export default function SignUpPage(props: Route.ComponentProps) {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="firstName" className={style.label.required()}>名</Label>
+            <Label htmlFor="firstName" className={style.label.required()}>
+              名
+            </Label>
             <Input
               id="firstName"
               name="firstName"
@@ -614,7 +609,9 @@ export default function SignUpPage(props: Route.ComponentProps) {
         <div className={`space-y-4 ${step === "profile" ? "" : "hidden"}`}>
           <h2 className="text-lg font-semibold">プロファイル情報</h2>
           <div className="space-y-2">
-            <Label htmlFor="year" className={style.label.required()}>学年</Label>
+            <Label htmlFor="year" className={style.label.required()}>
+              学年
+            </Label>
             <Select
               name="year"
               required
@@ -633,7 +630,9 @@ export default function SignUpPage(props: Route.ComponentProps) {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="grade" className={style.label.required()}>現在の級段位</Label>
+            <Label htmlFor="grade" className={style.label.required()}>
+              現在の級段位
+            </Label>
             <Select
               name="grade"
               required
@@ -652,7 +651,9 @@ export default function SignUpPage(props: Route.ComponentProps) {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="joinedAt" className={style.label.required()}>入部年度</Label>
+            <Label htmlFor="joinedAt" className={style.label.required()}>
+              入部年度
+            </Label>
             <Input
               id="joinedAt"
               name="joinedAt"
@@ -664,7 +665,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
               onChange={e =>
                 dispatch({
                   type: "SET_FORM_VALUES",
-                  payload: { joinedAt: Number(e.target.value)},
+                  payload: { joinedAt: Number(e.target.value) },
                 })
               }
             />
@@ -708,7 +709,9 @@ export default function SignUpPage(props: Route.ComponentProps) {
             />
             <Label
               htmlFor="legalAccepted"
-              className={style.label.required({ class: "text-sm font-normal text-gray-898 dark:text-gray-300"})}
+              className={style.label.required({
+                class: "text-sm font-normal text-gray-898 dark:text-gray-300",
+              })}
             >
               <Link
                 to="https://omu-aikido.com/terms-of-service/"

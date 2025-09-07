@@ -104,7 +104,7 @@ export const style = {
 
   label: {
     required: tv({
-      base: "after:content-['*'] after:text-red-600 after:m1-1 after:dark:text-red-400"
+      base: "after:content-['*'] after:text-red-600 after:m1-1 after:dark:text-red-400",
     }),
   },
 
