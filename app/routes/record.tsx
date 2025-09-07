@@ -230,34 +230,38 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
         <div className="overflow-x-auto w-full sm:block hidden">
           <fetcher.Form method="post">
             <div className="flex flex-row items-center justify-between mb-4">
-              <Button
-                type="submit"
-                className="w-full mx-1 mb-4"
-                disabled={!isChanged || fetcher.state !== "idle"}
-                data-testid="record-button-submit"
-              >
-                {fetcher.state === "idle"
-                  ? "登録"
-                  : fetcher.state === "loading"
-                    ? "読み込み中"
-                    : "送信中"}
-              </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={() => {
-                  if (window.confirm("変更をリセットします。よろしいですか？")) {
-                    setActivities(originalActivities)
-                    setSelectedDate(null)
-                    setShowDailyActivityModal(false)
-                  }
-                }}
-                className="w-1/4 mx-1 mb-4"
-                disabled={!isChanged || fetcher.state !== "idle"}
-                data-testid="record-button-reset"
-              >
-                リセット
-              </Button>
+              <div className="pr-1 w-3/4">
+                <Button
+                  type="submit"
+                  className="w-full text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
+                  disabled={!isChanged || fetcher.state !== "idle"}
+                  data-testid="record-button-submit"
+                >
+                  {fetcher.state === "idle"
+                    ? "登録"
+                    : fetcher.state === "loading"
+                      ? "読み込み中"
+                      : "送信中"}
+                </Button>
+              </div>
+              <div className="pl-1 w-1/4">
+                <Button
+                  type="button"
+                  className="w-full"
+                  variant="destructive"
+                  onClick={() => {
+                    if (window.confirm("変更をリセットします。よろしいですか？")) {
+                      setActivities(originalActivities)
+                      setSelectedDate(null)
+                      setShowDailyActivityModal(false)
+                    }
+                  }}
+                  disabled={!isChanged || fetcher.state !== "idle"}
+                  data-testid="record-button-reset"
+                >
+                  リセット
+                </Button>
+              </div>
             </div>
             <input type="hidden" name="actionType" value="batchUpdate" />
             <input

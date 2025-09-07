@@ -4,6 +4,7 @@ import { redirect, useFetcher } from "react-router"
 
 import type { Route } from "./+types/status"
 
+import { DatePicker } from "~/components/ui/date-picker"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import {
@@ -82,11 +83,7 @@ export default function StatusForm({ loaderData }: Route.ComponentProps) {
         isEditing ? "status-form-wrapper-editing" : "status-form-wrapper-viewing"
       }
     >
-      <GradeSelect
-        profile={profile}
-        isEditing={isEditing}
-        fetcherState={fetcher.state}
-      />
+      <GradeSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
       <GetGradeAtInput
         profile={profile}
         isEditing={isEditing}
@@ -97,11 +94,7 @@ export default function StatusForm({ loaderData }: Route.ComponentProps) {
         isEditing={isEditing}
         fetcherState={fetcher.state}
       />
-      <YearSelect
-        profile={profile}
-        isEditing={isEditing}
-        fetcherState={fetcher.state}
-      />
+      <YearSelect profile={profile} isEditing={isEditing} fetcherState={fetcher.state} />
 
       <StateButton
         isEditing={isEditing}
@@ -148,20 +141,39 @@ function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
 
 function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
   const disabled = !isEditing || fetcherState === "loading"
-  const value = profile.getGradeAt
-    ? new Date(profile.getGradeAt).toISOString().split("T")[0]
-    : ""
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    profile.getGradeAt ? new Date(profile.getGradeAt) : undefined,
+  )
+
   return (
     <div className="space-y-2">
       <Label htmlFor="getGradeAt">級段位取得日</Label>
-      <Input
-        type="date"
-        id="getGradeAt"
-        name="getGradeAt"
-        defaultValue={isEditing ? value : undefined}
-        value={!isEditing ? value : undefined}
-        disabled={disabled}
-      />
+      {isEditing ? (
+        <>
+          <DatePicker
+            date={selectedDate}
+            onSelect={setSelectedDate}
+            placeholder="級段位取得日を選択"
+            disabled={disabled}
+          />
+          <input
+            type="hidden"
+            name="getGradeAt"
+            value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
+          />
+        </>
+      ) : (
+        <Input
+          type="date"
+          value={
+            profile.getGradeAt
+              ? new Date(profile.getGradeAt).toISOString().split("T")[0]
+              : ""
+          }
+          disabled
+          readOnly
+        />
+      )}
     </div>
   )
 }
@@ -200,12 +212,7 @@ function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
   return (
     <div className="space-y-2">
       <Label htmlFor="year">学年</Label>
-      <Select
-        name="year"
-        required
-        defaultValue={profile.year}
-        disabled={disabled}
-      >
+      <Select name="year" required defaultValue={profile.year} disabled={disabled}>
         <SelectTrigger id="year">
           <SelectValue placeholder="学年を選択" />
         </SelectTrigger>

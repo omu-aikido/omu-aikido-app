@@ -13,9 +13,12 @@ export const NavigationTab = React.memo<{ tabs?: NavigationTabProp[] }>(
     return (
       <Tabs value={activeTab} className="w-full">
         <TabsList className={`grid w-full grid-cols-${tabs.length}`}>
-          {tabs.map((tab) => (
+          {tabs.map(tab => (
             <TabsTrigger key={tab.to} value={tab.to} asChild>
-              <Link to={tab.to} data-testid={`navigation-tab-link-${tab.to.replace(/\//g, "-")}`}>
+              <Link
+                to={tab.to}
+                data-testid={`navigation-tab-link-${tab.to.replace(/\//g, "-")}`}
+              >
                 {tab.label}
               </Link>
             </TabsTrigger>

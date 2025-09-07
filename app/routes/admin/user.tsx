@@ -11,6 +11,7 @@ import { ActivitiesTable } from "~/components/component/UserActivitiesTable"
 import { UserProfileSection } from "~/components/component/UserProfile"
 import { FilterSection } from "~/components/component/UserRecordsFilter"
 import { Button } from "~/components/ui/button"
+import { DatePicker } from "~/components/ui/date-picker"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import {
@@ -318,7 +319,6 @@ export default function AdminUser(args: Route.ComponentProps) {
 
   return (
     <>
-
       {/* User Profile Section */}
       <UserProfileSection
         user={user as User}
@@ -425,12 +425,7 @@ function RoleSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
       <Label htmlFor="role">
         役職<span className="text-red-500">*</span>
       </Label>
-      <Select
-        name="role"
-        required
-        defaultValue={profile.role}
-        disabled={disabled}
-      >
+      <Select name="role" required defaultValue={profile.role} disabled={disabled}>
         <SelectTrigger id="role">
           <SelectValue placeholder="役職を選択" />
         </SelectTrigger>
@@ -476,20 +471,39 @@ function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
 
 function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
   const disabled = !isEditing || fetcherState === "loading"
-  const value = profile.getGradeAt
-    ? new Date(profile.getGradeAt).toISOString().split("T")[0]
-    : ""
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    profile.getGradeAt ? new Date(profile.getGradeAt) : undefined,
+  )
+
   return (
     <div className="space-y-2">
       <Label htmlFor="getGradeAt">級段位取得日</Label>
-      <Input
-        type="date"
-        id="getGradeAt"
-        name="getGradeAt"
-        defaultValue={isEditing ? value : undefined}
-        value={!isEditing ? value : undefined}
-        disabled={disabled}
-      />
+      {isEditing ? (
+        <>
+          <DatePicker
+            date={selectedDate}
+            onSelect={setSelectedDate}
+            placeholder="級段位取得日を選択"
+            disabled={disabled}
+          />
+          <input
+            type="hidden"
+            name="getGradeAt"
+            value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
+          />
+        </>
+      ) : (
+        <Input
+          type="date"
+          value={
+            profile.getGradeAt
+              ? new Date(profile.getGradeAt).toISOString().split("T")[0]
+              : ""
+          }
+          disabled
+          readOnly
+        />
+      )}
     </div>
   )
 }
@@ -535,12 +549,7 @@ function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
       <Label htmlFor="year">
         学年<span className="text-red-500">*</span>
       </Label>
-      <Select
-        name="year"
-        required
-        defaultValue={profile.year}
-        disabled={disabled}
-      >
+      <Select name="year" required defaultValue={profile.year} disabled={disabled}>
         <SelectTrigger>
           <SelectValue placeholder="学年を選択" />
         </SelectTrigger>
@@ -555,8 +564,6 @@ function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
     </div>
   )
 }
-
-
 
 // MARK: Form Components
 interface FormFieldProps {

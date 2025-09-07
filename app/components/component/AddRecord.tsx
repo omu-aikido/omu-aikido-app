@@ -1,7 +1,12 @@
 import { useAuth } from "@clerk/react-router"
 import React, { useState } from "react"
 import type { FetcherWithComponents } from "react-router"
+import { toast } from "sonner"
 
+import { Button } from "~/components/ui/button"
+import { DatePicker } from "~/components/ui/date-picker"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
 import { style } from "~/styles/component"
 
 interface AddRecordProps {
@@ -11,26 +16,24 @@ interface AddRecordProps {
 export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher }) {
   const { userId } = useAuth()
   const submitting = fetcher.state === "submitting"
-  const date = new Date()
-  const [formState, setFormState] = useState({
-    date: [
-      date.getFullYear(),
-      String(date.getMonth() + 1).padStart(2, "0"),
-      String(date.getDate()).padStart(2, "0"),
-    ].join("-"),
-    period: "1.5",
-  })
-
-  const handleDateChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormState(prev => ({ ...prev, date: e.target.value }))
-  }, [])
+  const today = new Date()
+  const [selectedDate, setSelectedDate] = useState<Date>(today)
+  const [period, setPeriod] = useState("1.5")
 
   const handlePeriodChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFormState(prev => ({ ...prev, period: e.target.value }))
+      setPeriod(e.target.value)
     },
     [],
   )
+
+  const formatDateForInput = (date: Date) => {
+    return [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("-")
+  }
 
   return (
     <>
@@ -45,52 +48,59 @@ export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher
           value={userId ?? ""}
           data-testid="add-record-input-userid"
         />
-        <label
-          htmlFor="dateDaypicker"
+        <input
+          type="hidden"
+          name="date"
+          value={formatDateForInput(selectedDate)}
+          data-testid="add-record-input-date"
+        />
+        <Label
           className={style.form.label({ necessary: true, class: "col-span-1" })}
           data-testid="add-record-label-date"
         >
           日付
-        </label>
-        <input
-          id="dateDaypicker"
-          name="date"
-          autoComplete="off"
-          type="date"
-          className={style.form.input({ class: "col-span-2" })}
-          value={formState.date}
-          onChange={handleDateChange}
-          data-testid="add-record-input-date"
-        />
-        <label
+        </Label>
+        <div className="col-span-2">
+          <DatePicker
+            date={selectedDate}
+            onSelect={date => date && setSelectedDate(date)}
+            placeholder="日付を選択してください"
+          />
+        </div>
+        <Label
           htmlFor="timeInput"
           className={style.form.label({ necessary: true, class: "col-span-1" })}
           data-testid="add-record-label-period"
         >
           稽古時間
-        </label>
-        <input
+        </Label>
+        <Input
           id="timeInput"
           name="period"
           autoComplete="off"
           step="0.5"
           type="number"
-          className={style.form.input({ class: "col-span-2" })}
+          className="col-span-2"
           min="1"
           max="5"
-          value={formState.period}
+          value={period}
           onChange={handlePeriodChange}
           data-testid="add-record-input-period"
         />
-        <button
+        <Button
           disabled={submitting}
           type="submit"
           id="submitAddRecord"
           className={style.form.button({ class: "col-span-3 mt-2" })}
           data-testid="add-record-button-submit"
+          onClick={() => {
+            toast("記録が追加されました。", {
+              description: `日付: ${formatDateForInput(selectedDate)}, 稽古時間: ${period}時間`,
+            })
+          }}
         >
           {submitting ? "送信中..." : "追加"}
-        </button>
+        </Button>
       </fetcher.Form>
     </>
   )

@@ -132,7 +132,16 @@ export default tseslint.config(
         "warn",
         {
           allowConstantExport: true,
-          allowExportNames: ["meta", "links", "headers", "loader", "action", "default", "buttonVariants", "useSidebar"],
+          allowExportNames: [
+            "meta",
+            "links",
+            "headers",
+            "loader",
+            "action",
+            "default",
+            "buttonVariants",
+            "useSidebar",
+          ],
         },
       ],
     },

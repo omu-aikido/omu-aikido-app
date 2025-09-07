@@ -11,6 +11,7 @@ import type { Route } from "./+types/sign-up"
 
 import { Button } from "~/components/ui/button"
 import { Checkbox } from "~/components/ui/checkbox"
+import { DatePicker } from "~/components/ui/date-picker"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import {
@@ -27,15 +28,16 @@ type ClientActionReturn =
   | { success: false; errors: Record<string, string> }
 
 const formDataSchema = z.object({
-  email: z.email("有効なメールアドレスを入力してください"),
+  email: z.string().email("有効なメールアドレスを入力してください"),
   newPassword: z.string().min(8, "パスワードは8文字以上である必要があります"),
   firstName: z.string().min(1, "名は必須です"),
   lastName: z.string().min(1, "姓は必須です"),
   username: z.string().optional(),
-  year: z.enum(year.map(y => y.year)),
-  grade: z.number().min(-4).max(5),
+  year: z.enum(year.map(y => y.year) as [string, ...string[]]),
+  grade: z.number().int().min(-4).max(5),
   joinedAt: z
     .number()
+    .int()
     .min(JoinedAtYearRange.min, "入部年度は2000年から2030年の間で入力してください")
     .max(JoinedAtYearRange.max, "入部年度は2000年から2030年の間で入力してください"),
   getGradeAt: z
@@ -44,7 +46,6 @@ const formDataSchema = z.object({
     .nullable()
     .transform(val => {
       if (!val || val === "") return null
-      // 日付の形式を検証
       const dateRegex = /^\d{4}-\d{2}-\d{2}$/
       if (!dateRegex.test(val)) return null
       return val
@@ -58,21 +59,13 @@ const formDataSchema = z.object({
 })
 
 const localformState = formDataSchema
-  .omit({ joinedAt: true, getGradeAt: true })
   .extend({
-    joinedAt: z.string(),
-    getGradeAt: z.string(),
     confirmPassword: z.string(),
-    grade: z.number().min(-4).max(5).default(0),
   })
-  .superRefine((data, ctx) => {
-    if (data.newPassword !== data.confirmPassword) {
-      ctx.addIssue({
-        code: "custom",
-        message: "パスワードが一致しません",
-        path: ["confirmPassword"],
-      })
-    }
+  .omit({ getGradeAt: true })
+  .extend({
+    getGradeAt: z.string(),
+    grade: z.number().int().min(-4).max(5).default(0),
   })
 
 type LocalFormState = z.infer<typeof localformState>
@@ -107,18 +100,20 @@ export async function clientAction({
     year: data.year || "b1",
     grade: data.grade ? Number(data.grade) : 0,
     joinedAt: data.joinedAt ? Number(data.joinedAt) : new Date().getFullYear(),
-    getGradeAt: data.getGradeAt && data.getGradeAt !== "" ? data.getGradeAt : null,
+    getGradeAt: data.getGradeAt && data.getGradeAt !== "" ? String(data.getGradeAt) : null,
     legalAccepted: data.legalAccepted === "on",
   })
 
   if (!parsed.success) {
-    const errors: Record<string, string> = {}
-    for (const issue of parsed.error.issues) {
-      if (issue.path.length > 0) {
-        errors[issue.path[0] as string] = issue.message // 型キャストを追加
-      }
+    return {
+      success: false,
+      errors: Object.fromEntries(
+        parsed.error.issues.map(issue => [
+          issue.path[0] || 'general',
+          issue.message
+        ])
+      )
     }
-    return { success: false, errors }
   }
 
   return { success: true, formData: parsed.data }
@@ -176,12 +171,63 @@ const getInitialFormState = (currentYear: number): FormState => ({
     username: "",
     year: "b1",
     grade: 0,
-    joinedAt: currentYear.toString(),
+    joinedAt: currentYear,
     getGradeAt: "",
     legalAccepted: false,
   },
   isSignUpCreated: false,
 })
+// 統一化されたバリデーション関数
+const validateFormData = (
+  formValues: LocalFormState,
+  step?: "basic" | "personal" | "profile"
+): { success: true } | { success: false; errors: Record<string, string> } => {
+  // ステップ別のスキーマを定義
+  const stepSchemas = {
+    basic: localformState
+      .pick({
+        email: true,
+        newPassword: true,
+        confirmPassword: true,
+      })
+      .refine(
+        (data) => data.newPassword === data.confirmPassword,
+        {
+          message: "パスワードが一致しません",
+          path: ["confirmPassword"],
+        }
+      ),
+    personal: localformState.pick({
+      firstName: true,
+      lastName: true,
+      username: true,
+    }),
+    profile: localformState.pick({
+      year: true,
+      grade: true,
+      joinedAt: true,
+      getGradeAt: true,
+      legalAccepted: true,
+    }),
+  }
+
+  const schema = step ? stepSchemas[step] : localformState
+  const parsed = schema.safeParse(formValues)
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      errors: Object.fromEntries(
+        parsed.error.issues.map(issue => [
+          issue.path[0] || 'general',
+          issue.message
+        ])
+      )
+    }
+  }
+
+  return { success: true }
+}
 
 // MARK: Component
 export default function SignUpPage(props: Route.ComponentProps) {
@@ -242,8 +288,6 @@ export default function SignUpPage(props: Route.ComponentProps) {
       } catch (err) {
         dispatch({ type: "SET_IS_SIGN_UP_CREATED", payload: false }) // エラー時にフラグをリセット
         const errorMsg = "ユーザー登録に失敗しました"
-
-        // Clerkのエラーメッセージを安全に取得
         if (typeof err === "object" && err && "errors" in err) {
           const extracted = (err as { errors?: ClerkAPIError[] }).errors
           if (extracted && extracted.length > 0) {
@@ -272,38 +316,15 @@ export default function SignUpPage(props: Route.ComponentProps) {
 
   // 各ステップのバリデーション
   const validateStep = (currentStep: string): boolean => {
-    let schema: z.ZodSchema
-
-    if (currentStep === "basic") {
-      schema = localformState.pick({
-        email: true,
-        newPassword: true,
-        confirmPassword: true,
-      })
-    } else if (currentStep === "personal") {
-      schema = localformState.pick({ firstName: true, lastName: true, username: true })
-    } else if (currentStep === "profile") {
-      schema = localformState.pick({
-        year: true,
-        grade: true,
-        joinedAt: true,
-        getGradeAt: true,
-        legalAccepted: true,
-      })
-    } else {
+    if (!["basic", "personal", "profile"].includes(currentStep)) {
       dispatch({ type: "SET_FORM_ERRORS", payload: { general: "不明なステップです" } })
       return false
     }
 
-    const parsed = schema.safeParse(formValues)
-    if (!parsed.success) {
-      const newErrors: Record<string, string> = {}
-      for (const issue of parsed.error.issues) {
-        if (issue.path.length > 0) {
-          newErrors[issue.path[0] as string] = issue.message // 型キャストを追加
-        }
-      }
-      dispatch({ type: "SET_FORM_ERRORS", payload: newErrors })
+    const validation = validateFormData(formValues, currentStep as "basic" | "personal" | "profile")
+
+    if (!validation.success) {
+      dispatch({ type: "SET_FORM_ERRORS", payload: validation.errors })
       return false
     }
 
@@ -340,7 +361,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
     if (formValues.username) fd.append("username", formValues.username)
     fd.append("year", formValues.year)
     fd.append("grade", formValues.grade.toString())
-    fd.append("joinedAt", formValues.joinedAt)
+    fd.append("joinedAt", formValues.joinedAt.toString())
     fd.append("getGradeAt", formValues.getGradeAt)
     if (formValues.legalAccepted) fd.append("legalAccepted", "on")
     fetcher.submit(fd, { method: "post" })
@@ -406,24 +427,26 @@ export default function SignUpPage(props: Route.ComponentProps) {
         <div className={`space-y-4 ${step === "basic" ? "" : "hidden"}`}>
           <h2 className="text-lg font-semibold">基本情報</h2>
           <div className="space-y-2">
-            <Label htmlFor="email">メールアドレス</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={formValues.email}
-              onChange={e =>
-                dispatch({ type: "SET_FORM_VALUES", payload: { email: e.target.value } })
-              }
-            />
+            <div>
+              <Label htmlFor="email" className={style.label.required()}>メールアドレス</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={formValues.email}
+                onChange={e =>
+                  dispatch({ type: "SET_FORM_VALUES", payload: { email: e.target.value } })
+                }
+              />
+            </div>
             {formErrors.email && (
               <p className="text-sm font-medium text-destructive">{formErrors.email}</p>
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">パスワード</Label>
+            <Label htmlFor="password" className={style.label.required()}>パスワード</Label>
             <Input
               id="password"
               name="newPassword"
@@ -439,11 +462,13 @@ export default function SignUpPage(props: Route.ComponentProps) {
               }
             />
             {formErrors.newPassword && (
-              <p className="text-sm font-medium text-destructive">{formErrors.newPassword}</p>
+              <p className="text-sm font-medium text-destructive">
+                {formErrors.newPassword}
+              </p>
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password-confirm">パスワード確認</Label>
+            <Label htmlFor="password-confirm" className={style.label.required()}>パスワード確認</Label>
             <Input
               id="password-confirm"
               name="confirmPassword"
@@ -466,7 +491,23 @@ export default function SignUpPage(props: Route.ComponentProps) {
           </div>
           <Button
             type="button"
-            onClick={handleNext}
+            onClick={e => {
+              if (!z.email(formValues.email).safeParse(formValues.email).success){
+                dispatch({
+                  type: "SET_FORM_ERRORS",
+                  payload: { email: "メールアドレスの形式が正しくありません" },
+                })
+                return
+              }
+              if (formValues.newPassword !== formValues.confirmPassword) {
+                dispatch({
+                  type: "SET_FORM_ERRORS",
+                  payload: { confirmPassword: "パスワードが一致しません" },
+                })
+                return
+              }
+              handleNext(e)
+            }}
             className="w-full"
             disabled={fetcher.state !== "idle" || isSignUpCreated}
             data-testid="sign-up-button-next-basic"
@@ -481,7 +522,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
         <div className={`space-y-4 ${step === "personal" ? "" : "hidden"}`}>
           <h2 className="text-lg font-semibold">個人情報</h2>
           <div className="space-y-2">
-            <Label htmlFor="lastName">姓</Label>
+            <Label htmlFor="lastName" className={style.label.required()}>姓</Label>
             <Input
               id="lastName"
               name="lastName"
@@ -490,15 +531,20 @@ export default function SignUpPage(props: Route.ComponentProps) {
               required
               value={formValues.lastName}
               onChange={e =>
-                dispatch({ type: "SET_FORM_VALUES", payload: { lastName: e.target.value } })
+                dispatch({
+                  type: "SET_FORM_VALUES",
+                  payload: { lastName: e.target.value },
+                })
               }
             />
             {formErrors.lastName && (
-              <p className="text-sm font-medium text-destructive">{formErrors.lastName}</p>
+              <p className="text-sm font-medium text-destructive">
+                {formErrors.lastName}
+              </p>
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="firstName">名</Label>
+            <Label htmlFor="firstName" className={style.label.required()}>名</Label>
             <Input
               id="firstName"
               name="firstName"
@@ -514,7 +560,9 @@ export default function SignUpPage(props: Route.ComponentProps) {
               }
             />
             {formErrors.firstName && (
-              <p className="text-sm font-medium text-destructive">{formErrors.firstName}</p>
+              <p className="text-sm font-medium text-destructive">
+                {formErrors.firstName}
+              </p>
             )}
           </div>
           <div className="space-y-2">
@@ -526,11 +574,16 @@ export default function SignUpPage(props: Route.ComponentProps) {
               autoComplete="username"
               value={formValues.username}
               onChange={e =>
-                dispatch({ type: "SET_FORM_VALUES", payload: { username: e.target.value } })
+                dispatch({
+                  type: "SET_FORM_VALUES",
+                  payload: { username: e.target.value },
+                })
               }
             />
             {formErrors.username && (
-              <p className="text-sm font-medium text-destructive">{formErrors.username}</p>
+              <p className="text-sm font-medium text-destructive">
+                {formErrors.username}
+              </p>
             )}
           </div>
           <div className="flex gap-2">
@@ -561,7 +614,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
         <div className={`space-y-4 ${step === "profile" ? "" : "hidden"}`}>
           <h2 className="text-lg font-semibold">プロファイル情報</h2>
           <div className="space-y-2">
-            <Label htmlFor="year">学年</Label>
+            <Label htmlFor="year" className={style.label.required()}>学年</Label>
             <Select
               name="year"
               required
@@ -580,16 +633,13 @@ export default function SignUpPage(props: Route.ComponentProps) {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="grade">現在の級段位</Label>
+            <Label htmlFor="grade" className={style.label.required()}>現在の級段位</Label>
             <Select
               name="grade"
               required
               value={String(formValues.grade)}
               onValueChange={value =>
-                dispatch({
-                  type: "SET_FORM_VALUES",
-                  payload: { grade: Number(value) },
-                })
+                dispatch({ type: "SET_FORM_VALUES", payload: { grade: Number(value) } })
               }
             >
               <SelectTrigger id="grade">
@@ -602,7 +652,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="joinedAt">入部年度</Label>
+            <Label htmlFor="joinedAt" className={style.label.required()}>入部年度</Label>
             <Input
               id="joinedAt"
               name="joinedAt"
@@ -612,33 +662,38 @@ export default function SignUpPage(props: Route.ComponentProps) {
               max={JoinedAtYearRange.max}
               value={formValues.joinedAt}
               onChange={e =>
-                dispatch({ type: "SET_FORM_VALUES", payload: { joinedAt: e.target.value } })
+                dispatch({
+                  type: "SET_FORM_VALUES",
+                  payload: { joinedAt: Number(e.target.value)},
+                })
               }
             />
             {formErrors.joinedAt && (
-              <p className="text-sm font-medium text-destructive">{formErrors.joinedAt}</p>
+              <p className="text-sm font-medium text-destructive">
+                {formErrors.joinedAt}
+              </p>
             )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="getGradeAt">級段位取得日</Label>
-            <Input
-              id="getGradeAt"
-              name="getGradeAt"
-              type="date"
-              value={formValues.getGradeAt}
-              onChange={e =>
+            <DatePicker
+              date={formValues.getGradeAt ? new Date(formValues.getGradeAt) : undefined}
+              onSelect={date =>
                 dispatch({
                   type: "SET_FORM_VALUES",
-                  payload: { getGradeAt: e.target.value },
+                  payload: { getGradeAt: date ? date.toISOString().split("T")[0] : "" },
                 })
               }
+              placeholder="級段位取得日を選択"
             />
             {formErrors.getGradeAt && (
-              <p className="text-sm font-medium text-destructive">{formErrors.getGradeAt}</p>
+              <p className="text-sm font-medium text-destructive">
+                {formErrors.getGradeAt}
+              </p>
             )}
           </div>
 
-          <div className="flex items-start gap-3 mt-4">
+          <div className="flex items-center gap-3 mt-4">
             <Checkbox
               id="legalAccepted"
               name="legalAccepted"
@@ -653,30 +708,32 @@ export default function SignUpPage(props: Route.ComponentProps) {
             />
             <Label
               htmlFor="legalAccepted"
-              className="text-sm font-normal text-gray-898 dark:text-gray-300"
+              className={style.label.required({ class: "text-sm font-normal text-gray-898 dark:text-gray-300"})}
             >
-              <a
-                href="https://omu-aikido.com/terms-of-service/"
+              <Link
+                to="https://omu-aikido.com/terms-of-service/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
               >
                 利用規約
-              </a>
+              </Link>
               および
-              <a
-                href="https://omu-aikido.com/privacy-policy/"
+              <Link
+                to="https://omu-aikido.com/privacy-policy/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
               >
                 プライバシーポリシー
-              </a>
+              </Link>
               に同意します
             </Label>
           </div>
           {formErrors.legalAccepted && (
-            <p className="text-sm font-medium text-destructive">{formErrors.legalAccepted}</p>
+            <p className="text-sm font-medium text-destructive">
+              {formErrors.legalAccepted}
+            </p>
           )}
 
           <div className="flex gap-2">

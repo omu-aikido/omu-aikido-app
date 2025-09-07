@@ -1,5 +1,4 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
-import { useEffect } from "react"
 import { Link, useFetcher } from "react-router"
 
 import type { Route } from "./+types/home"
@@ -10,7 +9,6 @@ import { NextGrade } from "~/components/component/NextGrade"
 import Recents from "~/components/component/Recents"
 import { Button } from "~/components/ui/button"
 import type { ActivityType } from "~/db/schema"
-import { useNotificationStore } from "~/hooks/notification"
 import {
   createActivity,
   getUserMonthlyRank,
@@ -96,25 +94,14 @@ export async function action(args: Route.ActionArgs) {
     activity: { id: "", date, userId, period },
     env,
   })
-  const result = { row: response.rows, count: response.rowsAffected }
-  return { data: result.row, result: result.count == 1 }
+  const result = { response, count: response.rowsAffected }
+  return { response: result.response, result: result.count == 1 }
 }
 
 // MARK: Component
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { gradeData, apps, recent, rankingdata } = loaderData
   const fetcher = useFetcher<typeof action>()
-  const { showNotification } = useNotificationStore()
-
-  useEffect(() => {
-    if (fetcher.data?.result) {
-      showNotification({
-        title: "成功",
-        message: "記録が追加されました。",
-        type: "success",
-      })
-    }
-  }, [fetcher.data, showNotification])
 
   return (
     <>

@@ -59,7 +59,11 @@ export default function App(args: Route.ComponentProps) {
       <ReactHeader title="ポータル">
         <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="cursor-pointer p-2 mx-3 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors flex items-center justify-center h-10 w-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="cursor-pointer p-2 mx-3 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors flex items-center justify-center h-10 w-10"
+            >
               ≡
             </Button>
           </SheetTrigger>

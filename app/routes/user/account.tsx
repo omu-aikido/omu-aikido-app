@@ -168,8 +168,7 @@ function FirstNameInput({
   firstName?: string
   disabled: boolean
 }) {
-  const safeFirstName =
-    typeof firstName === "string" ? firstName.replace(/[<]/g, "") : ""
+  const safeFirstName = typeof firstName === "string" ? firstName.replace(/[<]/g, "") : ""
   return (
     <div className="space-y-2">
       <Label htmlFor="firstName">名</Label>

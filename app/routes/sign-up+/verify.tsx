@@ -8,8 +8,8 @@ import type { LoaderFunctionArgs } from "react-router"
 import { redirect, useNavigate } from "react-router"
 
 import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
+import { OTPInput } from "~/components/ui/otp-input"
 import { style } from "~/styles/component"
 
 // MARK: Loader
@@ -159,15 +159,14 @@ export default function VerifyPage() {
             <form onSubmit={handleVerifySubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="code">認証コード</Label>
-                <Input
-                  id="code"
-                  name="code"
-                  value={code}
-                  onChange={e => setCode(e.target.value)}
-                  required
-                  disabled={loading}
-                  placeholder="認証コードを入力"
-                />
+                <div className="flex justify-center">
+                  <OTPInput
+                    value={code}
+                    onChange={setCode}
+                    maxLength={6}
+                    disabled={loading}
+                  />
+                </div>
               </div>
               <Button
                 type="submit"

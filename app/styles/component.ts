@@ -102,6 +102,12 @@ export const style = {
     }),
   },
 
+  label: {
+    required: tv({
+      base: "after:content-['*'] after:text-red-600 after:m1-1 after:dark:text-red-400"
+    }),
+  },
+
   card: {
     container: tv({
       base: "bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md border border-slate-200 dark:border-slate-700",

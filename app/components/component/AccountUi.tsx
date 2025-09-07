@@ -1,6 +1,17 @@
 import { SignedIn, useClerk } from "@clerk/react-router"
 import { Link } from "react-router"
 
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogCancel,
+  AlertDialogAction,
+  AlertDialogHeader,
+  AlertDialogFooter,
+} from "~/components/ui/alert-dialog"
+import { Button } from "~/components/ui/button"
 import { Icon } from "~/components/ui/Icon"
 import { style } from "~/styles/component"
 import type { PagePath } from "~/type"
@@ -59,26 +70,36 @@ export function AccountUi({ apps }: AccountUiProps) {
         ))}
         <hr data-testid="account-ui-divider-bottom" />
 
-        <button
-          className={style.button({ type: "secondary", className: "w-full" })}
-          aria-label="サインアウト"
-          onClick={async e => {
-            e.preventDefault()
-            if (window.confirm("サインアウトしてよろしいですか？")) {
-              await signOut()
-              window.location.reload()
-            }
-          }}
-          data-testid="account-ui-button-signout"
-        >
-          <span
-            className="flex flex-row items-center justify-center"
-            data-testid="account-ui-signout-content"
-          >
-            サインアウト
-            <Icon icon="sign-out" />
-          </span>
-        </button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button aria-label="サインアウト" data-testid="account-ui-button-signout">
+              <span
+                className="flex flex-row items-center justify-center"
+                data-testid="account-ui-signout-content"
+              >
+                サインアウト
+                <Icon icon="sign-out" />
+              </span>
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>サインアウトしてもよろしいですか?</AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>キャンセル</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={async e => {
+                  e.preventDefault()
+                  await signOut()
+                  window.location.reload()
+                }}
+              >
+                サインアウト
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </SignedIn>
     </div>
   )

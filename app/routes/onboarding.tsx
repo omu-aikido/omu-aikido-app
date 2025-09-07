@@ -6,6 +6,7 @@ import { redirect, useFetcher, useNavigate } from "react-router"
 import type { Route } from "./+types/onboarding"
 
 import { Button } from "~/components/ui/button"
+import { DatePicker } from "~/components/ui/date-picker"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import {
@@ -299,6 +300,7 @@ export default function OnboardingPage(args: Route.ComponentProps) {
   const fetcher = useFetcher()
   const [hasRetried, setHasRetried] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [getGradeAtDate, setGetGradeAtDate] = useState<Date | undefined>()
   const { loaderData } = args
 
   // loaderからの状態を判定
@@ -415,7 +417,16 @@ export default function OnboardingPage(args: Route.ComponentProps) {
 
           <div className="space-y-2">
             <Label htmlFor="getGradeAt">級段位取得日</Label>
-            <Input id="getGradeAt" name="getGradeAt" type="date" />
+            <DatePicker
+              date={getGradeAtDate}
+              onSelect={setGetGradeAtDate}
+              placeholder="級段位取得日を選択"
+            />
+            <input
+              type="hidden"
+              name="getGradeAt"
+              value={getGradeAtDate ? getGradeAtDate.toISOString().split("T")[0] : ""}
+            />
             {errors.getGradeAt && (
               <p className="text-sm font-medium text-destructive">{errors.getGradeAt}</p>
             )}
