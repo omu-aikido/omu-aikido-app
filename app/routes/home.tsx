@@ -1,4 +1,5 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
+import type { ResultSet } from "@libsql/client"
 import { Link, useFetcher } from "react-router"
 
 import type { Route } from "./+types/home"
@@ -81,21 +82,23 @@ export function meta({}: Route.MetaArgs) {
 }
 
 // MARK: Action
-export async function action(args: Route.ActionArgs) {
+export async function action(
+  args: Route.ActionArgs,
+): Promise<{ response: ResultSet | null; result: boolean }> {
   const request = args.request
   const env = args.context.cloudflare.env
   const formData = await request.formData()
   const userId = formData.get("userId") as string
   const date = formData.get("date") as string
   const period = formData.get("period") as unknown as number
-  if (!date || !period) return { data: null, result: false }
+  if (!date || !period) return { response: null, result: false }
   const response = await createActivity({
     userId,
     activity: { id: "", date, userId, period },
     env,
   })
   const result = { response, count: response.rowsAffected }
-  return { response: result.response, result: result.count == 1 }
+  return { response: result.response, result: result.count === 1 }
 }
 
 // MARK: Component
