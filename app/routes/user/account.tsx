@@ -5,6 +5,8 @@ import { Link, useFetcher, useOutletContext } from "react-router"
 
 import type { Route } from "./+types/account"
 
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
 import { StateButton } from "~/components/ui/StateButton"
 import type { UserLayoutComponentProps } from "~/layout/user"
 import { style } from "~/styles/component"
@@ -65,33 +67,19 @@ export default function ProfileForm() {
     <>
       <FormWrapper
         method="post"
-        className={style.form.container()}
+        className="space-y-4"
         encType={isEditing ? "multipart/form-data" : undefined}
         data-testid="profile-form"
       >
-        <div className="flex gap-2" data-testid="profile-inputs">
-          <ProfileImageInput
-            imageUrl={user.imageUrl}
-            isEditing={isEditing}
-            data-testid="profile-image-input"
-          />
-          <LastNameInput
-            lastName={user.lastName ?? undefined}
-            disabled={disabled}
-            data-testid="last-name-input"
-          />
-          <FirstNameInput
-            firstName={user.firstName ?? undefined}
-            disabled={disabled}
-            data-testid="first-name-input"
-          />
+        <div className="flex items-center gap-4">
+          <ProfileImageInput imageUrl={user.imageUrl} isEditing={isEditing} />
+          <div className="flex-grow grid grid-cols-2 gap-4">
+            <LastNameInput lastName={user.lastName ?? undefined} disabled={disabled} />
+            <FirstNameInput firstName={user.firstName ?? undefined} disabled={disabled} />
+          </div>
         </div>
-        <UsernameInput
-          username={user.username || ""}
-          disabled={disabled}
-          data-testid="username-input"
-        />
-        <EmailInput email={primaryEmail} data-testid="email-input" />
+        <UsernameInput username={user.username || ""} disabled={disabled} />
+        <EmailInput email={primaryEmail} />
         <StateButton
           isEditing={isEditing}
           setIsEditing={setIsEditing}
@@ -157,20 +145,16 @@ function ProfileImageInput({
 }
 
 function LastNameInput({ lastName, disabled }: { lastName?: string; disabled: boolean }) {
-  // Sanitize the lastName to prevent XSS
-  const safeLastName = typeof lastName === "string" ? lastName.replace(/[<>]/g, "") : ""
+  const safeLastName = typeof lastName === "string" ? lastName.replace(/[<]/g, "") : ""
   return (
-    <div className="w-1/2">
-      <label htmlFor="lastName" className={style.form.label({ necessary: true })}>
-        姓
-      </label>
-      <input
+    <div className="space-y-2">
+      <Label htmlFor="lastName">姓</Label>
+      <Input
         type="text"
         name="lastName"
         id="lastName"
         defaultValue={safeLastName}
         required
-        className={style.form.input()}
         disabled={disabled}
       />
     </div>
@@ -184,21 +168,16 @@ function FirstNameInput({
   firstName?: string
   disabled: boolean
 }) {
-  // Sanitize the firstName to prevent XSS
-  const safeFirstName =
-    typeof firstName === "string" ? firstName.replace(/[<>]/g, "") : ""
+  const safeFirstName = typeof firstName === "string" ? firstName.replace(/[<]/g, "") : ""
   return (
-    <div className="w-1/2">
-      <label htmlFor="firstName" className={style.form.label({ necessary: true })}>
-        名
-      </label>
-      <input
+    <div className="space-y-2">
+      <Label htmlFor="firstName">名</Label>
+      <Input
         type="text"
         name="firstName"
         id="firstName"
         defaultValue={safeFirstName}
         required
-        className={style.form.input()}
         disabled={disabled}
       />
     </div>
@@ -206,19 +185,15 @@ function FirstNameInput({
 }
 
 function UsernameInput({ username, disabled }: { username: string; disabled: boolean }) {
-  // Sanitize the username to prevent XSS
-  const safeUsername = typeof username === "string" ? username.replace(/[<>]/g, "") : ""
+  const safeUsername = typeof username === "string" ? username.replace(/[<]/g, "") : ""
   return (
-    <div>
-      <label htmlFor="username" className={style.form.label()}>
-        ユーザー名
-      </label>
-      <input
+    <div className="space-y-2">
+      <Label htmlFor="username">ユーザー名</Label>
+      <Input
         type="text"
         name="username"
         id="username"
         defaultValue={safeUsername}
-        className={style.form.input()}
         disabled={disabled}
       />
     </div>
@@ -226,18 +201,11 @@ function UsernameInput({ username, disabled }: { username: string; disabled: boo
 }
 
 function EmailInput({ email }: { email: string }) {
-  // Sanitize the email to prevent XSS and render as read-only display
-  const safeEmail = typeof email === "string" ? email.replace(/[<>]/g, "") : ""
+  const safeEmail = typeof email === "string" ? email.replace(/[<]/g, "") : ""
   return (
-    <div>
-      <label className={style.form.label({ necessary: true })}>メールアドレス</label>
-      <input
-        className={style.form.input()}
-        aria-readonly="true"
-        value={safeEmail}
-        readOnly
-        disabled
-      />
+    <div className="space-y-2">
+      <Label>メールアドレス</Label>
+      <Input value={safeEmail} readOnly disabled />
     </div>
   )
 }

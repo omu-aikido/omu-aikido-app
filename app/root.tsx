@@ -14,7 +14,8 @@ import type { Route } from "./+types/root"
 
 import { Footer } from "~/components/component/Footer"
 import { ReactHeader } from "~/components/component/Header"
-import { NotificationContainer } from "~/components/ui/NotificationContainer"
+import { Button } from "~/components/ui/button"
+import { Toaster } from "~/components/ui/sonner"
 import "~/styles/global.css"
 
 export const links: Route.LinksFunction = () => [
@@ -47,7 +48,7 @@ export default function App(args: Route.ComponentProps) {
           <Links />
         </head>
         <body className="h-dvh">
-          <NotificationContainer />
+          <Toaster position="top-right" />
           <Outlet />
           <ScrollRestoration />
           <Scripts />
@@ -94,7 +95,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
           <></>
         </ReactHeader>
         <main className="min-h-4/5 p-6 mx-auto max-w-3xl text-center">
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4 mt-20">
             {message}
           </h1>
           {is404 && <img src="/404 NotFound.png" alt="404エラー" />}
@@ -110,12 +111,12 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
               </Link>
             ) : (
               <>
-                <button
+                <Button
                   onClick={handleReload}
                   className="inline-block px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition mr-4"
                 >
                   ページを再読み込み
-                </button>
+                </Button>
                 <Link
                   to="/"
                   className="inline-block px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition"

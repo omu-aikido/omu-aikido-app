@@ -7,7 +7,11 @@ const logger = getLogger("routes/sign-in")
 
 import type { Route } from "./+types/sign-in"
 
+import { Button } from "~/components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card"
 import { Icon } from "~/components/ui/Icon"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
 import { style } from "~/styles/component"
 
 // MARK: Loader
@@ -92,123 +96,119 @@ export default function SignInPage() {
   }
 
   return (
-    <div
+    <Card
       className={style.card.container({ class: "max-w-md mx-auto" })}
       data-testid="sign-in-container"
     >
-      <h1 className={style.text.sectionTitle()} data-testid="sign-in-title">
-        サインイン
-      </h1>
-      <fetcher.Form
-        method="post"
-        onSubmit={handleSubmit}
-        className={style.form.container()}
-        data-testid="sign-in-form"
-      >
-        <div>
-          <label
-            htmlFor="email"
-            className={style.form.label({ necessary: true })}
-            data-testid="sign-in-label-email"
-          >
-            メールアドレス
-          </label>
-          <input
-            id="email"
-            type="email"
-            name="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-            className={style.form.input()}
-            data-testid="sign-in-input-email"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="password"
-            className={style.form.label({ necessary: true })}
-            data-testid="sign-in-label-password"
-          >
-            パスワード
-          </label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-            className={style.form.input()}
-            data-testid="sign-in-input-password"
-          />
-        </div>
-        {error && (
-          <div data-testid="sign-in-error-container">
-            <div className={style.text.error()} data-testid="sign-in-error-message">
-              {error}
+      <CardHeader>
+        <CardTitle className="text-2xl">サインイン</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col gap-6">
+          <fetcher.Form method="post" onSubmit={handleSubmit} data-testid="sign-in-form">
+            <div className="grid gap-2">
+              <Label htmlFor="email">メールアドレス</Label>
+              <Input
+                id="email"
+                type="email"
+                name="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                placeholder="example@mail.com"
+                data-testid="sign-in-input-email"
+              />
             </div>
-            <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
-              サインインに失敗する場合は、
-              <span className={style.text.link()}>
-                <Link
-                  to="https://accounts.omu-aikido.com"
-                  data-testid="sign-in-link-external"
+            <div className="grid gap-2 mt-4">
+              <div className="flex items-center">
+                <Label htmlFor="password">パスワード</Label>
+                <a
+                  href="https://accounts.omu-aikido.com/sign-in/"
+                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                 >
-                  こちら
-                </Link>
-              </span>
-              からサインインをお試しください。
+                  パスーワードを忘れた
+                </a>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                name="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                data-testid="sign-in-input-password"
+              />
             </div>
-          </div>
-        )}
-        <button
-          type="submit"
-          disabled={loading || error !== null}
-          className={style.button({ type: "primary", class: "w-full" })}
-          data-testid="sign-in-button-submit"
-        >
-          {loading ? "サインイン中..." : "サインイン"}
-        </button>
-      </fetcher.Form>
-      <hr className="my-6" />
-      <button
-        type="button"
-        className="w-full py-2 px-4 bg-[#5865F2] dark:bg-[#4752C4] text-white font-semibold rounded flex items-center justify-center gap-2 hover:bg-[#4752C4] dark:hover:bg-[#36418C] transition disabled:opacity-50"
-        onClick={async () => {
-          if (!isLoaded || !signIn) return
-          setLoading(true)
-          try {
-            await signIn.authenticateWithRedirect({
-              strategy: "oauth_discord",
-              redirectUrl: "/",
-              redirectUrlComplete: "/",
-            })
-          } finally {
-            setLoading(false)
-          }
-        }}
-        disabled={loading}
-        data-testid="sign-in-button-discord"
-      >
-        <Icon icon={"discord-logo"} size="24" />
-        Discordで認証
-      </button>
-      <div
-        className="mt-4 text-center text-sm text-slate-600 dark:text-slate-400"
-        data-testid="sign-in-signup-link-container"
-      >
-        まだアカウントがありませんか？
-        <br />
-        <span className={style.text.link()}>
-          <Link to="/sign-up" data-testid="sign-in-link-signup">
-            こちら
+            {error && (
+              <div data-testid="sign-in-error-container">
+                <p
+                  className="text-sm font-medium text-destructive"
+                  data-testid="sign-in-error-message"
+                >
+                  {error}
+                </p>
+                <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
+                  サインインに失敗する場合は、
+                  <Button variant="link" asChild className="p-0">
+                    <Link
+                      to="https://accounts.omu-aikido.com"
+                      data-testid="sign-in-link-external"
+                      className="underline"
+                    >
+                      こちら
+                    </Link>
+                  </Button>
+                  からサインインをお試しください。
+                </div>
+              </div>
+            )}
+            <Button
+              type="submit"
+              disabled={loading || error !== null}
+              className="w-full cursor-pointer mt-4"
+              data-testid="sign-in-button-submit"
+            >
+              {loading ? "サインイン中..." : "サインイン"}
+            </Button>
+          </fetcher.Form>
+          <Button
+            type="button"
+            className="w-full"
+            variant="outline"
+            onClick={async () => {
+              if (!isLoaded || !signIn) return
+              setLoading(true)
+              try {
+                await signIn.authenticateWithRedirect({
+                  strategy: "oauth_discord",
+                  redirectUrl: "/",
+                  redirectUrlComplete: "/",
+                })
+              } finally {
+                setLoading(false)
+              }
+            }}
+            disabled={loading}
+            data-testid="sign-in-button-discord"
+          >
+            <Icon icon={"discord-logo"} size="24" className="mr-2" />
+            Discordで認証
+          </Button>
+        </div>
+        <hr />
+        <div className="mt-4 text-center text-sm">
+          まだアカウントがありませんか?{" "}
+          <Link
+            to="/sign-up"
+            data-testid="sign-in-link-signup"
+            className="underline underline-offset-4"
+          >
+            サインアップ
           </Link>
-        </span>
-        からサインアップしてください。
-      </div>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

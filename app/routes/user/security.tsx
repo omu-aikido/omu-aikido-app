@@ -3,7 +3,9 @@ import { useState } from "react"
 
 import type { Route } from "./+types/security"
 
-import { style } from "~/styles/component"
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
 
 // MARK: Meta
 export function meta({}: Route.MetaArgs) {
@@ -78,31 +80,20 @@ export default function SecurityPage() {
   return (
     <div>
       {!isEditing ? (
-        <>
-          <label className="block mb-1 font-medium">現在のパスワード</label>
-          <input
-            type="password"
-            className={style.form.input()}
-            value="*****************"
-            onChange={e => setCurrentPassword(e.target.value)}
-            required
-            disabled
-          />
-          <button
-            type="button"
-            className={style.form.button()}
-            onClick={() => setIsEditing(true)}
-          >
-            パスワードを変更
-          </button>
-        </>
-      ) : (
-        <form onSubmit={handlePasswordUpdate} className={style.form.container()}>
+        <div className="space-y-4">
           <div>
-            <label className={style.form.label()}>現在のパスワード</label>
-            <input
+            <Label>現在のパスワード</Label>
+            <Input type="password" value="*****************" readOnly disabled />
+          </div>
+          <Button onClick={() => setIsEditing(true)}>パスワードを変更</Button>
+        </div>
+      ) : (
+        <form onSubmit={handlePasswordUpdate} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="current-password">現在のパスワード</Label>
+            <Input
               type={visible ? "text" : "password"}
-              className={style.form.input()}
+              id="current-password"
               value={currentPassword}
               autoComplete="current-password"
               name="current-password"
@@ -110,11 +101,11 @@ export default function SecurityPage() {
               required
             />
           </div>
-          <div>
-            <label className={style.form.label()}>新規パスワード</label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="new-password">新規パスワード</Label>
+            <Input
               type={visible ? "text" : "password"}
-              className={style.form.input()}
+              id="new-password"
               value={newPassword}
               autoComplete="new-password"
               name="new-password"
@@ -122,11 +113,11 @@ export default function SecurityPage() {
               required
             />
           </div>
-          <div>
-            <label className={style.form.label()}>確認</label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="new-password-confirm">確認</Label>
+            <Input
               type={visible ? "text" : "password"}
-              className={style.form.input()}
+              id="new-password-confirm"
               value={confirmPassword}
               autoComplete="new-password"
               name="new-password-confirm"
@@ -134,22 +125,18 @@ export default function SecurityPage() {
               required
             />
           </div>
-          {error && <div className={style.text.error()}>{error}</div>}
-          {success && <div className={style.text.success()}>{success}</div>}
-          <button type="button" onClick={toggleVisibility} className={style.text.info()}>
+          {error && <p className="text-sm font-medium text-destructive">{error}</p>}
+          {success && <p className="text-sm font-medium text-green-600">{success}</p>}
+          <Button type="button" variant="ghost" onClick={toggleVisibility}>
             {visible ? "🙈" : "👁️"} パスワードを表示する
-          </button>
+          </Button>
           <div className="flex gap-2">
-            <button
-              type="submit"
-              className={style.form.button({ type: "green" })}
-              disabled={loading}
-            >
+            <Button type="submit" disabled={loading}>
               {loading ? "変更中..." : "保存"}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className={style.form.button({ type: "gray" })}
+              variant="secondary"
               disabled={loading}
               onClick={() => {
                 setIsEditing(false)
@@ -161,7 +148,7 @@ export default function SecurityPage() {
               }}
             >
               キャンセル
-            </button>
+            </Button>
           </div>
         </form>
       )}

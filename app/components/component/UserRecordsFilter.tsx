@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router"
-import { tv } from "tailwind-variants"
 
+import { DatePicker } from "~/components/ui/date-picker"
 import { style } from "~/styles/component"
 
 interface FilterSectionProps {
@@ -10,19 +10,26 @@ interface FilterSectionProps {
 }
 
 export function FilterSection({ startValue, endValue }: FilterSectionProps) {
-  const [start, setStart] = useState(startValue)
-  const [end, setEnd] = useState(endValue)
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    startValue ? new Date(startValue) : undefined,
+  )
+  const [endDate, setEndDate] = useState<Date | undefined>(
+    endValue ? new Date(endValue) : undefined,
+  )
   const navigate = useNavigate()
 
   // クエリを変更してページ遷移
   const handleFilter = () => {
     const params = new URLSearchParams()
-    if (start) params.set("start", start)
-    if (end) params.set("end", end)
+    if (startDate) params.set("start", startDate.toISOString().split("T")[0])
+    if (endDate) params.set("end", endDate.toISOString().split("T")[0])
     navigate("?" + params.toString())
   }
+
   // リセットはクエリを消して遷移
   const handleReset = () => {
+    setStartDate(undefined)
+    setEndDate(undefined)
     navigate("?")
   }
 
@@ -35,29 +42,19 @@ export function FilterSection({ startValue, endValue }: FilterSectionProps) {
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="start" className={style.text.info()}>
-                開始日
-              </label>
-              <input
-                type="date"
-                id="start"
-                name="start"
-                value={start}
-                onChange={e => setStart(e.target.value)}
-                className={input()}
+              <label className={style.text.info()}>開始日</label>
+              <DatePicker
+                date={startDate}
+                onSelect={setStartDate}
+                placeholder="開始日を選択"
               />
             </div>
             <div>
-              <label htmlFor="end" className={style.text.info()}>
-                終了日
-              </label>
-              <input
-                type="date"
-                id="end"
-                name="end"
-                value={end}
-                onChange={e => setEnd(e.target.value)}
-                className={input()}
+              <label className={style.text.info()}>終了日</label>
+              <DatePicker
+                date={endDate}
+                onSelect={setEndDate}
+                placeholder="終了日を選択"
               />
             </div>
           </div>
@@ -78,7 +75,3 @@ export function FilterSection({ startValue, endValue }: FilterSectionProps) {
     </details>
   )
 }
-
-const input = tv({
-  base: "w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-slate-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-})

@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react"
 
-import { style } from "~/styles/component" // Import style
+import { Input } from "~/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select"
 
 interface YearMonthSelectorModalProps {
   currentMonth: Date
@@ -26,32 +33,33 @@ export default function YearMonthSelectorInline({
 
   return (
     <div className="flex gap-2 items-center" data-testid="year-month-selector-container">
-      <input
+      <Input
         type="number"
-        id="select-year"
         min={yearOptions[0]}
         max={yearOptions[yearOptions.length - 1]}
         value={year}
         onChange={e => setYear(Number(e.target.value))}
-        className={style.form.input() + " w-20 text-center"}
+        className="w-20 text-center"
         disabled={isChanged}
         data-testid="year-month-selector-year"
       />
       <span className="mx-1">年</span>
-      <select
-        value={month}
-        id={`select-${month}`}
-        onChange={e => setMonth(Number(e.target.value))}
-        className={style.form.input()}
+      <Select
+        value={month.toString()}
+        onValueChange={value => setMonth(Number(value))}
         disabled={isChanged}
-        data-testid="year-month-selector-month"
       >
-        {monthOptions.map(m => (
-          <option key={m} value={m}>
-            {m}月
-          </option>
-        ))}
-      </select>
+        <SelectTrigger className="w-20" data-testid="year-month-selector-month">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {monthOptions.map(m => (
+            <SelectItem key={m} value={m.toString()}>
+              {m}月
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
 }

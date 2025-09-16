@@ -1,6 +1,6 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
-import { useEffect } from "react"
-import { useFetcher } from "react-router"
+import type { ResultSet } from "@libsql/client"
+import { Link, useFetcher } from "react-router"
 
 import type { Route } from "./+types/home"
 
@@ -8,10 +8,8 @@ import { AddRecord } from "~/components/component/AddRecord"
 import { MyRanking } from "~/components/component/MyRanking"
 import { NextGrade } from "~/components/component/NextGrade"
 import Recents from "~/components/component/Recents"
-import { AppIcon } from "~/components/ui/AppIcon"
-import Grid from "~/components/ui/Grid"
+import { Button } from "~/components/ui/button"
 import type { ActivityType } from "~/db/schema"
-import { useNotificationStore } from "~/hook/notification"
 import {
   createActivity,
   getUserMonthlyRank,
@@ -84,38 +82,29 @@ export function meta({}: Route.MetaArgs) {
 }
 
 // MARK: Action
-export async function action(args: Route.ActionArgs) {
+export async function action(
+  args: Route.ActionArgs,
+): Promise<{ response: ResultSet | null; result: boolean }> {
   const request = args.request
   const env = args.context.cloudflare.env
   const formData = await request.formData()
   const userId = formData.get("userId") as string
   const date = formData.get("date") as string
   const period = formData.get("period") as unknown as number
-  if (!date || !period) return { data: null, result: false }
+  if (!date || !period) return { response: null, result: false }
   const response = await createActivity({
     userId,
     activity: { id: "", date, userId, period },
     env,
   })
-  const result = { row: response.rows, count: response.rowsAffected }
-  return { data: result.row, result: result.count == 1 }
+  const result = { response, count: response.rowsAffected }
+  return { response: result.response, result: result.count === 1 }
 }
 
 // MARK: Component
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { gradeData, apps, recent, rankingdata } = loaderData
   const fetcher = useFetcher<typeof action>()
-  const { showNotification } = useNotificationStore()
-
-  useEffect(() => {
-    if (fetcher.data?.result) {
-      showNotification({
-        title: "成功",
-        message: "記録が追加されました。",
-        type: "success",
-      })
-    }
-  }, [fetcher.data, showNotification])
 
   return (
     <>
@@ -139,11 +128,19 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <Recents recent={recent} />
 
       <hr data-testid="home-divider" />
-      <Grid>
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {apps.map((app: PagePath) => (
-          <AppIcon key={app.href} title={app.name} id={app.href} desc={app.desc} />
+          <Button asChild variant="outline" className="h-24" key={app.href}>
+            <Link
+              to={app.href}
+              className="flex flex-col items-center justify-center gap-2"
+            >
+              <span className="text-lg font-semibold">{app.name}</span>
+              <p className="text-sm text-muted-foreground">{app.desc}</p>
+            </Link>
+          </Button>
         ))}
-      </Grid>
+      </div>
     </>
   )
 }
