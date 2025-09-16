@@ -10,22 +10,20 @@ export const NavigationTab = React.memo<{ tabs?: NavigationTabProp[] }>(
     const location = useLocation()
     const activeTab = tabs.find(tab => location.pathname === tab.to)?.to || ""
 
+    // タブの数に応じてクラス名をマッピング
+    const gridColsMap: { [key: number]: string } = {
+      1: "grid-cols-1",
+      2: "grid-cols-2",
+      3: "grid-cols-3",
+      4: "grid-cols-4",
+      5: "grid-cols-5",
+    }
+
+    const gridColsClass = gridColsMap[tabs.length] || ""
+
     return (
       <Tabs value={activeTab} className="w-full">
-        <TabsList
-          className={`grid w-full grid-cols-${
-            {
-              1: "grid-cols-1",
-              2: "grid-cols-2",
-              3: "grid-cols-3",
-              4: "grid-cols-4",
-              5: "grid-cols-5",
-              6: "grid-cols-6",
-              7: "grid-cols-7",
-              8: "grid-cols-8",
-            }[tabs.length] || "grid-cols-1"
-          }`}
-        >
+        <TabsList className={`grid w-full ${gridColsClass}`}>
           {tabs.map(tab => (
             <TabsTrigger key={tab.to} value={tab.to} asChild>
               <Link
