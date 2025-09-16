@@ -155,13 +155,8 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
   // 新しいフックを呼び出す
-  const {
-    currentMonth,
-    handleSelectYearMonth,
-    daysInMonth,
-    handlePrevMonth,
-    handleNextMonth,
-  } = useMonthlyNavigation(loadedMonth)
+  const { currentMonth, handleSelectYearMonth, daysInMonth } =
+    useMonthlyNavigation(loadedMonth)
 
   const isChanged = useMemo(() => {
     const mapNew = groupByDate(currentActivities)
@@ -222,8 +217,6 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
         <MonthNavigation
           isChanged={isChanged}
           currentMonth={currentMonth}
-          onPrev={handlePrevMonth}
-          onNext={handleNextMonth}
           onSelect={handleSelectYearMonth}
           YearMonthSelector={YearMonthSelectorInline}
         />
