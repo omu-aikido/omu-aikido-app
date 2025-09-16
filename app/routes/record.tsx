@@ -159,8 +159,6 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
     currentMonth,
     handleSelectYearMonth,
     daysInMonth,
-    handlePrevMonth,
-    handleNextMonth,
   } = useMonthlyNavigation(loadedMonth)
 
   const isChanged = useMemo(() => {
@@ -222,8 +220,6 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
         <MonthNavigation
           isChanged={isChanged}
           currentMonth={currentMonth}
-          onPrev={handlePrevMonth}
-          onNext={handleNextMonth}
           onSelect={handleSelectYearMonth}
           YearMonthSelector={YearMonthSelectorInline}
         />
