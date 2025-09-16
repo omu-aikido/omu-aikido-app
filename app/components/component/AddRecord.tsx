@@ -1,5 +1,5 @@
 import { useAuth } from "@clerk/react-router"
-import React, { useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import type { FetcherWithComponents } from "react-router"
 import { toast } from "sonner"
 
@@ -19,21 +19,33 @@ export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher
   const today = new Date()
   const [selectedDate, setSelectedDate] = useState<Date>(today)
   const [period, setPeriod] = useState("1.5")
+  const wasSubmitting = useRef(submitting)
 
-  const handlePeriodChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPeriod(e.target.value)
-    },
-    [],
-  )
+  const handlePeriodChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setPeriod(e.target.value)
+  }, [])
 
-  const formatDateForInput = (date: Date) => {
+  const formatDateForInput = useCallback((date: Date) => {
     return [
       date.getFullYear(),
       String(date.getMonth() + 1).padStart(2, "0"),
       String(date.getDate()).padStart(2, "0"),
     ].join("-")
-  }
+  }, [])
+
+  useEffect(() => {
+    if (wasSubmitting.current && !submitting) {
+      const data = fetcher.data as { error?: string } | null
+      if (!data?.error) {
+        toast("記録が追加されました。", {
+          description: `日付: ${formatDateForInput(
+            selectedDate,
+          )}, 稽古時間: ${period}時間`,
+        })
+      }
+    }
+    wasSubmitting.current = submitting
+  }, [submitting, fetcher.data, selectedDate, period, formatDateForInput])
 
   return (
     <>
@@ -93,11 +105,6 @@ export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher
           id="submitAddRecord"
           className={style.form.button({ class: "col-span-3 mt-2" })}
           data-testid="add-record-button-submit"
-          onClick={() => {
-            toast("記録が追加されました。", {
-              description: `日付: ${formatDateForInput(selectedDate)}, 稽古時間: ${period}時間`,
-            })
-          }}
         >
           {submitting ? "送信中..." : "追加"}
         </Button>
