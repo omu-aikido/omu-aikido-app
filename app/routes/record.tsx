@@ -319,37 +319,35 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                 />
               )
             })()}
-            <div className="fixed w-full right-0 bottom-0">
-              <div className="flex flex-row items-center justify-between pb-5 px-3">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => {
-                    if (window.confirm("変更をリセットします。よろしいですか？")) {
-                      setActivities(originalActivities)
-                      setSelectedDate(null)
-                      setShowDailyActivityModal(false)
-                    }
-                  }}
-                  className="w-1/3 mx-1 my-4"
-                  disabled={!isChanged || fetcher.state !== "idle"}
-                  data-testid="record-button-reset-mobile"
-                >
-                  リセット
-                </Button>
-                <Button
-                  type="submit"
-                  className="w-full mx-1 my-4"
-                  disabled={!isChanged || fetcher.state !== "idle"}
-                  data-testid="record-button-submit-mobile"
-                >
-                  {fetcher.state === "idle"
-                    ? "登録"
-                    : fetcher.state === "loading"
-                      ? "読み込み中"
-                      : "送信中"}
-                </Button>
-              </div>
+            <div className="fixed w-full px-4 pb-3 gap-x-2 bottom-0 left-0 right-0 flex flex-row justify-center items-center">
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => {
+                  if (window.confirm("変更をリセットします。よろしいですか？")) {
+                    setActivities(originalActivities)
+                    setSelectedDate(null)
+                    setShowDailyActivityModal(false)
+                  }
+                }}
+                className="h-12 w-1/3"
+                disabled={!isChanged || fetcher.state !== "idle"}
+                data-testid="record-button-reset-mobile"
+              >
+                リセット
+              </Button>
+              <Button
+                type="submit"
+                className="h-12 w-2/3"
+                disabled={!isChanged || fetcher.state !== "idle"}
+                data-testid="record-button-submit-mobile"
+              >
+                {fetcher.state === "idle"
+                  ? "登録"
+                  : fetcher.state === "loading"
+                    ? "読み込み中"
+                    : "送信中"}
+              </Button>
             </div>
           </fetcher.Form>
         </div>
