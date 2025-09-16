@@ -155,6 +155,7 @@ export default function SignInPage() {
                     <Link
                       to="https://accounts.omu-aikido.com"
                       data-testid="sign-in-link-external"
+                      className="underline"
                     >
                       こちら
                     </Link>
