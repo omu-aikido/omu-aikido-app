@@ -28,7 +28,7 @@ type ClientActionReturn =
   | { success: false; errors: Record<string, string> }
 
 const formDataSchema = z.object({
-  email: z.string().email("有効なメールアドレスを入力してください"),
+  email: z.email("有効なメールアドレスを入力してください"),
   newPassword: z.string().min(8, "パスワードは8文字以上である必要があります"),
   firstName: z.string().min(1, "名は必須です"),
   lastName: z.string().min(1, "姓は必須です"),
