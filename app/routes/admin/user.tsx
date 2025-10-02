@@ -139,7 +139,7 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
 
 // MARK: Meta
 export function meta(args: Route.MetaArgs) {
-  const user = args.data?.user
+  const user = args.loaderData?.user
   return [
     {
       title:
