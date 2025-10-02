@@ -41,7 +41,7 @@ export async function loader(args: Route.LoaderArgs) {
   const [year, month] = currentMonth.split("-")
   const date = new Date(parseInt(year), parseInt(month) - 1)
 
-  const startDate = startOfMonth(date).toISOString()
+  const startDate = `${year}-${month}-01`
   const endDate = endOfMonth(date).toISOString()
 
   try {
@@ -69,7 +69,7 @@ export async function loader(args: Route.LoaderArgs) {
 // MARK: Meta
 export function meta(args: Route.MetaArgs) {
   return [
-    { title: `${args.data?.currentMonth ?? "1ヶ"}月の記録 | ハム大合気ポータル` },
+    { title: `${args.loaderData?.currentMonth ?? "1ヶ"}月の記録 | ハム大合気ポータル` },
     { name: "description", content: "1カ月毎の記録を一覧できます。" },
   ]
 }
