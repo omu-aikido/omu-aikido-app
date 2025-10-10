@@ -24,10 +24,10 @@
     "test:unit": "vitest --project unit",
     "test:integration": "vitest --project integration",
     "test:watch": "vitest --watch",
-    "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
     "postdocker:up": "pnpm db:migrate",
-    "docker:db:reset": "docker compose down && docker compose up -d && pnpm db:migrate",
+    "docker:db:reset": "docker-compose down && docker-compose up -d && pnpm db:migrate",
     "pretest:e2e": "pnpm docker:down && pnpm docker:up && pnpm db:migrate",
     "posttest:e2e": "pnpm docker:down",
     "playwright:install": "playwright install"

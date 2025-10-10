@@ -161,10 +161,9 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
     groupedByPeriod.get(act.period)?.push(act)
   })
 
-  // periodでソート
-  const sortedPeriods = Array.from(groupedByPeriod.keys()).sort((a, b) => a - b)
+  const periods = Array.from(groupedByPeriod.keys())
 
-  sortedPeriods.forEach(period => {
+  periods.forEach(period => {
     const group = groupedByPeriod.get(period)!
     const allDeletedInGroup = group.every(
       act => act.isDeleted || act.status === "deleted",
@@ -212,7 +211,6 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
     }
   })
 
-  // 個々の活動も元の順番を保つために、表示前に再度ソートする
   displayItems.sort((a, b) => {
     if (a.createAt === b.createAt) {
       return 0
