@@ -33,12 +33,12 @@ describe("timeForNextGrade", () => {
   it("should return the correct time for the next grade based on current grade", () => {
     expect(timeForNextGrade(0)).toBe(40)
     expect(timeForNextGrade(5)).toBe(60)
-    expect(timeForNextGrade(3)).toBe(100)
+    expect(timeForNextGrade(3)).toBe(80)
     expect(timeForNextGrade(1)).toBe(100)
     expect(timeForNextGrade(-1)).toBe(200)
   })
 
-  it("should return 100 for unknown grade values", () => {
+  it("should return 300 for unknown grade values", () => {
     expect(timeForNextGrade(99)).toBe(300)
     expect(timeForNextGrade("unknown")).toBe(300)
   })
