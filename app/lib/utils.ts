@@ -21,14 +21,16 @@ export function translateGrade(grade_value: string | number): string {
 }
 
 export function timeForNextGrade(grade_value: string | number): number {
-  grade_value = parseInt(String(grade_value))
-  switch (grade_value) {
+  const grade_value_number = parseInt(String(grade_value))
+  switch (grade_value_number) {
     case 0:
       return 40
     case 5:
+    case 4:
       return 60
     case 3:
-      return 100
+    case 2:
+      return 80
     case 1:
       return 100
     case -1:
