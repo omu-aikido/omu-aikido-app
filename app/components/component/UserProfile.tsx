@@ -53,7 +53,7 @@ export function UserProfileSection({
               className="text-slate-600 dark:text-slate-400 flex flex-row items-center text-sm"
               data-testid="user-profile-discord"
             >
-              <Icon icon="discord-logo" className="!m-0 !mr-2" />
+              <Icon icon="discord-logo" className="m-0! mr-2!" />
               {discord.username}
             </p>
           )}
@@ -61,7 +61,7 @@ export function UserProfileSection({
             className="text-slate-600 dark:text-slate-400 flex flex-row items-center text-sm"
             data-testid="user-profile-email"
           >
-            <Icon icon="envelope" className="!m-0 !mr-2" />
+            <Icon icon="envelope" className="m-0! mr-2!" />
             {user.emailAddresses[0]?.emailAddress || "未設定"}
           </p>
         </div>
