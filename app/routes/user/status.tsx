@@ -33,7 +33,7 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 // MARK: Meta
-export function meta({ }: Route.MetaArgs) {
+export function meta({}: Route.MetaArgs) {
   return [
     { title: "ステータス | ハム大合気ポータル" },
     { name: "description", content: "アカウントのステータスを設定できます。" },
@@ -72,7 +72,7 @@ export default function StatusForm({ loaderData }: Route.ComponentProps) {
     return <p>プロフィール情報が見つかりませんでした。</p>
   }
 
-  const FormWrapper = isEditing ? fetcher.Form : "form"
+  const FormWrapper = isEditing ? fetcher.Form : "div"
 
   return (
     <FormWrapper

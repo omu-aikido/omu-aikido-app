@@ -61,7 +61,7 @@ export default function ProfileForm() {
   }, [fetcher.data])
 
   const disabled = !isEditing || fetcher.state !== "idle"
-  const FormWrapper = isEditing ? fetcher.Form : "form"
+  const FormWrapper = isEditing ? fetcher.Form : "div"
 
   return (
     <>
@@ -73,7 +73,7 @@ export default function ProfileForm() {
       >
         <div className="flex items-center gap-4">
           <ProfileImageInput imageUrl={user.imageUrl} isEditing={isEditing} />
-          <div className="flex-grow grid grid-cols-2 gap-4">
+          <div className="grow grid grid-cols-2 gap-4">
             <LastNameInput lastName={user.lastName ?? undefined} disabled={disabled} />
             <FirstNameInput firstName={user.firstName ?? undefined} disabled={disabled} />
           </div>
@@ -116,7 +116,7 @@ function ProfileImageInput({
 
   return (
     <div className="flex gap-2 items-center">
-      <div className="w-12 h-12 mr-4 rounded-full relative group overflow-hidden flex-shrink-0">
+      <div className="w-12 h-12 mr-4 rounded-full relative group overflow-hidden shrink-0">
         <img
           src={safeImageUrl}
           alt="Profile"

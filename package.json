@@ -33,7 +33,7 @@
     "playwright:install": "playwright install"
   },
   "dependencies": {
-    "@clerk/react-router": "^1.10.2",
+    "@clerk/react-router": "^2.1.6",
     "@libsql/client": "^0.15.15",
     "@logtape/logtape": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -54,7 +54,7 @@
     "drizzle-zod": "^0.8.3",
     "input-otp": "^1.4.2",
     "isbot": "^5.1.31",
-    "lucide-react": "^0.542.0",
+    "lucide-react": "^0.552.0",
     "next-themes": "^0.4.6",
     "react": "^19.2.0",
     "react-day-picker": "^9.11.1",
@@ -63,7 +63,7 @@
     "react-router-dom": "^7.9.5",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
-    "tailwind-variants": "^2.1.0",
+    "tailwind-variants": "^3.1.1",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^4.1.12",
     "zustand": "^5.0.8"
@@ -76,7 +76,7 @@
     "@react-router/dev": "^7.9.5",
     "@tailwindcss/vite": "^4.1.16",
     "@testing-library/react": "^16.3.0",
-    "@types/node": "^20.19.24",
+    "@types/node": "^22.17.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
@@ -86,7 +86,7 @@
     "eslint": "^9.39.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "happy-dom": "^18.0.1",
     "prettier": "^3.6.2",
@@ -96,7 +96,7 @@
     "typescript-eslint": "^8.46.2",
     "vite": "^7.1.12",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4",
+    "vitest": "^4.0.6",
     "wrangler": "^4.45.3"
   },
   "pnpm": {

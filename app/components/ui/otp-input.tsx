@@ -1,10 +1,9 @@
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSlot,
   InputOTPSeparator,
+  InputOTPSlot,
 } from "app/components/ui/input-otp"
-import * as React from "react"
 
 interface OTPInputProps {
   value?: string

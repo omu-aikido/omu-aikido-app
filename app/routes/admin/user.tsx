@@ -315,7 +315,7 @@ export default function AdminUser(args: Route.ComponentProps) {
     id: user.id,
   }
 
-  const FormWrapper = isEditing ? fetcher.Form : "form"
+  const FormWrapper = isEditing ? fetcher.Form : "div"
 
   return (
     <>

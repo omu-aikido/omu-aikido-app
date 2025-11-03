@@ -7,7 +7,7 @@ interface ProgressCircleProps {
 export function ProgressCircle({ title, className, id }: ProgressCircleProps) {
   return (
     <div
-      className={`fixed top-0 left-0 w-full h-full bg-slate-400/30 dark:bg-slate-600/30 backdrop-blur-sm z-[1000] pointer-events-none ${className}`}
+      className={`fixed top-0 left-0 w-full h-full bg-slate-400/30 dark:bg-slate-600/30 backdrop-blur-sm z-1000 pointer-events-none ${className}`}
       id={id}
       data-testid="progress-circle-overlay"
     >
