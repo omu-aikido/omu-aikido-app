@@ -33,7 +33,7 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 // MARK: Meta
-export function meta({}: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
   return [
     { title: "ステータス | ハム大合気ポータル" },
     { name: "description", content: "アカウントのステータスを設定できます。" },
@@ -148,32 +148,18 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
   return (
     <div className="space-y-2">
       <Label htmlFor="getGradeAt">級段位取得日</Label>
-      {isEditing ? (
-        <>
-          <DatePicker
-            date={selectedDate}
-            onSelect={setSelectedDate}
-            placeholder="級段位取得日を選択"
-            disabled={disabled}
-          />
-          <input
-            type="hidden"
-            name="getGradeAt"
-            value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
-          />
-        </>
-      ) : (
-        <Input
-          type="date"
-          value={
-            profile.getGradeAt
-              ? new Date(profile.getGradeAt).toISOString().split("T")[0]
-              : ""
-          }
-          disabled
-          readOnly
-        />
-      )}
+      <DatePicker
+        date={selectedDate}
+        onSelect={setSelectedDate}
+        placeholder="級段位取得日を選択"
+        disabled={disabled}
+        className="mb-0"
+      />
+      <input
+        type="hidden"
+        name="getGradeAt"
+        value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
+      />
     </div>
   )
 }
