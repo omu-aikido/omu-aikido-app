@@ -1,7 +1,7 @@
 import { createRequestHandler, RouterContextProvider } from "react-router"
 
 declare module "react-router" {
-  export interface RouterContextProvider {
+  export interface AppLoadContext {
     cloudflare: { env: Env; ctx: ExecutionContext }
   }
 }
