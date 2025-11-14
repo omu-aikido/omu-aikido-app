@@ -34,7 +34,7 @@ import type { Profile } from "~/type"
 // MARK: Loader
 export async function loader({ context, params, request }: Route.LoaderArgs) {
   const clerkClient = createClerkClient({
-    secretKey: context.get(CloudflareContext).env.CLERK_SECRET_KEY
+    secretKey: context.get(CloudflareContext).env.CLERK_SECRET_KEY,
   })
 
   const { userId } = params
