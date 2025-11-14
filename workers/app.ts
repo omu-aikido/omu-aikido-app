@@ -20,8 +20,7 @@ export default {
       return new Response(null, { status: 301, headers: { Location: url.toString() } })
     }
 
-    const context = new RouterContextProvider()
-    Object.assign(context, { cloudflare: { env, ctx } })
+    const context = { cloudflare: { env, ctx } }
     const response = await requestHandler(request, context)
 
     // CSPヘッダーを本番・開発両方に適用（開発時もブラウザエラーを防ぐため）
