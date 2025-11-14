@@ -81,10 +81,7 @@ export async function clientAction({
 
   if (!parsed.success) {
     const firstError = parsed.error.issues[0]
-    return {
-      success: false,
-      error: firstError?.message || "入力内容をご確認ください",
-    }
+    return { success: false, error: firstError?.message || "入力内容をご確認ください" }
   }
 
   const { email, password } = parsed.data
@@ -93,28 +90,16 @@ export async function clientAction({
     // Clerkインスタンスの取得
     const clerk = window.Clerk
     if (!clerk) {
-      return {
-        success: false,
-        error: "認証サービスが利用できません",
-      }
+      return { success: false, error: "認証サービスが利用できません" }
     }
 
     // サインイン処理
-    const result = await clerk.client.signIn.create({
-      identifier: email,
-      password,
-    })
+    const result = await clerk.client.signIn.create({ identifier: email, password })
 
     if (result.status === "complete") {
-      return {
-        success: true,
-        sessionId: result.createdSessionId,
-      }
+      return { success: true, sessionId: result.createdSessionId }
     } else {
-      return {
-        success: false,
-        error: "追加認証が必要です",
-      }
+      return { success: false, error: "追加認証が必要です" }
     }
   } catch (error) {
     logger.error(`Sign-in failed: ${String(error)}`)
