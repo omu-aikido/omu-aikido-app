@@ -1,6 +1,7 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { useEffect, useState } from "react"
 import { redirect, useFetcher } from "react-router"
+import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/status"
 
@@ -24,7 +25,7 @@ export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
   const userId = auth.userId
 
-  const env = args.context.cloudflare.env
+  const env = args.context.get(CloudflareContext).env
 
   const profile: Profile | null = await getProfile({ userId, env })
 
@@ -52,7 +53,7 @@ export async function action(args: Route.ActionArgs) {
   const joinedAt = Number(formData.get("joinedAt"))
   const getGradeAt = formData.get("getGradeAt")?.toString()
 
-  const env = args.context.cloudflare.env
+  const env = args.context.get(CloudflareContext).env
   const res = await updateProfile({ id: userId, year, grade, joinedAt, getGradeAt }, env)
 
   return res

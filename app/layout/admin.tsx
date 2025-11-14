@@ -1,5 +1,6 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { Outlet, redirect } from "react-router"
+import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/admin"
 
@@ -10,7 +11,7 @@ import { style } from "~/styles/component"
 // MARK: Loader - 共通の認証処理
 export async function loader(args: Route.LoaderArgs) {
   const { userId } = await getAuth(args)
-  const { env } = args.context.cloudflare
+  const env = args.context.get(CloudflareContext).env
   if (!userId) {
     return redirect("/sign-in?redirect_url=" + args.request.url)
   }

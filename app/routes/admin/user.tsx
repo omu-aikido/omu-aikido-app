@@ -3,6 +3,7 @@ import { getAuth, type User } from "@clerk/react-router/ssr.server"
 import { useEffect, useState } from "react"
 import { Link, redirect, useFetcher } from "react-router"
 import { toast } from "sonner"
+import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/user"
 
@@ -33,7 +34,7 @@ import type { Profile } from "~/type"
 // MARK: Loader
 export async function loader({ context, params, request }: Route.LoaderArgs) {
   const clerkClient = createClerkClient({
-    secretKey: context.cloudflare.env.CLERK_SECRET_KEY,
+    secretKey: context.get(CloudflareContext).env.CLERK_SECRET_KEY
   })
 
   const { userId } = params
@@ -41,7 +42,7 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
     throw new Response("User ID is required", { status: 400 })
   }
   const user = await clerkClient.users.getUser(userId)
-  const profile = await getProfile({ userId, env: context.cloudflare.env })
+  const profile = await getProfile({ userId, env: context.get(CloudflareContext).env })
 
   // fitler
   const url = new URL(request.url)
@@ -81,7 +82,7 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
     const { all, total, done } = await activitySummary({
       userId,
       getGradeAt,
-      env: context.cloudflare.env,
+      env: context.get(CloudflareContext).env,
     })
 
     const totalActivitiesCount = all.length
@@ -225,7 +226,7 @@ export async function action(args: Route.ActionArgs) {
     const result = await updateProfile({
       applicateBy: userId,
       newProfile: { id: targetUserId, year, grade, role, joinedAt, getGradeAt },
-      env: args.context.cloudflare.env,
+      env: args.context.get(CloudflareContext).env,
     })
 
     if (result instanceof Error) {

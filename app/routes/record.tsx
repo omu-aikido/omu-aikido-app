@@ -9,6 +9,7 @@ import {
 } from "date-fns"
 import { useEffect, useMemo, useState } from "react"
 import { redirect, useActionData, useFetcher, useSearchParams } from "react-router"
+import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/record"
 
@@ -49,7 +50,7 @@ export async function loader(args: Route.LoaderArgs) {
       userId,
       startDate,
       endDate,
-      env: context.cloudflare.env,
+      env: context.get(CloudflareContext).env,
     })
 
     return {
@@ -90,21 +91,21 @@ export async function action(args: Route.ActionArgs) {
         await createActivities({
           userId,
           activities: payload.added,
-          env: context.cloudflare.env,
+          env: context.get(CloudflareContext).env,
         })
       }
       if (payload.updated && payload.updated.length > 0) {
         await updateActivities({
           userId,
           activities: payload.updated,
-          env: context.cloudflare.env,
+          env: context.get(CloudflareContext).env,
         })
       }
       if (payload.deleted && payload.deleted.length > 0) {
         await deleteActivities({
           userId,
           ids: payload.deleted,
-          env: context.cloudflare.env,
+          env: context.get(CloudflareContext).env,
         })
       }
 
