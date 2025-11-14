@@ -1,6 +1,7 @@
 import { createClerkClient } from "@clerk/react-router/api.server"
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { Outlet, redirect } from "react-router"
+import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/user"
 export type UserLayoutComponentProps = Route.ComponentProps
@@ -14,7 +15,7 @@ export async function loader(args: Route.LoaderArgs) {
     return redirect("/sign-in?redirect_url=" + args.request.url)
   }
   const clerkClient = createClerkClient({
-    secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
+    secretKey: args.context.get(CloudflareContext).env.CLERK_SECRET_KEY,
   })
 
   const user = await clerkClient.users.getUser(userId)
@@ -36,7 +37,7 @@ export async function loader(args: Route.LoaderArgs) {
     email,
     discordAccount,
     username,
-    env: args.context.cloudflare.env,
+    env: args.context.get(CloudflareContext).env,
   }
 }
 

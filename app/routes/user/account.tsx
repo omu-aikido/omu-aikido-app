@@ -2,6 +2,7 @@ import { createClerkClient } from "@clerk/react-router/api.server"
 import { getAuth, type EmailAddress } from "@clerk/react-router/ssr.server"
 import { useEffect, useState } from "react"
 import { Link, useFetcher, useOutletContext } from "react-router"
+import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/account"
 
@@ -29,7 +30,7 @@ export async function action(args: Route.ActionArgs) {
   const username = formData.get("username")?.toString()
   const imageFile = formData.get("profileImage")
   const client = createClerkClient({
-    secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
+    secretKey: args.context.get(CloudflareContext).env.CLERK_SECRET_KEY,
   })
   const params: Partial<{ firstName: string; lastName: string; username: string }> = {}
   if (firstName) params.firstName = firstName

@@ -1,6 +1,7 @@
 import { getAuth } from "@clerk/react-router/ssr.server"
 import type { ResultSet } from "@libsql/client"
 import { Link, useFetcher } from "react-router"
+import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/home"
 
@@ -27,7 +28,7 @@ export async function loader(args: Route.LoaderArgs) {
   const userId = auth.userId
   if (!userId) throw new Error("User not authenticated")
 
-  const env = args.context.cloudflare.env
+  const env = args.context.get(CloudflareContext).env
 
   const apps: PagePath[] = [
     { name: "記録", href: "/record", desc: "活動の記録をつけよう" },
@@ -86,7 +87,7 @@ export async function action(
   args: Route.ActionArgs,
 ): Promise<{ response: ResultSet | null; result: boolean }> {
   const request = args.request
-  const env = args.context.cloudflare.env
+  const env = args.context.get(CloudflareContext).env
   const formData = await request.formData()
   const userId = formData.get("userId") as string
   const date = formData.get("date") as string

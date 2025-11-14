@@ -1,5 +1,5 @@
 import { ClerkProvider } from "@clerk/react-router"
-import { rootAuthLoader } from "@clerk/react-router/ssr.server"
+import { clerkMiddleware, rootAuthLoader } from "@clerk/react-router/server"
 import {
   isRouteErrorResponse,
   Link,
@@ -23,16 +23,12 @@ export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
 ]
 
-export async function loader(args: Route.LoaderArgs) {
-  return rootAuthLoader(args, {
-    secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
-    publishableKey: args.context.cloudflare.env.CLERK_PUBLISHABLE_KEY,
-  })
-}
+// eslint-disable-next-line react-refresh/only-export-components
+export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
 
-export default function App(args: Route.ComponentProps) {
-  const loaderData = args.loaderData
+export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args)
 
+export default function App({ loaderData }: Route.ComponentProps) {
   return (
     <html lang="ja">
       <ClerkProvider loaderData={loaderData}>

@@ -38,8 +38,14 @@ const formDataSchema = z.object({
   joinedAt: z
     .number()
     .int()
-    .min(JoinedAtYearRange.min, "入部年度は2000年から2030年の間で入力してください")
-    .max(JoinedAtYearRange.max, "入部年度は2000年から2030年の間で入力してください"),
+    .min(
+      JoinedAtYearRange.min,
+      `入部年度は${JoinedAtYearRange.min}年から${JoinedAtYearRange.max}年の間で入力してください`,
+    )
+    .max(
+      JoinedAtYearRange.max,
+      `入部年度は${JoinedAtYearRange.min}年から${JoinedAtYearRange.max}年の間で入力してください`,
+    ),
   getGradeAt: z
     .string()
     .optional()

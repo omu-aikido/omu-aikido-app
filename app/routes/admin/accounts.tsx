@@ -3,6 +3,7 @@ import type { User } from "@clerk/react-router/ssr.server"
 import React from "react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { useNavigate, useSearchParams } from "react-router"
+import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/accounts"
 
@@ -18,7 +19,7 @@ import { style } from "~/styles/component"
 export async function loader(args: LoaderFunctionArgs) {
   const { request, context } = args
   const clerkClient = createClerkClient({
-    secretKey: context.cloudflare.env.CLERK_SECRET_KEY,
+    secretKey: context.get(CloudflareContext).env.CLERK_SECRET_KEY,
   })
 
   const url = new URL(request.url)
@@ -37,7 +38,7 @@ export async function loader(args: LoaderFunctionArgs) {
     const ranking = await getMonthlyRanking({
       year: new Date().getUTCFullYear(),
       month: new Date().getUTCMonth(),
-      env: context.cloudflare.env,
+      env: context.get(CloudflareContext).env,
     })
 
     return { users, query, ranking }
