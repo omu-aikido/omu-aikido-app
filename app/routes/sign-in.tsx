@@ -1,8 +1,9 @@
-import { useSignIn } from "@clerk/react-router"
 import { getAuth } from "@clerk/react-router/ssr.server"
 import { getLogger } from "@logtape/logtape"
 import * as React from "react"
 import { Link, redirect, useFetcher, useNavigate } from "react-router"
+import { z } from "zod"
+
 const logger = getLogger("routes/sign-in")
 
 import type { Route } from "./+types/sign-in"
@@ -13,6 +14,17 @@ import { Icon } from "~/components/ui/Icon"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { style } from "~/styles/component"
+
+// MARK: Validation Schema
+const signInSchema = z.object({
+  email: z.email("有効なメールアドレスを入力してください"),
+  password: z.string().min(8, "パスワードは8文字以上である必要があります"),
+})
+
+// MARK: ClientAction Return Type
+type ClientActionReturn =
+  | { success: true; sessionId: string }
+  | { success: false; error: string }
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
@@ -53,6 +65,66 @@ export async function loader(args: Route.LoaderArgs) {
   }
 }
 
+// MARK: ClientAction
+// eslint-disable-next-line react-refresh/only-export-components
+export async function clientAction({
+  request,
+}: Route.ClientActionArgs): Promise<ClientActionReturn> {
+  const formData = await request.formData()
+  const data = Object.fromEntries(formData)
+
+  // バリデーション
+  const parsed = signInSchema.safeParse({
+    email: data.email || "",
+    password: data.password || "",
+  })
+
+  if (!parsed.success) {
+    const firstError = parsed.error.issues[0]
+    return {
+      success: false,
+      error: firstError?.message || "入力内容をご確認ください",
+    }
+  }
+
+  const { email, password } = parsed.data
+
+  try {
+    // Clerkインスタンスの取得
+    const clerk = window.Clerk
+    if (!clerk) {
+      return {
+        success: false,
+        error: "認証サービスが利用できません",
+      }
+    }
+
+    // サインイン処理
+    const result = await clerk.client.signIn.create({
+      identifier: email,
+      password,
+    })
+
+    if (result.status === "complete") {
+      return {
+        success: true,
+        sessionId: result.createdSessionId,
+      }
+    } else {
+      return {
+        success: false,
+        error: "追加認証が必要です",
+      }
+    }
+  } catch (error) {
+    logger.error(`Sign-in failed: ${String(error)}`)
+    return {
+      success: false,
+      error: "サインインに失敗しました。入力内容をご確認ください。",
+    }
+  }
+}
+
 // MARK: Meta
 export function meta() {
   return [
@@ -63,37 +135,28 @@ export function meta() {
 
 // MARK: Component
 export default function SignInPage() {
-  const { signIn, setActive, isLoaded } = useSignIn()
-  const fetcher = useFetcher()
+  const fetcher = useFetcher<ClientActionReturn>()
   const navigate = useNavigate()
-  const [email, setEmail] = React.useState("")
-  const [password, setPassword] = React.useState("")
-  const [error, setError] = React.useState<string | null>(null)
-  const [loading, setLoading] = React.useState(false)
+  const [isOAuthLoading, setIsOAuthLoading] = React.useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    if (!isLoaded || !signIn || !setActive) {
-      setError("認証サービスが利用できません")
-      setLoading(false)
-      return
-    }
-    try {
-      const result = await signIn.create({ identifier: email, password })
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId })
-        navigate("/")
-      } else {
-        setError("追加認証が必要です。")
+  // clientActionの結果を処理
+  React.useEffect(() => {
+    if (fetcher.data && fetcher.state === "idle") {
+      const result = fetcher.data
+
+      if (result.success) {
+        // セッションを有効化
+        const clerk = window.Clerk
+        if (clerk) {
+          clerk.setActive({ session: result.sessionId }).then(() => {
+            navigate("/")
+          })
+        }
       }
-    } catch {
-      setError("サインインに失敗しました。入力内容をご確認ください。")
-    } finally {
-      setLoading(false)
     }
-  }
+  }, [fetcher.data, fetcher.state, navigate])
+
+  const isLoading = fetcher.state === "submitting" || isOAuthLoading
 
   return (
     <Card
@@ -105,15 +168,13 @@ export default function SignInPage() {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-6">
-          <fetcher.Form method="post" onSubmit={handleSubmit} data-testid="sign-in-form">
+          <fetcher.Form method="post" data-testid="sign-in-form">
             <div className="grid gap-2">
               <Label htmlFor="email">メールアドレス</Label>
               <Input
                 id="email"
                 type="email"
                 name="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
                 required
                 autoComplete="email"
                 placeholder="example@mail.com"
@@ -134,20 +195,18 @@ export default function SignInPage() {
                 id="password"
                 type="password"
                 name="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
                 data-testid="sign-in-input-password"
               />
             </div>
-            {error && (
+            {fetcher.data && !fetcher.data.success && (
               <div data-testid="sign-in-error-container">
                 <p
-                  className="text-sm font-medium text-destructive"
+                  className="text-sm font-medium text-destructive mt-4"
                   data-testid="sign-in-error-message"
                 >
-                  {error}
+                  {fetcher.data.error}
                 </p>
                 <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
                   サインインに失敗する場合は、
@@ -166,11 +225,11 @@ export default function SignInPage() {
             )}
             <Button
               type="submit"
-              disabled={loading || error !== null}
+              disabled={isLoading}
               className="w-full cursor-pointer mt-4"
               data-testid="sign-in-button-submit"
             >
-              {loading ? "サインイン中..." : "サインイン"}
+              {fetcher.state === "submitting" ? "サインイン中..." : "サインイン"}
             </Button>
           </fetcher.Form>
           <Button
@@ -178,19 +237,20 @@ export default function SignInPage() {
             className="w-full"
             variant="outline"
             onClick={async () => {
-              if (!isLoaded || !signIn) return
-              setLoading(true)
+              const clerk = window.Clerk
+              if (!clerk) return
+              setIsOAuthLoading(true)
               try {
-                await signIn.authenticateWithRedirect({
+                await clerk.client.signIn.authenticateWithRedirect({
                   strategy: "oauth_discord",
                   redirectUrl: "/",
                   redirectUrlComplete: "/",
                 })
               } finally {
-                setLoading(false)
+                setIsOAuthLoading(false)
               }
             }}
-            disabled={loading}
+            disabled={isLoading}
             data-testid="sign-in-button-discord"
           >
             <Icon icon={"discord-logo"} size="24" className="mr-2" />

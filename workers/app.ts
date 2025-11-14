@@ -1,7 +1,7 @@
-import { createRequestHandler } from "react-router"
+import { createRequestHandler, RouterContextProvider } from "react-router"
 
 declare module "react-router" {
-  export interface AppLoadContext {
+  export interface RouterContextProvider {
     cloudflare: { env: Env; ctx: ExecutionContext }
   }
 }
@@ -20,7 +20,9 @@ export default {
       return new Response(null, { status: 301, headers: { Location: url.toString() } })
     }
 
-    const response = await requestHandler(request, { cloudflare: { env, ctx } })
+    const context = new RouterContextProvider()
+    Object.assign(context, { cloudflare: { env, ctx } })
+    const response = await requestHandler(request, context)
 
     // CSPヘッダーを本番・開発両方に適用（開発時もブラウザエラーを防ぐため）
     response.headers.set("X-Frame-Options", "DENY")

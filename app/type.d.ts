@@ -1,3 +1,4 @@
+import type { ClerkHostRouter } from "@clerk/react-router"
 import type { z } from "zod"
 
 import type { ActivityType } from "./db/schema"
@@ -20,4 +21,11 @@ export interface DailyActivityItem extends ActivityType {
    * 削除したときに period を元に戻すために使用します。
    */
   originalPeriod?: number
+}
+
+// Window型の拡張
+declare global {
+  interface Window {
+    Clerk?: ClerkHostRouter
+  }
 }
