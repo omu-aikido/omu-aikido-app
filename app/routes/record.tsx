@@ -44,13 +44,14 @@ export async function loader(args: Route.LoaderArgs) {
 
   const startDate = `${year}-${month}-01`
   const endDate = endOfMonth(date).toISOString()
+  const env = context.get(CloudflareContext).env
 
   try {
     const activities: ActivityType[] = await getActivitiesByDateRange({
       userId,
       startDate,
       endDate,
-      env: context.get(CloudflareContext).env,
+      env,
     })
 
     return {
@@ -84,29 +85,18 @@ export async function action(args: Route.ActionArgs) {
   const userId = auth.userId!
 
   if (actionType === "batchUpdate") {
+    const env = context.get(CloudflareContext).env
     const payload = JSON.parse(formData.get("payload") as string)
 
     try {
       if (payload.added && payload.added.length > 0) {
-        await createActivities({
-          userId,
-          activities: payload.added,
-          env: context.get(CloudflareContext).env,
-        })
+        await createActivities({ userId, activities: payload.added, env })
       }
       if (payload.updated && payload.updated.length > 0) {
-        await updateActivities({
-          userId,
-          activities: payload.updated,
-          env: context.get(CloudflareContext).env,
-        })
+        await updateActivities({ userId, activities: payload.updated, env })
       }
       if (payload.deleted && payload.deleted.length > 0) {
-        await deleteActivities({
-          userId,
-          ids: payload.deleted,
-          env: context.get(CloudflareContext).env,
-        })
+        await deleteActivities({ userId, ids: payload.deleted, env })
       }
 
       return redirect(`/record?month=${formData.get("currentMonth")}`)

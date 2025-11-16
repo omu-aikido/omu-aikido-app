@@ -47,13 +47,13 @@ export async function action(args: Route.ActionArgs) {
   if (!userId) {
     return redirect("/sign-in?redirect_url=" + args.request.url)
   }
+  const env = args.context.get(CloudflareContext).env
   const formData = await args.request.formData()
   const year = formData.get("year")?.toString()
   const grade = Number(formData.get("grade"))
   const joinedAt = Number(formData.get("joinedAt"))
   const getGradeAt = formData.get("getGradeAt")?.toString()
 
-  const env = args.context.get(CloudflareContext).env
   const res = await updateProfile({ id: userId, year, grade, joinedAt, getGradeAt }, env)
 
   return res

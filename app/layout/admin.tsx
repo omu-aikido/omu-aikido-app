@@ -11,10 +11,10 @@ import { style } from "~/styles/component"
 // MARK: Loader - 共通の認証処理
 export async function loader(args: Route.LoaderArgs) {
   const { userId } = await getAuth(args)
-  const env = args.context.get(CloudflareContext).env
   if (!userId) {
     return redirect("/sign-in?redirect_url=" + args.request.url)
   }
+  const env = args.context.get(CloudflareContext).env
   const profile = await getProfile({ userId, env })
   if (!profile) return redirect("/")
   const role = Role.fromString(profile.role)

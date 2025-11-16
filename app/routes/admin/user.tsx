@@ -161,6 +161,7 @@ export async function action(args: Route.ActionArgs) {
       headers: { "Content-Type": "application/json" },
     })
   }
+  const env = args.context.get(CloudflareContext).env
 
   const formData = await args.request.formData()
 
@@ -226,7 +227,7 @@ export async function action(args: Route.ActionArgs) {
     const result = await updateProfile({
       applicateBy: userId,
       newProfile: { id: targetUserId, year, grade, role, joinedAt, getGradeAt },
-      env: args.context.get(CloudflareContext).env,
+      env,
     })
 
     if (result instanceof Error) {

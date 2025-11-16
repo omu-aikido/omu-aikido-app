@@ -8,7 +8,7 @@ const logger = getLogger("routes/sign-in")
 import type { Route } from "./+types/sign-in"
 
 import { Button } from "~/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Icon } from "~/components/ui/Icon"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"

@@ -24,14 +24,13 @@ export function meta({}: Route.MetaArgs) {
 export async function action(args: Route.ActionArgs) {
   const { userId } = await getAuth(args)
   if (!userId) throw new Error("User not authenticated")
+  const env = args.context.get(CloudflareContext).env
   const formData = await args.request.formData()
   const lastName = formData.get("lastName")?.toString()
   const firstName = formData.get("firstName")?.toString()
   const username = formData.get("username")?.toString()
   const imageFile = formData.get("profileImage")
-  const client = createClerkClient({
-    secretKey: args.context.get(CloudflareContext).env.CLERK_SECRET_KEY,
-  })
+  const client = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
   const params: Partial<{ firstName: string; lastName: string; username: string }> = {}
   if (firstName) params.firstName = firstName
   if (lastName) params.lastName = lastName
