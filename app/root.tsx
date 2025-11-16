@@ -9,6 +9,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router"
+import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/root"
 
@@ -26,7 +27,11 @@ export const links: Route.LinksFunction = () => [
 // eslint-disable-next-line react-refresh/only-export-components
 export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
 
-export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args)
+export const loader = (args: Route.LoaderArgs) =>
+  rootAuthLoader(args, {
+    secretKey: args.context.get(CloudflareContext).env.CLERK_SECRET_KEY,
+    publishableKey: args.context.get(CloudflareContext).env.CLERK_PUBLISHABLE_KEY,
+  })
 
 export default function App({ loaderData }: Route.ComponentProps) {
   return (
