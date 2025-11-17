@@ -1,6 +1,6 @@
 import { useSignUp } from "@clerk/react-router"
 import { isClerkAPIResponseError } from "@clerk/react-router/errors"
-import { getAuth } from "@clerk/react-router/ssr.server"
+import { getAuth } from "@clerk/react-router/server"
 import type { ClerkAPIError } from "@clerk/types"
 import * as React from "react"
 import { useState } from "react"

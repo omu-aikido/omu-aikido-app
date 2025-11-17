@@ -1,6 +1,5 @@
-import { getAuth } from "@clerk/react-router/ssr.server"
+import { getAuth } from "@clerk/react-router/server"
 import { Outlet, redirect } from "react-router"
-import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/admin"
 
@@ -14,7 +13,7 @@ export async function loader(args: Route.LoaderArgs) {
   if (!userId) {
     return redirect("/sign-in?redirect_url=" + args.request.url)
   }
-  const env = args.context.get(CloudflareContext).env
+  const env = args.context.cloudflare.env
   const profile = await getProfile({ userId, env })
   if (!profile) return redirect("/")
   const role = Role.fromString(profile.role)

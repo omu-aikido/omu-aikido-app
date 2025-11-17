@@ -1,7 +1,5 @@
-import { createClerkClient } from "@clerk/react-router/api.server"
-import { getAuth } from "@clerk/react-router/ssr.server"
+import { createClerkClient, getAuth } from "@clerk/react-router/server"
 import { Outlet, redirect } from "react-router"
-import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/user"
 export type UserLayoutComponentProps = Route.ComponentProps
@@ -10,13 +8,12 @@ import { NavigationTab } from "~/components/ui/NavigationTab"
 
 // MARK: Loader - 共通の認証処理
 export async function loader(args: Route.LoaderArgs) {
+  const env = args.context.cloudflare.env
   const { userId } = await getAuth(args)
   if (!userId) {
     return redirect("/sign-in?redirect_url=" + args.request.url)
   }
-  const clerkClient = createClerkClient({
-    secretKey: args.context.get(CloudflareContext).env.CLERK_SECRET_KEY,
-  })
+  const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
 
   const user = await clerkClient.users.getUser(userId)
   const email = user.emailAddresses?.[0]?.emailAddress || ""
@@ -31,14 +28,7 @@ export async function loader(args: Route.LoaderArgs) {
     : undefined
   const username = user.username || ""
 
-  return {
-    userId,
-    user,
-    email,
-    discordAccount,
-    username,
-    env: args.context.get(CloudflareContext).env,
-  }
+  return { userId, user, email, discordAccount, username, env }
 }
 
 // MARK: Component - 共通のレイアウトとナビゲーション

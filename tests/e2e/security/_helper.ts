@@ -1,4 +1,4 @@
-import { createClerkClient } from "@clerk/react-router/api.server"
+import { createClerkClient } from "@clerk/react-router/server"
 import { getLogger } from "@logtape/logtape"
 
 const logger = getLogger("Test Helper")

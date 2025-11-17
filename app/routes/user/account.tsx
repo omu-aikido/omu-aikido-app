@@ -1,8 +1,6 @@
-import { createClerkClient } from "@clerk/react-router/api.server"
-import { getAuth, type EmailAddress } from "@clerk/react-router/ssr.server"
+import { createClerkClient, getAuth, type EmailAddress } from "@clerk/react-router/server"
 import { useEffect, useState } from "react"
 import { Link, useFetcher, useOutletContext } from "react-router"
-import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/account"
 
@@ -24,7 +22,7 @@ export function meta({}: Route.MetaArgs) {
 export async function action(args: Route.ActionArgs) {
   const { userId } = await getAuth(args)
   if (!userId) throw new Error("User not authenticated")
-  const env = args.context.get(CloudflareContext).env
+  const env = args.context.cloudflare.env
   const formData = await args.request.formData()
   const lastName = formData.get("lastName")?.toString()
   const firstName = formData.get("firstName")?.toString()

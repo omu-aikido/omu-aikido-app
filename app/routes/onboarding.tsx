@@ -1,8 +1,6 @@
-import { createClerkClient } from "@clerk/react-router/api.server"
-import { getAuth } from "@clerk/react-router/ssr.server"
+import { createClerkClient, getAuth } from "@clerk/react-router/server"
 import { useEffect, useState } from "react"
 import { redirect, useFetcher, useNavigate } from "react-router"
-import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/onboarding"
 
@@ -31,7 +29,7 @@ export async function loader(args: Route.LoaderArgs) {
 
   try {
     const clerkClient = createClerkClient({
-      secretKey: args.context.get(CloudflareContext).env.CLERK_SECRET_KEY,
+      secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
     })
 
     // ユーザー情報を取得
@@ -136,7 +134,7 @@ export async function action(args: Route.ActionArgs) {
   if (actionType === "retry") {
     try {
       const clerkClient = createClerkClient({
-        secretKey: args.context.get(CloudflareContext).env.CLERK_SECRET_KEY,
+        secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
       })
 
       // ユーザー情報を取得
@@ -266,7 +264,7 @@ export async function action(args: Route.ActionArgs) {
       }
 
       const clerkClient = createClerkClient({
-        secretKey: args.context.get(CloudflareContext).env.CLERK_SECRET_KEY,
+        secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
       })
 
       // プロファイルデータをpublicMetadataに設定

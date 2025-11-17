@@ -1,4 +1,4 @@
-import { getAuth } from "@clerk/react-router/ssr.server"
+import { getAuth } from "@clerk/react-router/server"
 import {
   addMonths,
   eachDayOfInterval,
@@ -9,7 +9,6 @@ import {
 } from "date-fns"
 import { useEffect, useMemo, useState } from "react"
 import { redirect, useActionData, useFetcher, useSearchParams } from "react-router"
-import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/record"
 
@@ -44,7 +43,7 @@ export async function loader(args: Route.LoaderArgs) {
 
   const startDate = `${year}-${month}-01`
   const endDate = endOfMonth(date).toISOString()
-  const env = context.get(CloudflareContext).env
+  const env = context.cloudflare.env
 
   try {
     const activities: ActivityType[] = await getActivitiesByDateRange({
@@ -83,9 +82,9 @@ export async function action(args: Route.ActionArgs) {
   const actionType = formData.get("actionType")
   const auth = await getAuth(args)
   const userId = auth.userId!
+  const env = context.cloudflare.env
 
   if (actionType === "batchUpdate") {
-    const env = context.get(CloudflareContext).env
     const payload = JSON.parse(formData.get("payload") as string)
 
     try {

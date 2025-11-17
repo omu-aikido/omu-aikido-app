@@ -1,4 +1,4 @@
-import type { ExternalAccount, User } from "@clerk/react-router/ssr.server"
+import type { ExternalAccount, User } from "@clerk/react-router/server"
 import { tv } from "tailwind-variants"
 
 import { Icon } from "~/components/ui/Icon"

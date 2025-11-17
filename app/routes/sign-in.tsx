@@ -1,5 +1,5 @@
 import { useSignIn } from "@clerk/react-router"
-import { getAuth } from "@clerk/react-router/ssr.server"
+import { getAuth } from "@clerk/react-router/server"
 import { getLogger } from "@logtape/logtape"
 import * as React from "react"
 import { Link, redirect, useFetcher, useNavigate } from "react-router"

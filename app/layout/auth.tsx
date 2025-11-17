@@ -1,7 +1,6 @@
-import { getAuth } from "@clerk/react-router/ssr.server"
+import { getAuth } from "@clerk/react-router/server"
 import { useState } from "react"
 import { Outlet, redirect } from "react-router"
-import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/auth"
 
@@ -29,7 +28,7 @@ export const links: Route.LinksFunction = () => [
 export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
   const userId = auth.userId
-  const env = args.context.get(CloudflareContext).env
+  const env = args.context.cloudflare.env
 
   const profile = await getProfile({ userId, env })
 

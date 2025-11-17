@@ -1,7 +1,6 @@
-import { getAuth } from "@clerk/react-router/ssr.server"
+import { getAuth } from "@clerk/react-router/server"
 import { useEffect, useState } from "react"
 import { redirect, useFetcher } from "react-router"
-import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/status"
 
@@ -25,7 +24,7 @@ export async function loader(args: Route.LoaderArgs) {
   const auth = await getAuth(args)
   const userId = auth.userId
 
-  const env = args.context.get(CloudflareContext).env
+  const env = args.context.cloudflare.env
 
   const profile: Profile | null = await getProfile({ userId, env })
 
@@ -47,7 +46,7 @@ export async function action(args: Route.ActionArgs) {
   if (!userId) {
     return redirect("/sign-in?redirect_url=" + args.request.url)
   }
-  const env = args.context.get(CloudflareContext).env
+  const env = args.context.cloudflare.env
   const formData = await args.request.formData()
   const year = formData.get("year")?.toString()
   const grade = Number(formData.get("grade"))
