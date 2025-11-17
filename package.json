@@ -8,7 +8,7 @@
     "deploy": "pnpm build && wrangler deploy --dry-run",
     "dev": "react-router dev",
     "predev": "pnpm docker:up",
-    "prebuild": "react-router typegen",
+    "prebuild": "react-router typegen && wrangler types",
     "precommit": "pnpm lint:fix && pnpm format",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
