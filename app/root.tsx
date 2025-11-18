@@ -1,5 +1,5 @@
 import { ClerkProvider } from "@clerk/react-router"
-import { clerkMiddleware, rootAuthLoader } from "@clerk/react-router/server"
+import { rootAuthLoader } from "@clerk/react-router/server"
 import {
   isRouteErrorResponse,
   Link,
@@ -9,13 +9,11 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router"
-import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/root"
 
 import { Footer } from "~/components/component/Footer"
 import { ReactHeader } from "~/components/component/Header"
-import { Button } from "~/components/ui/button"
 import { Toaster } from "~/components/ui/sonner"
 import "~/styles/global.css"
 
@@ -24,13 +22,10 @@ export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
 ]
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
-
 export const loader = (args: Route.LoaderArgs) =>
   rootAuthLoader(args, {
-    secretKey: args.context.get(CloudflareContext).env.CLERK_SECRET_KEY,
-    publishableKey: args.context.get(CloudflareContext).env.CLERK_PUBLISHABLE_KEY,
+    secretKey: args.context.cloudflare.env.CLERK_SECRET_KEY,
+    publishableKey: args.context.cloudflare.env.CLERK_PUBLISHABLE_KEY,
   })
 
 export default function App({ loaderData }: Route.ComponentProps) {
@@ -112,12 +107,12 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
               </Link>
             ) : (
               <>
-                <Button
+                <button
                   onClick={handleReload}
                   className="inline-block px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition mr-4"
                 >
                   ページを再読み込み
-                </Button>
+                </button>
                 <Link
                   to="/"
                   className="inline-block px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition"

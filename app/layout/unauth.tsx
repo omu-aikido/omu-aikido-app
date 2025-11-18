@@ -1,4 +1,4 @@
-import { getAuth } from "@clerk/react-router/ssr.server"
+import { getAuth } from "@clerk/react-router/server"
 import { Outlet, redirect } from "react-router"
 
 import type { Route } from "./+types/unauth"

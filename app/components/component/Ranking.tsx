@@ -1,4 +1,4 @@
-import type { User } from "@clerk/react-router/ssr.server"
+import type { User } from "@clerk/react-router/server"
 import React from "react"
 
 // Define the interface for a single user's rank data

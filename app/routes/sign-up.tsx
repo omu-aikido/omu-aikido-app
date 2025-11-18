@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useSignUp } from "@clerk/react-router"
-import { getAuth } from "@clerk/react-router/ssr.server"
+import { getAuth } from "@clerk/react-router/server"
 import type { ClerkAPIError } from "@clerk/types"
 import { useCallback, useEffect, useReducer, useState } from "react"
 import { Link, redirect, useFetcher, useNavigate } from "react-router"

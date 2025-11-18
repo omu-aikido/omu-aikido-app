@@ -1,4 +1,4 @@
-import { createClerkClient, type User } from "@clerk/react-router/api.server"
+import { createClerkClient, type User } from "@clerk/react-router/server"
 
 import { getProfile, getRole } from "~/lib/query/profile"
 import { Role } from "~/lib/zod"

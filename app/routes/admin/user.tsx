@@ -1,9 +1,7 @@
-import { createClerkClient } from "@clerk/react-router/api.server"
-import { getAuth, type User } from "@clerk/react-router/ssr.server"
+import { createClerkClient, getAuth, type User } from "@clerk/react-router/server"
 import { useEffect, useState } from "react"
 import { Link, redirect, useFetcher } from "react-router"
 import { toast } from "sonner"
-import { CloudflareContext } from "workers/app"
 
 import type { Route } from "./+types/user"
 
@@ -33,16 +31,15 @@ import type { Profile } from "~/type"
 
 // MARK: Loader
 export async function loader({ context, params, request }: Route.LoaderArgs) {
-  const clerkClient = createClerkClient({
-    secretKey: context.get(CloudflareContext).env.CLERK_SECRET_KEY,
-  })
+  const env = context.cloudflare.env
+  const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
 
   const { userId } = params
   if (!userId) {
     throw new Response("User ID is required", { status: 400 })
   }
   const user = await clerkClient.users.getUser(userId)
-  const profile = await getProfile({ userId, env: context.get(CloudflareContext).env })
+  const profile = await getProfile({ userId, env })
 
   // fitler
   const url = new URL(request.url)
@@ -79,11 +76,7 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
     )
 
     // Get user activities with date filtering
-    const { all, total, done } = await activitySummary({
-      userId,
-      getGradeAt,
-      env: context.get(CloudflareContext).env,
-    })
+    const { all, total, done } = await activitySummary({ userId, getGradeAt, env })
 
     const totalActivitiesCount = all.length
     const activities = all.slice((page - 1) * limit, page * limit)
@@ -161,6 +154,7 @@ export async function action(args: Route.ActionArgs) {
       headers: { "Content-Type": "application/json" },
     })
   }
+  const env = args.context.cloudflare.env
 
   const formData = await args.request.formData()
 
@@ -226,7 +220,7 @@ export async function action(args: Route.ActionArgs) {
     const result = await updateProfile({
       applicateBy: userId,
       newProfile: { id: targetUserId, year, grade, role, joinedAt, getGradeAt },
-      env: args.context.get(CloudflareContext).env,
+      env,
     })
 
     if (result instanceof Error) {

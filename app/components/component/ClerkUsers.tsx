@@ -1,4 +1,4 @@
-import type { User } from "@clerk/react-router/ssr.server"
+import type { User } from "@clerk/react-router/server"
 import React from "react"
 import { Link, useSearchParams } from "react-router"
 import { tv } from "tailwind-variants"

@@ -67,10 +67,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: testing
     steps:
-      - name: Create .env file
-        run: |
-          echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.env
-          echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.dev.vars
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -97,6 +93,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.env
+          echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.dev.vars
 
       - name: Type check
         run: pnpm run check
