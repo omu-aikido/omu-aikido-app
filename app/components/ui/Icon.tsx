@@ -1,4 +1,4 @@
-import { iconPaths } from "./IconPaths" // Assuming IconPaths.ts is in the same directory
+import { iconPaths } from "./IconPaths"; // Assuming IconPaths.ts is in the same directory
 
 interface IconProps {
   icon: keyof typeof iconPaths

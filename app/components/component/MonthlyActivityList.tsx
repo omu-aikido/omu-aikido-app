@@ -1,10 +1,10 @@
-import { format } from "date-fns"
-import React from "react"
-import { tv } from "tailwind-variants"
+import { format } from "date-fns";
+import React from "react";
+import { tv } from "tailwind-variants";
 
-import DayActivitySummary from "~/components/component/DayActivitySummary" // 正しいインポートパス
-import { style } from "~/styles/component"
-import type { DailyActivityItem } from "~/type"
+import DayActivitySummary from "~/components/component/DayActivitySummary"; // 正しいインポートパス
+import { style } from "~/styles/component";
+import type { DailyActivityItem } from "~/type";
 
 type Props = {
   daysInMonth: Date[]
@@ -18,7 +18,7 @@ const listItem = tv({
 })
 
 const dayLabel = tv({
-  base: "w-20 flex-shrink-0 font-semibold",
+  base: "w-20 shrink-0 font-semibold",
   variants: {
     day: {
       sunday: "text-red-500 dark:text-red-400",
