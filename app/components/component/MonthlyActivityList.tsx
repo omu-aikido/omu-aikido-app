@@ -1,10 +1,10 @@
-import { format } from "date-fns";
-import React from "react";
-import { tv } from "tailwind-variants";
+import { format } from "date-fns"
+import React from "react"
+import { tv } from "tailwind-variants"
 
-import DayActivitySummary from "~/components/component/DayActivitySummary"; // 正しいインポートパス
-import { style } from "~/styles/component";
-import type { DailyActivityItem } from "~/type";
+import DayActivitySummary from "~/components/component/DayActivitySummary" // 正しいインポートパス
+import { style } from "~/styles/component"
+import type { DailyActivityItem } from "~/type"
 
 type Props = {
   daysInMonth: Date[]

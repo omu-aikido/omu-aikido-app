@@ -1,7 +1,7 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React from "react"
+import { Link, useLocation } from "react-router-dom"
 
-import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs"
 
 export type NavigationTabProp = { to: string; label: string }
 

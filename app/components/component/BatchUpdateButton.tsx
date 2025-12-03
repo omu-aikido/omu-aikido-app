@@ -1,4 +1,4 @@
-import { style } from "~/styles/component"; // Import style
+import { style } from "~/styles/component" // Import style
 
 type Props = {
   isChanged: boolean

@@ -3,7 +3,11 @@ import type { FetcherWithComponents } from "react-router"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
-import type { ClientActionReturn, FormAction, LocalFormState } from "~/hooks/useSignUpForm"
+import type {
+  ClientActionReturn,
+  FormAction,
+  LocalFormState,
+} from "~/hooks/useSignUpForm"
 import { style } from "~/styles/component"
 
 type SignUpStepBasicProps = {
@@ -39,10 +43,7 @@ export function SignUpStepBasic({
             required
             value={formValues.email}
             onChange={e =>
-              dispatch({
-                type: "SET_FORM_VALUES",
-                payload: { email: e.target.value },
-              })
+              dispatch({ type: "SET_FORM_VALUES", payload: { email: e.target.value } })
             }
           />
         </div>
@@ -100,8 +101,8 @@ export function SignUpStepBasic({
         type="button"
         onClick={e => {
           // Inline validation to match original behavior, though handleNext also validates.
-          // Keeping it for immediate feedback if that was the intention, 
-          // but relying on handleNext is cleaner. 
+          // Keeping it for immediate feedback if that was the intention,
+          // but relying on handleNext is cleaner.
           // I'll stick to calling handleNext directly as it uses the shared validation logic.
           handleNext(e)
         }}

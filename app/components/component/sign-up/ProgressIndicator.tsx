@@ -1,6 +1,10 @@
 import { tv } from "tailwind-variants"
 
-export const ProgressIndicator = ({ step }: { step: "basic" | "personal" | "profile" }) => {
+export const ProgressIndicator = ({
+  step,
+}: {
+  step: "basic" | "personal" | "profile"
+}) => {
   const steps = ["基本情報", "個人情報", "プロファイル"]
   const currentIndex =
     step === "basic" ? 0 : step === "personal" ? 1 : step === "profile" ? 2 : 2

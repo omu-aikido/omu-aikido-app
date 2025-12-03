@@ -13,7 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select"
-import type { ClientActionReturn, FormAction, LocalFormState } from "~/hooks/useSignUpForm"
+import type {
+  ClientActionReturn,
+  FormAction,
+  LocalFormState,
+} from "~/hooks/useSignUpForm"
 import { JoinedAtYearRange, grade, year } from "~/lib/utils"
 import { style } from "~/styles/component"
 
@@ -145,10 +149,7 @@ export function SignUpStepProfile({
           required
           checked={formValues.legalAccepted}
           onCheckedChange={checked =>
-            dispatch({
-              type: "SET_FORM_VALUES",
-              payload: { legalAccepted: !!checked },
-            })
+            dispatch({ type: "SET_FORM_VALUES", payload: { legalAccepted: !!checked } })
           }
         />
         <Label

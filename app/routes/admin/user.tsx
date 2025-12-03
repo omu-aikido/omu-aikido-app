@@ -488,11 +488,7 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
           />
         </>
       ) : (
-          <DatePicker
-            date={selectedDate}
-            placeholder="級段位取得日を選択"
-            disabled
-          />
+        <DatePicker date={selectedDate} placeholder="級段位取得日を選択" disabled />
       )}
     </div>
   )

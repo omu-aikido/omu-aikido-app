@@ -3,7 +3,11 @@ import type { FetcherWithComponents } from "react-router"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
-import type { ClientActionReturn, FormAction, LocalFormState } from "~/hooks/useSignUpForm"
+import type {
+  ClientActionReturn,
+  FormAction,
+  LocalFormState,
+} from "~/hooks/useSignUpForm"
 import { style } from "~/styles/component"
 
 type SignUpStepPersonalProps = {
@@ -40,10 +44,7 @@ export function SignUpStepPersonal({
           required
           value={formValues.lastName}
           onChange={e =>
-            dispatch({
-              type: "SET_FORM_VALUES",
-              payload: { lastName: e.target.value },
-            })
+            dispatch({ type: "SET_FORM_VALUES", payload: { lastName: e.target.value } })
           }
         />
         {formErrors.lastName && (
@@ -62,10 +63,7 @@ export function SignUpStepPersonal({
           required
           value={formValues.firstName}
           onChange={e =>
-            dispatch({
-              type: "SET_FORM_VALUES",
-              payload: { firstName: e.target.value },
-            })
+            dispatch({ type: "SET_FORM_VALUES", payload: { firstName: e.target.value } })
           }
         />
         {formErrors.firstName && (
@@ -81,10 +79,7 @@ export function SignUpStepPersonal({
           autoComplete="username"
           value={formValues.username}
           onChange={e =>
-            dispatch({
-              type: "SET_FORM_VALUES",
-              payload: { username: e.target.value },
-            })
+            dispatch({ type: "SET_FORM_VALUES", payload: { username: e.target.value } })
           }
         />
         {formErrors.username && (

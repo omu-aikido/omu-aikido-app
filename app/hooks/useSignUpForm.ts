@@ -184,11 +184,5 @@ export function useSignUpForm(currentYear: number) {
     return true
   }
 
-  return {
-    state,
-    dispatch,
-    nextStep,
-    prevStep,
-    validateStep,
-  }
+  return { state, dispatch, nextStep, prevStep, validateStep }
 }

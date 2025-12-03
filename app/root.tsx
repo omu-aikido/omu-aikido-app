@@ -6,7 +6,8 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration, isRouteErrorResponse
+  ScrollRestoration,
+  isRouteErrorResponse,
 } from "react-router"
 
 import type { Route } from "./+types/root"

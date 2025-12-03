@@ -20,7 +20,7 @@ export default tseslint.config(
       "coverage/",
       "*.min.js",
       "*.min.css",
-      "playwright-report/"
+      "playwright-report/",
     ],
   },
   ...tseslint.configs.recommended,
