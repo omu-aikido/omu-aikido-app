@@ -1,13 +1,13 @@
 import { ClerkProvider } from "@clerk/react-router"
 import { rootAuthLoader } from "@clerk/react-router/server"
 import {
-  isRouteErrorResponse,
   Link,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  isRouteErrorResponse,
 } from "react-router"
 
 import type { Route } from "./+types/root"

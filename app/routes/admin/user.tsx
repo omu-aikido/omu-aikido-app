@@ -260,7 +260,7 @@ export default function AdminUser(args: Route.ComponentProps) {
     totalHours = 0,
   } = args.loaderData
   const discord = Array.isArray(user?.externalAccounts)
-    ? user.externalAccounts.find(
+    ? user?.externalAccounts.find(
         (acc: { provider: string }) => acc.provider === "oauth_discord",
       )
     : undefined
@@ -488,16 +488,7 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
           />
         </>
       ) : (
-        <Input
-          type="date"
-          value={
-            profile.getGradeAt
-              ? new Date(profile.getGradeAt).toISOString().split("T")[0]
-              : ""
-          }
-          disabled
-          readOnly
-        />
+        <DatePicker date={selectedDate} placeholder="級段位取得日を選択" disabled />
       )}
     </div>
   )

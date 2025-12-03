@@ -18,7 +18,7 @@ const listItem = tv({
 })
 
 const dayLabel = tv({
-  base: "w-20 flex-shrink-0 font-semibold",
+  base: "w-20 shrink-0 font-semibold",
   variants: {
     day: {
       sunday: "text-red-500 dark:text-red-400",

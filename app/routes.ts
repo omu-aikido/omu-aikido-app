@@ -1,6 +1,6 @@
-import { type RouteConfig, index, layout, prefix, route } from "@react-router/dev/routes"
+import { index, layout, prefix, route, type RouteConfig } from "@react-router/dev/routes"
 
-export default [
+const routes: RouteConfig = [
   layout("layout/auth.tsx", [
     // Home
     index("routes/home.tsx"),
@@ -17,6 +17,7 @@ export default [
     route("admin", "layout/admin.tsx", [
       index("routes/admin/accounts.tsx"),
       route("user/:userId", "routes/admin/user.tsx"),
+      route("norms", "routes/admin/norms.tsx"),
     ]),
   ]),
   layout("layout/unauth.tsx", [
@@ -31,4 +32,6 @@ export default [
   ]),
   // Onboarding
   route("onboarding", "routes/onboarding.tsx"),
-] satisfies RouteConfig
+]
+
+export default routes

@@ -38,9 +38,7 @@ export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher
       const data = fetcher.data as { error?: string } | null
       if (!data?.error) {
         toast("記録が追加されました。", {
-          description: `日付: ${formatDateForInput(
-            selectedDate,
-          )}, 稽古時間: ${period}時間`,
+          description: `日付: ${formatDateForInput(selectedDate)}, 稽古時間: ${period}時間`,
         })
       }
     }
