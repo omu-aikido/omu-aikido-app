@@ -1,6 +1,11 @@
 import { createClerkClient, type User } from "@clerk/react-router/server"
+import { and, eq, gte, or } from "drizzle-orm"
+
+import { activity } from "../../db/schema"
+import { createDb } from "../drizzle"
 
 import { getProfile, getRole } from "~/lib/query/profile"
+import { timeForNextGrade } from "~/lib/utils"
 import { Role } from "~/lib/zod"
 
 export async function updateProfile(input: {
@@ -58,4 +63,47 @@ export async function updateProfile(input: {
   } catch {
     throw new Error("Failed to update profile")
   }
+}
+
+export async function getUsersNorm(input: { userIds: string[]; env: Env }) {
+  const db = createDb(input.env)
+
+  const profiles = await Promise.all(
+    input.userIds.map(userId => getProfile({ userId, env: input.env })),
+  )
+
+  const validProfiles = profiles.filter((p): p is NonNullable<typeof p> => p !== null)
+
+  if (validProfiles.length === 0) {
+    return []
+  }
+
+  const conditions = validProfiles.map(profile => {
+    if (profile.getGradeAt) {
+      return and(eq(activity.userId, profile.id), gte(activity.date, profile.getGradeAt))
+    }
+    return eq(activity.userId, profile.id)
+  })
+
+  const activityData = await db
+    .select()
+    .from(activity)
+    .where(or(...conditions))
+
+  const results = validProfiles.map(profile => {
+    const userActivities = activityData.filter(a => a.userId === profile.id)
+    const totalPeriod = userActivities.reduce((sum, a) => sum + a.period, 0)
+    const current = totalPeriod / 1.5
+    const required = timeForNextGrade(profile.grade)
+
+    return {
+      userId: profile.id,
+      current,
+      required,
+      grade: profile.grade,
+      lastPromotionDate: profile.getGradeAt,
+    }
+  })
+
+  return results
 }

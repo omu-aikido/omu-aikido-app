@@ -39,6 +39,7 @@ export async function loader(args: Route.LoaderArgs) {
     role = Role.fromString(`${user.publicMetadata?.role}`)
     if (role && role.isManagement()) {
       apps.push({ name: "管理者", href: "/admin", desc: "管理者ページ" })
+      apps.push({ name: "審査", href: "/admin/norms", desc: "部員の稽古日数" })
     }
   }
 
