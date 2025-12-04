@@ -260,8 +260,8 @@ export async function getUserMonthlyRank(input: {
   const startDate = new Date(input.year, input.month, 1, 9)
   const endDate = new Date(input.year, input.month + 1, 0, 23, 59, 59)
 
-  const startDateStr = startDate.toISOString()
-  const endDateStr = endDate.toISOString()
+  const startDateStr = startDate.toISOString().split("T")[0]
+  const endDateStr = endDate.toISOString().split("T")[0]
 
   // 全ユーザーの月次合計を取得（順位付けのため）
   const allUserTotals = await db
