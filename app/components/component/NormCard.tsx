@@ -1,8 +1,4 @@
-import {
-  Clock,
-  TrendingUp,
-  User as UserIcon,
-} from "lucide-react"
+import { Clock, TrendingUp, User as UserIcon } from "lucide-react"
 import { Link } from "react-router"
 
 import { Card } from "~/components/ui/card"

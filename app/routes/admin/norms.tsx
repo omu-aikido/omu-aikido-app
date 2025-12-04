@@ -208,12 +208,7 @@ export default function NormsPage(args: Route.ComponentProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredUsers.map(({ user, norm, progress }) => (
-          <NormCard
-            key={user.id}
-            user={user}
-            norm={norm}
-            progress={progress}
-          />
+          <NormCard key={user.id} user={user} norm={norm} progress={progress} />
         ))}
       </div>
 

@@ -58,7 +58,7 @@ export async function action(args: Route.ActionArgs) {
   const res = await updateProfile({ id: userId, year, grade, joinedAt, getGradeAt }, env)
 
   if (!res.ok) throw new Error("Failed to update profile")
-  return getProfile({userId, env})
+  return getProfile({ userId, env })
 }
 
 // MARK: Component
