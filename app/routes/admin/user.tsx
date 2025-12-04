@@ -484,7 +484,7 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
           <input
             type="hidden"
             name="getGradeAt"
-            value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
+            value={selectedDate ? selectedDate.toISOString() : ""}
           />
         </>
       ) : (
