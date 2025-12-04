@@ -44,7 +44,7 @@ export async function updateProfile(input: {
   if (!targetRole || Role.compare(applicated.role, targetRole.role) > 0)
     throw new Error("Method Not Allowed: Not Enough")
   const getGradeAtValidate = input.newProfile.getGradeAt
-    ? input.newProfile.getGradeAt.toISOString().split('T')[0]
+    ? input.newProfile.getGradeAt.toISOString().split("T")[0]
     : ""
 
   const updatedMetadata = {

@@ -52,7 +52,9 @@ export async function action(args: Route.ActionArgs) {
   const grade = Number(formData.get("grade"))
   const joinedAt = Number(formData.get("joinedAt"))
   const getGradeAtValue = formData.get("getGradeAt")?.toString()
-  const getGradeAt = getGradeAtValue ? new Date(getGradeAtValue).toISOString().split("T")[0] : null
+  const getGradeAt = getGradeAtValue
+    ? new Date(getGradeAtValue).toISOString().split("T")[0]
+    : null
 
   const res = await updateProfile({ id: userId, year, grade, joinedAt, getGradeAt }, env)
 
