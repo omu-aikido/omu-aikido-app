@@ -16,7 +16,7 @@ import {
 } from "~/components/ui/select"
 import { StateButton } from "~/components/ui/StateButton"
 import { getProfile, updateProfile } from "~/lib/query/profile"
-import { grade as gradeOptions } from "~/lib/utils"
+import { formatDateToJSTString, grade as gradeOptions } from "~/lib/utils"
 import type { Profile } from "~/type"
 
 // MARK: Loader
@@ -52,9 +52,8 @@ export async function action(args: Route.ActionArgs) {
   const grade = Number(formData.get("grade"))
   const joinedAt = Number(formData.get("joinedAt"))
   const getGradeAtValue = formData.get("getGradeAt")?.toString()
-  const getGradeAt = getGradeAtValue
-    ? new Date(getGradeAtValue).toISOString().split("T")[0]
-    : null
+  // getGradeAtValue is already in YYYY-MM-DD (JST) format from the client
+  const getGradeAt = getGradeAtValue || null
 
   const res = await updateProfile({ id: userId, year, grade, joinedAt, getGradeAt }, env)
 
@@ -161,7 +160,7 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
       <input
         type="hidden"
         name="getGradeAt"
-        value={selectedDate ? selectedDate.toISOString() : ""}
+        value={selectedDate ? formatDateToJSTString(selectedDate) : ""}
       />
     </div>
   )

@@ -5,7 +5,7 @@ import { activity } from "../../db/schema"
 import { createDb } from "../drizzle"
 
 import { getProfile, getRole } from "~/lib/query/profile"
-import { timeForNextGrade } from "~/lib/utils"
+import { formatDateToJSTString, timeForNextGrade } from "~/lib/utils"
 import { Role } from "~/lib/zod"
 
 export async function updateProfile(input: {
@@ -44,7 +44,7 @@ export async function updateProfile(input: {
   if (!targetRole || Role.compare(applicated.role, targetRole.role) > 0)
     throw new Error("Method Not Allowed: Not Enough")
   const getGradeAtValidate = input.newProfile.getGradeAt
-    ? input.newProfile.getGradeAt.toISOString().split("T")[0]
+    ? formatDateToJSTString(input.newProfile.getGradeAt)
     : ""
 
   const updatedMetadata = {
