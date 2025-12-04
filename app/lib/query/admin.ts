@@ -75,8 +75,8 @@ export async function getMonthlyRanking(input: {
   const startDate = new Date(input.year, input.month, 1)
   const endDate = new Date(input.year, input.month + 1, 0, 23, 59, 59)
 
-  const startDateStr = startDate.toISOString()
-  const endDateStr = endDate.toISOString()
+  const startDateStr = startDate.toISOString().split("T")[0]
+  const endDateStr = endDate.toISOString().split("T")[0]
 
   const result = await db
     .select({ userId: activity.userId, total: sql<number>`SUM(${activity.period})` })
