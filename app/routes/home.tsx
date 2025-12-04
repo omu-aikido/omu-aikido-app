@@ -51,7 +51,9 @@ export async function loader(args: Route.LoaderArgs) {
     start: profile.getGradeAt
       ? getJST(new Date(`${profile.getGradeAt}T09:00:00.000Z`))
       : getJST(new Date(profile.joinedAt, 3, 1, 9)),
-    end: getJST(new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 9)),
+    end: getJST(
+      new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 9),
+    ),
     env,
   })
   const activityFromPreviousGrade = summary.length > 0 ? summary[0].total / 1.5 : 0
