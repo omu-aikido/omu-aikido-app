@@ -57,18 +57,19 @@ export async function action(args: Route.ActionArgs) {
 
   const res = await updateProfile({ id: userId, year, grade, joinedAt, getGradeAt }, env)
 
-  return res
+  if (!res.ok) throw new Error("Failed to update profile")
+  return getProfile({userId, env})
 }
 
 // MARK: Component
-export default function StatusForm({ loaderData }: Route.ComponentProps) {
-  const profile = loaderData.profile
+export default function StatusForm({ loaderData, actionData }: Route.ComponentProps) {
+  const profile = actionData ?? loaderData.profile
   const fetcher = useFetcher()
   const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
-    if (fetcher.data) setIsEditing(false)
-  }, [fetcher.data])
+    if (fetcher.state == "idle") setIsEditing(false)
+  }, [fetcher.state])
 
   if (!profile) {
     return <p>プロフィール情報が見つかりませんでした。</p>

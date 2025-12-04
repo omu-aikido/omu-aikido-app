@@ -1,45 +1,12 @@
 import {
-  AlertTriangle,
-  CheckCircle,
   Clock,
   TrendingUp,
   User as UserIcon,
 } from "lucide-react"
 import { Link } from "react-router"
-import { tv } from "tailwind-variants"
 
 import { Card } from "~/components/ui/card"
 import { translateGrade } from "~/lib/utils"
-
-const badgeStyles = tv({
-  base: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  variants: {
-    variant: {
-      default:
-        "border-transparent bg-slate-900 text-slate-50 hover:bg-slate-900/80 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/80",
-      secondary:
-        "border-transparent bg-slate-100 text-slate-900 hover:bg-slate-100/80 dark:bg-slate-800 dark:text-slate-50 dark:hover:bg-slate-800/80",
-      destructive:
-        "border-transparent bg-red-500 text-slate-50 hover:bg-red-500/80 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-900/80",
-      outline: "text-slate-950 dark:text-slate-50",
-      success:
-        "border-transparent bg-emerald-500 text-white hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700",
-      warning:
-        "border-transparent bg-amber-500 text-white hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700",
-    },
-  },
-  defaultVariants: { variant: "default" },
-})
-
-function Badge({
-  className,
-  variant,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement> & {
-  variant?: keyof typeof badgeStyles.variants.variant
-}) {
-  return <div className={badgeStyles({ variant, className })} {...props} />
-}
 
 function ProgressBar({
   current,
@@ -88,10 +55,9 @@ interface NormCardProps {
       }
     | undefined
   progress: number
-  isMet: boolean
 }
 
-export function NormCard({ user, norm, progress, isMet }: NormCardProps) {
+export function NormCard({ user, norm, progress }: NormCardProps) {
   return (
     <Link to={`/admin/user/${user.id}`} className="block group">
       <Card
@@ -121,20 +87,6 @@ export function NormCard({ user, norm, progress, isMet }: NormCardProps) {
               </div>
             </div>
             <div className="flex flex-col place-items-end">
-              {isMet ? (
-                <Badge variant="success" className="gap-1">
-                  <CheckCircle className="h-3 w-3" />
-                  達成
-                </Badge>
-              ) : (
-                <Badge
-                  variant={progress < 50 ? "destructive" : "warning"}
-                  className="gap-1"
-                >
-                  <AlertTriangle className="h-3 w-3" />
-                  {progress < 50 ? "要注意" : "進行中"}
-                </Badge>
-              )}
               <div className="mt-0.5 flex flex-row items-center gap-1 text-slate-500 dark:text-slate-400">
                 <Clock className="h-3 w-3" />
                 <span className="text-xs ">
