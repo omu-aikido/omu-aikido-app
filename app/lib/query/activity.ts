@@ -217,5 +217,5 @@ export async function getUserMonthlyRank(input: {
   const userTotal = Number(allUserTotals[userIndex].total)
   const rank = allUserTotals.filter(u => Number(u.total) > userTotal).length + 1
 
-  return { rank, total: allUserTotals.length, userTotal: allUserTotals[userIndex].total }
+  return { rank, total: allUserTotals.length, userTotal }
 }
