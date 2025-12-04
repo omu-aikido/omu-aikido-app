@@ -1,6 +1,6 @@
 import { and, desc, eq, gte, inArray, lte, sql } from "drizzle-orm"
 
-import { activity, type ActivityType } from "~/db/schema"
+import { activity } from "~/db/schema"
 import { createDb } from "~/lib/drizzle"
 
 export const selectActivity = activity.$inferSelect
@@ -186,68 +186,6 @@ export async function deleteActivities(input: {
   return results
 }
 
-// MARK: activitySummary
-export async function activitySummary({
-  userId,
-  getGradeAt,
-  env,
-}: {
-  userId: string
-  getGradeAt: Date
-  env: Env
-}) {
-  const db = createDb(env)
-  const conditions = [eq(activity.userId, userId)]
-
-  const allActivities = await db
-    .select()
-    .from(activity)
-    .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .orderBy(desc(activity.date))
-
-  const totalTrains = Math.floor(
-    allActivities.map(a => a.period).reduce((a, b) => a + b, 0) / 1.5,
-  )
-
-  const trainFromGradeUp = Math.floor(
-    allActivities
-      .filter(a => new Date(a.date) > getGradeAt)
-      .map(a => a.period)
-      .reduce((a, b) => a + b, 0) / 1.5,
-  )
-
-  return {
-    all: allActivities as ActivityType[],
-    total: totalTrains as number,
-    done: trainFromGradeUp as number,
-  }
-}
-
-// MARK: getMonthlyRanking
-export async function getMonthlyRanking(input: {
-  year: number
-  month: number
-  env: Env
-}) {
-  const db = createDb(input.env)
-
-  const startDate = new Date(input.year, input.month, 1)
-  const endDate = new Date(input.year, input.month + 1, 0, 23, 59, 59)
-
-  const startDateStr = startDate.toISOString()
-  const endDateStr = endDate.toISOString()
-
-  const result = await db
-    .select({ userId: activity.userId, total: sql<number>`SUM(${activity.period})` })
-    .from(activity)
-    .where(and(gte(activity.date, startDateStr), lte(activity.date, endDateStr)))
-    .groupBy(activity.userId)
-    .orderBy(desc(sql<number>`SUM(${activity.period})`))
-    .limit(5)
-
-  return result
-}
-
 // MARK: getUserMonthlyRank
 export async function getUserMonthlyRank(input: {
   userId: string
@@ -271,16 +209,16 @@ export async function getUserMonthlyRank(input: {
     .groupBy(activity.userId)
     .orderBy(desc(sql<number>`SUM(${activity.period})`))
 
-  // 指定されたユーザーの順位を計算
   const userIndex = allUserTotals.findIndex(user => user.userId === input.userId)
-
   if (userIndex === -1) {
-    // ユーザーが今月活動していない場合
     return null
   }
 
+  const userTotal = Number(allUserTotals[userIndex].total)
+  const rank = allUserTotals.filter(u => Number(u.total) > userTotal).length + 1
+
   return {
-    rank: userIndex + 1,
+    rank,
     total: allUserTotals.length,
     userTotal: allUserTotals[userIndex].total,
   }

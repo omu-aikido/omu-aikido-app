@@ -1,8 +1,8 @@
 import { createClerkClient, type User } from "@clerk/react-router/server"
-import { and, eq, gte, or } from "drizzle-orm"
+import { and, eq, gte, desc, or, sql, lte } from "drizzle-orm"
 
-import { activity } from "../../db/schema"
-import { createDb } from "../drizzle"
+import { activity, type ActivityType } from "~/db/schema"
+import { createDb } from "~/lib/drizzle"
 
 import { getProfile, getRole } from "~/lib/query/profile"
 import { formatDateToJSTString, timeForNextGrade } from "~/lib/utils"
@@ -62,6 +62,68 @@ export async function updateProfile(input: {
     return await clerkClient.users.getUser(input.newProfile.id)
   } catch {
     throw new Error("Failed to update profile")
+  }
+}
+
+// MARK: getMonthlyRanking
+export async function getMonthlyRanking(input: {
+  year: number
+  month: number
+  env: Env
+}) {
+  const db = createDb(input.env)
+
+  const startDate = new Date(input.year, input.month, 1)
+  const endDate = new Date(input.year, input.month + 1, 0, 23, 59, 59)
+
+  const startDateStr = startDate.toISOString()
+  const endDateStr = endDate.toISOString()
+
+  const result = await db
+    .select({ userId: activity.userId, total: sql<number>`SUM(${activity.period})` })
+    .from(activity)
+    .where(and(gte(activity.date, startDateStr), lte(activity.date, endDateStr)))
+    .groupBy(activity.userId)
+    .orderBy(desc(sql<number>`SUM(${activity.period})`))
+    .limit(5)
+
+  return result
+}
+
+// MARK: activitySummary
+export async function activitySummary({
+  userId,
+  getGradeAt,
+  env,
+}: {
+  userId: string
+  getGradeAt: Date
+  env: Env
+}) {
+  const db = createDb(env)
+  const conditions = [eq(activity.userId, userId)]
+
+  const allActivities = await db
+    .select()
+    .from(activity)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(desc(activity.date))
+
+  const totalTrains = Math.floor(
+    allActivities.map(a => a.period).reduce((a, b) => a + b, 0) / 1.5,
+  )
+
+  const trainFromGradeUp = Math.floor(
+    allActivities
+      .filter(a => new Date(a.date) > getGradeAt)
+      .map(a => a.period)
+      .reduce((a, b) => a + b, 0) / 1.5,
+  )
+
+  return {
+    all: allActivities as ActivityType[],
+    total: totalTrains as number,
+    done: trainFromGradeUp as number,
   }
 }
 
