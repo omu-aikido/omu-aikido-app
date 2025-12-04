@@ -257,7 +257,7 @@ export async function getUserMonthlyRank(input: {
 }): Promise<{ rank: number; total: number; userTotal: number } | null> {
   const db = createDb(input.env)
 
-  const startDate = new Date(input.year, input.month, 1)
+  const startDate = new Date(input.year, input.month, 1, 9)
   const endDate = new Date(input.year, input.month + 1, 0, 23, 59, 59)
 
   const startDateStr = startDate.toISOString()
