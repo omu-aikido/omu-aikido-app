@@ -3,7 +3,6 @@ import { and, eq, gte, desc, or, sql, lte } from "drizzle-orm"
 
 import { activity, type ActivityType } from "~/db/schema"
 import { createDb } from "~/lib/drizzle"
-
 import { getProfile, getRole } from "~/lib/query/profile"
 import { formatDateToJSTString, timeForNextGrade } from "~/lib/utils"
 import { Role } from "~/lib/zod"

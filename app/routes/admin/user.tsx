@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "~/components/ui/select"
 import { StateButton } from "~/components/ui/StateButton"
-import { activitySummary , updateProfile } from "~/lib/query/admin"
+import { activitySummary, updateProfile } from "~/lib/query/admin"
 import { getProfile } from "~/lib/query/profile"
 import { getJST, grade as gradeOptions } from "~/lib/utils"
 import { Role } from "~/lib/zod"
