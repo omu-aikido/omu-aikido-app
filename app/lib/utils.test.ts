@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import {
+  formatDateToJSTString,
   getJST,
   JoinedAtYearRange,
   timeForNextGrade,
@@ -103,5 +104,35 @@ describe("JoinedAtYearRange", () => {
     const currentYear = new Date().getFullYear()
     expect(JoinedAtYearRange.max).toBe(currentYear)
     expect(JoinedAtYearRange.min).toBe(currentYear - JoinedAtYearRange.RANGE)
+  })
+})
+
+describe("formatDateToJSTString", () => {
+  it("should format UTC midnight to JST date string", () => {
+    // UTC 2023-04-01 00:00:00 -> JST 2023-04-01 09:00:00
+    const date = new Date("2023-04-01T00:00:00Z")
+    const result = formatDateToJSTString(date)
+    expect(result).toBe("2023-04-01")
+  })
+
+  it("should handle UTC afternoon time that crosses to next day in JST", () => {
+    // UTC 2023-04-01 15:30:00 -> JST 2023-04-02 00:30:00
+    const date = new Date("2023-04-01T15:30:00Z")
+    const result = formatDateToJSTString(date)
+    expect(result).toBe("2023-04-02")
+  })
+
+  it("should format date crossing date boundary correctly", () => {
+    // UTC 2023-04-01 18:00:00 -> JST 2023-04-02 03:00:00
+    const date = new Date("2023-04-01T18:00:00Z")
+    const result = formatDateToJSTString(date)
+    expect(result).toBe("2023-04-02")
+  })
+
+  it("should handle edge case at JST midnight boundary", () => {
+    // UTC 2023-04-01 14:59:59 -> JST 2023-04-01 23:59:59
+    const date = new Date("2023-04-01T14:59:59Z")
+    const result = formatDateToJSTString(date)
+    expect(result).toBe("2023-04-01")
   })
 })

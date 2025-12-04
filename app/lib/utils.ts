@@ -81,6 +81,17 @@ export function getJST(date: Date): Date {
   return jstDate
 }
 
+/**
+ * 日付をJST基準のYYYY-MM-DD形式の文字列に変換
+ * クライアント側でもサーバー側でも一貫したJST日付を取得するために使用
+ * @param date 変換対象のDateオブジェクト
+ * @returns JST基準のYYYY-MM-DD形式の文字列
+ */
+export function formatDateToJSTString(date: Date): string {
+  const jstDate = getJST(date)
+  return jstDate.toISOString().split("T")[0]
+}
+
 export class JoinedAtYearRange {
   static RANGE = 4
   static get min() {
