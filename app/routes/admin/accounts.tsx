@@ -10,7 +10,7 @@ import ClerkUsers from "~/components/component/ClerkUsers"
 import Ranking from "~/components/component/Ranking"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
-import { getMonthlyRanking } from "~/lib/query/activity"
+import { getMonthlyRanking } from "~/lib/query/admin"
 import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
 
