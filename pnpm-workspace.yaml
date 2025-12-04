@@ -4,3 +4,4 @@ onlyBuiltDependencies:
   - esbuild
   - workerd
 minimumReleaseAge: 4320
+resolutionMode: time-based
