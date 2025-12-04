@@ -16,7 +16,7 @@ import {
 } from "~/components/ui/select"
 import { StateButton } from "~/components/ui/StateButton"
 import { getProfile, updateProfile } from "~/lib/query/profile"
-import { grade as gradeOptions } from "~/lib/utils"
+import { formatDateToJSTString, grade as gradeOptions } from "~/lib/utils"
 import type { Profile } from "~/type"
 
 // MARK: Loader
@@ -51,22 +51,25 @@ export async function action(args: Route.ActionArgs) {
   const year = formData.get("year")?.toString()
   const grade = Number(formData.get("grade"))
   const joinedAt = Number(formData.get("joinedAt"))
-  const getGradeAt = formData.get("getGradeAt")?.toString()
+  const getGradeAtValue = formData.get("getGradeAt")?.toString()
+  // getGradeAtValue is already in YYYY-MM-DD (JST) format from the client
+  const getGradeAt = getGradeAtValue || null
 
   const res = await updateProfile({ id: userId, year, grade, joinedAt, getGradeAt }, env)
 
-  return res
+  if (!res.ok) throw new Error("Failed to update profile")
+  return getProfile({ userId, env })
 }
 
 // MARK: Component
-export default function StatusForm({ loaderData }: Route.ComponentProps) {
-  const profile = loaderData.profile
+export default function StatusForm({ loaderData, actionData }: Route.ComponentProps) {
+  const profile = actionData ?? loaderData.profile
   const fetcher = useFetcher()
   const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
-    if (fetcher.data) setIsEditing(false)
-  }, [fetcher.data])
+    if (fetcher.state == "idle") setIsEditing(false)
+  }, [fetcher.state])
 
   if (!profile) {
     return <p>プロフィール情報が見つかりませんでした。</p>
@@ -158,7 +161,7 @@ function GetGradeAtInput({ profile, isEditing, fetcherState }: FormFieldProps) {
       <input
         type="hidden"
         name="getGradeAt"
-        value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
+        value={selectedDate ? formatDateToJSTString(selectedDate) : ""}
       />
     </div>
   )
