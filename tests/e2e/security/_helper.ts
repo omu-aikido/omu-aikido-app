@@ -11,7 +11,7 @@ export function updateRole({ role }: { role: string }) {
     year: "b2",
     grade: 3,
     joinedAt: 2025,
-    getGradeAt: "2025-07-19",
+    getGradeAt: "2025-07-19T00:00:00.000Z",
   }
   client.users
     .getUser(userId)

@@ -80,7 +80,7 @@ export async function loader(args: Route.LoaderArgs) {
       const dateStr = unsafeMetadata.getGradeAt.trim()
       const date = new Date(dateStr)
       if (!isNaN(date.getTime())) {
-        getGradeAt = date.toISOString().split("T")[0]
+        getGradeAt = date.toISOString()
       }
     }
 
@@ -186,7 +186,7 @@ export async function action(args: Route.ActionArgs) {
         const dateStr = unsafeMetadata.getGradeAt.trim()
         const date = new Date(dateStr)
         if (!isNaN(date.getTime())) {
-          getGradeAt = date.toISOString().split("T")[0]
+          getGradeAt = date.toISOString()
         }
       }
 

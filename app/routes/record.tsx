@@ -19,21 +19,15 @@ import MonthNavigation from "~/components/component/MonthNavigation"
 import YearMonthSelectorInline from "~/components/component/YearMonthSelector"
 import { Button } from "~/components/ui/button"
 import type { ActivityType } from "~/db/schema"
-import {
-  createActivities,
-  deleteActivities,
-  getActivitiesByDateRange,
-  updateActivities,
-} from "~/lib/query/activity"
+import { uc } from "~/lib/api-client"
 import { style } from "~/styles/component"
 import type { DailyActivityItem } from "~/type"
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
-  const { request, context } = args
+  const { request } = args
   const auth = await getAuth(args)
-  const userId = auth.userId!
-
+  const userId = auth.userId
   if (!userId) throw new Error("User not authenticated")
 
   const url = new URL(request.url)
@@ -43,15 +37,15 @@ export async function loader(args: Route.LoaderArgs) {
 
   const startDate = `${year}-${month}-01`
   const endDate = endOfMonth(date).toISOString()
-  const env = context.cloudflare.env
+  const client = uc({ request })
 
   try {
-    const activities: ActivityType[] = await getActivitiesByDateRange({
-      userId,
-      startDate,
-      endDate,
-      env,
-    })
+    const response = await client.activities.$get({ query: { startDate, endDate } })
+    if (!response.ok) {
+      throw new Error("Failed to fetch activities")
+    }
+    const data = (await response.json()) as { activities: ActivityType[] }
+    const activities = Array.isArray(data.activities) ? data.activities : []
 
     return {
       userId,
@@ -77,25 +71,25 @@ export function meta(args: Route.MetaArgs) {
 
 // MARK: Action
 export async function action(args: Route.ActionArgs) {
-  const { request, context } = args
+  const { request } = args
   const formData = await request.formData()
   const actionType = formData.get("actionType")
   const auth = await getAuth(args)
-  const userId = auth.userId!
-  const env = context.cloudflare.env
+  if (!auth.userId) {
+    throw new Error("User not authenticated")
+  }
+  const client = uc({ request })
 
   if (actionType === "batchUpdate") {
     const payload = JSON.parse(formData.get("payload") as string)
 
     try {
-      if (payload.added && payload.added.length > 0) {
-        await createActivities({ userId, activities: payload.added, env })
-      }
-      if (payload.updated && payload.updated.length > 0) {
-        await updateActivities({ userId, activities: payload.updated, env })
-      }
-      if (payload.deleted && payload.deleted.length > 0) {
-        await deleteActivities({ userId, ids: payload.deleted, env })
+      const response = await client.activities.$put({ json: payload })
+      if (!response.ok) {
+        const data = await response.json().catch(() => null)
+        return {
+          error: (data as { error?: string } | null)?.error ?? "登録に失敗しました。",
+        }
       }
 
       return redirect(`/record?month=${formData.get("currentMonth")}`)

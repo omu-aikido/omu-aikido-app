@@ -15,20 +15,21 @@ import {
   SelectValue,
 } from "~/components/ui/select"
 import { StateButton } from "~/components/ui/StateButton"
-import { getProfile, updateProfile } from "~/lib/query/profile"
+import { uc } from "~/lib/api-client"
 import { formatDateToJSTString, grade as gradeOptions } from "~/lib/utils"
 import type { Profile } from "~/type"
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
-  const auth = await getAuth(args)
-  const userId = auth.userId
-
-  const env = args.context.cloudflare.env
-
-  const profile: Profile | null = await getProfile({ userId, env })
-
-  // Return profile data for the component
+  const client = uc({ request: args.request })
+  const response = await client.profile.$get()
+  if (response.status === 404) {
+    return { profile: null }
+  }
+  if (!response.ok) {
+    throw new Error("プロフィール情報の取得に失敗しました。")
+  }
+  const { profile } = await response.json()
   return { profile }
 }
 
@@ -46,19 +47,22 @@ export async function action(args: Route.ActionArgs) {
   if (!userId) {
     return redirect("/sign-in?redirect_url=" + args.request.url)
   }
-  const env = args.context.cloudflare.env
+  const client = uc({ request: args.request })
   const formData = await args.request.formData()
   const year = formData.get("year")?.toString()
   const grade = Number(formData.get("grade"))
   const joinedAt = Number(formData.get("joinedAt"))
   const getGradeAtValue = formData.get("getGradeAt")?.toString()
-  // getGradeAtValue is already in YYYY-MM-DD (JST) format from the client
-  const getGradeAt = getGradeAtValue || null
+  const getGradeAt =
+    getGradeAtValue && getGradeAtValue.length > 0 ? getGradeAtValue : null
 
-  const res = await updateProfile({ id: userId, year, grade, joinedAt, getGradeAt }, env)
+  const response = await client.profile.$patch({
+    json: { year, grade, joinedAt, getGradeAt },
+  })
 
-  if (!res.ok) throw new Error("Failed to update profile")
-  return getProfile({ userId, env })
+  if (!response.ok) throw new Error("Failed to update profile")
+  const data = (await response.json()) as { profile: Profile }
+  return data.profile
 }
 
 // MARK: Component
