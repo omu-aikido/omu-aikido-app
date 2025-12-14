@@ -23,8 +23,8 @@ import {
 import { StateButton } from "~/components/ui/StateButton"
 import { activitySummary, updateProfile } from "~/lib/query/admin"
 import { getProfile } from "~/lib/query/profile"
+import { Role } from "~/lib/role"
 import { getJST, grade as gradeOptions } from "~/lib/utils"
-import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
 import type { Profile } from "~/type"
 
@@ -303,7 +303,7 @@ export default function AdminUser(args: Route.ComponentProps) {
   const safeProfile = profile ?? {
     role: "member",
     grade: 0,
-    getGradeAt: "",
+    getGradeAt: null,
     joinedAt: new Date().getFullYear(),
     year: "b1",
     id: user.id,

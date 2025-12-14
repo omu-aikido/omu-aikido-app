@@ -16,7 +16,7 @@ import {
   SheetTrigger,
 } from "~/components/ui/sheet"
 import { getProfile } from "~/lib/query/profile"
-import { Role } from "~/lib/zod"
+import { Role } from "~/lib/role"
 import "~/styles/global.css"
 import type { PagePath } from "~/type"
 

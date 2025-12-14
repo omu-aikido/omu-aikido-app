@@ -1,9 +1,9 @@
 import { ArkErrors } from "arktype"
 import { describe, expect, it } from "vitest"
 
-import { profileSchema } from "./account"
+import { profileBaseSchema } from "./account"
 
-type Profile = typeof profileSchema.infer
+type Profile = typeof profileBaseSchema.infer
 
 const baseProfile: Profile = {
   role: "member",
@@ -13,9 +13,9 @@ const baseProfile: Profile = {
   year: "b2",
 }
 
-describe("profileSchema", () => {
+describe("profileBaseSchema", () => {
   it("parses valid profile data", () => {
-    const parsed = profileSchema(baseProfile)
+    const parsed = profileBaseSchema(baseProfile)
     if (parsed instanceof ArkErrors) {
       throw parsed
     }
@@ -23,19 +23,19 @@ describe("profileSchema", () => {
   })
 
   it("rejects invalid profile data", () => {
-    const parsed = profileSchema({ ...baseProfile, role: "invalid" })
+    const parsed = profileBaseSchema({ ...baseProfile, role: "invalid" })
     //expect throw error
     expect(parsed).toBeInstanceOf(ArkErrors)
   })
 
   it("rejects invalid profile data", () => {
-    const parsed = profileSchema({ ...baseProfile, getGradeAt: null })
+    const parsed = profileBaseSchema({ ...baseProfile, getGradeAt: null })
     //expect throw error
     expect(parsed).not.toBeInstanceOf(ArkErrors)
   })
 
   it("parse stringed profile data", () => {
-    const parsed = profileSchema({ ...baseProfile, grade: "0", joinedAt: "2022" })
+    const parsed = profileBaseSchema({ ...baseProfile, grade: "0", joinedAt: "2022" })
     if (parsed instanceof ArkErrors) {
       throw parsed
     }

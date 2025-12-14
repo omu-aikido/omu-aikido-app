@@ -1,56 +1,41 @@
 import type { ClerkAPIError } from "@clerk/types"
+import { ArkErrors, type } from "arktype"
 import { useReducer } from "react"
-import { z } from "zod"
 
 import { JoinedAtYearRange, year } from "~/lib/utils"
 
-export const formDataSchema = z.object({
-  email: z.email("有効なメールアドレスを入力してください"),
-  newPassword: z.string().min(8, "パスワードは8文字以上である必要があります"),
-  firstName: z.string().min(1, "名は必須です"),
-  lastName: z.string().min(1, "姓は必須です"),
-  username: z.string().optional(),
-  year: z.enum(year.map(y => y.year) as [string, ...string[]]),
-  grade: z.number().int().min(-4).max(5),
-  joinedAt: z
-    .number()
-    .int()
-    .min(
-      JoinedAtYearRange.min,
-      `入部年度は${JoinedAtYearRange.min}年から${JoinedAtYearRange.max}年の間で入力してください`,
-    )
-    .max(
-      JoinedAtYearRange.max,
-      `入部年度は${JoinedAtYearRange.min}年から${JoinedAtYearRange.max}年の間で入力してください`,
-    ),
-  getGradeAt: z
-    .string()
-    .optional()
-    .nullable()
-    .transform(val => {
-      if (!val || val === "") return null
-      const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-      if (!dateRegex.test(val)) return null
-      return val
-    }),
-  legalAccepted: z
-    .boolean()
-    .refine(
-      val => val === true,
-      "利用規約とプライバシーポリシーに同意する必要があります",
-    ),
+const yearUnion = year.map(y => `'${y.year}'`).join("|")
+
+export const formDataSchema = type({
+  email: "string.email",
+  newPassword: "string>7",
+  firstName: "string>0",
+  lastName: "string>0",
+  username: "string?",
+  year: yearUnion as unknown as "string",
+  grade: "-4 <= number.integer <= 5",
+  joinedAt: `${JoinedAtYearRange.min} <= number.integer <= ${JoinedAtYearRange.max}`,
+  getGradeAt: "(string & /^\\d{4}-\\d{2}-\\d{2}$/ | null)?",
+  legalAccepted: "true",
 })
 
 export type ClientActionReturn =
-  | { success: true; formData: z.infer<typeof formDataSchema> }
+  | { success: true; formData: typeof formDataSchema.infer }
   | { success: false; errors: Record<string, string> }
 
-const localformState = formDataSchema
-  .extend({ confirmPassword: z.string() })
-  .omit({ getGradeAt: true })
-  .extend({ getGradeAt: z.string(), grade: z.number().int().min(-4).max(5).default(0) })
-
-export type LocalFormState = z.infer<typeof localformState>
+export type LocalFormState = {
+  email: string
+  newPassword: string
+  confirmPassword: string
+  firstName: string
+  lastName: string
+  username: string
+  year: string
+  grade: number
+  joinedAt: number
+  getGradeAt: string
+  legalAccepted: boolean
+}
 
 export type FormState = {
   step: "basic" | "personal" | "profile"
@@ -113,36 +98,71 @@ const validateFormData = (
   formValues: LocalFormState,
   step?: "basic" | "personal" | "profile",
 ): { success: true } | { success: false; errors: Record<string, string> } => {
-  // ステップ別のスキーマを定義
-  const stepSchemas = {
-    basic: localformState
-      .pick({ email: true, newPassword: true, confirmPassword: true })
-      .refine(data => data.newPassword === data.confirmPassword, {
-        message: "パスワードが一致しません",
-        path: ["confirmPassword"],
-      }),
-    personal: localformState.pick({ firstName: true, lastName: true, username: true }),
-    profile: localformState.pick({
-      year: true,
-      grade: true,
-      joinedAt: true,
-      getGradeAt: true,
-      legalAccepted: true,
-    }),
-  }
+  const errors: Record<string, string> = {}
 
-  const schema = step ? stepSchemas[step] : localformState
-  const parsed = schema.safeParse(formValues)
-
-  if (!parsed.success) {
-    return {
-      success: false,
-      errors: Object.fromEntries(
-        parsed.error.issues.map(issue => [issue.path[0] || "general", issue.message]),
-      ),
+  if (!step || step === "basic") {
+    const basic = type({
+      email: "string.email",
+      newPassword: "string>7",
+      confirmPassword: "string",
+    })({
+      email: formValues.email,
+      newPassword: formValues.newPassword,
+      confirmPassword: formValues.confirmPassword,
+    })
+    if (basic instanceof ArkErrors) {
+      for (const [key, value] of Object.entries(basic.byPath)) {
+        errors[key] = value?.message ?? "不正な値です"
+      }
+    }
+    if (formValues.newPassword !== formValues.confirmPassword) {
+      errors.confirmPassword = "パスワードが一致しません"
     }
   }
 
+  if (!step || step === "personal") {
+    const personal = type({
+      firstName: "string>0",
+      lastName: "string>0",
+      username: "string",
+    })({
+      firstName: formValues.firstName,
+      lastName: formValues.lastName,
+      username: formValues.username,
+    })
+    if (personal instanceof ArkErrors) {
+      for (const [key, value] of Object.entries(personal.byPath)) {
+        errors[key] = value?.message ?? "不正な値です"
+      }
+    }
+  }
+
+  if (!step || step === "profile") {
+    const getGradeAt =
+      formValues.getGradeAt && formValues.getGradeAt.length > 0
+        ? formValues.getGradeAt
+        : null
+    const profile = type({
+      year: yearUnion as unknown as "string",
+      grade: "-4 <= number.integer <= 5",
+      joinedAt: `${JoinedAtYearRange.min} <= number.integer <= ${JoinedAtYearRange.max}`,
+      getGradeAt: "string & /^\\d{4}-\\d{2}-\\d{2}$/ | null",
+      legalAccepted: "true",
+    })({
+      year: formValues.year,
+      grade: formValues.grade,
+      joinedAt: formValues.joinedAt,
+      getGradeAt,
+      legalAccepted: formValues.legalAccepted,
+    })
+    if (profile instanceof ArkErrors) {
+      for (const [key, value] of Object.entries(profile.byPath)) {
+        errors[key] = value?.message ?? "不正な値です"
+      }
+    }
+  }
+
+  if (Object.keys(errors).length > 0) return { success: false, errors }
   return { success: true }
 }
 

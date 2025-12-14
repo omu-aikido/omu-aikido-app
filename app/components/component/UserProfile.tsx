@@ -2,7 +2,7 @@ import type { ExternalAccount, User } from "@clerk/react-router/server"
 import { tv } from "tailwind-variants"
 
 import { Icon } from "~/components/ui/Icon"
-import { Role } from "~/lib/zod"
+import { Role } from "~/lib/role"
 import type { Profile } from "~/type"
 
 interface UserProfileSectionProps {

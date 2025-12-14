@@ -1,11 +1,8 @@
 import { createClerkClient, type User } from "@clerk/react-router/server"
-import type { z } from "zod"
+import { ArkErrors } from "arktype"
 
-import {
-  publicMetadataProfileSchema,
-  Role,
-  type updateProfileInputSchema,
-} from "~/lib/zod"
+import { Role } from "~/lib/role"
+import { publicMetadataProfileSchema, type AdminUpdateProfileInput } from "~/lib/schemas"
 import type { Profile } from "~/type"
 
 // Env型は worker-configuration.d.ts で定義されているグローバル型を使用
@@ -45,20 +42,16 @@ export async function getProfile(input: {
       return null
     }
 
-    const parsedProfile = publicMetadataProfileSchema.safeParse(user.publicMetadata)
-    if (!parsedProfile.success) {
-      return null
-    }
-
-    // Profile型に変換
-    return { ...parsedProfile.data, id: user.id } as Profile
+    const parsedProfile = publicMetadataProfileSchema(user.publicMetadata)
+    if (parsedProfile instanceof ArkErrors) return null
+    return { ...parsedProfile, role: parsedProfile.role ?? "member", id: user.id }
   } catch {
     return null
   }
 }
 
 export async function updateProfile(
-  input: z.infer<typeof updateProfileInputSchema>,
+  input: AdminUpdateProfileInput,
   env: Env,
 ): Promise<Response> {
   const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })

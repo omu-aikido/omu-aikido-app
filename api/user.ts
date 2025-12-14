@@ -1,7 +1,6 @@
 import { createClerkClient } from "@clerk/backend"
 import { getAuth } from "@hono/clerk-auth"
-import { arktypeValidator } from "@hono/arktype-validator"
-import { ArkErrors } from "arktype"
+import { ArkErrors, type } from "arktype"
 import { Hono } from "hono"
 
 import {
@@ -16,11 +15,18 @@ import { getUserMonthlyRank } from "./lib/db/ranking"
 import { userActivitySummaryAndRecent } from "./lib/db/summary"
 import { getProfile } from "./lib/profile"
 
-import { profileSchema } from "@/type/account"
-
+import { userProfileInputSchema } from "@/type/account"
 import { JoinedAtYearRange, getJST } from "~/lib/utils"
 
 const ONBOARDING_MESSAGE = "プロファイル情報を設定してください。"
+
+const onboardingSetupSchema = type({
+  year: "string & /^(b[1-4]|m[1-2]|d[1-2])$/",
+  grade:
+    "(string.numeric.parse |> -5 <= number.integer <= 5) | -5 <= number.integer <= 5",
+  joinedAt: `(string.numeric.parse |> ${JoinedAtYearRange.min} <= number.integer <= ${JoinedAtYearRange.max}) | ${JoinedAtYearRange.min} <= number.integer <= ${JoinedAtYearRange.max}`,
+  getGradeAt: "(string & /^\\d{4}-\\d{2}-\\d{2}$/ | null)?",
+})
 
 const normalizeGetGradeAt = (value: unknown): string | null => {
   if (value === null || value === undefined || value === "") {
@@ -105,8 +111,10 @@ export const userApp = new Hono<{ Bindings: Env }>()
   .patch("/profile", async c => {
     const auth = getAuth(c)
     if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
+    const existingProfile = await getProfile(c)
+    if (!existingProfile) return c.json({ error: ONBOARDING_MESSAGE }, 404)
     const body = await c.req.json()
-    const parsed = profileSchema(body)
+    const parsed = userProfileInputSchema(body)
     if (parsed instanceof ArkErrors) {
       return c.json({ error: "Invalid profile payload" }, 400)
     }
@@ -117,7 +125,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
         getGradeAt: parsed.getGradeAt,
         joinedAt: parsed.joinedAt,
         year: parsed.year,
-        role: parsed.role,
+        role: existingProfile.role,
       },
     })
     return c.json({ profile: { ...newMetadata.publicMetadata, id: auth.userId } }, 200)
@@ -328,18 +336,17 @@ export const userApp = new Hono<{ Bindings: Env }>()
     const auth = getAuth(c)
     if (!auth || !auth.userId)
       return c.json({ success: false, error: "認証が必要です" }, 401)
-    const parsed = onboardingSetupSchema.safeParse(await c.req.json())
-    if (!parsed.success) {
-      const fieldErrors = parsed.error.flatten().fieldErrors
+    const parsed = onboardingSetupSchema(await c.req.json())
+    if (parsed instanceof ArkErrors) {
       const errors = Object.fromEntries(
-        Object.entries(fieldErrors).map(([key, value]) => [
-          key,
-          value?.[0] ?? "不正な値です",
+        Object.entries(parsed.byPath).map(([key, value]) => [
+          key || "general",
+          value?.message ?? "不正な値です",
         ]),
       )
       return c.json({ success: false, errors }, 400)
     }
-    const data = parsed.data
+    const data = parsed
     if (data.joinedAt < JoinedAtYearRange.min || data.joinedAt > JoinedAtYearRange.max) {
       return c.json(
         {

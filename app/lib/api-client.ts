@@ -11,6 +11,7 @@ const createBaseUrl = (request: Request, path: string) => {
   return `${reqUrl.origin}${path}`
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const createClient = <T extends Hono<{ Bindings: Env }, any, any>>(config: {
   request: Request
   path: string

@@ -1,40 +1,28 @@
 import { createClerkClient } from "@clerk/backend"
 import { getAuth } from "@hono/clerk-auth"
+import { ArkErrors, type } from "arktype"
 import { and, desc, eq, gte, lte, or, sql } from "drizzle-orm"
 import { Hono } from "hono"
 import type { Context } from "hono"
-import { z } from "zod"
 
 import { createDb } from "./lib/db/drizzle"
 import { getProfile as getCurrentProfile } from "./lib/profile"
 
+import { publicMetadataProfileSchema } from "@/type/account"
+import { Role } from "@/type/role"
 import { activity } from "~/db/schema"
 import { formatDateToJSTString, getJST, timeForNextGrade } from "~/lib/utils"
-import { Role, publicMetadataProfileSchema } from "~/lib/zod"
 
 const clerkUserLimit = 500
 
-const adminProfileUpdateSchema = z.object({
-  year: z.string(),
-  grade: z.preprocess(val => Number(val), z.number()),
+const adminProfileUpdateSchema = type({
+  year: "string",
+  grade:
+    "(string.numeric.parse |> -5 <= number.integer <= 5) | -5 <= number.integer <= 5",
   role: Role.type(),
-  joinedAt: z.preprocess(val => Number(val), z.number()),
-  getGradeAt: z
-    .preprocess(val => {
-      if (val === null || val === undefined || val === "") {
-        return null
-      }
-      if (typeof val === "string") {
-        const trimmed = val.trim()
-        if (!trimmed) return null
-        const date = new Date(trimmed)
-        if (!isNaN(date.getTime())) {
-          return date.toISOString()
-        }
-      }
-      return val
-    }, z.string().nullable())
-    .optional(),
+  joinedAt:
+    "(string.numeric.parse |> 2020 <= number.integer <= 9999) | 2020 <= number.integer <= 9999",
+  getGradeAt: "(string & /^\\d{4}-\\d{2}-\\d{2}$/ | null)?",
 })
 
 const ensureAdminMiddleware = async (c: Context, next: () => Promise<void>) => {
@@ -78,14 +66,14 @@ const getUsersNorm = async (
   const db = createDb(env)
   const parsedProfiles = users
     .map(user => {
-      const parsed = publicMetadataProfileSchema.safeParse(user.publicMetadata)
-      if (!parsed.success) return null
-      return { id: user.id, profile: parsed.data }
+      const parsed = publicMetadataProfileSchema(user.publicMetadata)
+      if (parsed instanceof ArkErrors) return null
+      return { id: user.id, profile: parsed }
     })
     .filter(
       (
         entry,
-      ): entry is { id: string; profile: z.infer<typeof publicMetadataProfileSchema> } =>
+      ): entry is { id: string; profile: typeof publicMetadataProfileSchema.infer } =>
         Boolean(entry),
     )
 
@@ -166,8 +154,9 @@ export const adminApp = new Hono<{ Bindings: Env }>()
     const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
     try {
       const user = await clerkClient.users.getUser(userId)
-      const profileParse = publicMetadataProfileSchema.safeParse(user.publicMetadata)
-      const profile = profileParse.success ? { ...profileParse.data, id: user.id } : null
+      const profileParse = publicMetadataProfileSchema(user.publicMetadata)
+      const profile =
+        profileParse instanceof ArkErrors ? null : { ...profileParse, id: user.id }
 
       const allActivities = await getUserActivitySummary(c.env, userId)
       const totalActivitiesCount = allActivities.length
@@ -219,11 +208,11 @@ export const adminApp = new Hono<{ Bindings: Env }>()
     if (!targetUserId) {
       return c.json({ success: false, error: "ユーザーIDが必要です" }, 400)
     }
-    const parsed = adminProfileUpdateSchema.safeParse(await c.req.json())
-    if (!parsed.success) {
+    const parsed = adminProfileUpdateSchema(await c.req.json())
+    if (parsed instanceof ArkErrors) {
       return c.json({ success: false, error: "無効な入力です" }, 400)
     }
-    const { year, grade, role, joinedAt } = parsed.data
+    const { year, grade, role, joinedAt } = parsed
     if (Number.isNaN(grade) || Number.isNaN(joinedAt)) {
       return c.json({ success: false, error: "数値項目の形式が正しくありません" }, 400)
     }
@@ -246,12 +235,11 @@ export const adminApp = new Hono<{ Bindings: Env }>()
 
     const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
     const targetUser = await clerkClient.users.getUser(targetUserId)
-    const targetProfileParsed = publicMetadataProfileSchema.safeParse(
-      targetUser.publicMetadata,
-    )
-    const targetCurrentRole = targetProfileParsed.success
-      ? Role.fromString(targetProfileParsed.data.role ?? "member")
-      : Role.MEMBER
+    const targetProfileParsed = publicMetadataProfileSchema(targetUser.publicMetadata)
+    const targetCurrentRole =
+      targetProfileParsed instanceof ArkErrors
+        ? Role.MEMBER
+        : (Role.fromString(targetProfileParsed.role ?? "member") ?? Role.MEMBER)
     if (targetCurrentRole && Role.compare(adminRole.role, targetCurrentRole.role) > 0) {
       return c.json({ success: false, error: "現在の権限より上書きできません" }, 403)
     }
@@ -262,8 +250,8 @@ export const adminApp = new Hono<{ Bindings: Env }>()
     }
 
     const normalizedGetGradeAt =
-      parsed.data.getGradeAt && typeof parsed.data.getGradeAt === "string"
-        ? new Date(parsed.data.getGradeAt)
+      parsed.getGradeAt && typeof parsed.getGradeAt === "string"
+        ? new Date(parsed.getGradeAt)
         : null
     if (normalizedGetGradeAt && isNaN(normalizedGetGradeAt.getTime())) {
       return c.json(

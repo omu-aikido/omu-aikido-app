@@ -3,6 +3,7 @@ import { Link, useFetcher } from "react-router"
 
 import type { Route } from "./+types/home"
 
+import { Role } from "@/type/role"
 import { AddRecord } from "~/components/component/AddRecord"
 import { MyRanking } from "~/components/component/MyRanking"
 import { NextGrade } from "~/components/component/NextGrade"
@@ -11,7 +12,6 @@ import { Button } from "~/components/ui/button"
 import type { ActivityType } from "~/db/schema"
 import { uc } from "~/lib/api-client"
 import { timeForNextGrade } from "~/lib/utils"
-import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
 import type { PagePath } from "~/type"
 

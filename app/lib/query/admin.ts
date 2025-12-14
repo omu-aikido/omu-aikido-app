@@ -4,8 +4,8 @@ import { and, eq, gte, desc, or, sql, lte } from "drizzle-orm"
 import { activity, type ActivityType } from "~/db/schema"
 import { createDb } from "~/lib/drizzle"
 import { getProfile, getRole } from "~/lib/query/profile"
+import { Role } from "~/lib/role"
 import { formatDateToJSTString, timeForNextGrade } from "~/lib/utils"
-import { Role } from "~/lib/zod"
 
 export async function updateProfile(input: {
   applicateBy: string
