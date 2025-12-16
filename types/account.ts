@@ -12,10 +12,7 @@ const profileFieldDefinition = {
 } as const
 
 // DBに登録されている型（role 必須）
-export const profileBaseSchema = type({
-  ...profileFieldDefinition,
-  role: Role.type(),
-})
+export const profileBaseSchema = type({ ...profileFieldDefinition, role: Role.type() })
 
 // APIレスポンス等で id を含めたい場合
 export const profileWithIdSchema = type({

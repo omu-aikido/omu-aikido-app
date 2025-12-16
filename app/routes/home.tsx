@@ -128,7 +128,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <hr data-testid="home-divider" />
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {apps.map((app: PagePath) => (
-          <Button asChild variant="outline" className="h-24" key={app.href}>
+          <Button variant="outline" className="h-24" key={app.href}>
             <Link
               to={app.href}
               className="flex flex-col items-center justify-center gap-2"

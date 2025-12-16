@@ -74,6 +74,7 @@ export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher
           <DatePicker
             date={selectedDate}
             onSelect={date => date && setSelectedDate(date)}
+            className="w-full min-w-full"
             placeholder="日付を選択してください"
           />
         </div>
