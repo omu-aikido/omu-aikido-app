@@ -21,7 +21,7 @@ const adminProfileUpdateSchema = type({
     "(string.numeric.parse |> -5 <= number.integer <= 5) | -5 <= number.integer <= 5",
   role: Role.type(),
   joinedAt:
-    "(string.numeric.parse |> 2020 <= number.integer <= 9999) | 2020 <= number.integer <= 9999",
+    "(string.numeric.parse |> 0 <= number.integer <= 9999) | 0 <= number.integer <= 9999",
   getGradeAt: "(string & /^\\d{4}-\\d{2}-\\d{2}$/ | null)?",
 })
 
@@ -217,11 +217,13 @@ export const adminApp = new Hono<{ Bindings: Env }>()
       return c.json({ success: false, error: "数値項目の形式が正しくありません" }, 400)
     }
     const currentYear = new Date().getFullYear()
-    if (joinedAt < 1950 || joinedAt > currentYear + 1) {
+    const minJoinedAt = currentYear - 4
+    const maxJoinedAt = currentYear + 1
+    if (joinedAt < minJoinedAt || joinedAt > maxJoinedAt) {
       return c.json(
         {
           success: false,
-          error: `入部年度は1950年から${currentYear + 1}年の間で入力してください`,
+          error: `入部年度は${minJoinedAt}年から${maxJoinedAt}年の間で入力してください`,
         },
         400,
       )
