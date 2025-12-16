@@ -71,7 +71,7 @@ export async function loader(args: Route.LoaderArgs) {
         ? unsafeMetadata.joinedAt
         : undefined
 
-    let getGradeAt: string = ""
+    let getGradeAt: string | null = null
     if (
       unsafeMetadata.getGradeAt !== null &&
       typeof unsafeMetadata.getGradeAt === "string" &&
@@ -80,7 +80,7 @@ export async function loader(args: Route.LoaderArgs) {
       const dateStr = unsafeMetadata.getGradeAt.trim()
       const date = new Date(dateStr)
       if (!isNaN(date.getTime())) {
-        getGradeAt = date.toISOString()
+        getGradeAt = date.toISOString().split("T")[0]
       }
     }
 
@@ -177,7 +177,7 @@ export async function action(args: Route.ActionArgs) {
           ? unsafeMetadata.joinedAt
           : undefined
 
-      let getGradeAt: string = ""
+      let getGradeAt: string | null = null
       if (
         unsafeMetadata.getGradeAt !== null &&
         typeof unsafeMetadata.getGradeAt === "string" &&
@@ -186,7 +186,7 @@ export async function action(args: Route.ActionArgs) {
         const dateStr = unsafeMetadata.getGradeAt.trim()
         const date = new Date(dateStr)
         if (!isNaN(date.getTime())) {
-          getGradeAt = date.toISOString()
+          getGradeAt = date.toISOString().split("T")[0]
         }
       }
 
@@ -254,12 +254,12 @@ export async function action(args: Route.ActionArgs) {
       const grade = parseInt(gradeStr)
       const joinedAt = parseInt(joinedAtStr)
 
-      let processedGetGradeAt: string = ""
+      let processedGetGradeAt: string | null = null
       if (getGradeAt && getGradeAt.trim() !== "") {
         const dateStr = getGradeAt.trim()
         const date = new Date(dateStr)
         if (!isNaN(date.getTime())) {
-          processedGetGradeAt = date.toISOString()
+          processedGetGradeAt = date.toISOString().split("T")[0]
         }
       }
 

@@ -2,6 +2,30 @@ import { type } from "arktype"
 
 import { Role } from "./role"
 
+export const coerceProfileMetadata = (input: unknown): unknown => {
+  if (!input || typeof input !== "object") return input
+  const record = input as Record<string, unknown>
+
+  const getGradeAt = record.getGradeAt
+  if (getGradeAt === "") {
+    return { ...record, getGradeAt: null }
+  }
+  if (typeof getGradeAt === "string") {
+    const trimmed = getGradeAt.trim()
+    if (!trimmed) {
+      return { ...record, getGradeAt: null }
+    }
+    if (/^\d{4}-\d{2}-\d{2}T/.test(trimmed)) {
+      return { ...record, getGradeAt: trimmed.slice(0, 10) }
+    }
+    if (trimmed !== getGradeAt) {
+      return { ...record, getGradeAt: trimmed }
+    }
+  }
+
+  return input
+}
+
 const profileFieldDefinition = {
   grade:
     "(string.numeric.parse |> -5 <= number.integer <= 5) | -5 <= number.integer <= 5",

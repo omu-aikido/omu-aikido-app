@@ -2,7 +2,11 @@ import { createClerkClient, type User } from "@clerk/react-router/server"
 import { ArkErrors } from "arktype"
 
 import { Role } from "~/lib/role"
-import { publicMetadataProfileSchema, type AdminUpdateProfileInput } from "~/lib/schemas"
+import {
+  coerceProfileMetadata,
+  publicMetadataProfileSchema,
+  type AdminUpdateProfileInput,
+} from "~/lib/schemas"
 import type { Profile } from "~/type"
 
 // Env型は worker-configuration.d.ts で定義されているグローバル型を使用
@@ -42,7 +46,7 @@ export async function getProfile(input: {
       return null
     }
 
-    const parsedProfile = publicMetadataProfileSchema(user.publicMetadata)
+    const parsedProfile = publicMetadataProfileSchema(coerceProfileMetadata(user.publicMetadata))
     if (parsedProfile instanceof ArkErrors) return null
     return { ...parsedProfile, role: parsedProfile.role ?? "member", id: user.id }
   } catch {
