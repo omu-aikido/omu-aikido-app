@@ -16,10 +16,7 @@ const requestHandler = createRequestHandler(
 
 const app = new Hono<{ Bindings: Env }>()
 
-// Honoで処理するルート（React Routerより先にマッチ）
-app.route("/api", api)
-
-app.use("*", async c => {
+app.use("*", async (c, next) => {
   const request = c.req.raw
   const env = c.env
 
@@ -29,10 +26,9 @@ app.use("*", async c => {
     return new Response(null, { status: 301, headers: { Location: url.toString() } })
   }
 
-  const response = await requestHandler(request, {
-    cloudflare: { env, ctx: c.executionCtx },
-  })
+  await next()
 
+  const response = c.res
   response.headers.set("X-Frame-Options", "DENY")
   response.headers.set("X-Content-Type-Options", "nosniff")
   response.headers.set(
@@ -60,6 +56,15 @@ app.use("*", async c => {
     )
   }
 
+  return
+})
+
+app.route("/api", api)
+
+app.all("*", async c => {
+  const response = await requestHandler(c.req.raw, {
+    cloudflare: { env: c.env, ctx: c.executionCtx },
+  })
   return response
 })
 
