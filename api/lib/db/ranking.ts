@@ -10,11 +10,12 @@ export async function getUserMonthlyRank(input: {
 }): Promise<{ rank: number; total: number; userTotal: number } | null> {
   const db = createDb(input.env)
 
-  const year = new Date().getUTCFullYear()
-  const month = new Date().getUTCMonth()
+  const now = new Date()
+  const year = now.getUTCFullYear()
+  const monthIndex = now.getUTCMonth()
 
-  const startDateStr = `${year}-${month}-01`
-  const endDateStr = new Date(year, month + 1, 0).toISOString().split("T")[0]
+  const startDateStr = new Date(Date.UTC(year, monthIndex, 1)).toISOString().slice(0, 10)
+  const endDateStr = new Date(Date.UTC(year, monthIndex + 1, 0)).toISOString().slice(0, 10)
 
   // 全ユーザーの月次合計を取得（順位付けのため）
   const allUserTotals = await db
