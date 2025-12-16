@@ -262,7 +262,7 @@ export const adminApp = new Hono<{ Bindings: Env }>()
 
     const updatedMetadata = {
       grade,
-      getGradeAt: normalizedGetGradeAt ? formatDateToJSTString(normalizedGetGradeAt) : "",
+      getGradeAt: normalizedGetGradeAt ? formatDateToJSTString(normalizedGetGradeAt) : null,
       joinedAt,
       year,
       role,
