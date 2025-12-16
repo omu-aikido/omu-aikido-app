@@ -58,7 +58,7 @@ export default function App(args: Route.ComponentProps) {
     <div className="h-dvh" data-testid="auth-layout-container">
       <ReactHeader title="ポータル">
         <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-          <SheetTrigger asChild>
+          <SheetTrigger>
             <Button
               variant="ghost"
               size="icon"

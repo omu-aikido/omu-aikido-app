@@ -151,7 +151,7 @@ export default function SignInPage() {
                 </p>
                 <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
                   サインインに失敗する場合は、
-                  <Button variant="link" asChild className="p-0">
+                  <Button variant="link" className="p-0">
                     <Link
                       to="https://accounts.omu-aikido.com"
                       data-testid="sign-in-link-external"

@@ -7,16 +7,16 @@ import { DatePicker } from "~/components/ui/date-picker"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "~/components/ui/select"
 import type {
-  ClientActionReturn,
-  FormAction,
-  LocalFormState,
+    ClientActionReturn,
+    FormAction,
+    LocalFormState,
 } from "~/hooks/useSignUpForm"
 import { JoinedAtYearRange, grade, year } from "~/lib/utils"
 import { style } from "~/styles/component"
@@ -69,11 +69,11 @@ export function SignUpStepProfile({
           required
           value={formValues.year}
           onValueChange={value =>
-            dispatch({ type: "SET_FORM_VALUES", payload: { year: value } })
+            dispatch({ type: "SET_FORM_VALUES", payload: { year: value ?? formValues.year } })
           }
         >
           <SelectTrigger id="year">
-            <SelectValue placeholder="学年を選択" />
+            <SelectValue aria-placeholder="学年を選択" />
           </SelectTrigger>
           <SelectContent>{yearOptions()}</SelectContent>
         </Select>
@@ -94,7 +94,7 @@ export function SignUpStepProfile({
           }
         >
           <SelectTrigger id="grade">
-            <SelectValue placeholder="級段位を選択" />
+            <SelectValue aria-placeholder="級段位を選択" />
           </SelectTrigger>
           <SelectContent>{gradeOptions()}</SelectContent>
         </Select>
@@ -113,7 +113,7 @@ export function SignUpStepProfile({
           required
           min={JoinedAtYearRange.min}
           max={JoinedAtYearRange.max}
-          value={formValues.joinedAt}
+          value={formValues.joinedAt ?? ""}
           onChange={e =>
             dispatch({
               type: "SET_FORM_VALUES",

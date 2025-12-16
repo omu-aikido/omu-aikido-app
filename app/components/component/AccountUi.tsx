@@ -71,7 +71,7 @@ export function AccountUi({ apps }: AccountUiProps) {
         <hr data-testid="account-ui-divider-bottom" />
 
         <AlertDialog>
-          <AlertDialogTrigger asChild>
+          <AlertDialogTrigger>
             <Button aria-label="サインアウト" data-testid="account-ui-button-signout">
               <span
                 className="flex flex-row items-center justify-center"

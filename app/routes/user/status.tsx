@@ -132,7 +132,7 @@ function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         disabled={disabled}
       >
         <SelectTrigger id="grade">
-          <SelectValue placeholder="級段位を選択" />
+          <SelectValue aria-placeholder="級段位を選択" />
         </SelectTrigger>
         <SelectContent>
           {gradeOptions.map(g => (
@@ -207,7 +207,7 @@ function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
       <Label htmlFor="year">学年</Label>
       <Select name="year" required defaultValue={profile.year} disabled={disabled}>
         <SelectTrigger id="year">
-          <SelectValue placeholder="学年を選択" />
+          <SelectValue aria-placeholder="学年を選択" />
         </SelectTrigger>
         <SelectContent>
           {yearOptions.map(y => (

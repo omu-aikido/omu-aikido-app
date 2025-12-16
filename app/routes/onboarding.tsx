@@ -376,7 +376,7 @@ export default function OnboardingPage(args: Route.ComponentProps) {
             <Label htmlFor="year">学年</Label>
             <Select name="year" defaultValue="b1" required>
               <SelectTrigger id="year">
-                <SelectValue placeholder="学年を選択" />
+                <SelectValue aria-placeholder="学年を選択" />
               </SelectTrigger>
               <SelectContent>{yearOptions()}</SelectContent>
             </Select>
@@ -389,7 +389,7 @@ export default function OnboardingPage(args: Route.ComponentProps) {
             <Label htmlFor="grade">現在の級段位</Label>
             <Select name="grade" defaultValue="0" required>
               <SelectTrigger id="grade">
-                <SelectValue placeholder="級段位を選択" />
+                <SelectValue aria-placeholder="級段位を選択" />
               </SelectTrigger>
               <SelectContent>{gradeOptions()}</SelectContent>
             </Select>
