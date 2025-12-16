@@ -7,16 +7,16 @@ import { DatePicker } from "~/components/ui/date-picker"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "~/components/ui/select"
 import type {
-    ClientActionReturn,
-    FormAction,
-    LocalFormState,
+  ClientActionReturn,
+  FormAction,
+  LocalFormState,
 } from "~/hooks/useSignUpForm"
 import { JoinedAtYearRange, grade, year } from "~/lib/utils"
 import { style } from "~/styles/component"
@@ -69,7 +69,10 @@ export function SignUpStepProfile({
           required
           value={formValues.year}
           onValueChange={value =>
-            dispatch({ type: "SET_FORM_VALUES", payload: { year: value ?? formValues.year } })
+            dispatch({
+              type: "SET_FORM_VALUES",
+              payload: { year: value ?? formValues.year },
+            })
           }
         >
           <SelectTrigger id="year">
