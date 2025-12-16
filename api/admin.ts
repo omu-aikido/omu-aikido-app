@@ -66,7 +66,9 @@ const getUsersNorm = async (
   const db = createDb(env)
   const parsedProfiles = users
     .map(user => {
-      const parsed = publicMetadataProfileSchema(coerceProfileMetadata(user.publicMetadata))
+      const parsed = publicMetadataProfileSchema(
+        coerceProfileMetadata(user.publicMetadata),
+      )
       if (parsed instanceof ArkErrors) return null
       return { id: user.id, profile: parsed }
     })
@@ -154,7 +156,9 @@ export const adminApp = new Hono<{ Bindings: Env }>()
     const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
     try {
       const user = await clerkClient.users.getUser(userId)
-      const profileParse = publicMetadataProfileSchema(coerceProfileMetadata(user.publicMetadata))
+      const profileParse = publicMetadataProfileSchema(
+        coerceProfileMetadata(user.publicMetadata),
+      )
       const profile =
         profileParse instanceof ArkErrors ? null : { ...profileParse, id: user.id }
 
@@ -266,7 +270,9 @@ export const adminApp = new Hono<{ Bindings: Env }>()
 
     const updatedMetadata = {
       grade,
-      getGradeAt: normalizedGetGradeAt ? formatDateToJSTString(normalizedGetGradeAt) : null,
+      getGradeAt: normalizedGetGradeAt
+        ? formatDateToJSTString(normalizedGetGradeAt)
+        : null,
       joinedAt,
       year,
       role,

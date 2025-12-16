@@ -46,7 +46,9 @@ export async function getProfile(input: {
       return null
     }
 
-    const parsedProfile = publicMetadataProfileSchema(coerceProfileMetadata(user.publicMetadata))
+    const parsedProfile = publicMetadataProfileSchema(
+      coerceProfileMetadata(user.publicMetadata),
+    )
     if (parsedProfile instanceof ArkErrors) return null
     return { ...parsedProfile, role: parsedProfile.role ?? "member", id: user.id }
   } catch {
