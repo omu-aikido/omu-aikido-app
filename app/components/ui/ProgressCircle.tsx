@@ -7,12 +7,12 @@ interface ProgressCircleProps {
 export function ProgressCircle({ title, className, id }: ProgressCircleProps) {
   return (
     <div
-      className={`fixed top-0 left-0 w-full h-full bg-slate-400/30 dark:bg-slate-600/30 backdrop-blur-sm z-1000 pointer-events-none ${className}`}
+      className={`pointer-events-none fixed top-0 left-0 z-1000 h-full w-full bg-slate-400/30 backdrop-blur-sm dark:bg-slate-600/30 ${className}`}
       id={id}
       data-testid="progress-circle-overlay"
     >
       <div
-        className="gap-2 flex flex-row justify-items-center justify-center items-center h-full"
+        className="flex h-full flex-row items-center justify-center justify-items-center gap-2"
         data-testid="progress-circle-content"
       >
         <svg
@@ -37,7 +37,7 @@ export function ProgressCircle({ title, className, id }: ProgressCircleProps) {
           />
         </svg>
         <h1
-          className="text-2xl md:text-xl sm:text-lg"
+          className="text-2xl sm:text-lg md:text-xl"
           data-testid="progress-circle-title"
         >
           {title}

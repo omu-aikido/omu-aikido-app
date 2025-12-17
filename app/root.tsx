@@ -90,18 +90,18 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         <ReactHeader title="ポータル">
           <></>
         </ReactHeader>
-        <main className="min-h-4/5 p-6 mx-auto max-w-3xl text-center">
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4 mt-20">
+        <main className="mx-auto min-h-4/5 max-w-3xl p-6 text-center">
+          <h1 className="mt-20 mb-4 text-2xl font-bold text-slate-800 dark:text-slate-100">
             {message}
           </h1>
           {is404 && <img src="/404 NotFound.png" alt="404エラー" />}
           {!is404 && <img src="/500 InternalServerError.png" alt="サーバーエラー" />}
-          <p className="text-lg mb-6 text-slate-600 dark:text-slate-300">{details}</p>
+          <p className="mb-6 text-lg text-slate-600 dark:text-slate-300">{details}</p>
           <div className="space-y-4">
             {is404 ? (
               <Link
                 to="/"
-                className="inline-block px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition"
+                className="inline-block rounded-sm bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
               >
                 ホームに戻る
               </Link>
@@ -109,17 +109,17 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
               <>
                 <button
                   onClick={handleReload}
-                  className="inline-block px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition mr-4"
+                  className="mr-4 inline-block rounded-sm bg-green-600 px-6 py-3 text-white transition hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
                 >
                   ページを再読み込み
                 </button>
                 <Link
                   to="/"
-                  className="inline-block px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition"
+                  className="inline-block rounded-sm bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                 >
                   ホームに戻る
                 </Link>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-4">
+                <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
                   問題が解決しない場合は、管理者にお問い合わせください。
                 </p>
               </>

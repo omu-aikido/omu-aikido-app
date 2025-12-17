@@ -13,7 +13,7 @@ type Props = {
 }
 
 const listItem = tv({
-  base: "flex items-center flex-row justify-between py-3 px-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors",
+  base: "flex cursor-pointer flex-row items-center justify-between px-2 py-3 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800",
   variants: { today: { true: "bg-green-100 dark:bg-green-900/40", false: "" } },
 })
 

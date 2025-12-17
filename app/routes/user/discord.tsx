@@ -68,23 +68,23 @@ export default function Discord() {
 
   return (
     <>
-      <div className="max-w-lg mx-auto p-4">
+      <div className="mx-auto max-w-lg p-4">
         {discordAccount ? (
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-4 border rounded-lg bg-indigo-50 border-indigo-200 dark:bg-indigo-950 dark:border-indigo-800">
+            <div className="flex items-center gap-3 rounded-lg border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-800 dark:bg-indigo-950">
               {discordAccount.imageUrl ? (
                 <img
                   src={discordAccount.imageUrl}
                   alt="Discord プロフィール画像"
-                  className="w-10 h-10 rounded-full"
+                  className="h-10 w-10 rounded-full"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-indigo-500 dark:bg-indigo-700 flex items-center justify-center">
-                  <span className="text-white font-medium text-sm">D</span>
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 dark:bg-indigo-700">
+                  <span className="text-sm font-medium text-white">D</span>
                 </div>
               )}
               <div>
-                <span className="font-medium text-indigo-800 dark:text-indigo-200 flex flex-row items-center">
+                <span className="flex flex-row items-center font-medium text-indigo-800 dark:text-indigo-200">
                   <Icon icon="discord-logo" />
                   {discordAccount.username || "Discord ユーザー"}
                 </span>
@@ -112,7 +112,7 @@ export default function Discord() {
             >
               {isConnecting ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                   連携中...
                 </>
               ) : (

@@ -47,7 +47,7 @@ function ChartContainer({
         data-slot="chart"
         data-chart={chartId}
         className={cn(
-          "tw:[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground tw:[&_.recharts-cartesian-grid_line[stroke=#ccc]]:stroke-border/50 tw:[&_.recharts-curve.recharts-tooltip-cursor]:stroke-border tw:[&_.recharts-polar-grid_[stroke=#ccc]]:stroke-border tw:[&_.recharts-radial-bar-background-sector]:fill-muted tw:[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted tw:[&_.recharts-reference-line_[stroke=#ccc]]:stroke-border tw:flex tw:aspect-video tw:justify-center tw:text-xs tw:[&_.recharts-dot[stroke=#fff]]:stroke-transparent tw:[&_.recharts-layer]:outline-hidden tw:[&_.recharts-sector]:outline-hidden tw:[&_.recharts-sector[stroke=#fff]]:stroke-transparent tw:[&_.recharts-surface]:outline-hidden",
+          "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
           className,
         )}
         {...props}
@@ -134,7 +134,7 @@ function ChartTooltipContent({
 
     if (labelFormatter) {
       return (
-        <div className={cn("tw:font-medium", labelClassName)}>
+        <div className={cn("font-medium", labelClassName)}>
           {labelFormatter(value, payload)}
         </div>
       )
@@ -144,7 +144,7 @@ function ChartTooltipContent({
       return null
     }
 
-    return <div className={cn("tw:font-medium", labelClassName)}>{value}</div>
+    return <div className={cn("font-medium", labelClassName)}>{value}</div>
   }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey])
 
   if (!active || !payload?.length) {
@@ -156,12 +156,12 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        "tw:border-border/50 tw:bg-background tw:gap-1.5 tw:rounded-lg tw:border tw:px-2.5 tw:py-1.5 tw:text-xs tw:shadow-xl tw:grid tw:min-w-[8rem] tw:items-start",
+        "grid min-w-32 items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
         className,
       )}
     >
       {!nestLabel ? tooltipLabel : null}
-      <div className="tw:grid tw:gap-1.5">
+      <div className="grid gap-1.5">
         {payload
           .filter(item => item.type !== "none")
           .map((item, index) => {
@@ -173,8 +173,8 @@ function ChartTooltipContent({
               <div
                 key={item.dataKey}
                 className={cn(
-                  "tw:[&>svg]:text-muted-foreground tw:flex tw:w-full tw:flex-wrap tw:items-stretch tw:gap-2 tw:[&>svg]:h-2.5 tw:[&>svg]:w-2.5",
-                  indicator === "dot" && "tw:items-center",
+                  "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground",
+                  indicator === "dot" && "items-center",
                 )}
               >
                 {formatter && item?.value !== undefined && item.name ? (
@@ -187,7 +187,7 @@ function ChartTooltipContent({
                       !hideIndicator && (
                         <div
                           className={cn(
-                            "tw:shrink-0 tw:rounded-[2px] tw:border-(--color-border) tw:bg-(--color-bg)",
+                            "shrink-0 rounded-[2px] border-border bg-(--color-bg)",
                             {
                               "h-2.5 w-2.5": indicator === "dot",
                               "w-1": indicator === "line",
@@ -207,18 +207,18 @@ function ChartTooltipContent({
                     )}
                     <div
                       className={cn(
-                        "tw:flex tw:flex-1 tw:justify-between tw:leading-none",
-                        nestLabel ? "tw:items-end" : "tw:items-center",
+                        "flex flex-1 justify-between leading-none",
+                        nestLabel ? "items-end" : "items-center",
                       )}
                     >
-                      <div className="tw:grid tw:gap-1.5">
+                      <div className="grid gap-1.5">
                         {nestLabel ? tooltipLabel : null}
-                        <span className="tw:text-muted-foreground">
+                        <span className="text-muted-foreground">
                           {itemConfig?.label || item.name}
                         </span>
                       </div>
                       {item.value && (
-                        <span className="tw:text-foreground tw:font-mono tw:font-medium tw:tabular-nums">
+                        <span className="font-mono font-medium text-foreground tabular-nums">
                           {item.value.toLocaleString()}
                         </span>
                       )}
@@ -255,8 +255,8 @@ function ChartLegendContent({
   return (
     <div
       className={cn(
-        "tw:flex tw:items-center tw:justify-center tw:gap-4",
-        verticalAlign === "top" ? "tw:pb-3" : "tw:pt-3",
+        "flex items-center justify-center gap-4",
+        verticalAlign === "top" ? "pb-3" : "pt-3",
         className,
       )}
     >
@@ -270,14 +270,14 @@ function ChartLegendContent({
             <div
               key={item.value}
               className={cn(
-                "tw:[&>svg]:text-muted-foreground tw:flex tw:items-center tw:gap-1.5 tw:[&>svg]:h-3 tw:[&>svg]:w-3",
+                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
               )}
             >
               {itemConfig?.icon && !hideIcon ? (
                 <itemConfig.icon />
               ) : (
                 <div
-                  className="tw:h-2 tw:w-2 tw:shrink-0 tw:rounded-[2px]"
+                  className="h-2 w-2 shrink-0 rounded-[2px]"
                   style={{ backgroundColor: item.color }}
                 />
               )}

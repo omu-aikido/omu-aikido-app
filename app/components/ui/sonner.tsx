@@ -14,13 +14,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
-      className="tw:toaster tw:group"
+      className="toaster group"
       icons={{
-        success: <CircleCheckIcon className="tw:size-4" />,
-        info: <InfoIcon className="tw:size-4" />,
-        warning: <TriangleAlertIcon className="tw:size-4" />,
-        error: <OctagonXIcon className="tw:size-4" />,
-        loading: <Loader2Icon className="tw:size-4 tw:animate-spin" />,
+        success: <CircleCheckIcon className="size-4" />,
+        info: <InfoIcon className="size-4" />,
+        warning: <TriangleAlertIcon className="size-4" />,
+        error: <OctagonXIcon className="size-4" />,
+        loading: <Loader2Icon className="size-4 animate-spin" />,
       }}
       style={
         {

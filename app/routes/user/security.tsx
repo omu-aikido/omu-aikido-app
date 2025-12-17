@@ -34,8 +34,8 @@ export default function SecurityPage() {
   if (!isLoaded) {
     return (
       <div className="space-y-4">
-        <div className="animate-pulse bg-gray-200 h-4 w-3/4 rounded" />
-        <div className="animate-pulse bg-gray-200 h-20 w-full rounded" />
+        <div className="h-4 w-3/4 animate-pulse rounded-sm bg-gray-200" />
+        <div className="h-20 w-full animate-pulse rounded-sm bg-gray-200" />
       </div>
     )
   }

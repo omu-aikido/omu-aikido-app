@@ -43,16 +43,16 @@ export function NextGrade(gradeData: {
   return (
     <details
       ref={detailsRef}
-      className={style.card.container({ class: "select-none pb-0 group" })}
+      className={style.card.container({ class: "group pb-0 select-none" })}
       data-testid="next-grade-container"
     >
       <summary className="block" data-testid="next-grade-summary">
         <div
-          className="flex flex-row items-center justify-center gap-2 mb-4"
+          className="mb-4 flex flex-row items-center justify-center gap-2"
           data-testid="next-grade-header"
         >
           <h2
-            className={style.text.sectionTitle({ class: "text-xl mb-0 mt-0.5" })}
+            className={style.text.sectionTitle({ class: "mt-0.5 mb-0 text-xl" })}
             data-testid="next-grade-title"
           >
             {translateGrade(targetGrade)}
@@ -64,30 +64,30 @@ export function NextGrade(gradeData: {
           >
             {needToNextGrade}
           </p>
-          <span className="text-base font-medium text-gray-600 dark:text-gray-400 mt-1">
+          <span className="mt-1 text-base font-medium text-gray-600 dark:text-gray-400">
             日
           </span>
         </div>
         <div
-          className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5"
+          className="h-2.5 w-full rounded-full bg-gray-200 dark:bg-gray-700"
           data-testid="next-grade-progress-container"
         >
           <div
-            className="bg-indigo-600 dark:bg-indigo-400 h-2.5 rounded-full"
+            className="h-2.5 rounded-full bg-indigo-600 dark:bg-indigo-400"
             style={{ width: `${progressPercentage}%` }}
             data-testid="next-grade-progress-bar"
           />
         </div>
         <div
-          className="flex flex-col items-center mt-4 cursor-pointer group-open:hidden"
+          className="mt-4 flex cursor-pointer flex-col items-center group-open:hidden"
           data-testid="next-grade-expand-indicator"
         >
-          <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-0.5" />
-          <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-0.5" />
+          <div className="mb-0.5 h-0.5 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
+          <div className="mb-0.5 h-0.5 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
         </div>
       </summary>
       <p
-        className="mt-5 mb-2 border border-slate-500 p-2 rounded-md"
+        className="mt-5 mb-2 rounded-md border border-slate-500 p-2"
         data-testid="next-grade-details"
       >
         {progressComment}
@@ -105,7 +105,7 @@ export function NextGrade(gradeData: {
         稽古は1.5時間で１日分としてカウントされます。
       </p>
       <div
-        className="flex flex-col items-center mt-4 cursor-pointer"
+        className="mt-4 flex cursor-pointer flex-col items-center"
         onClick={handleClose}
         tabIndex={0}
         role="button"
@@ -115,8 +115,8 @@ export function NextGrade(gradeData: {
         }}
         data-testid="next-grade-close-button"
       >
-        <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-0.5" />
-        <div className="w-12 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600 mb-0.5" />
+        <div className="mb-0.5 h-0.5 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
+        <div className="mb-0.5 h-0.5 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
       </div>
     </details>
   )

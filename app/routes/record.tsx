@@ -176,7 +176,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
 
   return (
     <div
-      className="min-h-screen transition-colors duration-200 relative"
+      className="relative min-h-screen transition-colors duration-200"
       data-testid="record-page-container"
     >
       <>
@@ -185,11 +185,11 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
         </h1>
         {error && (
           <div
-            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-800 rounded-lg p-4 mb-6"
+            className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-800 dark:bg-red-900/20"
             data-testid="record-error-container"
           >
             <p
-              className="text-red-600 dark:text-red-400 text-center"
+              className="text-center text-red-600 dark:text-red-400"
               data-testid="record-error-message"
             >
               エラー: {error}
@@ -202,13 +202,13 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
           onSelect={handleSelectYearMonth}
           YearMonthSelector={YearMonthSelectorInline}
         />
-        <div className="overflow-x-auto w-full sm:block hidden">
+        <div className="hidden w-full overflow-x-auto sm:block">
           <fetcher.Form method="post">
-            <div className="flex flex-row items-center justify-between mb-4">
-              <div className="pr-1 w-3/4">
+            <div className="mb-4 flex flex-row items-center justify-between">
+              <div className="w-3/4 pr-1">
                 <Button
                   type="submit"
-                  className="w-full text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
+                  className="w-full bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
                   disabled={!isChanged || fetcher.state !== "idle"}
                   data-testid="record-button-submit"
                 >
@@ -219,7 +219,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                       : "送信中"}
                 </Button>
               </div>
-              <div className="pl-1 w-1/4">
+              <div className="w-1/4 pl-1">
                 <Button
                   type="button"
                   className="w-full"
@@ -269,7 +269,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
             />
           </fetcher.Form>
         </div>
-        <div className="w-full block sm:hidden">
+        <div className="block w-full sm:hidden">
           <MonthlyActivityList
             daysInMonth={daysInMonth}
             currentActivities={currentActivities}
@@ -301,7 +301,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
                 />
               )
             })()}
-            <div className="fixed w-full px-4 pb-3 gap-x-2 bottom-0 left-0 right-0 flex flex-row justify-center items-center">
+            <div className="fixed right-0 bottom-0 left-0 flex w-full flex-row items-center justify-center gap-x-2 px-4 pb-3">
               <Button
                 type="button"
                 variant="destructive"

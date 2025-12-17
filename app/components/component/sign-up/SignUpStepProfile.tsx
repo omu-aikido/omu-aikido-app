@@ -145,7 +145,7 @@ export function SignUpStepProfile({
         )}
       </div>
 
-      <div className="flex items-center gap-3 mt-4">
+      <div className="mt-4 flex items-center gap-3">
         <Checkbox
           id="legalAccepted"
           name="legalAccepted"
@@ -158,14 +158,14 @@ export function SignUpStepProfile({
         <Label
           htmlFor="legalAccepted"
           className={style.label.required({
-            class: "text-sm font-normal text-gray-898 dark:text-gray-300",
+            class: "text-gray-898 text-sm font-normal dark:text-gray-300",
           })}
         >
           <Link
             to="https://omu-aikido.com/terms-of-service/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+            className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           >
             利用規約
           </Link>
@@ -174,7 +174,7 @@ export function SignUpStepProfile({
             to="https://omu-aikido.com/privacy-policy/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+            className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           >
             プライバシーポリシー
           </Link>
@@ -203,7 +203,7 @@ export function SignUpStepProfile({
           data-testid="sign-up-button-submit"
         >
           {(fetcher.state !== "idle" || isSignUpCreated) && (
-            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
           )}
           {fetcher.state !== "idle" || isSignUpCreated ? "処理中..." : "アカウントを作成"}
         </Button>

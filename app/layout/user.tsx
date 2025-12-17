@@ -47,7 +47,7 @@ export default function AccountLayout(args: Route.ComponentProps) {
   return (
     <div data-testid="user-layout-container">
       <h1
-        className="text-xl font-bold mb-4"
+        className="mb-4 text-xl font-bold"
         data-testid="user-layout-title"
       >{`アカウント: ${args.loaderData.user.lastName} ${args.loaderData.user.firstName}`}</h1>
       <NavigationTab tabs={navigationTabs} />

@@ -234,7 +234,7 @@ export default function AdminAccounts(args: Route.ComponentProps) {
         <Ranking data={args.loaderData.ranking} users={users as User[]} />
       )}
 
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <h2 className={style.text.subtitle()}>アカウント管理</h2>
         {/* 検索フォーム（SPA対応） */}
         <div className="flex gap-2">

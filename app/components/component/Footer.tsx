@@ -6,14 +6,14 @@ import { style } from "~/styles/component"
 
 const footer = {
   link: tv({
-    base: "mx-2 text-cyan-600 dark:text-blue-300 hover:text-blue-600 dark:hover:text-cyan-400 visited:text-emerald-600 dark:visited:text-emerald-300",
+    base: "mx-2 text-cyan-600 visited:text-emerald-600 hover:text-blue-600 dark:text-blue-300 dark:visited:text-emerald-300 dark:hover:text-cyan-400",
   }),
   social: {
     link: tv({
-      base: "flex text-slate-700 dark:text-slate-300 mx-2 my-0 px-2 items-center hover:transform hover:scale-110 transition-transform",
+      base: "mx-2 my-0 flex items-center px-2 text-slate-700 transition-transform hover:scale-110 hover:transform dark:text-slate-300",
     }),
     text: tv({
-      base: "text-slate-700 dark:text-slate-300 text-sm font-bold mr-2 hidden md:block",
+      base: "mr-2 hidden text-sm font-bold text-slate-700 md:block dark:text-slate-300",
     }),
   },
 }
@@ -21,10 +21,10 @@ const footer = {
 export function Footer() {
   return (
     <footer
-      className="flex flex-col items-center justify-center p-4 bg-slate-300 dark:bg-slate-800"
+      className="flex flex-col items-center justify-center bg-slate-300 p-4 dark:bg-slate-800"
       data-testid="footer-container"
     >
-      <div className="text-center items-center p-4" data-testid="footer-info">
+      <div className="items-center p-4 text-center" data-testid="footer-info">
         <p className={style.text.info({ class: "text-center" })}>
           © OMU Aikido Club All Rights Reserved.
           <br />

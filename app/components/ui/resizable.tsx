@@ -12,7 +12,7 @@ function ResizablePanelGroup({
     <ResizablePrimitive.PanelGroup
       data-slot="resizable-panel-group"
       className={cn(
-        "tw:flex tw:h-full tw:w-full tw:data-[panel-group-direction=vertical]:flex-col",
+        "flex h-full w-full data-[panel-group-direction=vertical]:flex-col",
         className,
       )}
       {...props}
@@ -37,14 +37,12 @@ function ResizableHandle({
     <ResizablePrimitive.PanelResizeHandle
       data-slot="resizable-handle"
       className={cn(
-        "tw:bg-border tw:focus-visible:ring-ring tw:relative tw:flex tw:w-px tw:items-center tw:justify-center tw:after:absolute tw:after:inset-y-0 tw:after:left-1/2 tw:after:w-1 tw:after:-translate-x-1/2 tw:focus-visible:ring-1 tw:focus-visible:ring-offset-1 tw:focus-visible:outline-hidden tw:data-[panel-group-direction=vertical]:h-px tw:data-[panel-group-direction=vertical]:w-full tw:data-[panel-group-direction=vertical]:after:left-0 tw:data-[panel-group-direction=vertical]:after:h-1 tw:data-[panel-group-direction=vertical]:after:w-full tw:data-[panel-group-direction=vertical]:after:translate-x-0 tw:data-[panel-group-direction=vertical]:after:-translate-y-1/2 tw:[&[data-panel-group-direction=vertical]>div]:rotate-90",
+        "relative flex w-px items-center justify-center bg-border after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-hidden data-[panel-group-direction=vertical]:h-px data-[panel-group-direction=vertical]:w-full data-[panel-group-direction=vertical]:after:left-0 data-[panel-group-direction=vertical]:after:h-1 data-[panel-group-direction=vertical]:after:w-full data-[panel-group-direction=vertical]:after:translate-x-0 data-[panel-group-direction=vertical]:after:-translate-y-1/2 [&[data-panel-group-direction=vertical]>div]:rotate-90",
         className,
       )}
       {...props}
     >
-      {withHandle && (
-        <div className="tw:bg-border tw:h-6 tw:w-1 tw:rounded-lg tw:z-10 tw:flex tw:shrink-0" />
-      )}
+      {withHandle && <div className="z-10 flex h-6 w-1 shrink-0 rounded-lg bg-border" />}
     </ResizablePrimitive.PanelResizeHandle>
   )
 }

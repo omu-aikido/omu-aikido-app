@@ -71,7 +71,7 @@ export default function ProfileForm() {
       >
         <div className="flex items-center gap-4">
           <ProfileImageInput imageUrl={user.imageUrl} isEditing={isEditing} />
-          <div className="grow grid grid-cols-2 gap-4">
+          <div className="grid grow grid-cols-2 gap-4">
             <LastNameInput lastName={user.lastName ?? undefined} disabled={disabled} />
             <FirstNameInput firstName={user.firstName ?? undefined} disabled={disabled} />
           </div>
@@ -115,18 +115,18 @@ function ProfileImageInput({
       : ""
 
   return (
-    <div className="flex gap-2 items-center">
-      <div className="w-12 h-12 mr-4 rounded-full relative group overflow-hidden shrink-0">
+    <div className="flex items-center gap-2">
+      <div className="group relative mr-4 h-12 w-12 shrink-0 overflow-hidden rounded-full">
         <img
           src={safeImageUrl}
           alt="Profile"
-          className="w-full h-full object-cover rounded-full aspect-square"
+          className="aspect-square h-full w-full rounded-full object-cover"
         />
         {isEditing && (
           <>
             <label
               htmlFor="profileImage"
-              className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-50 group-hover:opacity-100 transition-opacity cursor-pointer"
+              className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center bg-black/40 opacity-50 transition-opacity group-hover:opacity-100"
             >
               <span className="text-xs text-white">変更</span>
             </label>
@@ -135,7 +135,7 @@ function ProfileImageInput({
               name="profileImage"
               id="profileImage"
               accept="image/*"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
             />
           </>
         )}

@@ -24,7 +24,7 @@ export default function App() {
         <></>
       </ReactHeader>
       <main
-        className="min-h-4/5 p-3 md:p-6 mt-20 mx-auto max-w-3xl overflow-y-auto mb-auto"
+        className="mx-auto mt-20 mb-auto min-h-4/5 max-w-3xl overflow-y-auto p-3 md:p-6"
         data-testid="unauth-layout-main"
       >
         <Outlet />

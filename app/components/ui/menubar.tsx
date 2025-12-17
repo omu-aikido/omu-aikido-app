@@ -24,7 +24,7 @@ function Menubar({ className, ...props }: MenubarPrimitive.Props) {
     <MenubarPrimitive
       data-slot="menubar"
       className={cn(
-        "tw:bg-background tw:h-9 tw:gap-1 tw:rounded-md tw:border tw:p-1 tw:shadow-xs tw:flex tw:items-center",
+        "flex h-9 items-center gap-1 rounded-md border bg-background p-1 shadow-xs",
         className,
       )}
       {...props}
@@ -52,7 +52,7 @@ function MenubarTrigger({
     <DropdownMenuTrigger
       data-slot="menubar-trigger"
       className={cn(
-        "tw:hover:bg-muted tw:aria-expanded:bg-muted tw:rounded-sm tw:px-2 tw:py-1 tw:text-sm tw:font-medium tw:flex tw:items-center tw:outline-hidden tw:select-none",
+        "flex items-center rounded-sm px-2 py-1 text-sm font-medium outline-hidden select-none hover:bg-muted aria-expanded:bg-muted",
         className,
       )}
       {...props}
@@ -74,7 +74,7 @@ function MenubarContent({
       alignOffset={alignOffset}
       sideOffset={sideOffset}
       className={cn(
-        "tw:bg-popover tw:text-popover-foreground tw:data-open:animate-in tw:data-open:fade-in-0 tw:data-open:zoom-in-95 tw:data-[side=bottom]:slide-in-from-top-2 tw:data-[side=left]:slide-in-from-right-2 tw:data-[side=right]:slide-in-from-left-2 tw:data-[side=top]:slide-in-from-bottom-2 tw:ring-foreground/10 tw:min-w-36 tw:rounded-md tw:p-1 tw:shadow-md tw:ring-1 tw:duration-100 tw:",
+        "min-w-36 rounded-md bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className,
       )}
       {...props}
@@ -94,7 +94,7 @@ function MenubarItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "tw:focus:bg-accent tw:focus:text-accent-foreground tw:data-[variant=destructive]:text-destructive tw:data-[variant=destructive]:focus:bg-destructive/10 tw:dark:data-[variant=destructive]:focus:bg-destructive/20 tw:data-[variant=destructive]:focus:text-destructive tw:data-[variant=destructive]:*:[svg]:!text-destructive tw:not-data-[variant=destructive]:focus:**:text-accent-foreground tw:gap-2 tw:rounded-sm tw:px-2 tw:py-1.5 tw:text-sm tw:data-[disabled]:opacity-50 tw:data-[inset]:pl-8 tw:[&_svg:not([class*=size-])]:size-4 tw:group/menubar-item",
+        "group/menubar-item gap-2 rounded-sm px-2 py-1.5 text-sm focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-disabled:opacity-50 data-inset:pl-8 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 [&_svg:not([class*='size-'])]:size-4 data-[variant=destructive]:*:[svg]:text-destructive!",
         className,
       )}
       {...props}
@@ -112,13 +112,13 @@ function MenubarCheckboxItem({
     <MenuPrimitive.CheckboxItem
       data-slot="menubar-checkbox-item"
       className={cn(
-        "tw:focus:bg-accent tw:focus:text-accent-foreground tw:focus:**:text-accent-foreground tw:gap-2 tw:rounded-md tw:py-1.5 tw:pr-2 tw:pl-8 tw:text-sm tw:data-disabled:opacity-50 tw:relative tw:flex tw:cursor-default tw:items-center tw:outline-hidden tw:select-none tw:data-disabled:pointer-events-none tw:data-disabled:opacity-50 tw:[&_svg]:pointer-events-none tw:[&_svg]:shrink-0",
+        "relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-2 pl-8 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className,
       )}
       checked={checked}
       {...props}
     >
-      <span className="tw:left-2 tw:size-4 tw:[&_svg:not([class*=size-])]:size-4 tw:pointer-events-none tw:absolute tw:flex tw:items-center tw:justify-center">
+      <span className="pointer-events-none absolute left-2 flex size-4 items-center justify-center [&_svg:not([class*='size-'])]:size-4">
         <MenuPrimitive.CheckboxItemIndicator>
           <CheckIcon />
         </MenuPrimitive.CheckboxItemIndicator>
@@ -143,12 +143,12 @@ function MenubarRadioItem({
     <MenuPrimitive.RadioItem
       data-slot="menubar-radio-item"
       className={cn(
-        "tw:focus:bg-accent tw:focus:text-accent-foreground tw:focus:**:text-accent-foreground tw:gap-2 tw:rounded-md tw:py-1.5 tw:pr-2 tw:pl-8 tw:text-sm tw:data-disabled:opacity-50 tw:[&_svg:not([class*=size-])]:size-4 tw:relative tw:flex tw:cursor-default tw:items-center tw:outline-hidden tw:select-none tw:data-disabled:pointer-events-none tw:[&_svg]:pointer-events-none tw:[&_svg]:shrink-0",
+        "relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-2 pl-8 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
     >
-      <span className="tw:left-2 tw:size-4 tw:[&_svg:not([class*=size-])]:size-4 tw:pointer-events-none tw:absolute tw:flex tw:items-center tw:justify-center">
+      <span className="pointer-events-none absolute left-2 flex size-4 items-center justify-center [&_svg:not([class*='size-'])]:size-4">
         <MenuPrimitive.RadioItemIndicator>
           <CheckIcon />
         </MenuPrimitive.RadioItemIndicator>
@@ -167,10 +167,7 @@ function MenubarLabel({
     <DropdownMenuLabel
       data-slot="menubar-label"
       data-inset={inset}
-      className={cn(
-        "tw:px-2 tw:py-1.5 tw:text-sm tw:font-medium tw:data-[inset]:pl-8",
-        className,
-      )}
+      className={cn("px-2 py-1.5 text-sm font-medium data-inset:pl-8", className)}
       {...props}
     />
   )
@@ -183,7 +180,7 @@ function MenubarSeparator({
   return (
     <DropdownMenuSeparator
       data-slot="menubar-separator"
-      className={cn("tw:bg-border tw:-mx-1 tw:my-1 tw:h-px", className)}
+      className={cn("-mx-1 my-1 h-px bg-border", className)}
       {...props}
     />
   )
@@ -197,7 +194,7 @@ function MenubarShortcut({
     <DropdownMenuShortcut
       data-slot="menubar-shortcut"
       className={cn(
-        "tw:text-muted-foreground tw:group-focus/menubar-item:text-accent-foreground tw:text-xs tw:tracking-widest tw:ml-auto",
+        "ml-auto text-xs tracking-widest text-muted-foreground group-focus/menubar-item:text-accent-foreground",
         className,
       )}
       {...props}
@@ -219,7 +216,7 @@ function MenubarSubTrigger({
       data-slot="menubar-sub-trigger"
       data-inset={inset}
       className={cn(
-        "tw:focus:bg-accent tw:focus:text-accent-foreground tw:data-open:bg-accent tw:data-open:text-accent-foreground tw:gap-2 tw:rounded-sm tw:px-2 tw:py-1.5 tw:text-sm tw:data-[inset]:pl-8 tw:[&_svg:not([class*=size-])]:size-4",
+        "gap-2 rounded-sm px-2 py-1.5 text-sm focus:bg-accent focus:text-accent-foreground data-inset:pl-8 data-open:bg-accent data-open:text-accent-foreground [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -235,7 +232,7 @@ function MenubarSubContent({
     <DropdownMenuSubContent
       data-slot="menubar-sub-content"
       className={cn(
-        "tw:bg-popover tw:text-popover-foreground tw:data-open:animate-in tw:data-closed:animate-out tw:data-closed:fade-out-0 tw:data-open:fade-in-0 tw:data-closed:zoom-out-95 tw:data-open:zoom-in-95 tw:data-[side=bottom]:slide-in-from-top-2 tw:data-[side=left]:slide-in-from-right-2 tw:data-[side=right]:slide-in-from-left-2 tw:data-[side=top]:slide-in-from-bottom-2 tw:ring-foreground/10 tw:min-w-32 tw:rounded-md tw:p-1 tw:shadow-lg tw:ring-1 tw:duration-100",
+        "min-w-32 rounded-md bg-popover p-1 text-popover-foreground shadow-lg ring-1 ring-foreground/10 duration-100 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className,
       )}
       {...props}

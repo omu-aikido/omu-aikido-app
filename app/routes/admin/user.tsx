@@ -1,5 +1,5 @@
 import { createClerkClient, getAuth, type User } from "@clerk/react-router/server"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Link, redirect, useFetcher } from "react-router"
 import { toast } from "sonner"
 
@@ -267,26 +267,26 @@ export default function AdminUser(args: Route.ComponentProps) {
   const fetcher = useFetcher()
   const [isEditing, setIsEditing] = useState(false)
 
-  useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data) {
-      try {
-        const response =
-          typeof fetcher.data === "string" ? JSON.parse(fetcher.data) : fetcher.data
-        if (response?.error) {
-          toast.error(response.error)
-        }
-      } catch {
-        if (fetcher.data instanceof Error) {
-          toast.error("エラーが発生しました")
-        }
+  if (!fetcher.data && fetcher.state == "idle") {
+    setIsEditing(false)
+  }
+  if (fetcher.state === "idle" && fetcher.data) {
+    try {
+      const response =
+        typeof fetcher.data === "string" ? JSON.parse(fetcher.data) : fetcher.data
+      if (response?.error) {
+        toast.error(response.error)
+      }
+    } catch {
+      if (fetcher.data instanceof Error) {
+        toast.error("エラーが発生しました")
       }
     }
-    if (!fetcher.data && fetcher.state == "idle") setIsEditing(false)
-  }, [fetcher.state, fetcher.data])
+  }
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-64">
+      <div className="flex min-h-64 items-center justify-center">
         <div className="text-center">
           <p className="text-lg text-slate-600 dark:text-slate-400">
             ユーザー情報が見つかりませんでした。

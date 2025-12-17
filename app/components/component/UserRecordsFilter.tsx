@@ -35,12 +35,12 @@ export function FilterSection({ startValue, endValue }: FilterSectionProps) {
 
   return (
     <details className={style.filterCard({ className: "mb-6" })}>
-      <summary className="flex bg-slate-300 dark:bg-slate-600 p-4 cursor-pointer">
+      <summary className="flex cursor-pointer bg-slate-300 p-4 dark:bg-slate-600">
         フィルター
       </summary>
       <div className="p-6">
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label className={style.text.info()}>開始日</label>
               <DatePicker
@@ -58,7 +58,7 @@ export function FilterSection({ startValue, endValue }: FilterSectionProps) {
               />
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
               className={style.button({ type: "secondary" })}

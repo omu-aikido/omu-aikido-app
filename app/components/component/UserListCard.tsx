@@ -19,7 +19,7 @@ export const UserListRow = React.memo<{ key: string; user: User }>(function User
   return (
     <tr
       key={key}
-      className="hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-200 cursor-pointer"
+      className="cursor-pointer transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-slate-700"
       onClick={handleRowClick}
     >
       <td className="px-6 py-3 whitespace-nowrap">
@@ -27,7 +27,7 @@ export const UserListRow = React.memo<{ key: string; user: User }>(function User
           <img
             src={typeof user.imageUrl === "string" ? user.imageUrl : ""}
             alt={`${typeof user.lastName === "string" ? user.lastName : ""} ${typeof user.firstName === "string" ? user.firstName : ""}`}
-            className="w-10 h-10 rounded-full object-cover border-2 border-slate-200 dark:border-slate-600"
+            className="h-10 w-10 rounded-full border-2 border-slate-200 object-cover dark:border-slate-600"
           />
           <div className="ml-4">
             <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
@@ -38,16 +38,16 @@ export const UserListRow = React.memo<{ key: string; user: User }>(function User
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+        <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-200">
           {user.publicMetadata.role && user.publicMetadata.role !== ""
             ? Role.fromString(user.publicMetadata.role as string)?.ja
             : "未設定"}
         </span>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">
+      <td className="px-6 py-4 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100">
         {translateYear(user.publicMetadata.year as string)}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">
+      <td className="px-6 py-4 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100">
         {translateGrade(user.publicMetadata.grade as number)}
       </td>
     </tr>
@@ -69,20 +69,20 @@ export const UserCell = React.memo<{ key: string; user: User }>(function UserCel
     <>
       <div
         key={key}
-        className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm p-4 flex items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-200"
+        className="flex cursor-pointer items-center rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-colors duration-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
         onClick={handleCellClick}
       >
         <img
           src={typeof user.imageUrl === "string" ? user.imageUrl : ""}
           alt={`${typeof user.lastName === "string" ? user.lastName : ""} ${typeof user.firstName === "string" ? user.firstName : ""}`}
-          className="w-12 h-12 rounded-full object-cover border-2 border-slate-200 dark:border-slate-600 mr-4"
+          className="mr-4 h-12 w-12 rounded-full border-2 border-slate-200 object-cover dark:border-slate-600"
         />
         <div className="flex-1">
-          <div className="font-medium text-slate-900 dark:text-slate-100 text-base">
+          <div className="text-base font-medium text-slate-900 dark:text-slate-100">
             {user.lastName} {user.firstName}
           </div>
-          <div className="flex flex-wrap gap-2 mt-1 text-xs items-center">
-            <span className="inline-flex px-2 py-1 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+            <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-200">
               {user.publicMetadata.role && user.publicMetadata.role !== ""
                 ? Role.fromString(user.publicMetadata.role as string)?.ja
                 : "未設定"}

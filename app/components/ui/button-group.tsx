@@ -5,14 +5,14 @@ import { cn } from "app/lib/utils"
 import { cva, type VariantProps } from "class-variance-authority"
 
 const buttonGroupVariants = cva(
-  "tw:has-[>[data-slot=button-group]]:gap-2 tw:has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md tw:flex tw:w-fit tw:items-stretch tw:[&>*]:focus-visible:z-10 tw:[&>*]:focus-visible:relative tw:[&>[data-slot=select-trigger]:not([class*=w-])]:w-fit tw:[&>input]:flex-1",
+  "flex w-fit items-stretch *:focus-visible:relative *:focus-visible:z-10 has-[>[data-slot=button-group]]:gap-2 has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-r-md [&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1",
   {
     variants: {
       orientation: {
         horizontal:
-          "tw:[&>[data-slot]:not(:has(~[data-slot]))]:rounded-r-md! tw:[&>[data-slot]~[data-slot]]:rounded-l-none tw:[&>[data-slot]~[data-slot]]:border-l-0 tw:[&>[data-slot]]:rounded-r-none",
+          "*:data-slot:rounded-r-none [&>[data-slot]:not(:has(~[data-slot]))]:rounded-r-md! [&>[data-slot]~[data-slot]]:rounded-l-none [&>[data-slot]~[data-slot]]:border-l-0",
         vertical:
-          "tw:[&>[data-slot]:not(:has(~[data-slot]))]:rounded-b-md! tw:flex-col tw:[&>[data-slot]~[data-slot]]:rounded-t-none tw:[&>[data-slot]~[data-slot]]:border-t-0 tw:[&>[data-slot]]:rounded-b-none",
+          "flex-col *:data-slot:rounded-b-none [&>[data-slot]:not(:has(~[data-slot]))]:rounded-b-md! [&>[data-slot]~[data-slot]]:rounded-t-none [&>[data-slot]~[data-slot]]:border-t-0",
       },
     },
     defaultVariants: { orientation: "horizontal" },
@@ -45,7 +45,7 @@ function ButtonGroupText({
     props: mergeProps<"div">(
       {
         className: cn(
-          "bg-muted gap-2 rounded-md border px-2.5 text-sm font-medium shadow-xs [&_svg:not([class*='size-'])]:size-4 flex items-center [&_svg]:pointer-events-none",
+          "flex items-center gap-2 rounded-md border bg-muted px-2.5 text-sm font-medium shadow-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
           className,
         ),
       },
@@ -66,7 +66,7 @@ function ButtonGroupSeparator({
       data-slot="button-group-separator"
       orientation={orientation}
       className={cn(
-        "tw:bg-input tw:relative tw:self-stretch tw:data-[orientation=horizontal]:mx-px tw:data-[orientation=horizontal]:w-auto tw:data-[orientation=vertical]:my-px tw:data-[orientation=vertical]:h-auto",
+        "relative self-stretch bg-input data-[orientation=horizontal]:mx-px data-[orientation=horizontal]:w-auto data-[orientation=vertical]:my-px data-[orientation=vertical]:h-auto",
         className,
       )}
       {...props}

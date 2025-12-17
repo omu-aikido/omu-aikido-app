@@ -48,7 +48,7 @@ export function Recents({ recent }: { recent: ActivityType | undefined }) {
   return (
     <div className={`${style.card.container()} mt-4`} data-testid="recents-container">
       <h2
-        className="text-lg text-slate-600 dark:text-slate-300 mb-2 mt-0"
+        className="mt-0 mb-2 text-lg text-slate-600 dark:text-slate-300"
         data-testid="recents-title"
       >
         最近追加した項目:
@@ -62,7 +62,7 @@ export function Recents({ recent }: { recent: ActivityType | undefined }) {
         </small>
       </h2>
       <div
-        className="flex justify-between text-sm text-slate-600 dark:text-slate-300 md:flex-row flex-col"
+        className="flex flex-col justify-between text-sm text-slate-600 md:flex-row dark:text-slate-300"
         data-testid="recents-details"
       >
         <span className="mr-2" data-testid="recents-date">

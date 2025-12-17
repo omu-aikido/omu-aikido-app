@@ -10,7 +10,7 @@ export const ProgressIndicator = ({
     step === "basic" ? 0 : step === "personal" ? 1 : step === "profile" ? 2 : 2
 
   const indicator = tv({
-    base: "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
+    base: "flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold",
     variants: {
       step: {
         current: "bg-blue-600 text-white",
@@ -37,7 +37,7 @@ export const ProgressIndicator = ({
             {idx + 1}
           </div>
           {idx < steps.length - 1 && (
-            <div className="w-6 h-0.5 bg-slate-400 dark:bg-slate-500 mx-2" />
+            <div className="mx-2 h-0.5 w-6 bg-slate-400 dark:bg-slate-500" />
           )}
         </div>
       ))}

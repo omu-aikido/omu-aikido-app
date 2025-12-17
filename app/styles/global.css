@@ -45,7 +45,7 @@ hr {
 }
 
 input:-webkit-autofill {
-  @apply shadow shadow-slate-50 dark:shadow-slate-900 text-slate-900 dark:text-slate-200;
+  @apply text-slate-900 shadow shadow-slate-50 dark:text-slate-200 dark:shadow-slate-900;
 }
 
 input[type="date"] {

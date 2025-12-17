@@ -109,9 +109,9 @@ export default function VerifyPage() {
 
   if (!isLoaded) {
     return (
-      <div className={style.card.container({ class: "max-w-md mx-auto" })}>
-        <div className="text-center py-8">
-          <div className="animate-spin mx-auto mb-4 w-8 h-8 border-4 border-t-transparent rounded-full border-blue-600" />
+      <div className={style.card.container({ class: "mx-auto max-w-md" })}>
+        <div className="py-8 text-center">
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
           <p className="text-slate-600 dark:text-slate-400">読み込み中...</p>
         </div>
       </div>
@@ -123,15 +123,15 @@ export default function VerifyPage() {
   }
 
   return (
-    <div className={style.card.container({ class: "max-w-md mx-auto" })}>
+    <div className={style.card.container({ class: "mx-auto max-w-md" })}>
       <h1 className={style.text.sectionTitle()}>メール認証</h1>
 
       {(() => {
         if (loading) {
           return (
-            <div className="text-center py-8">
-              <div className="animate-spin mx-auto mb-4 w-8 h-8 border-4 border-t-transparent rounded-full border-blue-600" />
-              <p className="text-slate-600 dark:text-slate-400 mb-2">処理中...</p>
+            <div className="py-8 text-center">
+              <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+              <p className="mb-2 text-slate-600 dark:text-slate-400">処理中...</p>
               <p className="text-sm text-slate-500 dark:text-slate-500">
                 しばらくお待ちください
               </p>
@@ -141,8 +141,8 @@ export default function VerifyPage() {
 
         if (isVerificationSuccess) {
           return (
-            <div className="text-center py-8">
-              <div className="animate-spin mx-auto mb-4 w-8 h-8 border-4 border-t-transparent rounded-full border-green-600" />
+            <div className="py-8 text-center">
+              <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-green-600 border-t-transparent" />
               <p className="text-sm text-slate-500 dark:text-slate-500">
                 ローディング中...
               </p>
@@ -174,7 +174,7 @@ export default function VerifyPage() {
                 disabled={!canSubmit || !code.trim()}
               >
                 {!canSubmit && (
-                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 )}
                 {!canSubmit
                   ? isVerificationSuccess
@@ -185,7 +185,7 @@ export default function VerifyPage() {
             </form>
 
             <div className="mt-4 text-center">
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+              <p className="mb-2 text-sm text-slate-600 dark:text-slate-400">
                 認証コードが届かない場合
               </p>
               <Button
