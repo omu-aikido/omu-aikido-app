@@ -1,3 +1,5 @@
+import { useId } from "react"
+
 import { iconPaths } from "./IconPaths" // Assuming IconPaths.ts is in the same directory
 
 interface IconProps {
@@ -15,6 +17,8 @@ export function Icon({
   size,
   className,
 }: IconProps) {
+  const id = useId()
+
   // Restrict icon to only keys present in iconPaths
   const iconPath = iconPaths[icon]
 
@@ -36,9 +40,7 @@ export function Icon({
   }
 
   // Create a unique ID for the gradient if needed
-  const gradientId = gradient
-    ? `icon-gradient-${Math.random().toString(36).substring(2, 9)}`
-    : undefined
+  const gradientId = gradient ? `icon-gradient-${id}` : undefined
 
   return (
     <svg

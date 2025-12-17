@@ -1,5 +1,5 @@
 import { createClerkClient, getAuth } from "@clerk/react-router/server"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Link, useFetcher, useOutletContext } from "react-router"
 
 import type { Route } from "./+types/account"
@@ -53,9 +53,10 @@ export default function ProfileForm() {
     ""
   const [isEditing, setIsEditing] = useState(false)
 
-  useEffect(() => {
-    if (fetcher.data) setIsEditing(false)
-  }, [fetcher.data])
+  // Reset editing when fetcher has data
+  if (fetcher.data && isEditing) {
+    setIsEditing(false)
+  }
 
   const disabled = !isEditing || fetcher.state !== "idle"
   const FormWrapper = isEditing ? fetcher.Form : "div"

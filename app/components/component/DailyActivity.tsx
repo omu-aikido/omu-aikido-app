@@ -1,5 +1,5 @@
 import { format } from "date-fns"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 
 import { toLocalJPString } from "~/lib/utils"
 import { style } from "~/styles/component"
@@ -20,17 +20,9 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
   onSave,
   onClose,
 }) => {
-  const [dailyActivities, setDailyActivities] = useState<DailyActivityItem[]>(activities)
-
-  useEffect(() => {
-    // 保持している activities を受け取ったとき、元の period を originalPeriod に保存しておく
-    setDailyActivities(
-      activities.map(act => ({
-        ...act,
-        originalPeriod: act.originalPeriod ?? act.period,
-      })),
-    )
-  }, [activities])
+  const [dailyActivities, setDailyActivities] = useState<DailyActivityItem[]>(() =>
+    activities.map(act => ({ ...act, originalPeriod: act.originalPeriod ?? act.period })),
+  )
 
   const handlePeriodChange = (id: DailyActivityItem["id"], newPeriod: number) => {
     setDailyActivities(prev => {

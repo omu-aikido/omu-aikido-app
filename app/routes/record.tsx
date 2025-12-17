@@ -7,11 +7,12 @@ import {
   startOfMonth,
   subMonths,
 } from "date-fns"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { redirect, useActionData, useFetcher, useSearchParams } from "react-router"
 
 import type { Route } from "./+types/record"
 
+import { isDateString } from "@/type/date"
 import DailyActivity from "~/components/component/DailyActivity"
 import MonthlyActivityList from "~/components/component/MonthlyActivityList"
 import MonthlyCalendarGrid from "~/components/component/MonthlyCalendarGrid"
@@ -35,8 +36,11 @@ export async function loader(args: Route.LoaderArgs) {
   const [year, month] = currentMonth.split("-")
   const date = new Date(parseInt(year), parseInt(month) - 1)
 
-  const startDate = `${year}-${month}-01`
-  const endDate = endOfMonth(date).toISOString()
+  const startDate = format(startOfMonth(date), "yyyy-MM-dd")
+  const endDate = format(endOfMonth(date), "yyyy-MM-dd")
+  if (!isDateString(startDate) || !isDateString(endDate)) {
+    throw new Error("Invalid date range")
+  }
   const client = uc({ request })
 
   try {
@@ -114,25 +118,19 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
   const fetcher = useFetcher()
 
   const [originalActivities, setOriginalActivities] = useState<DailyActivityItem[]>(
-    initialActivities?.map(act => ({ ...act, status: "unchanged" })) || [],
+    () => initialActivities?.map(act => ({ ...act, status: "unchanged" })) || [],
   )
   const [currentActivities, setActivities] = useState<DailyActivityItem[]>(
-    initialActivities?.map(act => ({ ...act, status: "unchanged" })) || [],
+    () => initialActivities?.map(act => ({ ...act, status: "unchanged" })) || [],
   )
 
-  useEffect(() => {
-    setOriginalActivities(
-      initialActivities?.map(act => ({ ...act, status: "unchanged" })) || [],
-    )
-    setActivities(initialActivities?.map(act => ({ ...act, status: "unchanged" })) || [])
-  }, [initialActivities])
-
-  useEffect(() => {
-    if (fetcher.data && fetcher.data.updatedActivitiesWithStatus) {
+  // Update activities when fetcher returns data
+  if (fetcher.data && fetcher.data.updatedActivitiesWithStatus) {
+    if (currentActivities !== fetcher.data.updatedActivitiesWithStatus) {
       setActivities(fetcher.data.updatedActivitiesWithStatus)
       setOriginalActivities(fetcher.data.updatedActivitiesWithStatus)
     }
-  }, [fetcher.data])
+  }
 
   const error = loaderError || actionData?.error || null
   const [showDailyActivityModal, setShowDailyActivityModal] = useState(false)

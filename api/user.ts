@@ -1,6 +1,7 @@
 import { createClerkClient } from "@clerk/backend"
+import { arktypeValidator } from "@hono/arktype-validator"
 import { getAuth } from "@hono/clerk-auth"
-import { ArkErrors, type } from "arktype"
+import { type } from "arktype"
 import { Hono } from "hono"
 
 import {
@@ -8,7 +9,6 @@ import {
   createActivity,
   deleteActivities,
   getActivitiesByDateRange,
-  type inputActivity,
   updateActivities,
 } from "./lib/db/activity"
 import { getUserMonthlyRank } from "./lib/db/ranking"
@@ -26,6 +26,40 @@ const onboardingSetupSchema = type({
     "(string.numeric.parse |> -5 <= number.integer <= 5) | -5 <= number.integer <= 5",
   joinedAt: `(string.numeric.parse |> ${JoinedAtYearRange.min} <= number.integer <= ${JoinedAtYearRange.max}) | ${JoinedAtYearRange.min} <= number.integer <= ${JoinedAtYearRange.max}`,
   getGradeAt: "(string & /^\\d{4}-\\d{2}-\\d{2}$/ | null)?",
+})
+
+const activitiesQuerySchema = type({
+  startDate: "(string & /^\\d{4}-\\d{2}-\\d{2}$/)?",
+  endDate: "(string & /^\\d{4}-\\d{2}-\\d{2}$/)?",
+})
+
+const activityDateSchema = "string & /^\\d{4}-\\d{2}-\\d{2}$/"
+const activityPeriodSchema = "(string.numeric.parse |> number > 0) | number > 0"
+
+const activityUpsertSchema = type({
+  id: "string",
+  date: activityDateSchema,
+  period: activityPeriodSchema,
+})
+
+const createActivitySchema = type({
+  date: activityDateSchema,
+  period: activityPeriodSchema,
+})
+
+const updateActivitiesSchema = type({
+  added: activityUpsertSchema.array().optional(),
+  updated: activityUpsertSchema.array().optional(),
+  deleted: type("string").array().optional(),
+})
+
+const updateUserProfileSchema = userProfileInputSchema
+
+const updateAccountSchema = type({
+  firstName: "string?",
+  lastName: "string?",
+  username: "string?",
+  profileImage: "unknown?",
 })
 
 const normalizeGetGradeAt = (value: unknown): string | null => {
@@ -108,28 +142,32 @@ export const userApp = new Hono<{ Bindings: Env }>()
     if (!profile) return c.json({ error: "Profile not found" }, 404)
     return c.json({ profile: { id: auth.userId, ...profile } }, 200)
   })
-  .patch("/profile", async c => {
-    const auth = getAuth(c)
-    if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
-    const existingProfile = await getProfile(c)
-    if (!existingProfile) return c.json({ error: ONBOARDING_MESSAGE }, 404)
-    const body = await c.req.json()
-    const parsed = userProfileInputSchema(body)
-    if (parsed instanceof ArkErrors) {
-      return c.json({ error: "Invalid profile payload" }, 400)
-    }
-    const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
-    const newMetadata = await clerkClient.users.updateUserMetadata(auth.userId, {
-      publicMetadata: {
-        grade: parsed.grade,
-        getGradeAt: parsed.getGradeAt,
-        joinedAt: parsed.joinedAt,
-        year: parsed.year,
-        role: existingProfile.role,
-      },
-    })
-    return c.json({ profile: { ...newMetadata.publicMetadata, id: auth.userId } }, 200)
-  })
+  .patch(
+    "/profile",
+    arktypeValidator("json", updateUserProfileSchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: "Invalid profile payload" }, 400)
+      }
+    }),
+    async c => {
+      const auth = getAuth(c)
+      if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
+      const existingProfile = await getProfile(c)
+      if (!existingProfile) return c.json({ error: ONBOARDING_MESSAGE }, 404)
+      const parsed = c.req.valid("json")
+      const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
+      const newMetadata = await clerkClient.users.updateUserMetadata(auth.userId, {
+        publicMetadata: {
+          grade: parsed.grade,
+          getGradeAt: parsed.getGradeAt,
+          joinedAt: parsed.joinedAt,
+          year: parsed.year,
+          role: existingProfile.role,
+        },
+      })
+      return c.json({ profile: { ...newMetadata.publicMetadata, id: auth.userId } }, 200)
+    },
+  )
   .get("/account", async c => {
     const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
     const auth = getAuth(c)
@@ -137,44 +175,60 @@ export const userApp = new Hono<{ Bindings: Env }>()
     const user = await clerkClient.users.getUser(auth.userId)
     return c.json({ user }, 200)
   })
-  .patch("/account", async c => {
-    const auth = getAuth(c)
-    if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
-    const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
-    const formData = await c.req.formData()
-    const firstName = formData.get("firstName")
-    const lastName = formData.get("lastName")
-    const username = formData.get("username")
-    const updatePayload: { firstName?: string; lastName?: string; username?: string } = {}
-    if (typeof firstName === "string" && firstName.trim()) {
-      updatePayload.firstName = firstName.trim()
-    }
-    if (typeof lastName === "string" && lastName.trim()) {
-      updatePayload.lastName = lastName.trim()
-    }
-    if (typeof username === "string" && username.trim()) {
-      updatePayload.username = username.trim()
-    }
-    if (Object.keys(updatePayload).length > 0) {
-      try {
-        await clerkClient.users.updateUser(auth.userId, updatePayload)
-      } catch (err) {
-        return c.json(err, 500)
+  .patch(
+    "/account",
+    arktypeValidator("form", updateAccountSchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: "Invalid form payload" }, 400)
       }
-    }
-    const profileImage = formData.get("profileImage")
-    if (profileImage instanceof File && profileImage.size > 0) {
-      try {
-        await clerkClient.users.updateUserProfileImage(auth.userId, {
-          file: profileImage,
-        })
-      } catch (err) {
-        return c.json(err, 500)
+    }),
+    async c => {
+      const auth = getAuth(c)
+      if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
+      const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
+
+      const body = c.req.valid("form")
+      const normalizeFirstValue = (value: unknown) =>
+        Array.isArray(value) ? value[0] : value
+
+      const firstName = normalizeFirstValue(body.firstName)
+      const lastName = normalizeFirstValue(body.lastName)
+      const username = normalizeFirstValue(body.username)
+
+      const updatePayload: { firstName?: string; lastName?: string; username?: string } =
+        {}
+      if (typeof firstName === "string" && firstName.trim()) {
+        updatePayload.firstName = firstName.trim()
       }
-    }
-    const user = await clerkClient.users.getUser(auth.userId)
-    return c.json({ user }, 200)
-  })
+      if (typeof lastName === "string" && lastName.trim()) {
+        updatePayload.lastName = lastName.trim()
+      }
+      if (typeof username === "string" && username.trim()) {
+        updatePayload.username = username.trim()
+      }
+      if (Object.keys(updatePayload).length > 0) {
+        try {
+          await clerkClient.users.updateUser(auth.userId, updatePayload)
+        } catch (err) {
+          return c.json(err, 500)
+        }
+      }
+
+      const profileImage = normalizeFirstValue(body.profileImage)
+      if (profileImage instanceof File && profileImage.size > 0) {
+        try {
+          await clerkClient.users.updateUserProfileImage(auth.userId, {
+            file: profileImage,
+          })
+        } catch (err) {
+          return c.json(err, 500)
+        }
+      }
+
+      const user = await clerkClient.users.getUser(auth.userId)
+      return c.json({ user }, 200)
+    },
+  )
   .get("/summary", async c => {
     const auth = getAuth(c)
     if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
@@ -201,67 +255,90 @@ export const userApp = new Hono<{ Bindings: Env }>()
     const ranking = await getUserMonthlyRank({ userId: auth.userId, env: c.env })
     return c.json({ ranking }, 200)
   })
-  .get("/activities", async c => {
-    const auth = getAuth(c)
-    if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
-    const startDate = c.req.query("startDate")
-    const endDate = c.req.query("endDate")
-    const activities = await getActivitiesByDateRange({
-      userId: auth.userId,
-      startDate: startDate || undefined,
-      endDate: endDate || undefined,
-      env: c.env,
-    })
-    return c.json({ activities }, 200)
-  })
-  .post("/activities", async c => {
-    const auth = getAuth(c)
-    if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
-    const body = await c.req.json<{ date?: string; period?: number | string }>()
-    if (!body.date || body.period === undefined) {
-      return c.json({ error: "Invalid activity payload" }, 400)
-    }
-    const period = Number(body.period)
-    if (!Number.isFinite(period)) {
-      return c.json({ error: "Invalid period" }, 400)
-    }
-    await createActivity({
-      userId: auth.userId,
-      activity: { id: "", date: body.date, userId: auth.userId, period },
-      env: c.env,
-    })
-    return c.json({ success: true }, 200)
-  })
-  .put("/activities", async c => {
-    const auth = getAuth(c)
-    if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
-    const body = await c.req.json<{
-      added?: Array<typeof inputActivity>
-      updated?: Array<typeof inputActivity>
-      deleted?: string[]
-    }>()
-    const added = Array.isArray(body?.added) ? body.added : []
-    const updated = Array.isArray(body?.updated) ? body.updated : []
-    const deleted = Array.isArray(body?.deleted) ? body.deleted : []
-    if (added.length > 0) {
-      await createActivities({
+  .get(
+    "/activities",
+    arktypeValidator("query", activitiesQuerySchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: "Invalid query" }, 400)
+      }
+    }),
+    async c => {
+      const auth = getAuth(c)
+      if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
+      const { startDate, endDate } = c.req.valid("query")
+      const activities = await getActivitiesByDateRange({
         userId: auth.userId,
-        activities: added.map(act => ({ ...act, userId: auth.userId })),
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
         env: c.env,
       })
-    }
-    if (updated.length > 0) {
-      await updateActivities({
+      return c.json({ activities }, 200)
+    },
+  )
+  .post(
+    "/activities",
+    arktypeValidator("json", createActivitySchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: "Invalid activity payload" }, 400)
+      }
+    }),
+    async c => {
+      const auth = getAuth(c)
+      if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
+      const body = c.req.valid("json")
+      await createActivity({
         userId: auth.userId,
-        activities: updated.map(act => ({ ...act, userId: auth.userId })),
+        activity: { id: "", date: body.date, userId: auth.userId, period: body.period },
         env: c.env,
       })
-    }
-    if (deleted.length > 0) {
-      await deleteActivities({ userId: auth.userId, ids: deleted, env: c.env })
-    }
-    return c.json({ success: true }, 200)
-  })
+      return c.json({ success: true }, 200)
+    },
+  )
+  .put(
+    "/activities",
+    arktypeValidator("json", updateActivitiesSchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: "Invalid activity payload" }, 400)
+      }
+    }),
+    async c => {
+      const auth = getAuth(c)
+      if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
+      const body = c.req.valid("json")
+      const added = body.added ?? []
+      const updated = body.updated ?? []
+      const deleted = body.deleted ?? []
+
+      if (added.length > 0) {
+        await createActivities({
+          userId: auth.userId,
+          activities: added.map(act => ({
+            id: act.id,
+            date: act.date,
+            period: act.period,
+            userId: auth.userId,
+          })),
+          env: c.env,
+        })
+      }
+      if (updated.length > 0) {
+        await updateActivities({
+          userId: auth.userId,
+          activities: updated.map(act => ({
+            id: act.id,
+            date: act.date,
+            period: act.period,
+            userId: auth.userId,
+          })),
+          env: c.env,
+        })
+      }
+      if (deleted.length > 0) {
+        await deleteActivities({ userId: auth.userId, ids: deleted, env: c.env })
+      }
+      return c.json({ success: true }, 200)
+    },
+  )
   .get("/onboarding", async c => {
     const auth = getAuth(c)
     if (!auth || !auth.userId) return c.json({ status: "unauthorized" }, 401)
@@ -332,44 +409,50 @@ export const userApp = new Hono<{ Bindings: Env }>()
       )
     }
   })
-  .post("/onboarding/setup", async c => {
-    const auth = getAuth(c)
-    if (!auth || !auth.userId)
-      return c.json({ success: false, error: "認証が必要です" }, 401)
-    const parsed = onboardingSetupSchema(await c.req.json())
-    if (parsed instanceof ArkErrors) {
+  .post(
+    "/onboarding/setup",
+    arktypeValidator("json", onboardingSetupSchema, (result, c) => {
+      if (result.success) return
       const errors = Object.fromEntries(
-        Object.entries(parsed.byPath).map(([key, value]) => [
+        Object.entries(result.errors.byPath).map(([key, value]) => [
           key || "general",
           value?.message ?? "不正な値です",
         ]),
       )
       return c.json({ success: false, errors }, 400)
-    }
-    const data = parsed
-    if (data.joinedAt < JoinedAtYearRange.min || data.joinedAt > JoinedAtYearRange.max) {
-      return c.json(
-        {
-          success: false,
-          errors: {
-            joinedAt: `入部年度は${JoinedAtYearRange.min}年から${JoinedAtYearRange.max}年の間で入力してください`,
+    }),
+    async c => {
+      const auth = getAuth(c)
+      if (!auth || !auth.userId)
+        return c.json({ success: false, error: "認証が必要です" }, 401)
+      const data = c.req.valid("json")
+      if (
+        data.joinedAt < JoinedAtYearRange.min ||
+        data.joinedAt > JoinedAtYearRange.max
+      ) {
+        return c.json(
+          {
+            success: false,
+            errors: {
+              joinedAt: `入部年度は${JoinedAtYearRange.min}年から${JoinedAtYearRange.max}年の間で入力してください`,
+            },
           },
+          400,
+        )
+      }
+      const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
+      await clerkClient.users.updateUserMetadata(auth.userId, {
+        publicMetadata: {
+          year: data.year,
+          grade: data.grade,
+          joinedAt: data.joinedAt,
+          getGradeAt: data.getGradeAt ?? null,
+          role: "member",
         },
-        400,
-      )
-    }
-    const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
-    await clerkClient.users.updateUserMetadata(auth.userId, {
-      publicMetadata: {
-        year: data.year,
-        grade: data.grade,
-        joinedAt: data.joinedAt,
-        getGradeAt: data.getGradeAt ?? null,
-        role: "member",
-      },
-      unsafeMetadata: {},
-    })
-    return c.json({ success: true, redirect: "/" }, 200)
-  })
+        unsafeMetadata: {},
+      })
+      return c.json({ success: true, redirect: "/" }, 200)
+    },
+  )
 
 export type UserApp = typeof userApp

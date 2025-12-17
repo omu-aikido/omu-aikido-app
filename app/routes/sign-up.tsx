@@ -97,10 +97,8 @@ export default function SignUpPage(props: Route.ComponentProps) {
   const { state, dispatch, nextStep, prevStep, validateStep } = useSignUpForm(currentYear)
   const { step, clerkErrors, formErrors, formValues, isSignUpCreated } = state
 
-  const [hydrated, setHydrated] = useState(false)
-  useEffect(() => {
-    setHydrated(true)
-  }, [])
+  const [hydrated] = useState(() => typeof window !== "undefined")
+
   const disabled =
     !hydrated ||
     step !== "profile" ||

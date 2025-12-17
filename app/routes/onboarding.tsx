@@ -1,5 +1,5 @@
 import { createClerkClient, getAuth } from "@clerk/react-router/server"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { redirect, useFetcher, useNavigate } from "react-router"
 
 import type { Route } from "./+types/onboarding"
@@ -324,9 +324,7 @@ export default function OnboardingPage(args: Route.ComponentProps) {
       if (result.success && result.redirect) {
         navigate(result.redirect, { replace: true })
       } else if (!result.success) {
-        if (result.errors) {
-          setErrors(result.errors)
-        } else if (result.requiresReSignup) {
+        if (result.requiresReSignup) {
           // 再サインアップが必要な場合
           setTimeout(() => {
             navigate("/sign-up", { replace: true })
@@ -335,6 +333,20 @@ export default function OnboardingPage(args: Route.ComponentProps) {
       }
     }
   }, [fetcher.data, navigate])
+
+  // Handle errors separately
+  const errorData = useMemo(() => {
+    if (fetcher.data && typeof fetcher.data === "object") {
+      const result = fetcher.data as { success: boolean; errors?: Record<string, string> }
+      return !result.success && result.errors ? result.errors : null
+    }
+    return null
+  }, [fetcher.data])
+
+  // Update errors when errorData changes
+  if (errorData && errorData !== errors) {
+    setErrors(errorData)
+  }
 
   // 自動タイムアウト（エラーが発生した場合のフォールバック）
   useEffect(() => {

@@ -1,3 +1,5 @@
+import "./arktype-config"
+
 import { Hono } from "hono"
 import { createRequestHandler } from "react-router"
 
