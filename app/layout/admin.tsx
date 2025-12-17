@@ -4,7 +4,7 @@ import { Outlet, redirect } from "react-router"
 import type { Route } from "./+types/admin"
 
 import { getProfile } from "~/lib/query/profile"
-import { Role } from "~/lib/zod"
+import { Role } from "~/lib/role"
 import { style } from "~/styles/component"
 
 // MARK: Loader - 共通の認証処理

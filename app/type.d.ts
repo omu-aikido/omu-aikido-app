@@ -1,13 +1,13 @@
 import type { ClerkHostRouter } from "@clerk/react-router"
-import type { z } from "zod"
+
+import type { profileWithIdSchema } from "../types/account"
 
 import type { ActivityType } from "./db/schema"
-import type { profileSchema } from "./lib/zod"
 
 export type Year = "b1" | "b2" | "b3" | "b4" | "m1" | "m2" | "d1" | "d2"
 export type Grade = 0 | 5 | 4 | 3 | 2 | 1 | -1 | -2
 
-export type Profile = z.infer<typeof profileSchema>
+export type Profile = typeof profileWithIdSchema.infer
 
 type PagePath = { name: string; href: string; desc: string }
 

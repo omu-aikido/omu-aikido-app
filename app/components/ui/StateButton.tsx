@@ -1,6 +1,6 @@
-import type { FetcherWithComponents } from "react-router"
-
 import { Button } from "~/components/ui/button"
+
+type FetcherLike = { state: "idle" | "submitting" | "loading" }
 
 export function StateButton({
   isEditing,
@@ -9,7 +9,7 @@ export function StateButton({
 }: {
   isEditing: boolean
   setIsEditing: (editing: boolean) => void
-  fetcher: FetcherWithComponents<unknown>
+  fetcher: FetcherLike
 }) {
   const isBusy = fetcher.state !== "idle"
   const submitLabel: string = isBusy ? "通信中" : "保存"

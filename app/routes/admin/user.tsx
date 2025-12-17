@@ -23,8 +23,8 @@ import {
 import { StateButton } from "~/components/ui/StateButton"
 import { activitySummary, updateProfile } from "~/lib/query/admin"
 import { getProfile } from "~/lib/query/profile"
+import { Role } from "~/lib/role"
 import { getJST, grade as gradeOptions } from "~/lib/utils"
-import { Role } from "~/lib/zod"
 import { style } from "~/styles/component"
 import type { Profile } from "~/type"
 
@@ -291,7 +291,7 @@ export default function AdminUser(args: Route.ComponentProps) {
           <p className="text-lg text-slate-600 dark:text-slate-400">
             ユーザー情報が見つかりませんでした。
           </p>
-          <Button asChild className="mt-4">
+          <Button className="mt-4">
             <Link to="/admin">アカウント管理に戻る</Link>
           </Button>
         </div>
@@ -303,7 +303,7 @@ export default function AdminUser(args: Route.ComponentProps) {
   const safeProfile = profile ?? {
     role: "member",
     grade: 0,
-    getGradeAt: "",
+    getGradeAt: null,
     joinedAt: new Date().getFullYear(),
     year: "b1",
     id: user.id,
@@ -421,7 +421,7 @@ function RoleSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
       </Label>
       <Select name="role" required defaultValue={profile.role} disabled={disabled}>
         <SelectTrigger id="role">
-          <SelectValue placeholder="役職を選択" />
+          <SelectValue aria-placeholder="役職を選択" />
         </SelectTrigger>
         <SelectContent>
           {Role.ALL.map(r => (
@@ -449,7 +449,7 @@ function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         disabled={disabled}
       >
         <SelectTrigger id="grade">
-          <SelectValue placeholder="級段位を選択" />
+          <SelectValue aria-placeholder="級段位を選択" />
         </SelectTrigger>
         <SelectContent>
           {gradeOptions.map(g => (
@@ -536,7 +536,7 @@ function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
       </Label>
       <Select name="year" required defaultValue={profile.year} disabled={disabled}>
         <SelectTrigger>
-          <SelectValue placeholder="学年を選択" />
+          <SelectValue aria-placeholder="学年を選択" />
         </SelectTrigger>
         <SelectContent>
           {yearOptions.map(y => (

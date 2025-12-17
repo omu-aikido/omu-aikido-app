@@ -16,7 +16,7 @@ import {
   SheetTrigger,
 } from "~/components/ui/sheet"
 import { getProfile } from "~/lib/query/profile"
-import { Role } from "~/lib/zod"
+import { Role } from "~/lib/role"
 import "~/styles/global.css"
 import type { PagePath } from "~/type"
 
@@ -58,7 +58,7 @@ export default function App(args: Route.ComponentProps) {
     <div className="h-dvh" data-testid="auth-layout-container">
       <ReactHeader title="ポータル">
         <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-          <SheetTrigger asChild>
+          <SheetTrigger>
             <Button
               variant="ghost"
               size="icon"

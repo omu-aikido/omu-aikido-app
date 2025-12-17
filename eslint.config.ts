@@ -126,7 +126,10 @@ export default tseslint.config(
   },
   // React Router specific configuration
   {
-    files: ["app/**/*.{js,jsx,ts,tsx}"],
+    files: [
+      "app/routes/**/*.{js,jsx,ts,tsx}",
+      "app/components/component/**/*.{js,jsx,ts,tsx}",
+    ],
     rules: {
       // React Router v7 specific rules
       "react-refresh/only-export-components": [

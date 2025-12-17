@@ -2,9 +2,9 @@
 import { useSignUp } from "@clerk/react-router"
 import { getAuth } from "@clerk/react-router/server"
 import type { ClerkAPIError } from "@clerk/types"
+import { ArkErrors } from "arktype"
 import { useCallback, useEffect, useState } from "react"
 import { Link, redirect, useFetcher, useNavigate } from "react-router"
-import type { z } from "zod"
 
 import type { Route } from "./+types/sign-up"
 
@@ -37,7 +37,7 @@ export async function clientAction({
   const formData = await request.formData()
   const data = Object.fromEntries(formData)
 
-  const parsed = formDataSchema.safeParse({
+  const parsed = formDataSchema({
     email: data.email || "",
     newPassword: data.newPassword || "",
     firstName: data.firstName || "",
@@ -51,16 +51,19 @@ export async function clientAction({
     legalAccepted: data.legalAccepted === "on",
   })
 
-  if (!parsed.success) {
+  if (parsed instanceof ArkErrors) {
     return {
       success: false,
       errors: Object.fromEntries(
-        parsed.error.issues.map(issue => [issue.path[0] || "general", issue.message]),
+        Object.entries(parsed.byPath).map(([key, value]) => [
+          key || "general",
+          value?.message ?? "不正な値です",
+        ]),
       ),
     }
   }
 
-  return { success: true, formData: parsed.data }
+  return { success: true, formData: parsed }
 }
 
 function usePreferredTheme() {
@@ -109,7 +112,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
 
   // クライアントサイドでのClerk登録処理
   const handleClerkSignUp = useCallback(
-    async (validatedData: z.infer<typeof formDataSchema>) => {
+    async (validatedData: typeof formDataSchema.infer) => {
       dispatch({ type: "SET_IS_SIGN_UP_CREATED", payload: true })
       if (!isLoaded || !signUp || !validatedData || isSignUpCreated) {
         if (!isSignUpCreated) {
@@ -224,16 +227,8 @@ export default function SignUpPage(props: Route.ComponentProps) {
           dispatch({ type: "SET_IS_SIGN_UP_CREATED", payload: false })
         }
       } else {
-        // result.formData should already be a plain object from clientAction — validate with zod
-        try {
-          const parsed = formDataSchema.parse(result.formData)
-          handleClerkSignUp(parsed)
-        } catch {
-          dispatch({
-            type: "SET_FORM_ERRORS",
-            payload: { general: "無効なフォームデータが返されました" },
-          })
-        }
+        // result.formData should already be validated by clientAction
+        handleClerkSignUp(result.formData)
       }
     }
   }, [fetcher.data, fetcher.state, handleClerkSignUp, dispatch])

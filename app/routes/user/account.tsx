@@ -1,4 +1,4 @@
-import { createClerkClient, getAuth, type EmailAddress } from "@clerk/react-router/server"
+import { createClerkClient, getAuth } from "@clerk/react-router/server"
 import { useEffect, useState } from "react"
 import { Link, useFetcher, useOutletContext } from "react-router"
 
@@ -48,8 +48,7 @@ export default function ProfileForm() {
   const context = useOutletContext<UserLayoutComponentProps>()
   const user = context.loaderData.user
   const primaryEmail =
-    user.emailAddresses.find((e: EmailAddress) => e.id === user.primaryEmailAddressId)
-      ?.emailAddress ||
+    user.emailAddresses.find(e => e.id === user.primaryEmailAddressId)?.emailAddress ||
     user.emailAddresses[0]?.emailAddress ||
     ""
   const [isEditing, setIsEditing] = useState(false)
@@ -108,7 +107,9 @@ function ProfileImageInput({
   // Only allow http(s) URLs or data URLs for images
   const safeImageUrl =
     typeof imageUrl === "string" &&
-    (/^https?:\/\/[^ "]+$/.test(imageUrl) || /^data:image\//.test(imageUrl))
+    (((imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) &&
+      !imageUrl.includes(" ")) ||
+      imageUrl.startsWith("data:image/"))
       ? imageUrl
       : ""
 

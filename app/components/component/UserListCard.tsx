@@ -2,8 +2,8 @@ import type { User } from "@clerk/react-router/server"
 import React from "react"
 import { useNavigate } from "react-router"
 
+import { Role } from "~/lib/role"
 import { translateGrade, translateYear } from "~/lib/utils"
-import { Role } from "~/lib/zod"
 
 // MARK: UserListRow
 export const UserListRow = React.memo<{ key: string; user: User }>(function UserListRow({

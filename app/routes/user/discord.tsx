@@ -1,10 +1,8 @@
 import { useUser } from "@clerk/react-router"
 import { useState } from "react"
-import { useOutletContext } from "react-router"
 
 import { Button } from "~/components/ui/button"
 import { Icon } from "~/components/ui/Icon"
-import type { UserLayoutComponentProps } from "~/layout/user"
 
 export function meta() {
   return [
@@ -17,9 +15,8 @@ export function meta() {
 export default function Discord() {
   const [isConnecting, setIsConnecting] = useState(false)
   const [isDisconnecting, setIsDisconnecting] = useState(false)
-  const context = useOutletContext<UserLayoutComponentProps>()
-  const { loaderData } = context
   const { user } = useUser()
+  const discordAccount = user?.externalAccounts.find(acc => acc.provider === "discord")
 
   const handleConnectDiscord = async () => {
     if (!user) return
@@ -72,12 +69,12 @@ export default function Discord() {
   return (
     <>
       <div className="max-w-lg mx-auto p-4">
-        {loaderData.discordAccount ? (
+        {discordAccount ? (
           <div className="space-y-4">
             <div className="flex items-center gap-3 p-4 border rounded-lg bg-indigo-50 border-indigo-200 dark:bg-indigo-950 dark:border-indigo-800">
-              {loaderData.discordAccount.imageUrl ? (
+              {discordAccount.imageUrl ? (
                 <img
-                  src={loaderData.discordAccount.imageUrl}
+                  src={discordAccount.imageUrl}
                   alt="Discord プロフィール画像"
                   className="w-10 h-10 rounded-full"
                 />
@@ -89,10 +86,10 @@ export default function Discord() {
               <div>
                 <span className="font-medium text-indigo-800 dark:text-indigo-200 flex flex-row items-center">
                   <Icon icon="discord-logo" />
-                  {loaderData.discordAccount.username || "Discord ユーザー"}
+                  {discordAccount.username || "Discord ユーザー"}
                 </span>
                 <p className="text-sm text-indigo-600 dark:text-indigo-300">
-                  {loaderData.discordAccount.emailAddress || "連携済み"}
+                  {discordAccount.emailAddress || "連携済み"}
                 </p>
               </div>
             </div>

@@ -1,23 +1,17 @@
 import { getAuth } from "@clerk/react-router/server"
-import type { ResultSet } from "@libsql/client"
 import { Link, useFetcher } from "react-router"
 
 import type { Route } from "./+types/home"
 
+import { Role } from "@/type/role"
 import { AddRecord } from "~/components/component/AddRecord"
 import { MyRanking } from "~/components/component/MyRanking"
 import { NextGrade } from "~/components/component/NextGrade"
 import Recents from "~/components/component/Recents"
 import { Button } from "~/components/ui/button"
 import type { ActivityType } from "~/db/schema"
-import {
-  createActivity,
-  getUserMonthlyRank,
-  userActivitySummaryAndRecent,
-} from "~/lib/query/activity"
-import { getAccount, getProfile } from "~/lib/query/profile"
-import { getJST, timeForNextGrade } from "~/lib/utils"
-import { Role } from "~/lib/zod"
+import { uc } from "~/lib/api-client"
+import { timeForNextGrade } from "~/lib/utils"
 import { style } from "~/styles/component"
 import type { PagePath } from "~/type"
 
@@ -27,14 +21,27 @@ export async function loader(args: Route.LoaderArgs) {
   const userId = auth.userId
   if (!userId) throw new Error("User not authenticated")
 
-  const env = args.context.cloudflare.env
+  const client = uc({ request: args.request })
+  const [profileRes, summaryRes, accountRes, rankingRes] = await Promise.all([
+    client.profile.$get(),
+    client.summary.$get(),
+    client.account.$get(),
+    client.ranking.$get(),
+  ])
+  if (!profileRes.ok) throw new Error("Failed to fetch profile")
+  const { profile } = await profileRes.json()
+  if (!summaryRes.ok) throw new Error("Failed to fetch summary")
+  const { summary } = await summaryRes.json()
+  if (!accountRes.ok) throw new Error("Failed to fetch account")
+  const { user } = await accountRes.json()
+  if (!rankingRes.ok) throw new Error("Failed to fetch ranking data")
+  const { ranking } = await rankingRes.json()
 
   const apps: PagePath[] = [
     { name: "記録", href: "/record", desc: "活動の記録をつけよう" },
     { name: "アカウント", href: "/account", desc: "アカウント設定ページ" },
   ]
   let role: Role | null = null
-  const user = await getAccount({ userId, env })
   if (user) {
     role = Role.fromString(`${user.publicMetadata?.role}`)
     if (role && role.isManagement()) {
@@ -43,19 +50,6 @@ export async function loader(args: Route.LoaderArgs) {
     }
   }
 
-  const profile = await getProfile({ userId, env })
-  if (!profile) throw new Error("Profile not found")
-  const today = new Date()
-  const summary = await userActivitySummaryAndRecent({
-    userId,
-    start: profile.getGradeAt
-      ? getJST(new Date(`${profile.getGradeAt}T09:00:00.000Z`))
-      : getJST(new Date(profile.joinedAt, 3, 1, 9)),
-    end: getJST(
-      new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 9),
-    ),
-    env,
-  })
   const activityFromPreviousGrade = summary.length > 0 ? summary[0].total / 1.5 : 0
   const grade = profile.grade
   const forNextGrade = timeForNextGrade(grade ? grade : 0)
@@ -65,14 +59,9 @@ export async function loader(args: Route.LoaderArgs) {
   )
   const gradeData = { grade, needToNextGrade, forNextGrade }
 
-  const recent = summary.pop() as ActivityType
+  const recent = summary.at(-1) as ActivityType | undefined
 
-  const rankingdata = await getUserMonthlyRank({
-    userId,
-    year: new Date().getUTCFullYear(),
-    month: new Date().getUTCMonth(),
-    env,
-  })
+  const rankingdata = ranking
 
   return { gradeData, apps, recent, rankingdata }
 }
@@ -86,23 +75,28 @@ export function meta({}: Route.MetaArgs) {
 }
 
 // MARK: Action
-export async function action(
-  args: Route.ActionArgs,
-): Promise<{ response: ResultSet | null; result: boolean }> {
+export async function action(args: Route.ActionArgs) {
   const request = args.request
-  const env = args.context.cloudflare.env
+  const client = uc({ request })
   const formData = await request.formData()
-  const userId = formData.get("userId") as string
-  const date = formData.get("date") as string
-  const period = formData.get("period") as unknown as number
-  if (!date || !period) return { response: null, result: false }
-  const response = await createActivity({
-    userId,
-    activity: { id: "", date, userId, period },
-    env,
-  })
-  const result = { response, count: response.rowsAffected }
-  return { response: result.response, result: result.count === 1 }
+  const date = formData.get("date")
+  const periodValue = formData.get("period")
+  if (typeof date !== "string" || typeof periodValue !== "string") {
+    return { error: "日付と稽古時間を入力してください。" }
+  }
+  const period = Number(periodValue)
+  if (Number.isNaN(period) || period <= 0) {
+    return { error: "稽古時間の形式が正しくありません。" }
+  }
+
+  const response = await client.activities.$post({ json: { date, period } })
+  if (!response.ok) {
+    const data = await response.json().catch(() => null)
+    return {
+      error: (data as { error?: string } | null)?.error ?? "記録の追加に失敗しました。",
+    }
+  }
+  return { success: true }
 }
 
 // MARK: Component
@@ -134,7 +128,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <hr data-testid="home-divider" />
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {apps.map((app: PagePath) => (
-          <Button asChild variant="outline" className="h-24" key={app.href}>
+          <Button variant="outline" className="h-24" key={app.href}>
             <Link
               to={app.href}
               className="flex flex-col items-center justify-center gap-2"

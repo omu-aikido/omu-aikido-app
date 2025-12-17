@@ -2,12 +2,14 @@
   "extends": "./tsconfig.json",
   "include": [
     ".react-router/types/**/*",
+    "api/**/*",
     "app/**/*",
     "app/**/.server/**/*",
     "app/**/.client/**/*",
     "workers/**/*",
     "worker-configuration.d.ts",
-    "app/env.server.tsx"
+    "app/env.server.tsx",
+    "types"
   ],
   "compilerOptions": {
     "composite": true,
@@ -20,7 +22,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "rootDirs": [".", "./.react-router/types"],
-    "paths": { "~/*": ["./app/*"] },
+    "paths": { "~/*": ["./app/*"], "@/api/*": ["./api/*"], "@/type/*": ["./types/*"] },
     "esModuleInterop": true,
     "resolveJsonModule": true
   }

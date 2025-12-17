@@ -11,7 +11,7 @@ import Ranking from "~/components/component/Ranking"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { getMonthlyRanking } from "~/lib/query/admin"
-import { Role } from "~/lib/zod"
+import { Role } from "~/lib/role"
 import { style } from "~/styles/component"
 
 // MARK: Loader

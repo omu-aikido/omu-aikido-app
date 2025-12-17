@@ -71,7 +71,7 @@ export async function loader(args: Route.LoaderArgs) {
         ? unsafeMetadata.joinedAt
         : undefined
 
-    let getGradeAt: string = ""
+    let getGradeAt: string | null = null
     if (
       unsafeMetadata.getGradeAt !== null &&
       typeof unsafeMetadata.getGradeAt === "string" &&
@@ -177,7 +177,7 @@ export async function action(args: Route.ActionArgs) {
           ? unsafeMetadata.joinedAt
           : undefined
 
-      let getGradeAt: string = ""
+      let getGradeAt: string | null = null
       if (
         unsafeMetadata.getGradeAt !== null &&
         typeof unsafeMetadata.getGradeAt === "string" &&
@@ -254,12 +254,12 @@ export async function action(args: Route.ActionArgs) {
       const grade = parseInt(gradeStr)
       const joinedAt = parseInt(joinedAtStr)
 
-      let processedGetGradeAt: string = ""
+      let processedGetGradeAt: string | null = null
       if (getGradeAt && getGradeAt.trim() !== "") {
         const dateStr = getGradeAt.trim()
         const date = new Date(dateStr)
         if (!isNaN(date.getTime())) {
-          processedGetGradeAt = date.toISOString()
+          processedGetGradeAt = date.toISOString().split("T")[0]
         }
       }
 
@@ -376,7 +376,7 @@ export default function OnboardingPage(args: Route.ComponentProps) {
             <Label htmlFor="year">学年</Label>
             <Select name="year" defaultValue="b1" required>
               <SelectTrigger id="year">
-                <SelectValue placeholder="学年を選択" />
+                <SelectValue aria-placeholder="学年を選択" />
               </SelectTrigger>
               <SelectContent>{yearOptions()}</SelectContent>
             </Select>
@@ -389,7 +389,7 @@ export default function OnboardingPage(args: Route.ComponentProps) {
             <Label htmlFor="grade">現在の級段位</Label>
             <Select name="grade" defaultValue="0" required>
               <SelectTrigger id="grade">
-                <SelectValue placeholder="級段位を選択" />
+                <SelectValue aria-placeholder="級段位を選択" />
               </SelectTrigger>
               <SelectContent>{gradeOptions()}</SelectContent>
             </Select>
