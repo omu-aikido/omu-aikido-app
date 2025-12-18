@@ -318,7 +318,6 @@ export default function AdminUser(args: Route.ComponentProps) {
                 return
               }
             }
-
           }
         }}
       >

@@ -1,7 +1,11 @@
 import { ArkErrors } from "arktype"
 import { describe, expect, it } from "vitest"
 
-import { coerceProfileMetadata, profileBaseSchema, userProfileRequestSchema } from "./account"
+import {
+  coerceProfileMetadata,
+  profileBaseSchema,
+  userProfileRequestSchema,
+} from "./account"
 
 type Profile = typeof profileBaseSchema.infer
 
