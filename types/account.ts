@@ -29,11 +29,13 @@ export const coerceProfileMetadata = (input: unknown): unknown => {
 const profileFieldDefinition = {
   grade:
     "(string.numeric.parse |> -5 <= number.integer <= 5) | -5 <= number.integer <= 5",
-  getGradeAt: "string & /^\\d{4}-\\d{2}-\\d{2}$/ | null",
+  getGradeAt: "string & /^\\d{4}-\\d{2}-\\d{2}$/ | null | ''",
   joinedAt:
     "(string.numeric.parse |> 2020 <= number.integer <= 9999) | 2020 <= number.integer <= 9999",
   year: "string & /^(b[1-4]|m[1-2]|d[1-2])$/",
 } as const
+
+const getGradeAtRequestDefinition = profileFieldDefinition.getGradeAt
 
 // DBに登録されている型（role 必須）
 export const profileBaseSchema = type({ ...profileFieldDefinition, role: Role.type() })
@@ -55,6 +57,12 @@ export const publicMetadataProfileSchema = type({
 export const userProfileInputSchema = type(profileFieldDefinition)
 export type UserProfileInput = typeof userProfileInputSchema.infer
 
+// User が送る入力（空文字の getGradeAt を許容する）
+export const userProfileRequestSchema = type({
+  ...profileFieldDefinition,
+  getGradeAt: getGradeAtRequestDefinition,
+})
+
 // Admin が任意ユーザーの profile を更新する入力（部分更新）
 export const adminUpdateProfileInputSchema = type({
   id: "string",
@@ -62,7 +70,7 @@ export const adminUpdateProfileInputSchema = type({
   year: `${profileFieldDefinition.year}?`,
   grade: `${profileFieldDefinition.grade}?`,
   joinedAt: `${profileFieldDefinition.joinedAt}?`,
-  getGradeAt: `${profileFieldDefinition.getGradeAt}?`,
+  getGradeAt: `(${getGradeAtRequestDefinition})?`,
 })
 
 export type AdminUpdateProfileInput = typeof adminUpdateProfileInputSchema.infer

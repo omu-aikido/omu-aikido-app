@@ -44,7 +44,7 @@ export async function updateProfile(input: {
     throw new Error("Method Not Allowed: Not Enough")
   const getGradeAtValidate = input.newProfile.getGradeAt
     ? formatDateToJSTString(input.newProfile.getGradeAt)
-    : ""
+    : null
 
   const updatedMetadata = {
     grade: input.newProfile.grade,

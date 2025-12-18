@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useFetcher, useOutletContext } from "react-router"
 
 import type { Route } from "./+types/account"
@@ -51,10 +51,13 @@ export default function ProfileForm() {
     ""
   const [isEditing, setIsEditing] = useState(false)
 
-  // Reset editing when fetcher has data
-  if (fetcher.data && isEditing) {
-    setIsEditing(false)
-  }
+  useEffect(() => {
+    if (!isEditing) return
+    if (fetcher.state !== "idle") return
+    if (!fetcher.data) return
+    const id = setTimeout(() => setIsEditing(false), 0)
+    return () => clearTimeout(id)
+  }, [fetcher.data, fetcher.state, isEditing])
 
   const disabled = !isEditing || fetcher.state !== "idle"
   const FormWrapper = isEditing ? fetcher.Form : "div"

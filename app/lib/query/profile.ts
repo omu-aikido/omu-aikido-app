@@ -73,10 +73,20 @@ export async function updateProfile(
     }
 
     const { id, ...metadata } = input
+    const hasGetGradeAtKey = Object.prototype.hasOwnProperty.call(metadata, "getGradeAt")
+    let nextGetGradeAt = existingProfile.getGradeAt
+    if (hasGetGradeAtKey) {
+      const value = metadata.getGradeAt
+      if (value === "" || value === null) {
+        nextGetGradeAt = null
+      } else if (typeof value === "string") {
+        nextGetGradeAt = value
+      }
+    }
     // 既存データとマージ
     const updatedMetadata = {
       grade: metadata.grade ?? existingProfile.grade,
-      getGradeAt: metadata.getGradeAt ?? existingProfile.getGradeAt,
+      getGradeAt: nextGetGradeAt,
       joinedAt: metadata.joinedAt ?? existingProfile.joinedAt,
       year: metadata.year ?? existingProfile.year,
       role: metadata.role ?? existingProfile.role,
