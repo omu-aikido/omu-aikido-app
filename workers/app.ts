@@ -94,13 +94,6 @@ app.use("*", async (c, next) => {
 
   response.headers.set("Permissions-Policy", "browsing-topics=(), interest-cohort=()")
 
-  if (env.CLERK_PUBLISHABLE_KEY.startsWith("pk_live")) {
-    response.headers.set(
-      "Strict-Transport-Security",
-      "max-age=63072000; includeSubDomains; preload",
-    )
-  }
-
   return
 })
 

@@ -15,6 +15,7 @@ jobs:
     env:
       CLERK_PUBLISHABLE_KEY: ${{ secrets.CLERK_PUBLISHABLE_KEY }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      CLERK_FRONTEND_API_URL: ${{ secrets.CLERK_FRONTEND_API_URL }}
       TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
       TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
     steps:
@@ -43,4 +44,10 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --name record
+          command: deploy --config build/server/wrangler.json --name record
+          secrets: |
+            CLERK_PUBLISHABLE_KEY
+            CLERK_SECRET_KEY
+            CLERK_FRONTEND_API_URL
+            TURSO_DATABASE_URL
+            TURSO_AUTH_TOKEN
