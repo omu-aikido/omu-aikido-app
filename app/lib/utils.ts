@@ -12,10 +12,16 @@ export const grade = [
   { name: "二段", grade: -2 },
   { name: "三段", grade: -3 },
   { name: "四段", grade: -4 },
+  { name: "五段", grade: -5 },
 ]
 
 export function translateGrade(grade_value: string | number): string {
-  const grade_value_number = parseInt(String(grade_value))
+  const raw = String(grade_value ?? "").trim()
+  if (!raw) return "不明"
+  const labelMatch = grade.find(g => g.name === raw)
+  if (labelMatch) return labelMatch.name
+
+  const grade_value_number = parseInt(raw)
   const grade_data = grade.find(g => g.grade === grade_value_number)
   return grade_data ? grade_data.name : "不明"
 }
@@ -52,13 +58,29 @@ export const year = [
 ]
 
 export function translateYear(year_value: string): string {
-  // Only allow known year codes
-  const allowedYears = year.map(y => y.year)
-  if (!allowedYears.includes(year_value)) {
-    return "不明"
+  const raw = String(year_value ?? "").trim()
+  if (!raw) return "不明"
+
+  const code = raw.toLowerCase()
+  const yearByCode = year.find(y => y.year === code)
+  if (yearByCode) return yearByCode.name
+
+  const yearByLabel = year.find(y => y.name === raw)
+  if (yearByLabel) return yearByLabel.name
+
+  const uiLabelMap: Record<string, string> = {
+    "学部 1年": "b1",
+    "学部 2年": "b2",
+    "学部 3年": "b3",
+    "学部 4年": "b4",
+    "修士 1年": "m1",
+    "修士 2年": "m2",
+    "博士 1年": "d1",
+    "博士 2年": "d2",
   }
-  const year_data = year.find(y => y.year === year_value)
-  return year_data ? year_data.name : "不明"
+  const mappedCode = uiLabelMap[raw]
+  const yearByMapped = mappedCode ? year.find(y => y.year === mappedCode) : undefined
+  return yearByMapped ? yearByMapped.name : "不明"
 }
 
 export function toLocalJPString(date: Date): string {

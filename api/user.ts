@@ -16,7 +16,7 @@ import { getUserMonthlyRank } from "./lib/db/ranking"
 import { userActivitySummaryAndRecent } from "./lib/db/summary"
 import { getProfile } from "./lib/profile"
 
-import { userProfileInputSchema } from "@/type/account"
+import { userProfileRequestSchema } from "@/type/account"
 import { JoinedAtYearRange, getJST } from "~/lib/utils"
 
 const ONBOARDING_MESSAGE = "プロファイル情報を設定してください。"
@@ -87,7 +87,7 @@ const onboardingSetupSchema = type({
   grade:
     "(string.numeric.parse |> -5 <= number.integer <= 5) | -5 <= number.integer <= 5",
   joinedAt: `(string.numeric.parse |> ${JoinedAtYearRange.min} <= number.integer <= ${JoinedAtYearRange.max}) | ${JoinedAtYearRange.min} <= number.integer <= ${JoinedAtYearRange.max}`,
-  getGradeAt: "(string & /^\\d{4}-\\d{2}-\\d{2}$/ | null)?",
+  getGradeAt: "(string & /^\\d{4}-\\d{2}-\\d{2}$/ | null | '')?",
 })
 
 const activitiesQuerySchema = type({
@@ -115,7 +115,7 @@ const updateActivitiesSchema = type({
   deleted: type("string").array().optional(),
 })
 
-const updateUserProfileSchema = userProfileInputSchema
+const updateUserProfileSchema = userProfileRequestSchema
 
 const updateAccountSchema = type({
   firstName: "string?",
@@ -219,10 +219,11 @@ export const userApp = new Hono<{ Bindings: Env }>()
       if (!existingProfile) return c.json({ error: ONBOARDING_MESSAGE }, 404)
       const parsed = c.req.valid("json")
       const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
+      const normalizedGetGradeAt = normalizeGetGradeAt(parsed.getGradeAt)
       const newMetadata = await clerkClient.users.updateUserMetadata(auth.userId, {
         publicMetadata: {
           grade: parsed.grade,
-          getGradeAt: parsed.getGradeAt,
+          getGradeAt: normalizedGetGradeAt,
           joinedAt: parsed.joinedAt,
           year: parsed.year,
           role: existingProfile.role,
@@ -513,7 +514,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
           year: data.year,
           grade: data.grade,
           joinedAt: data.joinedAt,
-          getGradeAt: data.getGradeAt ?? null,
+          getGradeAt: normalizeGetGradeAt(data.getGradeAt),
           role: "member",
         },
         unsafeMetadata: {},

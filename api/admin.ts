@@ -60,7 +60,7 @@ const adminProfileUpdateSchema = type({
   role: Role.type(),
   joinedAt:
     "(string.numeric.parse |> 0 <= number.integer <= 9999) | 0 <= number.integer <= 9999",
-  getGradeAt: "(string & /^\\d{4}-\\d{2}-\\d{2}$/ | null)?",
+  getGradeAt: "(string & /^\\d{4}-\\d{2}-\\d{2}$/ | null | '')?",
 })
 
 const accountsQuerySchema = type({ query: "(string & /^.{0,100}$/)?" })

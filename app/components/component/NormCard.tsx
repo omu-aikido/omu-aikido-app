@@ -78,7 +78,9 @@ export function NormCard({ user, norm, progress }: NormCardProps) {
                   {user.lastName} {user.firstName}
                 </h3>
                 <p className="mt-0.5 font-mono text-xs text-slate-500 dark:text-slate-400">
-                  {norm?.grade ? translateGrade(norm.grade) : "未設定"}
+                  {norm?.grade !== undefined && norm?.grade !== null
+                    ? translateGrade(norm.grade)
+                    : "未設定"}
                 </p>
               </div>
             </div>

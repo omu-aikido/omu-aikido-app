@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useFetcher } from "react-router"
 
 import type { Route } from "./+types/status"
@@ -16,7 +16,12 @@ import {
 } from "~/components/ui/select"
 import { StateButton } from "~/components/ui/StateButton"
 import { uc } from "~/lib/api-client"
-import { formatDateToJSTString, grade as gradeOptions } from "~/lib/utils"
+import {
+  formatDateToJSTString,
+  grade as gradeOptions,
+  translateGrade,
+  translateYear,
+} from "~/lib/utils"
 import type { Profile } from "~/type"
 
 // MARK: Loader
@@ -81,10 +86,13 @@ export default function StatusForm({ loaderData, actionData }: Route.ComponentPr
   const fetcher = useFetcher()
   const [isEditing, setIsEditing] = useState(false)
 
-  // Reset editing when fetcher is idle
-  if (fetcher.state === "idle" && isEditing) {
-    setIsEditing(false)
-  }
+  useEffect(() => {
+    if (!isEditing) return
+    if (fetcher.state !== "idle") return
+    if (!fetcher.data) return
+    const id = setTimeout(() => setIsEditing(false), 0)
+    return () => clearTimeout(id)
+  }, [fetcher.data, fetcher.state, isEditing])
 
   if (!profile) {
     return <p>プロフィール情報が見つかりませんでした。</p>
@@ -142,8 +150,10 @@ function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         defaultValue={String(profile.grade)}
         disabled={disabled}
       >
-        <SelectTrigger id="grade">
-          <SelectValue aria-placeholder="級段位を選択" />
+        <SelectTrigger id="grade" className="w-full">
+          <SelectValue aria-placeholder="級段位を選択">
+            {value => translateGrade(String(value))}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {gradeOptions.map(g => (
@@ -217,8 +227,10 @@ function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
     <div className="space-y-2">
       <Label htmlFor="year">学年</Label>
       <Select name="year" required defaultValue={profile.year} disabled={disabled}>
-        <SelectTrigger id="year">
-          <SelectValue aria-placeholder="学年を選択" />
+        <SelectTrigger id="year" className="w-full">
+          <SelectValue aria-placeholder="学年を選択">
+            {value => translateYear(String(value))}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {yearOptions.map(y => (

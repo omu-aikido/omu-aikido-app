@@ -1,7 +1,11 @@
 import { ArkErrors } from "arktype"
 import { describe, expect, it } from "vitest"
 
-import { profileBaseSchema } from "./account"
+import {
+  coerceProfileMetadata,
+  profileBaseSchema,
+  userProfileRequestSchema,
+} from "./account"
 
 type Profile = typeof profileBaseSchema.infer
 
@@ -40,5 +44,32 @@ describe("profileBaseSchema", () => {
       throw parsed
     }
     expect(parsed).toStrictEqual(baseProfile)
+  })
+
+  it("accepts empty string getGradeAt via coerceProfileMetadata", () => {
+    const parsed = profileBaseSchema(
+      coerceProfileMetadata({ ...baseProfile, getGradeAt: "" }),
+    )
+    if (parsed instanceof ArkErrors) {
+      throw parsed
+    }
+    expect(parsed.getGradeAt).toBeNull()
+  })
+
+  it("accepts empty string getGradeAt without coercion", () => {
+    const parsed = profileBaseSchema({ ...baseProfile, getGradeAt: "" })
+    expect(parsed).not.toBeInstanceOf(ArkErrors)
+  })
+})
+
+describe("userProfileRequestSchema", () => {
+  it("accepts empty string getGradeAt", () => {
+    const parsed = userProfileRequestSchema({
+      year: "b2",
+      grade: 0,
+      joinedAt: 2022,
+      getGradeAt: "",
+    })
+    expect(parsed).not.toBeInstanceOf(ArkErrors)
   })
 })

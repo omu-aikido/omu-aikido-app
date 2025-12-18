@@ -1,5 +1,5 @@
 import type { ExternalAccount, User } from "@clerk/react-router/server"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Link, redirect, useFetcher } from "react-router"
 import { toast } from "sonner"
 
@@ -24,7 +24,7 @@ import { StateButton } from "~/components/ui/StateButton"
 import { ac } from "~/lib/api-client"
 import { getProfile } from "~/lib/query/profile"
 import { Role } from "~/lib/role"
-import { getJST, grade as gradeOptions } from "~/lib/utils"
+import { getJST, grade as gradeOptions, translateGrade, translateYear } from "~/lib/utils"
 import { style } from "~/styles/component"
 import type { Profile } from "~/type"
 
@@ -234,22 +234,23 @@ export default function AdminUser(args: Route.ComponentProps) {
   const fetcher = useFetcher()
   const [isEditing, setIsEditing] = useState(false)
 
-  if (!fetcher.data && fetcher.state == "idle") {
-    setIsEditing(false)
-  }
-  if (fetcher.state === "idle" && fetcher.data) {
+  const lastHandledFetcherDataRef = useRef<unknown>(null)
+  useEffect(() => {
+    if (fetcher.state !== "idle") return
+
+    if (!fetcher.data) return
+
+    if (Object.is(fetcher.data, lastHandledFetcherDataRef.current)) return
+    lastHandledFetcherDataRef.current = fetcher.data
+
     try {
       const response =
         typeof fetcher.data === "string" ? JSON.parse(fetcher.data) : fetcher.data
-      if (response?.error) {
-        toast.error(response.error)
-      }
+      if (response?.error) toast.error(response.error)
     } catch {
-      if (fetcher.data instanceof Error) {
-        toast.error("エラーが発生しました")
-      }
+      if (fetcher.data instanceof Error) toast.error("エラーが発生しました")
     }
-  }
+  }, [fetcher.data, fetcher.state])
 
   if (!user) {
     return (
@@ -387,8 +388,10 @@ function RoleSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         役職<span className="text-red-500">*</span>
       </Label>
       <Select name="role" required defaultValue={profile.role} disabled={disabled}>
-        <SelectTrigger id="role">
-          <SelectValue aria-placeholder="役職を選択" />
+        <SelectTrigger id="role" className="w-full">
+          <SelectValue aria-placeholder="役職を選択">
+            {value => Role.fromString(String(value))?.ja ?? "未設定"}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {Role.ALL.map(r => (
@@ -415,8 +418,10 @@ function GradeSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         defaultValue={String(profile.grade)}
         disabled={disabled}
       >
-        <SelectTrigger id="grade">
-          <SelectValue aria-placeholder="級段位を選択" />
+        <SelectTrigger id="grade" className="w-full">
+          <SelectValue aria-placeholder="級段位を選択">
+            {value => translateGrade(String(value))}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {gradeOptions.map(g => (
@@ -502,8 +507,10 @@ function YearSelect({ profile, isEditing, fetcherState }: FormFieldProps) {
         学年<span className="text-red-500">*</span>
       </Label>
       <Select name="year" required defaultValue={profile.year} disabled={disabled}>
-        <SelectTrigger>
-          <SelectValue aria-placeholder="学年を選択" />
+        <SelectTrigger className="w-full">
+          <SelectValue aria-placeholder="学年を選択">
+            {value => translateYear(String(value))}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {yearOptions.map(y => (

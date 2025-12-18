@@ -22,11 +22,14 @@ describe("translateGrade", () => {
     expect(translateGrade(-2)).toBe("二段")
     expect(translateGrade(-3)).toBe("三段")
     expect(translateGrade(-4)).toBe("四段")
+    expect(translateGrade(-5)).toBe("五段")
   })
 
   it("should return '不明' for an unknown grade value", () => {
     expect(translateGrade(99)).toBe("不明")
     expect(translateGrade("unknown")).toBe("不明")
+    expect(translateGrade("")).toBe("不明")
+    expect(translateGrade(" 無級 ")).toBe("無級")
   })
 })
 
@@ -55,10 +58,13 @@ describe("translateYear", () => {
     expect(translateYear("m2")).toBe("修士2年")
     expect(translateYear("d1")).toBe("博士1年")
     expect(translateYear("d2")).toBe("博士2年")
+    expect(translateYear(" b1 ")).toBe("1回生")
+    expect(translateYear("学部 1年")).toBe("1回生")
   })
 
   it("should return '不明' for an unknown year value", () => {
     expect(translateYear("unknown")).toBe("不明")
+    expect(translateYear("")).toBe("不明")
   })
 })
 
