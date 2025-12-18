@@ -1,5 +1,5 @@
-import { ClerkProvider } from '@clerk/react-router'
-import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/server'
+import { ClerkProvider } from "@clerk/react-router"
+import { clerkMiddleware, rootAuthLoader } from "@clerk/react-router/server"
 import {
   Link,
   Links,

@@ -518,7 +518,13 @@ export const userApp = new Hono<{ Bindings: Env }>()
         },
         unsafeMetadata: {},
       })
-      purgeUserCache(c, auth.userId, ["/profile", "/account", "/summary", "/ranking", "/onboarding"])
+      purgeUserCache(c, auth.userId, [
+        "/profile",
+        "/account",
+        "/summary",
+        "/ranking",
+        "/onboarding",
+      ])
       return c.json({ success: true, redirect: "/" }, 200)
     },
   )

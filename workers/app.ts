@@ -67,7 +67,10 @@ app.use("*", async (c, next) => {
 
   const response = c.res
 
-  if (new URL(request.url).pathname.startsWith("/api/") && !response.headers.has("Cache-Control")) {
+  if (
+    new URL(request.url).pathname.startsWith("/api/") &&
+    !response.headers.has("Cache-Control")
+  ) {
     response.headers.set("Cache-Control", "no-store")
   }
 
