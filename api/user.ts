@@ -3,6 +3,7 @@ import { arktypeValidator } from "@hono/arktype-validator"
 import { getAuth } from "@hono/clerk-auth"
 import { type } from "arktype"
 import { Hono } from "hono"
+import type { Context } from "hono"
 
 import {
   createActivities,
@@ -19,6 +20,67 @@ import { userProfileInputSchema } from "@/type/account"
 import { JoinedAtYearRange, getJST } from "~/lib/utils"
 
 const ONBOARDING_MESSAGE = "プロファイル情報を設定してください。"
+
+const getUserCacheControlForPath = (path: string): string | null => {
+  if (path === "/profile") return "private, max-age=60"
+  if (path === "/account") return "private, max-age=60"
+  if (path === "/summary") return "private, max-age=30"
+  if (path === "/ranking") return "private, max-age=60"
+  if (path === "/activities") return "private, max-age=15"
+  if (path === "/onboarding") return "private, max-age=10"
+  return null
+}
+
+const createUserCacheKey = (requestUrl: string, userId: string): Request => {
+  const url = new URL(requestUrl)
+  url.searchParams.set("__uid", userId)
+  return new Request(url.toString(), { method: "GET" })
+}
+
+const userEdgeCacheMiddleware = async (c: Context, next: () => Promise<void>) => {
+  if (c.req.method !== "GET") {
+    await next()
+    return
+  }
+
+  const auth = getAuth(c)
+  if (!auth || !auth.userId) {
+    await next()
+    return
+  }
+
+  const cacheControl = getUserCacheControlForPath(c.req.path)
+  if (!cacheControl) {
+    await next()
+    return
+  }
+
+  const cache = (caches as unknown as { default: Cache }).default
+  const cacheKey = createUserCacheKey(c.req.url, auth.userId)
+
+  const cached = await cache.match(cacheKey)
+  if (cached) {
+    return cached
+  }
+
+  await next()
+
+  const response = c.res
+  if (!response.ok) return
+  if (response.headers.has("Set-Cookie")) return
+
+  response.headers.set("Cache-Control", cacheControl)
+  c.executionCtx.waitUntil(cache.put(cacheKey, response.clone()))
+}
+
+const purgeUserCache = (c: Context, userId: string, paths: string[]) => {
+  const cache = (caches as unknown as { default: Cache }).default
+  const origin = new URL(c.req.url).origin
+  for (const path of paths) {
+    const key = createUserCacheKey(`${origin}/api/user${path}`, userId)
+    c.executionCtx.waitUntil(cache.delete(key))
+  }
+}
 
 const onboardingSetupSchema = type({
   year: "string & /^(b[1-4]|m[1-2]|d[1-2])$/",
@@ -135,6 +197,7 @@ const migrateUnsafeMetadata = async ({
 }
 
 export const userApp = new Hono<{ Bindings: Env }>()
+  .use("*", userEdgeCacheMiddleware)
   .get("/profile", async c => {
     const profile = await getProfile(c)
     const auth = getAuth(c)
@@ -165,6 +228,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
           role: existingProfile.role,
         },
       })
+      purgeUserCache(c, auth.userId, ["/profile", "/summary", "/ranking"])
       return c.json({ profile: { ...newMetadata.publicMetadata, id: auth.userId } }, 200)
     },
   )
@@ -226,6 +290,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
       }
 
       const user = await clerkClient.users.getUser(auth.userId)
+      purgeUserCache(c, auth.userId, ["/account"])
       return c.json({ user }, 200)
     },
   )
@@ -291,6 +356,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
         activity: { id: "", date: body.date, userId: auth.userId, period: body.period },
         env: c.env,
       })
+      purgeUserCache(c, auth.userId, ["/summary", "/ranking"])
       return c.json({ success: true }, 200)
     },
   )
@@ -336,6 +402,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
       if (deleted.length > 0) {
         await deleteActivities({ userId: auth.userId, ids: deleted, env: c.env })
       }
+      purgeUserCache(c, auth.userId, ["/summary", "/ranking"])
       return c.json({ success: true }, 200)
     },
   )
@@ -451,6 +518,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
         },
         unsafeMetadata: {},
       })
+      purgeUserCache(c, auth.userId, ["/profile", "/account", "/summary", "/ranking", "/onboarding"])
       return c.json({ success: true, redirect: "/" }, 200)
     },
   )

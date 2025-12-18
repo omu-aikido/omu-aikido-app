@@ -16,6 +16,43 @@ import { formatDateToJSTString, getJST, timeForNextGrade } from "~/lib/utils"
 
 const clerkUserLimit = 500
 
+const getAdminCacheControlForPath = (path: string): string | null => {
+  if (path === "/accounts") return "public, max-age=60"
+  if (path === "/norms") return "public, max-age=60"
+  if (path.startsWith("/users/")) return "public, max-age=30"
+  return null
+}
+
+const adminEdgeCacheMiddleware = async (c: Context, next: () => Promise<void>) => {
+  if (c.req.method !== "GET") {
+    await next()
+    return
+  }
+
+  const cacheControl = getAdminCacheControlForPath(c.req.path)
+  if (!cacheControl) {
+    await next()
+    return
+  }
+
+  const cache = (caches as unknown as { default: Cache }).default
+  const cacheKey = new Request(new URL(c.req.url).toString(), { method: "GET" })
+
+  const cached = await cache.match(cacheKey)
+  if (cached) {
+    return cached
+  }
+
+  await next()
+
+  const response = c.res
+  if (!response.ok) return
+  if (response.headers.has("Set-Cookie")) return
+
+  response.headers.set("Cache-Control", cacheControl)
+  c.executionCtx.waitUntil(cache.put(cacheKey, response.clone()))
+}
+
 const adminProfileUpdateSchema = type({
   year: "string",
   grade:
@@ -133,6 +170,7 @@ const getUserActivitySummary = async (env: Env, userId: string) => {
 
 export const adminApp = new Hono<{ Bindings: Env }>()
   .use("*", ensureAdminMiddleware)
+  .use("*", adminEdgeCacheMiddleware)
   .get(
     "/accounts",
     arktypeValidator("query", accountsQuerySchema, (result, c) => {
