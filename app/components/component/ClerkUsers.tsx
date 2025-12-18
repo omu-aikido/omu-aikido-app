@@ -7,14 +7,14 @@ import { UserCell, UserListRow } from "./UserListCard"
 
 const pagenation = tv({
   base: [
-    "m-2 px-3 py-2 text-sm font-medium  rounded-lg cursor-pointer",
-    " border border-slate-300 dark:border-slate-700",
-    "text-slate-700 bg-white hover:bg-slate-100",
-    "dark:text-slate-400  dark:bg-slate-800 dark:hover:bg-slate-700",
+    "m-2 cursor-pointer rounded-lg px-3 py-2 text-sm font-medium",
+    "border border-slate-300 dark:border-slate-700",
+    "bg-white text-slate-700 hover:bg-slate-100",
+    "dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700",
   ],
   variants: {
     disabled: {
-      true: ["text-slate-500 bg-slate-100 dark:bg-slate-700 ", "cursor-not-allowed"],
+      true: ["bg-slate-100 text-slate-500 dark:bg-slate-700", "cursor-not-allowed"],
     },
   },
 })
@@ -93,12 +93,12 @@ const ClerkUsers = React.memo<Props>(function ClerkUsers({
     <>
       {/* PC用テーブル */}
       {!isMobile && (
-        <div className="mt-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
+        <div className="mt-4 rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
           <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
             <thead className="bg-slate-50 dark:bg-slate-900">
               <tr>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase select-none hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
                   onClick={() => handleHeaderClick("name")}
                 >
                   <div className="flex items-center gap-1">
@@ -107,7 +107,7 @@ const ClerkUsers = React.memo<Props>(function ClerkUsers({
                   </div>
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase select-none hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
                   onClick={() => handleHeaderClick("role")}
                 >
                   <div className="flex items-center gap-1">
@@ -116,7 +116,7 @@ const ClerkUsers = React.memo<Props>(function ClerkUsers({
                   </div>
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase select-none hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
                   onClick={() => handleHeaderClick("year")}
                 >
                   <div className="flex items-center gap-1">
@@ -125,7 +125,7 @@ const ClerkUsers = React.memo<Props>(function ClerkUsers({
                   </div>
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase select-none hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
                   onClick={() => handleHeaderClick("grade")}
                 >
                   <div className="flex items-center gap-1">
@@ -135,7 +135,7 @@ const ClerkUsers = React.memo<Props>(function ClerkUsers({
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
+            <tbody className="divide-y divide-slate-200 bg-white dark:divide-slate-700 dark:bg-slate-800">
               {users && users.length > 0 ? (
                 users.map(user => <UserListRow user={user} key={user.id} />)
               ) : (
@@ -155,10 +155,10 @@ const ClerkUsers = React.memo<Props>(function ClerkUsers({
       {/* モバイル用リスト + ソートUI */}
       {isMobile && (
         <div className="mt-4 space-y-4">
-          <div className="flex justify-end mb-2">
+          <div className="mb-2 flex justify-end">
             <button
               type="button"
-              className="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-md text-sm font-medium border border-slate-300 dark:border-slate-600"
+              className="rounded-md border border-slate-300 bg-slate-200 px-3 py-1 text-sm font-medium text-slate-700 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
               onClick={() => setShowSort(v => !v)}
               aria-haspopup="listbox"
               aria-expanded={showSort}
@@ -167,13 +167,13 @@ const ClerkUsers = React.memo<Props>(function ClerkUsers({
             </button>
           </div>
           {showSort && (
-            <div className="mb-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md shadow-md z-20 absolute left-0 right-0 mx-4">
+            <div className="absolute right-0 left-0 z-20 mx-4 mb-2 rounded-md border border-slate-300 bg-white shadow-md dark:border-slate-600 dark:bg-slate-800">
               <ul className="divide-y divide-slate-200 dark:divide-slate-700">
                 {sortOptions.map(opt => (
                   <li key={opt.key}>
                     <button
                       type="button"
-                      className={`w-full text-left px-4 py-2 text-sm ${sortBy === opt.key ? "bg-blue-100 dark:bg-blue-900 font-bold" : ""}`}
+                      className={`w-full px-4 py-2 text-left text-sm ${sortBy === opt.key ? "bg-blue-100 font-bold dark:bg-blue-900" : ""}`}
                       onClick={() => {
                         setShowSort(false)
                         if (onSort) onSort(opt.key)
@@ -191,9 +191,9 @@ const ClerkUsers = React.memo<Props>(function ClerkUsers({
           {users && users.length > 0 ? (
             users.map(user => <UserCell user={user} key={user.id} />)
           ) : (
-            <div className="text-center text-slate-500 dark:text-slate-400 py-8">
-              <div className="flex justify-center items-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600">
+            <div className="py-8 text-center text-slate-500 dark:text-slate-400">
+              <div className="flex items-center justify-center py-8">
+                <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600">
                   <span className="ml-2 text-slate-600 dark:text-slate-400">
                     読み込み中...
                   </span>
@@ -205,7 +205,7 @@ const ClerkUsers = React.memo<Props>(function ClerkUsers({
       )}
       {/* ページネーション: 共通 */}
       {totalPages > 0 && (
-        <div className="flex gap-2 justify-center mt-4">
+        <div className="mt-4 flex justify-center gap-2">
           <nav className="inline-flex -space-x-px">
             {currentPage > 0 ? (
               <Link to={createPageLink(currentPage - 1)} className={pagenation()}>
@@ -214,7 +214,7 @@ const ClerkUsers = React.memo<Props>(function ClerkUsers({
             ) : (
               <p className={pagenation({ disabled: true })}>前へ</p>
             )}
-            <div className="m-2 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-300 bg-slate-200 border border-slate-300 dark:bg-slate-600 dark:border-slate-700">
+            <div className="m-2 rounded-lg border border-slate-300 bg-slate-200 px-3 py-2 text-sm font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-600 dark:text-slate-300">
               {currentPage + 1 + "/" + totalPages}
             </div>
             {currentPage < totalPages - 1 ? (

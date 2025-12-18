@@ -3,18 +3,17 @@ import { cn } from "app/lib/utils"
 import { cva, type VariantProps } from "class-variance-authority"
 
 const toggleVariants = cva(
-  "tw:hover:text-foreground tw:aria-pressed:bg-muted tw:focus-visible:border-ring tw:focus-visible:ring-ring/50 tw:aria-invalid:ring-destructive/20 tw:dark:aria-invalid:ring-destructive/40 tw:aria-invalid:border-destructive tw:gap-1 tw:rounded-md tw:text-sm tw:font-medium tw:transition-[color,box-shadow] tw:[&_svg:not([class*=size-])]:size-4 tw:group/toggle tw:hover:bg-muted tw:inline-flex tw:items-center tw:justify-center tw:whitespace-nowrap tw:outline-none tw:focus-visible:ring-[3px] tw:disabled:pointer-events-none tw:disabled:opacity-50 tw:[&_svg]:pointer-events-none tw:[&_svg]:shrink-0",
+  "group/toggle inline-flex items-center justify-center gap-1 rounded-md text-sm font-medium whitespace-nowrap transition-[color,box-shadow] outline-none hover:bg-muted hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 aria-pressed:bg-muted dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: "tw:bg-transparent",
-        outline:
-          "tw:border-input tw:hover:bg-muted tw:border tw:bg-transparent tw:shadow-xs",
+        default: "bg-transparent",
+        outline: "border border-input bg-transparent shadow-xs hover:bg-muted",
       },
       size: {
-        default: "tw:h-9 tw:min-w-9 tw:px-2",
-        sm: "tw:h-8 tw:min-w-8 tw:px-1.5",
-        lg: "tw:h-10 tw:min-w-10 tw:px-2.5",
+        default: "h-9 min-w-9 px-2",
+        sm: "h-8 min-w-8 px-1.5",
+        lg: "h-10 min-w-10 px-2.5",
       },
     },
     defaultVariants: { variant: "default", size: "default" },

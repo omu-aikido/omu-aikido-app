@@ -17,11 +17,11 @@ export default function MonthNavigation({
 }: Props) {
   return (
     <div
-      className="flex flex-row justify-between items-center mb-2 sm:mb-4 gap-2 "
+      className="mb-2 flex flex-row items-center justify-between gap-2 sm:mb-4"
       data-testid="month-navigation-container"
     >
       <div
-        className="flex items-center gap-2 mx-auto"
+        className="mx-auto flex items-center gap-2"
         data-testid="month-navigation-selector"
       >
         <YearMonthSelector

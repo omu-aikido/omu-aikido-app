@@ -47,7 +47,7 @@ export const ActivitiesTable = React.memo<ActivitiesTableProps>(function Activit
               <th className={tablehead()}>編集日</th>
             </tr>
           </thead>
-          <tbody className="bg-slate-50 dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
+          <tbody className="divide-y divide-slate-200 bg-slate-50 dark:divide-slate-700 dark:bg-slate-800">
             {activities.length === 0 ? (
               <tr>
                 <td
@@ -80,7 +80,7 @@ export const ActivitiesTable = React.memo<ActivitiesTableProps>(function Activit
       {/* ページングUI */}
       {totalPages > 1 && (
         <nav
-          className="flex justify-center items-center gap-2 py-4"
+          className="flex items-center justify-center gap-2 py-4"
           aria-label="ページネーション"
         >
           <Link
@@ -109,15 +109,15 @@ export const ActivitiesTable = React.memo<ActivitiesTableProps>(function Activit
 })
 
 const tablehead = tv({
-  base: "px-2 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300 bg-slate-200 dark:bg-slate-800/90 uppercase tracking-wider",
+  base: "bg-slate-200 px-2 py-3 text-center text-xs font-medium tracking-wider text-slate-500 uppercase dark:bg-slate-800/90 dark:text-slate-300",
 })
 
 const tableRow = tv({
-  base: "hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150",
+  base: "transition-colors duration-150 hover:bg-slate-50 dark:hover:bg-slate-700",
 })
 
 const tableCell = tv({
-  base: "px-2 py-4 whitespace-nowrap text-sm text-center",
+  base: "px-2 py-4 text-center text-sm whitespace-nowrap",
   variants: {
     variant: {
       primary: "text-slate-900 dark:text-slate-100",
@@ -127,12 +127,12 @@ const tableCell = tv({
 })
 
 const paginationButton = tv({
-  base: "px-3 py-1 rounded transition-colors duration-150 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500",
+  base: "rounded-sm px-3 py-1 text-sm font-medium transition-colors duration-150 focus:ring-2 focus:ring-blue-500 focus:outline-none",
   variants: {
     active: {
       true: "bg-blue-600 text-white",
       false:
-        "bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-slate-100",
+        "bg-slate-200 text-slate-900 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-100",
     },
     disabled: { true: "pointer-events-none opacity-50", false: "" },
   },

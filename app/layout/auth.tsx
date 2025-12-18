@@ -62,7 +62,7 @@ export default function App(args: Route.ComponentProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="cursor-pointer p-2 mx-3 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors flex items-center justify-center h-10 w-10"
+              className="mx-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg p-2 transition-colors hover:bg-slate-300 dark:hover:bg-slate-600"
             >
               ≡
             </Button>
@@ -78,7 +78,7 @@ export default function App(args: Route.ComponentProps) {
         </Sheet>
       </ReactHeader>
       <main
-        className="min-h-4/5 p-3 md:p-6 mt-20 mx-auto max-w-3xl overflow-y-auto mb-auto"
+        className="mx-auto mt-20 mb-auto min-h-4/5 max-w-3xl overflow-y-auto p-3 md:p-6"
         data-testid="auth-layout-main"
       >
         <Outlet />

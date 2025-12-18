@@ -13,9 +13,9 @@ type Props = {
 
 const cell = tv({
   slots: {
-    week: "font-bold text-center py-2 border-y border-slate-200 dark:border-slate-600 first:border-l border-r",
+    week: "border-y border-r border-slate-200 py-2 text-center font-bold first:border-l dark:border-slate-600",
     date: [
-      "min-h-[60px] sm:min-h-[100px] border-r border-b border-slate-200 dark:border-slate-600",
+      "min-h-[60px] border-r border-b border-slate-200 sm:min-h-[100px] dark:border-slate-600",
     ],
   },
   compoundSlots: [
@@ -47,9 +47,9 @@ const cell = tv({
       },
     },
     disabled: {
-      true: { date: "bg-slate-100 dark:bg-slate-800 opacity-80" },
+      true: { date: "bg-slate-100 opacity-80 dark:bg-slate-800" },
       false: {
-        date: "cursor-pointer bg-white dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800",
+        date: "cursor-pointer bg-white hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800",
       },
     },
     isFirstRow: { true: { date: "border-t" } },
@@ -155,7 +155,7 @@ const CalendarDayCell = React.memo<{
       onClick={handleClick}
       data-testid={`day-${format(day, "d")}`}
     >
-      <div className="font-semibold mb-1 sm:mb-2">{format(day, "d")}</div>
+      <div className="mb-1 font-semibold sm:mb-2">{format(day, "d")}</div>
       <div
         className="space-y-1"
         data-testid={
@@ -204,7 +204,7 @@ const MonthlyCalendarGrid = React.memo<Props>(function MonthlyCalendarGrid({
 
   return (
     <div
-      className="min-w-[700px] grid grid-cols-7 gap-0 mb-6"
+      className="mb-6 grid min-w-175 grid-cols-7 gap-0"
       data-testid="monthly-activity-grid"
     >
       {weekdays.map((day, index) => (

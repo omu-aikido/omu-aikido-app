@@ -1,5 +1,5 @@
 import { createClerkClient, getAuth } from "@clerk/react-router/server"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { redirect, useFetcher, useNavigate } from "react-router"
 
 import type { Route } from "./+types/onboarding"
@@ -324,9 +324,7 @@ export default function OnboardingPage(args: Route.ComponentProps) {
       if (result.success && result.redirect) {
         navigate(result.redirect, { replace: true })
       } else if (!result.success) {
-        if (result.errors) {
-          setErrors(result.errors)
-        } else if (result.requiresReSignup) {
+        if (result.requiresReSignup) {
           // 再サインアップが必要な場合
           setTimeout(() => {
             navigate("/sign-up", { replace: true })
@@ -335,6 +333,20 @@ export default function OnboardingPage(args: Route.ComponentProps) {
       }
     }
   }, [fetcher.data, navigate])
+
+  // Handle errors separately
+  const errorData = useMemo(() => {
+    if (fetcher.data && typeof fetcher.data === "object") {
+      const result = fetcher.data as { success: boolean; errors?: Record<string, string> }
+      return !result.success && result.errors ? result.errors : null
+    }
+    return null
+  }, [fetcher.data])
+
+  // Update errors when errorData changes
+  if (errorData && errorData !== errors) {
+    setErrors(errorData)
+  }
 
   // 自動タイムアウト（エラーが発生した場合のフォールバック）
   useEffect(() => {
@@ -365,9 +377,9 @@ export default function OnboardingPage(args: Route.ComponentProps) {
   // プロファイル設定が必要な場合のフォーム表示
   if (needsProfileSetup) {
     return (
-      <div className={style.card.container({ class: "max-w-md mx-auto" })}>
+      <div className={style.card.container({ class: "mx-auto max-w-md" })}>
         <h1 className={style.text.sectionTitle()}>プロファイル設定</h1>
-        <p className="mt-4 text-slate-600 dark:text-slate-400 mb-6 text-center">
+        <p className="mt-4 mb-6 text-center text-slate-600 dark:text-slate-400">
           {setupMessage}
         </p>
 
@@ -437,7 +449,7 @@ export default function OnboardingPage(args: Route.ComponentProps) {
             className="w-full"
           >
             {fetcher.state === "submitting" && (
-              <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+              <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
             )}
             {fetcher.state === "submitting" ? "設定中..." : "プロファイルを設定"}
           </Button>
@@ -458,12 +470,12 @@ export default function OnboardingPage(args: Route.ComponentProps) {
   // ローダーでエラーが発生している場合の表示
   if (hasLoaderError) {
     return (
-      <div className={style.card.container({ class: "max-w-md mx-auto text-center" })}>
+      <div className={style.card.container({ class: "mx-auto max-w-md text-center" })}>
         <h1 className={style.text.sectionTitle()}>アカウント設定エラー</h1>
         <div className="mt-6">
-          <div className="text-red-600 mb-4">
+          <div className="mb-4 text-red-600">
             <svg
-              className="w-12 h-12 mx-auto mb-2"
+              className="mx-auto mb-2 h-12 w-12"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -475,7 +487,7 @@ export default function OnboardingPage(args: Route.ComponentProps) {
             </svg>
           </div>
         </div>
-        <p className="mt-4 text-slate-600 dark:text-slate-400 mb-6">{errorMessage}</p>
+        <p className="mt-4 mb-6 text-slate-600 dark:text-slate-400">{errorMessage}</p>
 
         {requiresReSignup ? (
           <div className="space-y-4">
@@ -505,7 +517,7 @@ export default function OnboardingPage(args: Route.ComponentProps) {
             {fetcher.data &&
               typeof fetcher.data === "object" &&
               !fetcher.data.success && (
-                <p className="text-sm text-red-600 mt-2">
+                <p className="mt-2 text-sm text-red-600">
                   {fetcher.data.error || "再試行に失敗しました"}
                 </p>
               )}
@@ -520,10 +532,10 @@ export default function OnboardingPage(args: Route.ComponentProps) {
 
   // 正常な場合のローディング表示
   return (
-    <div className={style.card.container({ class: "max-w-md mx-auto text-center" })}>
+    <div className={style.card.container({ class: "mx-auto max-w-md text-center" })}>
       <h1 className={style.text.sectionTitle()}>アカウントを設定中...</h1>
       <div className="mt-6">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
+        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600" />
       </div>
       <p className="mt-4 text-slate-600 dark:text-slate-400">
         アカウントの初期設定を行っています。

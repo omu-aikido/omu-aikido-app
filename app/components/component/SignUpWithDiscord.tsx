@@ -25,7 +25,7 @@ export default function SignUpWithDiscord({
           <input
             id="discordLegalAccepted"
             type="checkbox"
-            className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            className="mt-1 h-4 w-4 rounded-sm border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
             checked={legalAccepted}
             onChange={e => {
               setLegalAccepted(e.target.checked)
@@ -39,7 +39,7 @@ export default function SignUpWithDiscord({
               href="https://omu-aikido.com/terms-of-service/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+              className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
             >
               利用規約
             </a>
@@ -48,7 +48,7 @@ export default function SignUpWithDiscord({
               href="https://omu-aikido.com/privacy-policy/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+              className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
             >
               プライバシーポリシー
             </a>
@@ -59,7 +59,7 @@ export default function SignUpWithDiscord({
 
       <button
         type="button"
-        className="w-full py-2 px-4 bg-[#5865F2] dark:bg-[#4752C4] text-white font-semibold rounded flex items-center justify-center gap-2 hover:bg-[#4752C4] dark:hover:bg-[#36418C] transition disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex w-full items-center justify-center gap-2 rounded-sm bg-[#5865F2] px-4 py-2 font-semibold text-white transition hover:bg-[#4752C4] disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#4752C4] dark:hover:bg-[#36418C]"
         onClick={async () => {
           if (!isLoaded || !signUp) return
           const discordLegalCheckbox = document.getElementById(

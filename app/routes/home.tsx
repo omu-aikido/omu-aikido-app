@@ -1,8 +1,8 @@
-import { getAuth } from "@clerk/react-router/server"
 import { Link, useFetcher } from "react-router"
 
 import type { Route } from "./+types/home"
 
+import { isDateString } from "@/type/date"
 import { Role } from "@/type/role"
 import { AddRecord } from "~/components/component/AddRecord"
 import { MyRanking } from "~/components/component/MyRanking"
@@ -17,10 +17,6 @@ import type { PagePath } from "~/type"
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
-  const auth = await getAuth(args)
-  const userId = auth.userId
-  if (!userId) throw new Error("User not authenticated")
-
   const client = uc({ request: args.request })
   const [profileRes, summaryRes, accountRes, rankingRes] = await Promise.all([
     client.profile.$get(),
@@ -38,8 +34,8 @@ export async function loader(args: Route.LoaderArgs) {
   const { ranking } = await rankingRes.json()
 
   const apps: PagePath[] = [
-    { name: "記録", href: "/record", desc: "活動の記録をつけよう" },
-    { name: "アカウント", href: "/account", desc: "アカウント設定ページ" },
+    { name: "記録", href: "/record", desc: "活動の記録" },
+    { name: "アカウント", href: "/account", desc: "アカウント設定" },
   ]
   let role: Role | null = null
   if (user) {
@@ -83,6 +79,9 @@ export async function action(args: Route.ActionArgs) {
   const periodValue = formData.get("period")
   if (typeof date !== "string" || typeof periodValue !== "string") {
     return { error: "日付と稽古時間を入力してください。" }
+  }
+  if (!isDateString(date)) {
+    return { error: "日付の形式が正しくありません。" }
   }
   const period = Number(periodValue)
   if (Number.isNaN(period) || period <= 0) {

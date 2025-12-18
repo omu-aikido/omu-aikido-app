@@ -1,5 +1,4 @@
-import { createClerkClient, getAuth } from "@clerk/react-router/server"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Link, useFetcher, useOutletContext } from "react-router"
 
 import type { Route } from "./+types/account"
@@ -8,6 +7,7 @@ import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { StateButton } from "~/components/ui/StateButton"
 import type { UserLayoutComponentProps } from "~/layout/user"
+import { uc } from "~/lib/api-client"
 import { style } from "~/styles/component"
 
 // MARK: Meta
@@ -20,25 +20,23 @@ export function meta({}: Route.MetaArgs) {
 
 // MARK: Action
 export async function action(args: Route.ActionArgs) {
-  const { userId } = await getAuth(args)
-  if (!userId) throw new Error("User not authenticated")
-  const env = args.context.cloudflare.env
   const formData = await args.request.formData()
-  const lastName = formData.get("lastName")?.toString()
-  const firstName = formData.get("firstName")?.toString()
-  const username = formData.get("username")?.toString()
-  const imageFile = formData.get("profileImage")
-  const client = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
-  const params: Partial<{ firstName: string; lastName: string; username: string }> = {}
-  if (firstName) params.firstName = firstName
-  if (lastName) params.lastName = lastName
-  if (username) params.username = username
-  await client.users.updateUser(userId, params)
-  if (imageFile && typeof imageFile !== "string") {
-    await client.users.updateUserProfileImage(userId, { file: imageFile })
+
+  const client = uc({ request: args.request })
+  const response = await client.account.$patch({
+    form: formData as FormData & {
+      firstName?: string
+      lastName?: string
+      username?: string
+      profileImage?: File
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error("Failed to update account")
   }
-  const user = await client.users.getUser(userId)
-  return user
+
+  return await response.json()
 }
 
 // MARK: Component
@@ -53,9 +51,10 @@ export default function ProfileForm() {
     ""
   const [isEditing, setIsEditing] = useState(false)
 
-  useEffect(() => {
-    if (fetcher.data) setIsEditing(false)
-  }, [fetcher.data])
+  // Reset editing when fetcher has data
+  if (fetcher.data && isEditing) {
+    setIsEditing(false)
+  }
 
   const disabled = !isEditing || fetcher.state !== "idle"
   const FormWrapper = isEditing ? fetcher.Form : "div"
@@ -70,7 +69,7 @@ export default function ProfileForm() {
       >
         <div className="flex items-center gap-4">
           <ProfileImageInput imageUrl={user.imageUrl} isEditing={isEditing} />
-          <div className="grow grid grid-cols-2 gap-4">
+          <div className="grid grow grid-cols-2 gap-4">
             <LastNameInput lastName={user.lastName ?? undefined} disabled={disabled} />
             <FirstNameInput firstName={user.firstName ?? undefined} disabled={disabled} />
           </div>
@@ -114,18 +113,18 @@ function ProfileImageInput({
       : ""
 
   return (
-    <div className="flex gap-2 items-center">
-      <div className="w-12 h-12 mr-4 rounded-full relative group overflow-hidden shrink-0">
+    <div className="flex items-center gap-2">
+      <div className="group relative mr-4 h-12 w-12 shrink-0 overflow-hidden rounded-full">
         <img
           src={safeImageUrl}
           alt="Profile"
-          className="w-full h-full object-cover rounded-full aspect-square"
+          className="aspect-square h-full w-full rounded-full object-cover"
         />
         {isEditing && (
           <>
             <label
               htmlFor="profileImage"
-              className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-50 group-hover:opacity-100 transition-opacity cursor-pointer"
+              className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center bg-black/40 opacity-50 transition-opacity group-hover:opacity-100"
             >
               <span className="text-xs text-white">変更</span>
             </label>
@@ -134,7 +133,7 @@ function ProfileImageInput({
               name="profileImage"
               id="profileImage"
               accept="image/*"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
             />
           </>
         )}

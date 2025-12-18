@@ -97,7 +97,7 @@ export default function SignInPage() {
 
   return (
     <Card
-      className={style.card.container({ class: "max-w-md mx-auto" })}
+      className={style.card.container({ class: "mx-auto max-w-md" })}
       data-testid="sign-in-container"
     >
       <CardHeader>
@@ -120,7 +120,7 @@ export default function SignInPage() {
                 data-testid="sign-in-input-email"
               />
             </div>
-            <div className="grid gap-2 mt-4">
+            <div className="mt-4 grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">パスワード</Label>
                 <a
@@ -167,7 +167,7 @@ export default function SignInPage() {
             <Button
               type="submit"
               disabled={loading || error !== null}
-              className="w-full cursor-pointer mt-4"
+              className="mt-4 w-full cursor-pointer"
               data-testid="sign-in-button-submit"
             >
               {loading ? "サインイン中..." : "サインイン"}

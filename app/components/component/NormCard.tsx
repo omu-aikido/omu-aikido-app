@@ -22,7 +22,7 @@ function ProgressBar({
 
   return (
     <div
-      className={`w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden ${className}`}
+      className={`h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700 ${className}`}
     >
       <div
         className={`h-2 rounded-full transition-all duration-500 ease-out ${colorClass}`}
@@ -55,14 +55,14 @@ interface NormCardProps {
 
 export function NormCard({ user, norm, progress }: NormCardProps) {
   return (
-    <Link to={`/admin/user/${user.id}`} className="block group">
+    <Link to={`/admin/user/${user.id}`} className="group block">
       <Card
-        className={`h-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5`}
+        className={`h-full overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg`}
       >
-        <div className="p-3 space-y-4">
-          <div className="flex justify-between items-start mb-3">
+        <div className="space-y-4 p-3">
+          <div className="mb-3 flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-lg overflow-hidden">
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-lg font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 {user.imageUrl ? (
                   <img
                     src={user.imageUrl}
@@ -74,10 +74,10 @@ export function NormCard({ user, norm, progress }: NormCardProps) {
                 )}
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <h3 className="font-bold text-slate-900 transition-colors group-hover:text-blue-600 dark:text-slate-100 dark:group-hover:text-blue-400">
                   {user.lastName} {user.firstName}
                 </h3>
-                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 font-mono">
+                <p className="mt-0.5 font-mono text-xs text-slate-500 dark:text-slate-400">
                   {norm?.grade ? translateGrade(norm.grade) : "未設定"}
                 </p>
               </div>
@@ -85,7 +85,7 @@ export function NormCard({ user, norm, progress }: NormCardProps) {
             <div className="flex flex-col place-items-end">
               <div className="mt-0.5 flex flex-row items-center gap-1 text-slate-500 dark:text-slate-400">
                 <Clock className="h-3 w-3" />
-                <span className="text-xs ">
+                <span className="text-xs">
                   {norm?.lastPromotionDate
                     ? new Date(norm.lastPromotionDate).toLocaleDateString("ja-JP")
                     : "記録なし"}
@@ -97,7 +97,7 @@ export function NormCard({ user, norm, progress }: NormCardProps) {
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
               <div className="flex items-center gap-1">
-                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <span className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
                   <TrendingUp className="h-3 w-3" />
                 </span>
                 <span className="font-mono font-bold text-slate-900 dark:text-slate-100">

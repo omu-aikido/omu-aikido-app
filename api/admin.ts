@@ -1,4 +1,5 @@
 import { createClerkClient } from "@clerk/backend"
+import { arktypeValidator } from "@hono/arktype-validator"
 import { getAuth } from "@hono/clerk-auth"
 import { ArkErrors, type } from "arktype"
 import { and, desc, eq, gte, lte, or, sql } from "drizzle-orm"
@@ -15,6 +16,43 @@ import { formatDateToJSTString, getJST, timeForNextGrade } from "~/lib/utils"
 
 const clerkUserLimit = 500
 
+const getAdminCacheControlForPath = (path: string): string | null => {
+  if (path === "/accounts") return "public, max-age=60"
+  if (path === "/norms") return "public, max-age=60"
+  if (path.startsWith("/users/")) return "public, max-age=30"
+  return null
+}
+
+const adminEdgeCacheMiddleware = async (c: Context, next: () => Promise<void>) => {
+  if (c.req.method !== "GET") {
+    await next()
+    return
+  }
+
+  const cacheControl = getAdminCacheControlForPath(c.req.path)
+  if (!cacheControl) {
+    await next()
+    return
+  }
+
+  const cache = (caches as unknown as { default: Cache }).default
+  const cacheKey = new Request(new URL(c.req.url).toString(), { method: "GET" })
+
+  const cached = await cache.match(cacheKey)
+  if (cached) {
+    return cached
+  }
+
+  await next()
+
+  const response = c.res
+  if (!response.ok) return
+  if (response.headers.has("Set-Cookie")) return
+
+  response.headers.set("Cache-Control", cacheControl)
+  c.executionCtx.waitUntil(cache.put(cacheKey, response.clone()))
+}
+
 const adminProfileUpdateSchema = type({
   year: "string",
   grade:
@@ -23,6 +61,16 @@ const adminProfileUpdateSchema = type({
   joinedAt:
     "(string.numeric.parse |> 0 <= number.integer <= 9999) | 0 <= number.integer <= 9999",
   getGradeAt: "(string & /^\\d{4}-\\d{2}-\\d{2}$/ | null)?",
+})
+
+const accountsQuerySchema = type({ query: "(string & /^.{0,100}$/)?" })
+
+const userIdParamSchema = type({ userId: "string & /^\\S+$/" })
+
+const userActivitiesQuerySchema = type({
+  page: "((string.numeric.parse |> number.integer >= 1) | number.integer >= 1)?",
+  limit:
+    "((string.numeric.parse |> 1 <= number.integer <= 100) | 1 <= number.integer <= 100)?",
 })
 
 const ensureAdminMiddleware = async (c: Context, next: () => Promise<void>) => {
@@ -122,167 +170,196 @@ const getUserActivitySummary = async (env: Env, userId: string) => {
 
 export const adminApp = new Hono<{ Bindings: Env }>()
   .use("*", ensureAdminMiddleware)
-  .get("/accounts", async c => {
-    const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
-    const query = c.req.query("query")?.trim() ?? ""
-    const clerkUsers = await clerkClient.users.getUserList({
-      limit: clerkUserLimit,
-      query,
-      orderBy: "created_at",
-    })
-
-    const ranking = await getMonthlyRanking(c.env)
-    return c.json({ users: clerkUsers.data, query, ranking })
-  })
-  .get("/norms", async c => {
-    const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
-    const search = c.req.query("search")?.trim() ?? ""
-    const clerkUsers = await clerkClient.users.getUserList({
-      limit: clerkUserLimit,
-      query: search,
-      orderBy: "created_at",
-    })
-    const norms = await getUsersNorm(c.env, clerkUsers.data)
-    return c.json({ users: clerkUsers.data, norms, search })
-  })
-  .get("/users/:userId", async c => {
-    const userId = c.req.param("userId")
-    if (!userId) {
-      return c.json({ error: "User ID is required" }, 400)
-    }
-    const page = Math.max(Number(c.req.query("page")) || 1, 1)
-    const limit = Math.max(Number(c.req.query("limit")) || 10, 1)
-
-    const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
-    try {
-      const user = await clerkClient.users.getUser(userId)
-      const profileParse = publicMetadataProfileSchema(
-        coerceProfileMetadata(user.publicMetadata),
-      )
-      const profile =
-        profileParse instanceof ArkErrors ? null : { ...profileParse, id: user.id }
-
-      const allActivities = await getUserActivitySummary(c.env, userId)
-      const totalActivitiesCount = allActivities.length
-      const activities = allActivities.slice((page - 1) * limit, page * limit)
-      const totalHours = allActivities.reduce((sum, a) => sum + (a.period || 0), 0)
-      const totalEntries = totalActivitiesCount
-      const totalDays = new Set(allActivities.map(a => a.date)).size
-
-      const getGradeAtDate = profile?.getGradeAt
-        ? new Date(profile.getGradeAt)
-        : getJST(new Date(profile?.joinedAt ?? new Date().getFullYear(), 2, 1))
-
-      const trainsAfterGrade = allActivities
-        .filter(a => {
-          const date = new Date(a.date)
-          return date > getGradeAtDate
-        })
-        .map(a => a.period)
-        .reduce((sum, period) => sum + period, 0)
-
-      const trainCount = Math.floor(
-        allActivities.map(a => a.period).reduce((sum, val) => sum + val, 0) / 1.5,
-      )
-      const doneTrain = Math.floor(trainsAfterGrade / 1.5)
-
-      return c.json({
-        user,
-        profile,
-        activities,
-        trainCount,
-        doneTrain,
-        page,
-        totalActivitiesCount,
-        limit,
-        totalDays,
-        totalEntries,
-        totalHours,
+  .use("*", adminEdgeCacheMiddleware)
+  .get(
+    "/accounts",
+    arktypeValidator("query", accountsQuerySchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: "Invalid query" }, 400)
+      }
+    }),
+    async c => {
+      const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
+      const { query } = c.req.valid("query")
+      const clerkUsers = await clerkClient.users.getUserList({
+        limit: clerkUserLimit,
+        query: query ?? "",
+        orderBy: "created_at",
       })
-    } catch {
-      return c.json({ error: "User not found" }, 404)
-    }
-  })
-  .patch("/users/:userId/profile", async c => {
-    const auth = getAuth(c)
-    if (!auth || !auth.userId) {
-      return c.json({ success: false, error: "認証されていません" }, 401)
-    }
-    const targetUserId = c.req.param("userId")
-    if (!targetUserId) {
-      return c.json({ success: false, error: "ユーザーIDが必要です" }, 400)
-    }
-    const parsed = adminProfileUpdateSchema(await c.req.json())
-    if (parsed instanceof ArkErrors) {
-      return c.json({ success: false, error: "無効な入力です" }, 400)
-    }
-    const { year, grade, role, joinedAt } = parsed
-    if (Number.isNaN(grade) || Number.isNaN(joinedAt)) {
-      return c.json({ success: false, error: "数値項目の形式が正しくありません" }, 400)
-    }
-    const currentYear = new Date().getFullYear()
-    const minJoinedAt = currentYear - 4
-    const maxJoinedAt = currentYear + 1
-    if (joinedAt < minJoinedAt || joinedAt > maxJoinedAt) {
-      return c.json(
-        {
-          success: false,
-          error: `入部年度は${minJoinedAt}年から${maxJoinedAt}年の間で入力してください`,
-        },
-        400,
+
+      const ranking = await getMonthlyRanking(c.env)
+      return c.json({ users: clerkUsers.data, query: query ?? "", ranking })
+    },
+  )
+  .get(
+    "/norms",
+    arktypeValidator("query", accountsQuerySchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: "Invalid query" }, 400)
+      }
+    }),
+    async c => {
+      const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
+      const { query } = c.req.valid("query")
+      const clerkUsers = await clerkClient.users.getUserList({
+        limit: clerkUserLimit,
+        query: query ?? "",
+        orderBy: "created_at",
+      })
+      const norms = await getUsersNorm(c.env, clerkUsers.data)
+      return c.json({ users: clerkUsers.data, norms, search: query ?? "" })
+    },
+  )
+  .get(
+    "/users/:userId",
+    arktypeValidator("param", userIdParamSchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: "User ID is required" }, 400)
+      }
+    }),
+    arktypeValidator("query", userActivitiesQuerySchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: "Invalid query" }, 400)
+      }
+    }),
+    async c => {
+      const { userId } = c.req.valid("param")
+      const { page = 1, limit = 10 } = c.req.valid("query")
+
+      const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
+      try {
+        const user = await clerkClient.users.getUser(userId)
+        const profileParse = publicMetadataProfileSchema(
+          coerceProfileMetadata(user.publicMetadata),
+        )
+        const profile =
+          profileParse instanceof ArkErrors ? null : { ...profileParse, id: user.id }
+
+        const allActivities = await getUserActivitySummary(c.env, userId)
+        const totalActivitiesCount = allActivities.length
+        const activities = allActivities.slice((page - 1) * limit, page * limit)
+        const totalHours = allActivities.reduce((sum, a) => sum + (a.period || 0), 0)
+        const totalEntries = totalActivitiesCount
+        const totalDays = new Set(allActivities.map(a => a.date)).size
+
+        const getGradeAtDate = profile?.getGradeAt
+          ? new Date(profile.getGradeAt)
+          : getJST(new Date(profile?.joinedAt ?? new Date().getFullYear(), 2, 1))
+
+        const trainsAfterGrade = allActivities
+          .filter(a => {
+            const date = new Date(a.date)
+            return date > getGradeAtDate
+          })
+          .map(a => a.period)
+          .reduce((sum, period) => sum + period, 0)
+
+        const trainCount = Math.floor(
+          allActivities.map(a => a.period).reduce((sum, val) => sum + val, 0) / 1.5,
+        )
+        const doneTrain = Math.floor(trainsAfterGrade / 1.5)
+
+        return c.json({
+          user,
+          profile,
+          activities,
+          trainCount,
+          doneTrain,
+          page,
+          totalActivitiesCount,
+          limit,
+          totalDays,
+          totalEntries,
+          totalHours,
+        })
+      } catch {
+        return c.json({ error: "User not found" }, 404)
+      }
+    },
+  )
+  .patch(
+    "/users/:userId/profile",
+    arktypeValidator("param", userIdParamSchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: "ユーザーIDが必要です" }, 400)
+      }
+    }),
+    arktypeValidator("json", adminProfileUpdateSchema, (result, c) => {
+      if (!result.success) {
+        return c.json({ error: "無効な入力です" }, 400)
+      }
+    }),
+    async c => {
+      const auth = getAuth(c)
+      if (!auth || !auth.userId) {
+        return c.json({ error: "認証されていません" }, 401)
+      }
+      const { userId: targetUserId } = c.req.valid("param")
+      const parsed = c.req.valid("json")
+      const { year, grade, role, joinedAt } = parsed
+      if (Number.isNaN(grade) || Number.isNaN(joinedAt)) {
+        return c.json({ error: "数値項目の形式が正しくありません" }, 400)
+      }
+      const currentYear = new Date().getFullYear()
+      const minJoinedAt = currentYear - 4
+      const maxJoinedAt = currentYear + 1
+      if (joinedAt < minJoinedAt || joinedAt > maxJoinedAt) {
+        return c.json(
+          {
+            error: `入部年度は${minJoinedAt}年から${maxJoinedAt}年の間で入力してください`,
+          },
+          400,
+        )
+      }
+
+      const adminProfile = await getCurrentProfile(c)
+      const adminRole = adminProfile?.role ? Role.fromString(adminProfile.role) : null
+      if (!adminRole || !adminRole.isManagement()) {
+        return c.json({ error: "権限が不足しています" }, 403)
+      }
+
+      const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
+      const targetUser = await clerkClient.users.getUser(targetUserId)
+      const targetProfileParsed = publicMetadataProfileSchema(
+        coerceProfileMetadata(targetUser.publicMetadata),
       )
-    }
+      const targetCurrentRole =
+        targetProfileParsed instanceof ArkErrors
+          ? Role.MEMBER
+          : (Role.fromString(targetProfileParsed.role ?? "member") ?? Role.MEMBER)
+      if (targetCurrentRole && Role.compare(adminRole.role, targetCurrentRole.role) > 0) {
+        return c.json({ error: "現在の権限より上書きできません" }, 403)
+      }
 
-    const adminProfile = await getCurrentProfile(c)
-    const adminRole = adminProfile?.role ? Role.fromString(adminProfile.role) : null
-    if (!adminRole || !adminRole.isManagement()) {
-      return c.json({ success: false, error: "権限が不足しています" }, 403)
-    }
+      const requestedRole = Role.fromString(role)
+      if (!requestedRole || Role.compare(adminRole.role, requestedRole.role) > 0) {
+        return c.json({ error: "権限が不足しています" }, 403)
+      }
 
-    const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
-    const targetUser = await clerkClient.users.getUser(targetUserId)
-    const targetProfileParsed = publicMetadataProfileSchema(
-      coerceProfileMetadata(targetUser.publicMetadata),
-    )
-    const targetCurrentRole =
-      targetProfileParsed instanceof ArkErrors
-        ? Role.MEMBER
-        : (Role.fromString(targetProfileParsed.role ?? "member") ?? Role.MEMBER)
-    if (targetCurrentRole && Role.compare(adminRole.role, targetCurrentRole.role) > 0) {
-      return c.json({ success: false, error: "現在の権限より上書きできません" }, 403)
-    }
+      const normalizedGetGradeAt =
+        parsed.getGradeAt && typeof parsed.getGradeAt === "string"
+          ? new Date(parsed.getGradeAt)
+          : null
+      if (normalizedGetGradeAt && isNaN(normalizedGetGradeAt.getTime())) {
+        return c.json({ error: "級段位取得日の形式が正しくありません" }, 400)
+      }
 
-    const requestedRole = Role.fromString(role)
-    if (!requestedRole || Role.compare(adminRole.role, requestedRole.role) > 0) {
-      return c.json({ success: false, error: "権限が不足しています" }, 403)
-    }
+      const updatedMetadata = {
+        grade,
+        getGradeAt: normalizedGetGradeAt
+          ? formatDateToJSTString(normalizedGetGradeAt)
+          : null,
+        joinedAt,
+        year,
+        role,
+      }
 
-    const normalizedGetGradeAt =
-      parsed.getGradeAt && typeof parsed.getGradeAt === "string"
-        ? new Date(parsed.getGradeAt)
-        : null
-    if (normalizedGetGradeAt && isNaN(normalizedGetGradeAt.getTime())) {
-      return c.json(
-        { success: false, error: "級段位取得日の形式が正しくありません" },
-        400,
-      )
-    }
+      await clerkClient.users.updateUserMetadata(targetUserId, {
+        publicMetadata: updatedMetadata,
+      })
 
-    const updatedMetadata = {
-      grade,
-      getGradeAt: normalizedGetGradeAt
-        ? formatDateToJSTString(normalizedGetGradeAt)
-        : null,
-      joinedAt,
-      year,
-      role,
-    }
-
-    await clerkClient.users.updateUserMetadata(targetUserId, {
-      publicMetadata: updatedMetadata,
-    })
-
-    return c.json({ success: true }, 200)
-  })
+      return c.json({ success: true }, 200)
+    },
+  )
 
 export type AdminApp = typeof adminApp

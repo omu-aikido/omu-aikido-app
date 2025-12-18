@@ -1,5 +1,4 @@
 import type { User } from "@clerk/react-router/server"
-import { createClerkClient } from "@clerk/react-router/server"
 import React from "react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { useNavigate, useSearchParams } from "react-router"
@@ -10,36 +9,26 @@ import ClerkUsers from "~/components/component/ClerkUsers"
 import Ranking from "~/components/component/Ranking"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
-import { getMonthlyRanking } from "~/lib/query/admin"
+import { ac } from "~/lib/api-client"
 import { Role } from "~/lib/role"
 import { style } from "~/styles/component"
 
 // MARK: Loader
 export async function loader(args: LoaderFunctionArgs) {
-  const { request, context } = args
-  const env = context.cloudflare.env
-  const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
-
+  const { request } = args
   const url = new URL(request.url)
   const query = url.searchParams.get("query") || ""
 
   try {
-    // 全件取得（100ユーザー以下想定）
-    const clerkUsers = await clerkClient.users.getUserList({
-      limit: 500, // 十分に大きな値で全件取得
-      query: query.trim(),
-      orderBy: "created_at",
-    })
+    const client = ac({ request })
+    const response = await client.accounts.$get({ query: { query } })
 
-    const users: User[] = clerkUsers.data
+    if (!response.ok) {
+      throw new Error("Failed to fetch accounts")
+    }
 
-    const ranking = await getMonthlyRanking({
-      year: new Date().getUTCFullYear(),
-      month: new Date().getUTCMonth(),
-      env,
-    })
-
-    return { users, query, ranking }
+    const data = await response.json()
+    return { users: data.users as User[], query: data.query, ranking: data.ranking }
   } catch {
     return {
       users: [] as User[],
@@ -234,7 +223,7 @@ export default function AdminAccounts(args: Route.ComponentProps) {
         <Ranking data={args.loaderData.ranking} users={users as User[]} />
       )}
 
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <h2 className={style.text.subtitle()}>アカウント管理</h2>
         {/* 検索フォーム（SPA対応） */}
         <div className="flex gap-2">

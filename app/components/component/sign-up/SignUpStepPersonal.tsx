@@ -104,7 +104,7 @@ export function SignUpStepPersonal({
           data-testid="sign-up-button-next-personal"
         >
           {(fetcher.state !== "idle" || isSignUpCreated) && (
-            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
           )}
           次へ
         </Button>

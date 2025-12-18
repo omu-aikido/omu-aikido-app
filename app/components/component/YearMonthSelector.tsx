@@ -32,7 +32,7 @@ export default function YearMonthSelectorInline({
   }, [year, month])
 
   return (
-    <div className="flex gap-2 items-center" data-testid="year-month-selector-container">
+    <div className="flex items-center gap-2" data-testid="year-month-selector-container">
       <Input
         type="number"
         min={yearOptions[0]}

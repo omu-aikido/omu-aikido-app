@@ -13,7 +13,7 @@ export const ReactHeader = React.memo<AuthedHeaderProps>(function ReactHeader({
   return (
     <>
       <header
-        className="w-full m-0 py-0 px-6 top-0 z-50 fixed select-none bg-slate-200/70 dark:bg-slate-800/90 text-slate-900 dark:text-slate-200 flex justify-between items-center h-20"
+        className="fixed top-0 z-50 m-0 flex h-20 w-full items-center justify-between bg-slate-200/70 px-6 py-0 text-slate-900 select-none dark:bg-slate-800/90 dark:text-slate-200"
         data-testid="header-container"
       >
         <h2
@@ -31,7 +31,7 @@ export const ReactHeader = React.memo<AuthedHeaderProps>(function ReactHeader({
         {children}
       </header>
       <div
-        className="backdrop-blur-md fixed top-0 left-0 w-full h-20 z-10"
+        className="fixed top-0 left-0 z-10 h-20 w-full backdrop-blur-md"
         data-testid="header-backdrop"
       />
     </>

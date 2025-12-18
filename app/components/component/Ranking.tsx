@@ -34,12 +34,12 @@ const Ranking = React.memo<RankingProps>(function Ranking({ data, users }) {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto my-4">
-      <h2 className="text-center text-slate-800 dark:text-slate-100 text-lg sm:text-xl font-semibold mb-3 sm:mb-4">
+    <div className="mx-auto my-4 w-full max-w-2xl">
+      <h2 className="mb-3 text-center text-lg font-semibold text-slate-800 sm:mb-4 sm:text-xl dark:text-slate-100">
         今月の稽古時間ランキング
       </h2>
       {sortedData.length === 0 ? (
-        <p className="text-center text-slate-500 dark:text-slate-400 py-4">
+        <p className="py-4 text-center text-slate-500 dark:text-slate-400">
           ランキングデータがありません。
         </p>
       ) : (
@@ -47,13 +47,13 @@ const Ranking = React.memo<RankingProps>(function Ranking({ data, users }) {
           <table className="min-w-full border-collapse text-sm sm:text-base">
             <thead>
               <tr className="bg-slate-100 dark:bg-slate-700">
-                <th className="py-2 px-3 font-semibold text-slate-700 dark:text-slate-200 text-left w-24">
+                <th className="w-24 px-3 py-2 text-left font-semibold text-slate-700 dark:text-slate-200">
                   順位
                 </th>
-                <th className="py-2 px-3 font-semibold text-slate-700 dark:text-slate-200 text-left">
+                <th className="px-3 py-2 text-left font-semibold text-slate-700 dark:text-slate-200">
                   名前
                 </th>
-                <th className="py-2 px-3 font-semibold text-slate-700 dark:text-slate-200 text-right w-24">
+                <th className="w-24 px-3 py-2 text-right font-semibold text-slate-700 dark:text-slate-200">
                   時間
                 </th>
               </tr>
@@ -68,13 +68,13 @@ const Ranking = React.memo<RankingProps>(function Ranking({ data, users }) {
                       : "bg-slate-50 dark:bg-slate-700"
                   }
                 >
-                  <td className="py-2 px-3 text-slate-800 dark:text-slate-100 font-mono">
+                  <td className="px-3 py-2 font-mono text-slate-800 dark:text-slate-100">
                     #{index + 1}
                   </td>
-                  <td className="py-2 px-3 text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                  <td className="px-3 py-2 whitespace-nowrap text-slate-700 dark:text-slate-200">
                     {userMap.get(item.userId) ?? "不明"}
                   </td>
-                  <td className="py-2 px-3 text-slate-900 dark:text-slate-100 text-right font-bold">
+                  <td className="px-3 py-2 text-right font-bold text-slate-900 dark:text-slate-100">
                     {item.total}時間
                   </td>
                 </tr>

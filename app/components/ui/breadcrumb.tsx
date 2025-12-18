@@ -20,7 +20,7 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
     <ol
       data-slot="breadcrumb-list"
       className={cn(
-        "tw:text-muted-foreground tw:gap-1.5 tw:text-sm tw:sm:gap-2.5 tw:flex tw:flex-wrap tw:items-center tw:break-words",
+        "flex flex-wrap items-center gap-1.5 text-sm wrap-break-word text-muted-foreground sm:gap-2.5",
         className,
       )}
       {...props}
@@ -32,7 +32,7 @@ function BreadcrumbItem({ className, ...props }: React.ComponentProps<"li">) {
   return (
     <li
       data-slot="breadcrumb-item"
-      className={cn("tw:gap-1.5 tw:inline-flex tw:items-center", className)}
+      className={cn("inline-flex items-center gap-1.5", className)}
       {...props}
     />
   )
@@ -42,7 +42,7 @@ function BreadcrumbLink({ className, render, ...props }: useRender.ComponentProp
   return useRender({
     defaultTagName: "a",
     props: mergeProps<"a">(
-      { className: cn("hover:text-foreground transition-colors", className) },
+      { className: cn("transition-colors hover:text-foreground", className) },
       props,
     ),
     render,
@@ -57,7 +57,7 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
       role="link"
       aria-disabled="true"
       aria-current="page"
-      className={cn("tw:text-foreground tw:font-normal", className)}
+      className={cn("font-normal text-foreground", className)}
       {...props}
     />
   )
@@ -73,7 +73,7 @@ function BreadcrumbSeparator({
       data-slot="breadcrumb-separator"
       role="presentation"
       aria-hidden="true"
-      className={cn("tw:[&>svg]:size-3.5", className)}
+      className={cn("[&>svg]:size-3.5", className)}
       {...props}
     >
       {children ?? <ChevronRightIcon />}
@@ -87,14 +87,11 @@ function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<"span"
       data-slot="breadcrumb-ellipsis"
       role="presentation"
       aria-hidden="true"
-      className={cn(
-        "tw:size-5 tw:[&>svg]:size-4 tw:flex tw:items-center tw:justify-center",
-        className,
-      )}
+      className={cn("flex size-5 items-center justify-center [&>svg]:size-4", className)}
       {...props}
     >
       <MoreHorizontalIcon />
-      <span className="tw:sr-only">More</span>
+      <span className="sr-only">More</span>
     </span>
   )
 }

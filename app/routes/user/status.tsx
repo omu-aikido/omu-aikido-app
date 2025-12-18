@@ -1,9 +1,9 @@
-import { getAuth } from "@clerk/react-router/server"
-import { useEffect, useState } from "react"
-import { redirect, useFetcher } from "react-router"
+import { useState } from "react"
+import { useFetcher } from "react-router"
 
 import type { Route } from "./+types/status"
 
+import { isDateString } from "@/type/date"
 import { DatePicker } from "~/components/ui/date-picker"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
@@ -43,18 +43,28 @@ export function meta({}: Route.MetaArgs) {
 
 // MARK: Action
 export async function action(args: Route.ActionArgs) {
-  const { userId } = await getAuth(args)
-  if (!userId) {
-    return redirect("/sign-in?redirect_url=" + args.request.url)
-  }
+  const isYearValue = (
+    value: string,
+  ): value is `b${number}` | `m${number}` | `d${number}` =>
+    /^(b[1-4]|m[1-2]|d[1-2])$/.test(value)
   const client = uc({ request: args.request })
   const formData = await args.request.formData()
-  const year = formData.get("year")?.toString()
+  const year = formData.get("year")
   const grade = Number(formData.get("grade"))
   const joinedAt = Number(formData.get("joinedAt"))
   const getGradeAtValue = formData.get("getGradeAt")?.toString()
   const getGradeAt =
     getGradeAtValue && getGradeAtValue.length > 0 ? getGradeAtValue : null
+
+  if (typeof year !== "string" || !isYearValue(year)) {
+    throw new Error("Invalid year")
+  }
+  if (!Number.isFinite(grade) || !Number.isFinite(joinedAt)) {
+    throw new Error("Invalid profile payload")
+  }
+  if (getGradeAt !== null && !isDateString(getGradeAt)) {
+    throw new Error("Invalid getGradeAt")
+  }
 
   const response = await client.profile.$patch({
     json: { year, grade, joinedAt, getGradeAt },
@@ -71,9 +81,10 @@ export default function StatusForm({ loaderData, actionData }: Route.ComponentPr
   const fetcher = useFetcher()
   const [isEditing, setIsEditing] = useState(false)
 
-  useEffect(() => {
-    if (fetcher.state == "idle") setIsEditing(false)
-  }, [fetcher.state])
+  // Reset editing when fetcher is idle
+  if (fetcher.state === "idle" && isEditing) {
+    setIsEditing(false)
+  }
 
   if (!profile) {
     return <p>プロフィール情報が見つかりませんでした。</p>

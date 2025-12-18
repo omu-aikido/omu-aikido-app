@@ -22,7 +22,7 @@ export function UserProfileSection({
   if (!unSafeprofile) {
     statusBadge = (
       <span
-        className="inline-block px-3 py-1 mb-2 rounded-full bg-red-100 text-red-700 text-xs font-bold"
+        className="mb-2 inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700"
         data-testid="user-profile-status-badge"
       >
         プロフィール未設定
@@ -31,14 +31,14 @@ export function UserProfileSection({
   }
 
   return (
-    <div className={card({ className: "p-6 mb-3" })} data-testid="user-profile-container">
+    <div className={card({ className: "mb-3 p-6" })} data-testid="user-profile-container">
       {/* ステータスバッジ表示 */}
       {statusBadge}
-      <div className="flex items-center gap-4 mb-6" data-testid="user-profile-header">
+      <div className="mb-6 flex items-center gap-4" data-testid="user-profile-header">
         <img
           src={user.imageUrl}
           alt={`${user.lastName ?? ""} ${user.firstName ?? ""}`}
-          className="w-16 h-16 rounded-full object-cover border-4 border-slate-200 dark:border-slate-600"
+          className="h-16 w-16 rounded-full border-4 border-slate-200 object-cover dark:border-slate-600"
           data-testid="user-profile-avatar"
         />
         <div>
@@ -50,7 +50,7 @@ export function UserProfileSection({
           </h2>
           {discord && discord.username && (
             <p
-              className="text-slate-600 dark:text-slate-400 flex flex-row items-center text-sm"
+              className="flex flex-row items-center text-sm text-slate-600 dark:text-slate-400"
               data-testid="user-profile-discord"
             >
               <Icon icon="discord-logo" className="m-0! mr-2!" />
@@ -58,7 +58,7 @@ export function UserProfileSection({
             </p>
           )}
           <p
-            className="text-slate-600 dark:text-slate-400 flex flex-row items-center text-sm"
+            className="flex flex-row items-center text-sm text-slate-600 dark:text-slate-400"
             data-testid="user-profile-email"
           >
             <Icon icon="envelope" className="m-0! mr-2!" />
@@ -67,7 +67,7 @@ export function UserProfileSection({
         </div>
       </div>
       <div>
-        <div className="space-y-3 flex flex-col" data-testid="user-profile-details">
+        <div className="flex flex-col space-y-3" data-testid="user-profile-details">
           <div className={info().frame()} data-testid="user-profile-role">
             <label className={info().label()}>役職</label>
             <p className={info().value()}>
@@ -93,7 +93,7 @@ export function UserProfileSection({
 }
 
 const card = tv({
-  base: "bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700",
+  base: "rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800",
 })
 
 const info = tv({
@@ -101,6 +101,6 @@ const info = tv({
     frame: "flex flex-row",
     label: "block text-sm font-medium text-slate-700 dark:text-slate-300",
     value:
-      "ml-auto items-end justify-center text-sm text-slate-900 dark:text-slate-100 font-mono",
+      "ml-auto items-end justify-center font-mono text-sm text-slate-900 dark:text-slate-100",
   },
 })

@@ -3,8 +3,10 @@ import react from "eslint-plugin-react"
 import reactHooks from "eslint-plugin-react-hooks"
 import reactRefresh from "eslint-plugin-react-refresh"
 import tseslint from "typescript-eslint"
+import eslintPluginBetterTailwindcss from "eslint-plugin-better-tailwindcss"
+import { defineConfig } from "eslint/config"
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: [
       "node_modules/",
@@ -23,6 +25,7 @@ export default tseslint.config(
       "playwright-report/",
     ],
   },
+  reactHooks.configs.flat.recommended,
   ...tseslint.configs.recommended,
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
@@ -42,11 +45,17 @@ export default tseslint.config(
     },
     plugins: {
       react,
-      "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
       import: importPlugin,
+      "better-tailwindcss": eslintPluginBetterTailwindcss,
     },
-    settings: { react: { version: "detect" } },
+    settings: {
+      react: { version: "detect" },
+      "better-tailwindcss": {
+        entryPoint: "./app/styles/global.css",
+        tailwindConfig: "tailwind.config.ts",
+      },
+    },
     rules: {
       // TypeScript rules
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
@@ -91,6 +100,13 @@ export default tseslint.config(
       ],
       "import/no-duplicates": "error",
       "import/no-unused-modules": "off", // Disabled due to performance issues
+
+      // tailwindcss
+      "better-tailwindcss/enforce-consistent-line-wrapping": "off",
+      "better-tailwindcss/enforce-consistent-class-order": "warn",
+      "better-tailwindcss/enforce-canonical-classes": "warn",
+      "better-tailwindcss/no-unnecessary-whitespace": "warn",
+      "better-tailwindcss/no-deprecated-classes": "error",
     },
   },
   // Cloudflare Workers specific configuration

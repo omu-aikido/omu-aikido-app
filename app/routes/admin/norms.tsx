@@ -1,5 +1,4 @@
 import type { User } from "@clerk/react-router/server"
-import { createClerkClient } from "@clerk/react-router/server"
 import { ArrowDown01, ArrowUp01, Search } from "lucide-react"
 import { useMemo } from "react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
@@ -9,11 +8,10 @@ import type { Route } from "./+types/norms"
 
 import { NormCard } from "~/components/component/NormCard"
 import { Input } from "~/components/ui/input"
-import { getUsersNorm } from "~/lib/query/admin"
+import { ac } from "~/lib/api-client"
 
 // MARK: Constants
 const MAX_SEARCH_LENGTH = 100
-const MAX_USERS_LIMIT = 500
 const PERCENTAGE_MULTIPLIER = 100
 
 // MARK: Types
@@ -44,27 +42,21 @@ function sortByProgress<T extends { progress: number; isMet: boolean }>(
 
 // MARK: Loader
 export async function loader(args: LoaderFunctionArgs) {
-  const { request, context } = args
-  const env = context.cloudflare.env
-  const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
-
+  const { request } = args
   const url = new URL(request.url)
   const rawSearch = url.searchParams.get("search") || ""
   const search = rawSearch.trim().slice(0, MAX_SEARCH_LENGTH)
 
   try {
-    // 全件取得（100ユーザー以下想定）
-    const clerkUsers = await clerkClient.users.getUserList({
-      limit: MAX_USERS_LIMIT, // 十分に大きな値で全件取得
-      query: search,
-      orderBy: "created_at",
-    })
+    const client = ac({ request })
+    const response = await client.norms.$get({ query: { query: search } })
 
-    const users: User[] = clerkUsers.data
+    if (!response.ok) {
+      throw new Error("Failed to fetch norms")
+    }
 
-    const norms = await getUsersNorm({ userIds: users.map(user => user.id), env })
-
-    return { users, search, norms }
+    const data = await response.json()
+    return { users: data.users as User[], search: data.search, norms: data.norms }
   } catch {
     return { users: [] as User[], search, norms: [] as UserNorm[] }
   }
@@ -131,26 +123,26 @@ export default function NormsPage(args: Route.ComponentProps) {
   }, [users, norms, searchTerm, filterStatus, sortOrder])
 
   return (
-    <div className="space-y-8 p-4 md:p-8 max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between ">
+    <div className="mx-auto max-w-7xl space-y-8 p-4 md:p-8">
+      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
         <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="名前で検索..."
             value={searchTerm}
             onChange={e => updateSearchParams({ search: e.target.value })}
-            className="pl-9 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+            className="border-slate-200 bg-white pl-9 dark:border-slate-800 dark:bg-slate-950"
           />
         </div>
 
-        <div className="flex items-center gap-4 w-full sm:w-auto">
-          <div className="flex bg-slate-200 dark:bg-slate-800 p-1 rounded-lg">
+        <div className="flex w-full items-center gap-4 sm:w-auto">
+          <div className="flex rounded-lg bg-slate-200 p-1 dark:bg-slate-800">
             <button
               onClick={() => updateSearchParams({ sort: "asc" })}
-              className={`p-1.5 rounded-md transition-all ${
+              className={`rounded-md p-1.5 transition-all ${
                 sortOrder === "asc"
-                  ? "bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50 shadow-sm"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                  ? "bg-white text-slate-900 shadow-sm dark:bg-slate-950 dark:text-slate-50"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
               title="進捗率が低い順"
             >
@@ -158,10 +150,10 @@ export default function NormsPage(args: Route.ComponentProps) {
             </button>
             <button
               onClick={() => updateSearchParams({ sort: "desc" })}
-              className={`p-1.5 rounded-md transition-all ${
+              className={`rounded-md p-1.5 transition-all ${
                 sortOrder === "desc"
-                  ? "bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50 shadow-sm"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                  ? "bg-white text-slate-900 shadow-sm dark:bg-slate-950 dark:text-slate-50"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
               title="進捗率が高い順（達成優先）"
             >
@@ -170,33 +162,33 @@ export default function NormsPage(args: Route.ComponentProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex bg-slate-200 dark:bg-slate-800 p-1 rounded-lg">
+            <div className="flex rounded-lg bg-slate-200 p-1 dark:bg-slate-800">
               <button
                 onClick={() => updateSearchParams({ filter: "all" })}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
                   filterStatus === "all"
-                    ? "bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50 shadow-sm"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                    ? "bg-white text-slate-900 shadow-sm dark:bg-slate-950 dark:text-slate-50"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                 }`}
               >
                 全て
               </button>
               <button
                 onClick={() => updateSearchParams({ filter: "unmet" })}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
                   filterStatus === "unmet"
-                    ? "bg-white dark:bg-slate-950 text-red-600 dark:text-red-400 shadow-sm"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                    ? "bg-white text-red-600 shadow-sm dark:bg-slate-950 dark:text-red-400"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                 }`}
               >
                 未達成
               </button>
               <button
                 onClick={() => updateSearchParams({ filter: "met" })}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
                   filterStatus === "met"
-                    ? "bg-white dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 shadow-sm"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                    ? "bg-white text-emerald-600 shadow-sm dark:bg-slate-950 dark:text-emerald-400"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                 }`}
               >
                 達成済
@@ -206,14 +198,14 @@ export default function NormsPage(args: Route.ComponentProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {filteredUsers.map(({ user, norm, progress }) => (
           <NormCard key={user.id} user={user} norm={norm} progress={progress} />
         ))}
       </div>
 
       {filteredUsers.length === 0 && (
-        <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+        <div className="py-12 text-center text-slate-500 dark:text-slate-400">
           <p>該当するユーザーが見つかりません</p>
         </div>
       )}

@@ -97,10 +97,8 @@ export default function SignUpPage(props: Route.ComponentProps) {
   const { state, dispatch, nextStep, prevStep, validateStep } = useSignUpForm(currentYear)
   const { step, clerkErrors, formErrors, formValues, isSignUpCreated } = state
 
-  const [hydrated, setHydrated] = useState(false)
-  useEffect(() => {
-    setHydrated(true)
-  }, [])
+  const [hydrated] = useState(() => typeof window !== "undefined")
+
   const disabled =
     !hydrated ||
     step !== "profile" ||
@@ -235,7 +233,7 @@ export default function SignUpPage(props: Route.ComponentProps) {
 
   return (
     <div
-      className={style.card.container({ class: "max-w-md mx-auto" })}
+      className={style.card.container({ class: "mx-auto max-w-md" })}
       data-testid="sign-up-container"
     >
       <h1 className={style.text.sectionTitle()} data-testid="sign-up-title">

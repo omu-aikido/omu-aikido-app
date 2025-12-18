@@ -9,7 +9,7 @@ function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
       role="navigation"
       aria-label="pagination"
       data-slot="pagination"
-      className={cn("tw:mx-auto tw:flex tw:w-full tw:justify-center", className)}
+      className={cn("mx-auto flex w-full justify-center", className)}
       {...props}
     />
   )
@@ -19,7 +19,7 @@ function PaginationContent({ className, ...props }: React.ComponentProps<"ul">) 
   return (
     <ul
       data-slot="pagination-content"
-      className={cn("tw:gap-1 tw:flex tw:items-center", className)}
+      className={cn("flex items-center gap-1", className)}
       {...props}
     />
   )
@@ -67,11 +67,11 @@ function PaginationPrevious({
     <PaginationLink
       aria-label="Go to previous page"
       size="default"
-      className={cn("tw:pl-2!", className)}
+      className={cn("pl-2!", className)}
       {...props}
     >
       <ChevronLeftIcon data-icon="inline-start" />
-      <span className="tw:hidden tw:sm:block">Previous</span>
+      <span className="hidden sm:block">Previous</span>
     </PaginationLink>
   )
 }
@@ -84,10 +84,10 @@ function PaginationNext({
     <PaginationLink
       aria-label="Go to next page"
       size="default"
-      className={cn("tw:pr-2!", className)}
+      className={cn("pr-2!", className)}
       {...props}
     >
-      <span className="tw:hidden tw:sm:block">Next</span>
+      <span className="hidden sm:block">Next</span>
       <ChevronRightIcon data-icon="inline-end" />
     </PaginationLink>
   )
@@ -99,13 +99,13 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<"span"
       aria-hidden
       data-slot="pagination-ellipsis"
       className={cn(
-        "tw:size-9 tw:items-center tw:justify-center tw:[&_svg:not([class*=size-])]:size-4 tw:flex tw:items-center tw:justify-center",
+        "flex size-9 items-center justify-center [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
     >
       <MoreHorizontalIcon />
-      <span className="tw:sr-only">More pages</span>
+      <span className="sr-only">More pages</span>
     </span>
   )
 }

@@ -1,5 +1,5 @@
 import { format } from "date-fns"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 
 import { toLocalJPString } from "~/lib/utils"
 import { style } from "~/styles/component"
@@ -20,17 +20,9 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
   onSave,
   onClose,
 }) => {
-  const [dailyActivities, setDailyActivities] = useState<DailyActivityItem[]>(activities)
-
-  useEffect(() => {
-    // 保持している activities を受け取ったとき、元の period を originalPeriod に保存しておく
-    setDailyActivities(
-      activities.map(act => ({
-        ...act,
-        originalPeriod: act.originalPeriod ?? act.period,
-      })),
-    )
-  }, [activities])
+  const [dailyActivities, setDailyActivities] = useState<DailyActivityItem[]>(() =>
+    activities.map(act => ({ ...act, originalPeriod: act.originalPeriod ?? act.period })),
+  )
 
   const handlePeriodChange = (id: DailyActivityItem["id"], newPeriod: number) => {
     setDailyActivities(prev => {
@@ -220,18 +212,18 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-slate-600/50 dark:bg-slate-900/75 flex justify-center items-center z-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-600/50 dark:bg-slate-900/75"
       data-testid="daily-activity-modal"
     >
       <div
-        className={style.card.container({ class: "max-w-md w-full mx-4" })}
+        className={style.card.container({ class: "mx-4 w-full max-w-md" })}
         data-testid="daily-activity-card"
       >
-        <h2 className={style.text.sectionTitle({ class: "text-xl mb-4" })}>
+        <h2 className={style.text.sectionTitle({ class: "mb-4 text-xl" })}>
           {date ? format(date, "yyyy年MM月dd日") : "日付不明"} の記録
         </h2>
         <div
-          className="flex flex-col max-h-80 overflow-y-auto mb-4"
+          className="mb-4 flex max-h-80 flex-col overflow-y-auto"
           data-testid="daily-activity-list"
         >
           {dailyActivities.filter(act => !act.isDeleted && act.status !== "deleted")
@@ -248,7 +240,7 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
                 key={act.id}
                 className={style.record.activityStatusStyles({
                   class:
-                    "flex items-center py-0.5 border-b border-slate-200 dark:border-slate-600",
+                    "flex items-center border-b border-slate-200 py-0.5 dark:border-slate-600",
                   status:
                     act.isDeleted || act.status === "deleted"
                       ? "deleted"
@@ -259,7 +251,7 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
                 {!isMergedDeletedDisplay && ( // マージされた削除活動でない場合のみ表示
                   <button
                     onClick={() => handleDeleteActivity(act.id)}
-                    className="p-1 mx-1 sm:mx-3 rounded-full hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors"
+                    className="mx-1 rounded-full p-1 transition-colors hover:bg-red-100 sm:mx-3 dark:hover:bg-red-900/60"
                     title="削除"
                     data-testid="delete-record"
                   >
@@ -284,8 +276,10 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
                   step="0.5"
                   value={act.period}
                   id={act.id}
+                  min="0.5"
+                  max="5"
                   onChange={e => handlePeriodChange(act.id, parseFloat(e.target.value))}
-                  className={style.form.input({ className: "w-20 mr-2" })}
+                  className={style.form.input({ className: "mr-2 w-20" })}
                   data-testid={`input-record`}
                   disabled={
                     act.isDeleted || act.status === "deleted" || isMergedDeletedDisplay
@@ -293,7 +287,7 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
                 />
                 <span className="text-slate-900 dark:text-white">時間</span>
                 <span
-                  className={style.text.info({ class: "items-end ml-auto font-mono" })}
+                  className={style.text.info({ class: "ml-auto items-end font-mono" })}
                 >
                   {toLocalJPString(
                     new Date(act.updatedAt ? act.updatedAt : act.createAt),
@@ -304,11 +298,11 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
           })}
           <button
             onClick={handleAddActivity}
-            className="flex items-center py-0.5 border-b border-slate-200 dark:border-slate-600 cursor-pointer"
+            className="flex cursor-pointer items-center border-b border-slate-200 py-0.5 dark:border-slate-600"
             style={{ minHeight: "48px" }}
             data-testid={`add-record`}
           >
-            <div className="p-1 mx-1 sm:mx-3 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors">
+            <div className="mx-1 rounded-full p-1 transition-colors hover:bg-blue-100 sm:mx-3 dark:hover:bg-blue-900">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 text-blue-500"
@@ -327,7 +321,7 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
             記録を追加
           </button>
         </div>
-        <div className="flex items-center mt-6">
+        <div className="mt-6 flex items-center">
           <button
             onClick={onClose}
             className={style.button({ type: "secondary", className: "mr-auto" })}

@@ -1,10 +1,12 @@
+import "./arktype-config"
+
 import { Hono } from "hono"
-import { createRequestHandler } from "react-router"
+import { RouterContextProvider, createRequestHandler } from "react-router"
 
 import { api } from "../api"
 
 declare module "react-router" {
-  export interface AppLoadContext {
+  export interface RouterContextProvider {
     cloudflare: { env: Env; ctx: ExecutionContext }
   }
 }
@@ -15,6 +17,41 @@ const requestHandler = createRequestHandler(
 )
 
 const app = new Hono<{ Bindings: Env }>()
+
+function getCacheControlForPathname(pathname: string): string | null {
+  if (pathname.startsWith("/assets/")) return "public, max-age=31536000, immutable"
+  if (pathname === "/favicon.ico") return "public, max-age=86400"
+  if (pathname === "/favicon.svg") return "public, max-age=86400"
+  if (pathname === "/robots.txt") return "public, max-age=86400"
+  if (pathname === "/sitemap-index.xml") return "public, max-age=86400"
+  return null
+}
+
+app.use("*", async (c, next) => {
+  const request = c.req.raw
+  if (request.method !== "GET") return next()
+
+  const url = new URL(request.url)
+  if (url.pathname.startsWith("/api/")) return next()
+
+  const cacheControl = getCacheControlForPathname(url.pathname)
+  if (!cacheControl) return next()
+
+  const cacheKey = new Request(url.toString(), { method: "GET" })
+  const cache = (caches as unknown as { default: Cache }).default
+
+  const cached = await cache.match(cacheKey)
+  if (cached) return cached
+
+  await next()
+
+  const response = c.res
+  if (!response.ok) return
+  if (response.headers.has("Set-Cookie")) return
+
+  response.headers.set("Cache-Control", cacheControl)
+  c.executionCtx.waitUntil(cache.put(cacheKey, response.clone()))
+})
 
 app.use("*", async (c, next) => {
   const request = c.req.raw
@@ -29,6 +66,14 @@ app.use("*", async (c, next) => {
   await next()
 
   const response = c.res
+
+  if (
+    new URL(request.url).pathname.startsWith("/api/") &&
+    !response.headers.has("Cache-Control")
+  ) {
+    response.headers.set("Cache-Control", "no-store")
+  }
+
   response.headers.set("X-Frame-Options", "DENY")
   response.headers.set("X-Content-Type-Options", "nosniff")
   response.headers.set(
@@ -62,9 +107,10 @@ app.use("*", async (c, next) => {
 app.route("/api", api)
 
 app.all("*", async c => {
-  const response = await requestHandler(c.req.raw, {
-    cloudflare: { env: c.env, ctx: c.executionCtx },
-  })
+  const loadContext = new RouterContextProvider()
+  loadContext.cloudflare = { env: c.env, ctx: c.executionCtx }
+
+  const response = await requestHandler(c.req.raw, loadContext)
   return response
 })
 
