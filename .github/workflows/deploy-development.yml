@@ -45,7 +45,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: versions upload --config build/server/wrangler.json --name record-preview
+          command: deploy --config wrangler.preview.jsonc
           secrets: |
             CLERK_PUBLISHABLE_KEY
             CLERK_SECRET_KEY
