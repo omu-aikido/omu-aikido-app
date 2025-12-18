@@ -1,6 +1,5 @@
-import { getAuth } from "@clerk/react-router/server"
 import { useState } from "react"
-import { redirect, useFetcher } from "react-router"
+import { useFetcher } from "react-router"
 
 import type { Route } from "./+types/status"
 
@@ -44,10 +43,6 @@ export function meta({}: Route.MetaArgs) {
 
 // MARK: Action
 export async function action(args: Route.ActionArgs) {
-  const { userId } = await getAuth(args)
-  if (!userId) {
-    return redirect("/sign-in?redirect_url=" + args.request.url)
-  }
   const isYearValue = (
     value: string,
   ): value is `b${number}` | `m${number}` | `d${number}` =>

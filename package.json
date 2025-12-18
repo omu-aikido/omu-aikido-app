@@ -9,7 +9,7 @@
     "dev": "react-router dev",
     "predev": "pnpm docker:up",
     "prebuild": "react-router typegen && wrangler types",
-    "precommit": "pnpm lint:fix && pnpm format",
+    "precommit": "pnpm format && pnpm lint:fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint:fix": "eslint . --fix",

@@ -1,4 +1,4 @@
-import { createClerkClient, getAuth, type User } from "@clerk/react-router/server"
+import type { ExternalAccount, User } from "@clerk/react-router/server"
 import { useState } from "react"
 import { Link, redirect, useFetcher } from "react-router"
 import { toast } from "sonner"
@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "~/components/ui/select"
 import { StateButton } from "~/components/ui/StateButton"
-import { activitySummary, updateProfile } from "~/lib/query/admin"
+import { ac } from "~/lib/api-client"
 import { getProfile } from "~/lib/query/profile"
 import { Role } from "~/lib/role"
 import { getJST, grade as gradeOptions } from "~/lib/utils"
@@ -31,16 +31,13 @@ import type { Profile } from "~/type"
 // MARK: Loader
 export async function loader({ context, params, request }: Route.LoaderArgs) {
   const env = context.cloudflare.env
-  const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
 
   const { userId } = params
   if (!userId) {
     throw new Response("User ID is required", { status: 400 })
   }
-  const user = await clerkClient.users.getUser(userId)
-  const profile = await getProfile({ userId, env })
 
-  // fitler
+  // filter
   const url = new URL(request.url)
   const startParam = url.searchParams.get("start")
   const endParam = url.searchParams.get("end")
@@ -70,38 +67,33 @@ export async function loader({ context, params, request }: Route.LoaderArgs) {
     const page = Math.max(Number(pageParam) || 1, 1)
     const limit = 10
 
-    const getGradeAt = new Date(
-      profile?.getGradeAt ?? (profile?.joinedAt ?? new Date().getFullYear(), 3, 1),
-    )
+    const client = ac({ request })
+    const response = await client.users[":userId"].$get({
+      param: { userId },
+      query: { page: page.toString(), limit: limit.toString() },
+    })
 
-    // Get user activities with date filtering
-    const { all, total, done } = await activitySummary({ userId, getGradeAt, env })
+    if (!response.ok) {
+      throw new Response("User not found", { status: 404 })
+    }
 
-    const totalActivitiesCount = all.length
-    const activities = all.slice((page - 1) * limit, page * limit)
-
-    // 総稽古日数（ユニーク日付数）
-    const uniqueDates = new Set(all.map(a => new Date(a.date).toDateString()))
-    const totalDays = uniqueDates.size
-    // 総稽古回数（エントリー数）
-    const totalEntries = all.length
-    // 総稽古時間
-    const totalHours = all.reduce((sum, a) => sum + (a.period || 0), 0)
+    const data = await response.json()
+    const profile = await getProfile({ userId, env })
 
     return {
-      user,
+      user: data.user,
       profile,
-      activities,
-      trainCount: total,
-      doneTrain: done,
+      activities: data.activities,
+      trainCount: data.trainCount,
+      doneTrain: data.doneTrain,
       startValue: startParam,
       endValue: endParam,
-      page,
-      totalActivitiesCount,
-      limit,
-      totalDays,
-      totalEntries,
-      totalHours,
+      page: data.page,
+      totalActivitiesCount: data.totalActivitiesCount,
+      limit: data.limit,
+      totalDays: data.totalDays,
+      totalEntries: data.totalEntries,
+      totalHours: data.totalHours,
     }
   } catch (error) {
     // Handle different types of errors appropriately
@@ -146,15 +138,6 @@ export function meta(args: Route.MetaArgs) {
 
 // MARK: Action
 export async function action(args: Route.ActionArgs) {
-  const { userId } = await getAuth(args)
-  if (!userId) {
-    return new Response(JSON.stringify({ success: false, error: "認証されていません" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    })
-  }
-  const env = args.context.cloudflare.env
-
   const formData = await args.request.formData()
 
   const year = formData.get("year")?.toString()
@@ -170,40 +153,8 @@ export async function action(args: Route.ActionArgs) {
     )
   }
 
-  // Validate and parse numeric values
   const grade = Number(gradeStr)
   const joinedAt = Number(joinedAtStr)
-
-  if (isNaN(grade) || isNaN(joinedAt)) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: "級段位または入部年度の形式が正しくありません",
-      }),
-      { status: 400, headers: { "Content-Type": "application/json" } },
-    )
-  }
-
-  // Validate joined year range
-  const currentYear = new Date().getFullYear()
-  if (joinedAt < 1950 || joinedAt > currentYear + 1) {
-    return new Response(
-      JSON.stringify({ success: false, error: "入部年度が有効な範囲外です" }),
-      { status: 400, headers: { "Content-Type": "application/json" } },
-    )
-  }
-
-  // Parse and validate grade date if provided
-  let getGradeAt: Date | undefined
-  if (getGradeAtStr) {
-    getGradeAt = new Date(getGradeAtStr)
-    if (isNaN(getGradeAt.getTime())) {
-      return new Response(
-        JSON.stringify({ success: false, error: "級段位取得日の形式が正しくありません" }),
-        { status: 400, headers: { "Content-Type": "application/json" } },
-      )
-    }
-  }
 
   const { params } = args
   const targetUserId = params.userId
@@ -216,16 +167,28 @@ export async function action(args: Route.ActionArgs) {
   }
 
   try {
-    const result = await updateProfile({
-      applicateBy: userId,
-      newProfile: { id: targetUserId, year, grade, role, joinedAt, getGradeAt },
-      env,
+    const client = ac({ request: args.request })
+    const response = await client.users[":userId"].profile.$patch({
+      param: { userId: targetUserId },
+      json: {
+        year,
+        grade,
+        role: role as "admin" | "captain" | "vice-captain" | "treasurer" | "member",
+        joinedAt,
+        getGradeAt: getGradeAtStr
+          ? (getGradeAtStr as `${number}-${number}-${number}`)
+          : null,
+      },
     })
 
-    if (result instanceof Error) {
+    if (!response.ok) {
+      const error = await response.json()
       return new Response(
-        JSON.stringify({ success: false, error: "プロフィールの更新に失敗しました" }),
-        { status: 500, headers: { "Content-Type": "application/json" } },
+        JSON.stringify({
+          success: false,
+          error: error.error || "プロフィールの更新に失敗しました",
+        }),
+        { status: response.status, headers: { "Content-Type": "application/json" } },
       )
     }
 
@@ -258,11 +221,15 @@ export default function AdminUser(args: Route.ComponentProps) {
     totalEntries = 0,
     totalHours = 0,
   } = args.loaderData
-  const discord = Array.isArray(user?.externalAccounts)
-    ? user?.externalAccounts.find(
-        (acc: { provider: string }) => acc.provider === "oauth_discord",
-      )
-    : undefined
+  const discord = (() => {
+    if (!user?.externalAccounts || !Array.isArray(user.externalAccounts)) {
+      return undefined
+    }
+    const discordAccount = user.externalAccounts.find(
+      acc => acc.provider === "oauth_discord",
+    )
+    return discordAccount as ExternalAccount | undefined
+  })()
 
   const fetcher = useFetcher()
   const [isEditing, setIsEditing] = useState(false)

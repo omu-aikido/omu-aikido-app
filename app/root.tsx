@@ -1,5 +1,5 @@
-import { ClerkProvider } from "@clerk/react-router"
-import { rootAuthLoader } from "@clerk/react-router/server"
+import { ClerkProvider } from '@clerk/react-router'
+import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/server'
 import {
   Link,
   Links,
@@ -21,6 +21,8 @@ export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
 ]
+
+export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
 
 export const loader = (args: Route.LoaderArgs) =>
   rootAuthLoader(args, {

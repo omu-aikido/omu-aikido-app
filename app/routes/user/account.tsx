@@ -1,4 +1,3 @@
-import { createClerkClient, getAuth } from "@clerk/react-router/server"
 import { useState } from "react"
 import { Link, useFetcher, useOutletContext } from "react-router"
 
@@ -8,6 +7,7 @@ import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { StateButton } from "~/components/ui/StateButton"
 import type { UserLayoutComponentProps } from "~/layout/user"
+import { uc } from "~/lib/api-client"
 import { style } from "~/styles/component"
 
 // MARK: Meta
@@ -20,25 +20,23 @@ export function meta({}: Route.MetaArgs) {
 
 // MARK: Action
 export async function action(args: Route.ActionArgs) {
-  const { userId } = await getAuth(args)
-  if (!userId) throw new Error("User not authenticated")
-  const env = args.context.cloudflare.env
   const formData = await args.request.formData()
-  const lastName = formData.get("lastName")?.toString()
-  const firstName = formData.get("firstName")?.toString()
-  const username = formData.get("username")?.toString()
-  const imageFile = formData.get("profileImage")
-  const client = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
-  const params: Partial<{ firstName: string; lastName: string; username: string }> = {}
-  if (firstName) params.firstName = firstName
-  if (lastName) params.lastName = lastName
-  if (username) params.username = username
-  await client.users.updateUser(userId, params)
-  if (imageFile && typeof imageFile !== "string") {
-    await client.users.updateUserProfileImage(userId, { file: imageFile })
+
+  const client = uc({ request: args.request })
+  const response = await client.account.$patch({
+    form: formData as FormData & {
+      firstName?: string
+      lastName?: string
+      username?: string
+      profileImage?: File
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error("Failed to update account")
   }
-  const user = await client.users.getUser(userId)
-  return user
+
+  return await response.json()
 }
 
 // MARK: Component

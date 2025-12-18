@@ -1,4 +1,3 @@
-import { getAuth } from "@clerk/react-router/server"
 import { Link, useFetcher } from "react-router"
 
 import type { Route } from "./+types/home"
@@ -18,10 +17,6 @@ import type { PagePath } from "~/type"
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
-  const auth = await getAuth(args)
-  const userId = auth.userId
-  if (!userId) throw new Error("User not authenticated")
-
   const client = uc({ request: args.request })
   const [profileRes, summaryRes, accountRes, rankingRes] = await Promise.all([
     client.profile.$get(),

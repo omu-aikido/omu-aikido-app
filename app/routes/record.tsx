@@ -1,4 +1,3 @@
-import { getAuth } from "@clerk/react-router/server"
 import {
   addMonths,
   eachDayOfInterval,
@@ -27,9 +26,6 @@ import type { DailyActivityItem } from "~/type"
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
   const { request } = args
-  const auth = await getAuth(args)
-  const userId = auth.userId
-  if (!userId) throw new Error("User not authenticated")
 
   const url = new URL(request.url)
   const currentMonth = url.searchParams.get("month") || format(new Date(), "yyyy-MM")
@@ -52,16 +48,11 @@ export async function loader(args: Route.LoaderArgs) {
     const activities = Array.isArray(data.activities) ? data.activities : []
 
     return {
-      userId,
       activities: activities.map(act => ({ ...act, isDeleted: false })),
       currentMonth: format(date, "yyyy-MM"),
     }
   } catch {
-    return {
-      userId,
-      currentMonth: format(date, "yyyy-MM"),
-      error: "データの取得に失敗しました",
-    }
+    return { currentMonth: format(date, "yyyy-MM"), error: "データの取得に失敗しました" }
   }
 }
 
@@ -78,10 +69,6 @@ export async function action(args: Route.ActionArgs) {
   const { request } = args
   const formData = await request.formData()
   const actionType = formData.get("actionType")
-  const auth = await getAuth(args)
-  if (!auth.userId) {
-    throw new Error("User not authenticated")
-  }
   const client = uc({ request })
 
   if (actionType === "batchUpdate") {
@@ -109,7 +96,6 @@ export async function action(args: Route.ActionArgs) {
 export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps) {
   // totalPeriod を受け取る
   const {
-    userId,
     activities: initialActivities,
     currentMonth: loadedMonth,
     error: loaderError,
@@ -246,7 +232,6 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
             />
             {(() => {
               const payload = prepareBatchUpdatePayload(
-                userId,
                 originalActivities,
                 currentActivities,
               )
@@ -285,7 +270,6 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
             />
             {(() => {
               const payload = prepareBatchUpdatePayload(
-                userId,
                 originalActivities,
                 currentActivities,
               )
@@ -336,7 +320,7 @@ export default function MonthlyActivityForm({ loaderData }: Route.ComponentProps
       </>
       {showDailyActivityModal && selectedDate && (
         <DailyActivity
-          userId={userId}
+          userId=""
           date={selectedDate}
           activities={dailyActivitiesForSelectedDate}
           onSave={handleSaveDailyActivities}
@@ -399,12 +383,9 @@ function useMonthlyNavigation(loadedMonth: string) {
 }
 
 function prepareBatchUpdatePayload(
-  userId: string | undefined,
   originalActivities: DailyActivityItem[],
   currentActivities: DailyActivityItem[],
 ) {
-  if (!userId) return null
-
   const activitiesToAdd: DailyActivityItem[] = []
   const activitiesToUpdate: DailyActivityItem[] = []
   const activitiesToDelete: string[] = []
@@ -488,7 +469,6 @@ function prepareBatchUpdatePayload(
   })
 
   return {
-    userId,
     added: activitiesToAdd,
     updated: activitiesToUpdate,
     deleted: activitiesToDelete,

@@ -54,8 +54,12 @@ export const style = {
 
   form: {
     container: tv({
-      base: "gap-2 space-y-4",
-      variants: { vertical: { true: "grid grid-cols-3 items-center" } },
+      base: "space-y-4",
+      variants: {
+        vertical: {
+          true: "grid grid-cols-4 items-center gap-2 space-y-0",
+        },
+      },
     }),
     input: tv({
       base: [

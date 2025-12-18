@@ -1,12 +1,12 @@
 import "./arktype-config"
 
 import { Hono } from "hono"
-import { createRequestHandler } from "react-router"
+import { RouterContextProvider, createRequestHandler } from "react-router"
 
 import { api } from "../api"
 
 declare module "react-router" {
-  export interface AppLoadContext {
+  export interface RouterContextProvider {
     cloudflare: { env: Env; ctx: ExecutionContext }
   }
 }
@@ -64,9 +64,10 @@ app.use("*", async (c, next) => {
 app.route("/api", api)
 
 app.all("*", async c => {
-  const response = await requestHandler(c.req.raw, {
-    cloudflare: { env: c.env, ctx: c.executionCtx },
-  })
+  const loadContext = new RouterContextProvider()
+  loadContext.cloudflare = { env: c.env, ctx: c.executionCtx }
+
+  const response = await requestHandler(c.req.raw, loadContext)
   return response
 })
 

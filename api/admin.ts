@@ -28,8 +28,6 @@ const adminProfileUpdateSchema = type({
 
 const accountsQuerySchema = type({ query: "(string & /^.{0,100}$/)?" })
 
-const normsQuerySchema = type({ search: "(string & /^.{0,100}$/)?" })
-
 const userIdParamSchema = type({ userId: "string & /^\\S+$/" })
 
 const userActivitiesQuerySchema = type({
@@ -145,35 +143,33 @@ export const adminApp = new Hono<{ Bindings: Env }>()
     async c => {
       const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
       const { query } = c.req.valid("query")
-      const queryNorm = query?.trim() ?? ""
       const clerkUsers = await clerkClient.users.getUserList({
         limit: clerkUserLimit,
-        query: queryNorm,
+        query: query ?? "",
         orderBy: "created_at",
       })
 
       const ranking = await getMonthlyRanking(c.env)
-      return c.json({ users: clerkUsers.data, query: queryNorm, ranking })
+      return c.json({ users: clerkUsers.data, query: query ?? "", ranking })
     },
   )
   .get(
     "/norms",
-    arktypeValidator("query", normsQuerySchema, (result, c) => {
+    arktypeValidator("query", accountsQuerySchema, (result, c) => {
       if (!result.success) {
         return c.json({ error: "Invalid query" }, 400)
       }
     }),
     async c => {
       const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
-      const { search } = c.req.valid("query")
-      const searchNorm = search?.trim() ?? ""
+      const { query } = c.req.valid("query")
       const clerkUsers = await clerkClient.users.getUserList({
         limit: clerkUserLimit,
-        query: searchNorm,
+        query: query ?? "",
         orderBy: "created_at",
       })
       const norms = await getUsersNorm(c.env, clerkUsers.data)
-      return c.json({ users: clerkUsers.data, norms, search: searchNorm })
+      return c.json({ users: clerkUsers.data, norms, search: query ?? "" })
     },
   )
   .get(
@@ -190,9 +186,7 @@ export const adminApp = new Hono<{ Bindings: Env }>()
     }),
     async c => {
       const { userId } = c.req.valid("param")
-      const { page, limit } = c.req.valid("query")
-      const pageNorm = page ?? 1
-      const limitNorm = limit ?? 10
+      const { page = 1, limit = 10 } = c.req.valid("query")
 
       const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
       try {
@@ -205,10 +199,7 @@ export const adminApp = new Hono<{ Bindings: Env }>()
 
         const allActivities = await getUserActivitySummary(c.env, userId)
         const totalActivitiesCount = allActivities.length
-        const activities = allActivities.slice(
-          (pageNorm - 1) * limitNorm,
-          pageNorm * limitNorm,
-        )
+        const activities = allActivities.slice((page - 1) * limit, page * limit)
         const totalHours = allActivities.reduce((sum, a) => sum + (a.period || 0), 0)
         const totalEntries = totalActivitiesCount
         const totalDays = new Set(allActivities.map(a => a.date)).size
@@ -236,9 +227,9 @@ export const adminApp = new Hono<{ Bindings: Env }>()
           activities,
           trainCount,
           doneTrain,
-          page: pageNorm,
+          page,
           totalActivitiesCount,
-          limit: limitNorm,
+          limit,
           totalDays,
           totalEntries,
           totalHours,
@@ -252,24 +243,24 @@ export const adminApp = new Hono<{ Bindings: Env }>()
     "/users/:userId/profile",
     arktypeValidator("param", userIdParamSchema, (result, c) => {
       if (!result.success) {
-        return c.json({ success: false, error: "ユーザーIDが必要です" }, 400)
+        return c.json({ error: "ユーザーIDが必要です" }, 400)
       }
     }),
     arktypeValidator("json", adminProfileUpdateSchema, (result, c) => {
       if (!result.success) {
-        return c.json({ success: false, error: "無効な入力です" }, 400)
+        return c.json({ error: "無効な入力です" }, 400)
       }
     }),
     async c => {
       const auth = getAuth(c)
       if (!auth || !auth.userId) {
-        return c.json({ success: false, error: "認証されていません" }, 401)
+        return c.json({ error: "認証されていません" }, 401)
       }
       const { userId: targetUserId } = c.req.valid("param")
       const parsed = c.req.valid("json")
       const { year, grade, role, joinedAt } = parsed
       if (Number.isNaN(grade) || Number.isNaN(joinedAt)) {
-        return c.json({ success: false, error: "数値項目の形式が正しくありません" }, 400)
+        return c.json({ error: "数値項目の形式が正しくありません" }, 400)
       }
       const currentYear = new Date().getFullYear()
       const minJoinedAt = currentYear - 4
@@ -277,7 +268,6 @@ export const adminApp = new Hono<{ Bindings: Env }>()
       if (joinedAt < minJoinedAt || joinedAt > maxJoinedAt) {
         return c.json(
           {
-            success: false,
             error: `入部年度は${minJoinedAt}年から${maxJoinedAt}年の間で入力してください`,
           },
           400,
@@ -287,7 +277,7 @@ export const adminApp = new Hono<{ Bindings: Env }>()
       const adminProfile = await getCurrentProfile(c)
       const adminRole = adminProfile?.role ? Role.fromString(adminProfile.role) : null
       if (!adminRole || !adminRole.isManagement()) {
-        return c.json({ success: false, error: "権限が不足しています" }, 403)
+        return c.json({ error: "権限が不足しています" }, 403)
       }
 
       const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
@@ -300,12 +290,12 @@ export const adminApp = new Hono<{ Bindings: Env }>()
           ? Role.MEMBER
           : (Role.fromString(targetProfileParsed.role ?? "member") ?? Role.MEMBER)
       if (targetCurrentRole && Role.compare(adminRole.role, targetCurrentRole.role) > 0) {
-        return c.json({ success: false, error: "現在の権限より上書きできません" }, 403)
+        return c.json({ error: "現在の権限より上書きできません" }, 403)
       }
 
       const requestedRole = Role.fromString(role)
       if (!requestedRole || Role.compare(adminRole.role, requestedRole.role) > 0) {
-        return c.json({ success: false, error: "権限が不足しています" }, 403)
+        return c.json({ error: "権限が不足しています" }, 403)
       }
 
       const normalizedGetGradeAt =
@@ -313,10 +303,7 @@ export const adminApp = new Hono<{ Bindings: Env }>()
           ? new Date(parsed.getGradeAt)
           : null
       if (normalizedGetGradeAt && isNaN(normalizedGetGradeAt.getTime())) {
-        return c.json(
-          { success: false, error: "級段位取得日の形式が正しくありません" },
-          400,
-        )
+        return c.json({ error: "級段位取得日の形式が正しくありません" }, 400)
       }
 
       const updatedMetadata = {

@@ -276,6 +276,8 @@ const DailyActivity: React.FC<DailyActivityProps> = ({
                   step="0.5"
                   value={act.period}
                   id={act.id}
+                  min="0.5"
+                  max="5"
                   onChange={e => handlePeriodChange(act.id, parseFloat(e.target.value))}
                   className={style.form.input({ className: "mr-2 w-20" })}
                   data-testid={`input-record`}

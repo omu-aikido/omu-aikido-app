@@ -1,5 +1,4 @@
 import type { User } from "@clerk/react-router/server"
-import { createClerkClient } from "@clerk/react-router/server"
 import { ArrowDown01, ArrowUp01, Search } from "lucide-react"
 import { useMemo } from "react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
@@ -9,11 +8,10 @@ import type { Route } from "./+types/norms"
 
 import { NormCard } from "~/components/component/NormCard"
 import { Input } from "~/components/ui/input"
-import { getUsersNorm } from "~/lib/query/admin"
+import { ac } from "~/lib/api-client"
 
 // MARK: Constants
 const MAX_SEARCH_LENGTH = 100
-const MAX_USERS_LIMIT = 500
 const PERCENTAGE_MULTIPLIER = 100
 
 // MARK: Types
@@ -44,27 +42,21 @@ function sortByProgress<T extends { progress: number; isMet: boolean }>(
 
 // MARK: Loader
 export async function loader(args: LoaderFunctionArgs) {
-  const { request, context } = args
-  const env = context.cloudflare.env
-  const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY })
-
+  const { request } = args
   const url = new URL(request.url)
   const rawSearch = url.searchParams.get("search") || ""
   const search = rawSearch.trim().slice(0, MAX_SEARCH_LENGTH)
 
   try {
-    // 全件取得（100ユーザー以下想定）
-    const clerkUsers = await clerkClient.users.getUserList({
-      limit: MAX_USERS_LIMIT, // 十分に大きな値で全件取得
-      query: search,
-      orderBy: "created_at",
-    })
+    const client = ac({ request })
+    const response = await client.norms.$get({ query: { query: search } })
 
-    const users: User[] = clerkUsers.data
+    if (!response.ok) {
+      throw new Error("Failed to fetch norms")
+    }
 
-    const norms = await getUsersNorm({ userIds: users.map(user => user.id), env })
-
-    return { users, search, norms }
+    const data = await response.json()
+    return { users: data.users as User[], search: data.search, norms: data.norms }
   } catch {
     return { users: [] as User[], search, norms: [] as UserNorm[] }
   }

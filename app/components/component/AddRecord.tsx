@@ -64,23 +64,19 @@ export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher
           value={formatDateForInput(selectedDate)}
           data-testid="add-record-input-date"
         />
-        <Label
-          className={style.form.label({ necessary: true, class: "col-span-1" })}
-          data-testid="add-record-label-date"
-        >
+        <Label className="col-span-1" data-testid="add-record-label-date">
           日付
         </Label>
-        <div className="col-span-2">
+        <div className="col-span-3">
           <DatePicker
             date={selectedDate}
             onSelect={date => date && setSelectedDate(date)}
-            className="w-full min-w-full"
             placeholder="日付を選択してください"
           />
         </div>
         <Label
           htmlFor="timeInput"
-          className={style.form.label({ necessary: true, class: "col-span-1" })}
+          className="col-span-1"
           data-testid="add-record-label-period"
         >
           稽古時間
@@ -91,18 +87,18 @@ export const AddRecord = React.memo<AddRecordProps>(function AddRecord({ fetcher
           autoComplete="off"
           step="0.5"
           type="number"
-          className="col-span-2"
           min="1"
           max="5"
           value={period}
           onChange={handlePeriodChange}
+          className="col-span-3"
           data-testid="add-record-input-period"
         />
         <Button
           disabled={submitting}
           type="submit"
           id="submitAddRecord"
-          className={style.form.button({ class: "col-span-3 mt-2" })}
+          className={style.form.button({ class: "col-span-4 mt-2" })}
           data-testid="add-record-button-submit"
         >
           {submitting ? "送信中..." : "追加"}
