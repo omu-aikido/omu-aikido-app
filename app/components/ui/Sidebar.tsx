@@ -1,22 +1,23 @@
+import * as React from "react"
 import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
-import { Button } from "app/components/ui/button"
-import { Input } from "app/components/ui/input"
-import { Separator } from "app/components/ui/separator"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/app/lib/utils"
+import { Button } from "@/app/components/ui/button"
+import { Input } from "@/app/components/ui/input"
+import { Separator } from "@/app/components/ui/separator"
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "app/components/ui/sheet"
-import { Skeleton } from "app/components/ui/skeleton"
-import { Tooltip, TooltipContent, TooltipTrigger } from "app/components/ui/tooltip"
-import { useIsMobile } from "app/hooks/use-mobile"
-import { cn } from "app/lib/utils"
-import { cva, type VariantProps } from "class-variance-authority"
+} from "@/app/components/ui/sheet"
+import { Skeleton } from "@/app/components/ui/skeleton"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/app/components/ui/tooltip"
+import { useIsMobile } from "@/app/hooks/use-mobile"
 import { PanelLeftIcon } from "lucide-react"
-import * as React from "react"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -267,7 +268,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
       onClick={toggleSidebar}
       title="Toggle Sidebar"
       className={cn(
-        "absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-0.5 hover:after:bg-sidebar-border sm:flex",
+        "absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border sm:flex",
         "in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",
         "[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
         "group-data-[collapsible=offExamples]:translate-x-0 group-data-[collapsible=offExamples]:after:left-full hover:group-data-[collapsible=offExamples]:bg-sidebar",

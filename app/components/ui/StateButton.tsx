@@ -1,6 +1,8 @@
-import { Button } from "~/components/ui/button"
+import { Button } from "@/app/components/ui/button"
 
-type FetcherLike = { state: "idle" | "submitting" | "loading" }
+interface FetcherLike {
+  state: "idle" | "submitting" | "loading"
+}
 
 export function StateButton({
   isEditing,

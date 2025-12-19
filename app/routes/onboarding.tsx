@@ -4,19 +4,19 @@ import { redirect, useFetcher, useNavigate } from "react-router"
 
 import type { Route } from "./+types/onboarding"
 
-import { Button } from "~/components/ui/button"
-import { DatePicker } from "~/components/ui/date-picker"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
+import { Button } from "@/app/components/ui/button"
+import { DatePicker } from "@/app/components/ui/date-picker"
+import { Input } from "@/app/components/ui/input"
+import { Label } from "@/app/components/ui/label"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select"
-import { grade, JoinedAtYearRange, year } from "~/lib/utils"
-import { style } from "~/styles/component"
+} from "@/app/components/ui/select"
+import { grade, JoinedAtYearRange, year } from "@/app/lib/utils"
+import { style } from "@/app/styles/component"
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {

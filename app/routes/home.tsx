@@ -4,16 +4,16 @@ import type { Route } from "./+types/home"
 
 import { isDateString } from "@/type/date"
 import { Role } from "@/type/role"
-import { AddRecord } from "~/components/component/AddRecord"
-import { MyRanking } from "~/components/component/MyRanking"
-import { NextGrade } from "~/components/component/NextGrade"
-import Recents from "~/components/component/Recents"
-import { Button } from "~/components/ui/button"
-import type { ActivityType } from "~/db/schema"
-import { uc } from "~/lib/api-client"
-import { timeForNextGrade } from "~/lib/utils"
-import { style } from "~/styles/component"
-import type { PagePath } from "~/type"
+import { AddRecord } from "@/app/components/component/AddRecord"
+import { MyRanking } from "@/app/components/component/MyRanking"
+import { NextGrade } from "@/app/components/component/NextGrade"
+import Recents from "@/app/components/component/Recents"
+import { Button } from "@/app/components/ui/button"
+import type { ActivityType } from "@/app/db/schema"
+import { uc } from "@/app/lib/api-client"
+import { timeForNextGrade } from "@/app/lib/utils"
+import { style } from "@/app/styles/component"
+import type { PagePath } from "@/app/type"
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
@@ -63,7 +63,7 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 // MARK: Meta
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "ホーム | ハム大合気ポータル" },
     { name: "description", content: "大阪公立大学合氣道部の活動管理アプリ" },

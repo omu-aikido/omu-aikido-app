@@ -2,10 +2,10 @@ import { format, isSameDay } from "date-fns"
 import React from "react"
 import { tv } from "tailwind-variants"
 
-import DayActivitySummary from "~/components/component/DayActivitySummary" // 新しいインポートパス
-import type { DailyActivityItem } from "~/type"
+import DayActivitySummary from "@/app/components/component/DayActivitySummary" // 新しいインポートパス
+import type { DailyActivityItem } from "@/app/type"
 
-type Props = {
+interface Props {
   daysInMonth: Date[]
   currentActivities: DailyActivityItem[]
   onDayClick: (date: Date) => void

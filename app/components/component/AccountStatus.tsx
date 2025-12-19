@@ -1,4 +1,4 @@
-import { timeForNextGrade } from "~/lib/utils"
+import { timeForNextGrade } from "@/app/lib/utils"
 
 export function StatsSection({
   totalTrainCount,

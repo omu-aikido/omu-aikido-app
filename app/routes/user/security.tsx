@@ -1,14 +1,12 @@
 import { useUser } from "@clerk/react-router"
 import { useState } from "react"
 
-import type { Route } from "./+types/security"
-
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
+import { Button } from "@/app/components/ui/button"
+import { Input } from "@/app/components/ui/input"
+import { Label } from "@/app/components/ui/label"
 
 // MARK: Meta
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "パスワード変更 | ハム大合気ポータル" },
     { name: "description", content: "アカウントのパスワードの変更" },

@@ -23,11 +23,8 @@ jobs:
         run: |
           echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.env
           echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.dev.vars
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-      - name: Install dependencies
-        run: npm install -g pnpm
+      - name: Setup mise
+        uses: jdx/mise-action@v2
       - name: Get pnpm store directory
         shell: bash
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
@@ -40,11 +37,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Set up LibSQL Server
-        run: pnpm run db:push
+        run: mise run db-push
       - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
+        run: mise run playwright-install-ci
       - name: Run Playwright tests
-        run: pnpm exec playwright test
+        run: mise run test-e2e-ci
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:

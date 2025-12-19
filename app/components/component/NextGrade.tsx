@@ -1,7 +1,7 @@
 import { useRef } from "react"
 
-import { translateGrade } from "~/lib/utils"
-import { style } from "~/styles/component"
+import { translateGrade } from "@/app/lib/utils"
+import { style } from "@/app/styles/component"
 
 export function NextGrade(gradeData: {
   grade: number

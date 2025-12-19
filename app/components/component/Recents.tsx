@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 
-import type { ActivityType } from "~/db/schema"
-import { style } from "~/styles/component" // Import style
+import type { ActivityType } from "@/app/db/schema"
+import { style } from "@/app/styles/component" // Import style
 
 export function Recents({ recent }: { recent: ActivityType | undefined }) {
   const relativeTime = useMemo(() => {

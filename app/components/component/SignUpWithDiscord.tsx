@@ -1,8 +1,8 @@
 import type { SignUpResource } from "@clerk/types"
 import React from "react"
 
-import { Icon } from "~/components/ui/Icon"
-import { style } from "~/styles/component"
+import { Icon } from "@/app/components/ui/Icon"
+import { style } from "@/app/styles/component"
 
 export default function SignUpWithDiscord({
   signUp,

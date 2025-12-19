@@ -2,8 +2,8 @@ import React from "react"
 import { Link, useSearchParams } from "react-router"
 import { tv } from "tailwind-variants"
 
-import type { ActivityType } from "~/db/schema"
-import { style } from "~/styles/component"
+import type { ActivityType } from "@/app/db/schema"
+import { style } from "@/app/styles/component"
 
 interface ActivitiesTableProps {
   activities: ActivityType[]

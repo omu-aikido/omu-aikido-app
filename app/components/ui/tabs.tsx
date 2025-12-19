@@ -1,8 +1,7 @@
-"use client"
-
 import { Tabs as TabsPrimitive } from "@base-ui/react/tabs"
-import { cn } from "app/lib/utils"
 import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/app/lib/utils"
 
 function Tabs({
   className,

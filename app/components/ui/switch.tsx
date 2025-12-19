@@ -1,7 +1,6 @@
-"use client"
-
 import { Switch as SwitchPrimitive } from "@base-ui/react/switch"
-import { cn } from "app/lib/utils"
+
+import { cn } from "@/app/lib/utils"
 
 function Switch({
   className,

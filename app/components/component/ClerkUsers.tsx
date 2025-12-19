@@ -1,4 +1,4 @@
-import type { User } from "@clerk/react-router/server"
+import type { ApiUser } from "@/type/api-user"
 import React from "react"
 import { Link, useSearchParams } from "react-router"
 import { tv } from "tailwind-variants"
@@ -20,7 +20,7 @@ const pagenation = tv({
 })
 
 interface Props {
-  users: User[]
+  users: ApiUser[]
   totalPages: number
   currentPage: number
   sortBy?: string

@@ -3,7 +3,7 @@ import {
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "app/components/ui/input-otp"
+} from "@/app/components/ui/input-otp"
 
 interface OTPInputProps {
   value?: string

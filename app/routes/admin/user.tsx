@@ -1,32 +1,37 @@
-import type { ExternalAccount, User } from "@clerk/react-router/server"
+import type { ApiExternalAccount } from "@/type/api-user"
 import { useEffect, useRef, useState } from "react"
 import { Link, redirect, useFetcher } from "react-router"
 import { toast } from "sonner"
 
 import type { Route } from "./+types/user"
 
-import { StatsSection } from "~/components/component/AccountStatus"
-import { ActivitiesTable } from "~/components/component/UserActivitiesTable"
-import { UserProfileSection } from "~/components/component/UserProfile"
-import { FilterSection } from "~/components/component/UserRecordsFilter"
-import { Button } from "~/components/ui/button"
-import { DatePicker } from "~/components/ui/date-picker"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
+import { StatsSection } from "@/app/components/component/AccountStatus"
+import { ActivitiesTable } from "@/app/components/component/UserActivitiesTable"
+import { UserProfileSection } from "@/app/components/component/UserProfile"
+import { FilterSection } from "@/app/components/component/UserRecordsFilter"
+import { Button } from "@/app/components/ui/button"
+import { DatePicker } from "@/app/components/ui/date-picker"
+import { Input } from "@/app/components/ui/input"
+import { Label } from "@/app/components/ui/label"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select"
-import { StateButton } from "~/components/ui/StateButton"
-import { ac } from "~/lib/api-client"
-import { getProfile } from "~/lib/query/profile"
-import { Role } from "~/lib/role"
-import { getJST, grade as gradeOptions, translateGrade, translateYear } from "~/lib/utils"
-import { style } from "~/styles/component"
-import type { Profile } from "~/type"
+} from "@/app/components/ui/select"
+import { StateButton } from "@/app/components/ui/StateButton"
+import { ac } from "@/app/lib/api-client"
+import { getProfile } from "@/app/lib/query/profile"
+import { Role } from "@/app/lib/role"
+import {
+  getJST,
+  grade as gradeOptions,
+  translateGrade,
+  translateYear,
+} from "@/app/lib/utils"
+import { style } from "@/app/styles/component"
+import type { Profile } from "@/app/type"
 
 // MARK: Loader
 export async function loader({ context, params, request }: Route.LoaderArgs) {
@@ -228,7 +233,7 @@ export default function AdminUser(args: Route.ComponentProps) {
     const discordAccount = user.externalAccounts.find(
       acc => acc.provider === "oauth_discord",
     )
-    return discordAccount as ExternalAccount | undefined
+    return discordAccount as ApiExternalAccount | undefined
   })()
 
   const fetcher = useFetcher()
@@ -283,7 +288,7 @@ export default function AdminUser(args: Route.ComponentProps) {
     <>
       {/* User Profile Section */}
       <UserProfileSection
-        user={user as User}
+        user={user}
         unSafeprofile={profile}
         profile={safeProfile}
         discord={discord}

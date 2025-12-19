@@ -4,25 +4,25 @@ import { useFetcher } from "react-router"
 import type { Route } from "./+types/status"
 
 import { isDateString } from "@/type/date"
-import { DatePicker } from "~/components/ui/date-picker"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
+import { DatePicker } from "@/app/components/ui/date-picker"
+import { Input } from "@/app/components/ui/input"
+import { Label } from "@/app/components/ui/label"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select"
-import { StateButton } from "~/components/ui/StateButton"
-import { uc } from "~/lib/api-client"
+} from "@/app/components/ui/select"
+import { StateButton } from "@/app/components/ui/StateButton"
+import { uc } from "@/app/lib/api-client"
 import {
   formatDateToJSTString,
   grade as gradeOptions,
   translateGrade,
   translateYear,
-} from "~/lib/utils"
-import type { Profile } from "~/type"
+} from "@/app/lib/utils"
+import type { Profile } from "@/app/type"
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {
@@ -39,7 +39,7 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 // MARK: Meta
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "ステータス | ハム大合気ポータル" },
     { name: "description", content: "アカウントのステータスを設定できます。" },

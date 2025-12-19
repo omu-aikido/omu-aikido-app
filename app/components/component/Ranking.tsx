@@ -1,4 +1,4 @@
-import type { User } from "@clerk/react-router/server"
+import type { ApiUser } from "@/type/api-user"
 import React from "react"
 
 // Define the interface for a single user's rank data
@@ -10,7 +10,7 @@ interface UserRank {
 // Define the props interface for the Ranking component
 interface RankingProps {
   data: UserRank[]
-  users: User[]
+  users: ApiUser[]
 }
 
 const Ranking = React.memo<RankingProps>(function Ranking({ data, users }) {

@@ -1,0 +1,116 @@
+[tools]
+node = "24.8.0"
+pnpm = "latest"
+
+[tasks.lint]
+run = "pnpm exec oxlint --type-aware"
+
+[tasks.lint-fix]
+run = "pnpm exec oxlint --type-aware --fix"
+
+[tasks.format]
+run = "pnpm exec oxfmt --write ."
+
+[tasks.format-check]
+run = "pnpm exec oxfmt --check ."
+
+[tasks.build]
+run = "mise run build-preview"
+
+[tasks.build-preview]
+run = "pnpm exec react-router build"
+depends = ["react-router-types", "wrangler-types-preview"]
+
+[tasks.build-production]
+run = "pnpm exec react-router build"
+depends = ["react-router-types", "wrangler-types-production"]
+
+[tasks.dev]
+run = "pnpm exec react-router dev"
+depends = ["docker-up"]
+wait_for = ["lint","format"]
+
+[tasks.preview]
+run = "mise run build-production && pnpm exec wrangler dev --config wrangler.production.jsonc --port 4173"
+
+[tasks.react-router-types]
+run = "pnpm exec react-router typegen"
+
+[tasks.wrangler-types-preview]
+run = "pnpm exec wrangler types --config wrangler.preview.jsonc"
+
+[tasks.wrangler-types-production]
+run = "pnpm exec wrangler types --config wrangler.production.jsonc"
+
+[tasks.docker-up]
+run = "docker-compose up -d"
+depends_post = ["db-migrate"]
+
+[tasks.docker-down]
+run = "docker-compose down"
+
+[tasks.db-push]
+run = "pnpm exec drizzle-kit push --config ./drizzle.config.ts"
+
+[tasks.db-check]
+run = "pnpm exec drizzle-kit check --config ./drizzle.config.ts"
+
+[tasks.db-migrate]
+run = "pnpm exec drizzle-kit migrate --config ./drizzle.config.ts"
+
+[tasks.db-generate]
+run = "pnpm exec drizzle-kit generate --config ./drizzle.config.ts"
+
+[tasks.db-studio]
+run = "pnpm exec drizzle-kit studio --config ./drizzle.config.ts"
+
+[tasks.db-reset]
+confirm = "db container will be reset and rerun. are you sure?"
+run = [
+  { task = "docker-down" },
+  { task = "docker-up" }
+]
+
+[tasks.check]
+run = "mise run build-production && pnpm exec tsc -b && mise run db-check && mise run deploy-production-dry-run"
+
+[tasks.deploy-preview]
+run = "pnpm exec wrangler deploy --config wrangler.preview.jsonc"
+depends = ["build-preview"]
+
+[tasks.deploy-production]
+run = "pnpm exec wrangler deploy --config wrangler.production.jsonc"
+depends = ["build-production"]
+
+[tasks.deploy-production-dry-run]
+run = "pnpm exec wrangler deploy --config wrangler.production.jsonc --dry-run"
+depends = ["build-production"]
+
+[tasks.precommit]
+run = "mise run format && mise run lint-fix"
+
+[tasks.test]
+run = "pnpm exec vitest && pnpm exec playwright test"
+
+[tasks.test-e2e]
+run = "pnpm exec playwright test"
+wait_for = ["db-reset", "playwright-install" ]
+depends_post = ["docker-down"]
+
+[tasks.test-e2e-ci]
+run = "pnpm exec playwright test"
+
+[tasks.test-unit]
+run = "pnpm exec vitest --project unit"
+
+[tasks.test-integration]
+run = "pnpm exec vitest --project integration"
+
+[tasks.test-watch]
+run = "pnpm exec vitest --watch"
+
+[tasks.playwright-install]
+run = "pnpm exec playwright install"
+
+[tasks.playwright-install-ci]
+run = "pnpm exec playwright install --with-deps"

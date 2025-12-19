@@ -1,17 +1,17 @@
-import type { User } from "@clerk/react-router/server"
+import type { ApiUser } from "@/type/api-user"
 import React from "react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { useNavigate, useSearchParams } from "react-router"
 
 import type { Route } from "./+types/accounts"
 
-import ClerkUsers from "~/components/component/ClerkUsers"
-import Ranking from "~/components/component/Ranking"
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import { ac } from "~/lib/api-client"
-import { Role } from "~/lib/role"
-import { style } from "~/styles/component"
+import ClerkUsers from "@/app/components/component/ClerkUsers"
+import Ranking from "@/app/components/component/Ranking"
+import { Button } from "@/app/components/ui/button"
+import { Input } from "@/app/components/ui/input"
+import { ac } from "@/app/lib/api-client"
+import { Role } from "@/app/lib/role"
+import { style } from "@/app/styles/component"
 
 // MARK: Loader
 export async function loader(args: LoaderFunctionArgs) {
@@ -28,10 +28,14 @@ export async function loader(args: LoaderFunctionArgs) {
     }
 
     const data = await response.json()
-    return { users: data.users as User[], query: data.query, ranking: data.ranking }
+    return {
+      users: data.users as ApiUser[],
+      query: data.query,
+      ranking: data.ranking,
+    }
   } catch {
     return {
-      users: [] as User[],
+      users: [] as ApiUser[],
       query,
       ranking: [] as { userId: string; total: number }[],
     }
@@ -220,7 +224,7 @@ export default function AdminAccounts(args: Route.ComponentProps) {
   return (
     <div className="space-y-6">
       {args.loaderData.ranking.length > 0 && (
-        <Ranking data={args.loaderData.ranking} users={users as User[]} />
+        <Ranking data={args.loaderData.ranking} users={users as ApiUser[]} />
       )}
 
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -241,7 +245,7 @@ export default function AdminAccounts(args: Route.ComponentProps) {
       </div>
 
       <ClerkUsers
-        users={paginatedUsers as User[]}
+        users={paginatedUsers as ApiUser[]}
         totalPages={totalPages}
         currentPage={currentPage}
         sortBy={sortBy}

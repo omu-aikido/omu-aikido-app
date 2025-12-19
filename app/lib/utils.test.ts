@@ -8,7 +8,7 @@ import {
   toLocalJPString,
   translateGrade,
   translateYear,
-} from "~/lib/utils"
+} from "@/app/lib/utils"
 
 describe("translateGrade", () => {
   it("should return the correct grade name for a given grade value", () => {

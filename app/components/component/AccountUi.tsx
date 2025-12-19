@@ -10,11 +10,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "~/components/ui/alert-dialog"
-import { Button } from "~/components/ui/button"
-import { Icon } from "~/components/ui/Icon"
-import { style } from "~/styles/component"
-import type { PagePath } from "~/type"
+} from "@/app/components/ui/alert-dialog"
+import { Button } from "@/app/components/ui/button"
+import { Icon } from "@/app/components/ui/Icon"
+import { style } from "@/app/styles/component"
+import type { PagePath } from "@/app/type"
 
 interface AccountUiProps {
   apps: PagePath[]

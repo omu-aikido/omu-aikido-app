@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { useNavigate } from "react-router"
 
-import { DatePicker } from "~/components/ui/date-picker"
-import { style } from "~/styles/component"
+import { DatePicker } from "@/app/components/ui/date-picker"
+import { style } from "@/app/styles/component"
 
 interface FilterSectionProps {
   startValue: string

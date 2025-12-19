@@ -9,18 +9,14 @@ setup("global setup", async ({ page, context: _context }) => {
   await clerkSetup()
   await page.goto("/sign-in", { waitUntil: "networkidle", timeout: 60000 })
 
-  try {
-    await clerk.signIn({
-      page,
-      signInParams: {
-        strategy: "password",
-        identifier: process.env.E2E_CLERK_USER_USERNAME!,
-        password: process.env.E2E_CLERK_USER_PASSWORD!,
-      },
-    })
-  } catch (error) {
-    throw error
-  }
+  await clerk.signIn({
+    page,
+    signInParams: {
+      strategy: "password",
+      identifier: process.env.E2E_CLERK_USER_USERNAME!,
+      password: process.env.E2E_CLERK_USER_PASSWORD!,
+    },
+  })
 
   // ダッシュボードページへ遷移
   await page.goto("/", { waitUntil: "networkidle", timeout: 10000 })

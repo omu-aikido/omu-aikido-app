@@ -12,16 +12,16 @@ import { redirect, useActionData, useFetcher, useSearchParams } from "react-rout
 import type { Route } from "./+types/record"
 
 import { isDateString } from "@/type/date"
-import DailyActivity from "~/components/component/DailyActivity"
-import MonthlyActivityList from "~/components/component/MonthlyActivityList"
-import MonthlyCalendarGrid from "~/components/component/MonthlyCalendarGrid"
-import MonthNavigation from "~/components/component/MonthNavigation"
-import YearMonthSelectorInline from "~/components/component/YearMonthSelector"
-import { Button } from "~/components/ui/button"
-import type { ActivityType } from "~/db/schema"
-import { uc } from "~/lib/api-client"
-import { style } from "~/styles/component"
-import type { DailyActivityItem } from "~/type"
+import DailyActivity from "@/app/components/component/DailyActivity"
+import MonthlyActivityList from "@/app/components/component/MonthlyActivityList"
+import MonthlyCalendarGrid from "@/app/components/component/MonthlyCalendarGrid"
+import MonthNavigation from "@/app/components/component/MonthNavigation"
+import YearMonthSelectorInline from "@/app/components/component/YearMonthSelector"
+import { Button } from "@/app/components/ui/button"
+import type { ActivityType } from "@/app/db/schema"
+import { uc } from "@/app/lib/api-client"
+import { style } from "@/app/styles/component"
+import type { DailyActivityItem } from "@/app/type"
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {

@@ -1,4 +1,4 @@
-import type { User } from "@clerk/react-router/server"
+import type { ApiUser } from "@/type/api-user"
 import { ArrowDown01, ArrowUp01, Search } from "lucide-react"
 import { useMemo } from "react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
@@ -6,16 +6,16 @@ import { useSearchParams } from "react-router"
 
 import type { Route } from "./+types/norms"
 
-import { NormCard } from "~/components/component/NormCard"
-import { Input } from "~/components/ui/input"
-import { ac } from "~/lib/api-client"
+import { NormCard } from "@/app/components/component/NormCard"
+import { Input } from "@/app/components/ui/input"
+import { ac } from "@/app/lib/api-client"
 
 // MARK: Constants
 const MAX_SEARCH_LENGTH = 100
 const PERCENTAGE_MULTIPLIER = 100
 
 // MARK: Types
-type UserNorm = {
+interface UserNorm {
   userId: string
   current: number
   required: number
@@ -56,9 +56,13 @@ export async function loader(args: LoaderFunctionArgs) {
     }
 
     const data = await response.json()
-    return { users: data.users as User[], search: data.search, norms: data.norms }
+    return {
+      users: data.users as ApiUser[],
+      search: data.search,
+      norms: data.norms,
+    }
   } catch {
-    return { users: [] as User[], search, norms: [] as UserNorm[] }
+    return { users: [] as ApiUser[], search, norms: [] as UserNorm[] }
   }
 }
 

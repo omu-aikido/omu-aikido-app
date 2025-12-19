@@ -63,5 +63,6 @@
       "strings": "on"
     }
   },
-  "prettier.requireConfig": true
+  "prettier.requireConfig": true,
+  "kiroAgent.configureMCP": "Disabled"
 }

@@ -1,8 +1,8 @@
 import { Clock, TrendingUp, User as UserIcon } from "lucide-react"
 import { Link } from "react-router"
 
-import { Card } from "~/components/ui/card"
-import { translateGrade } from "~/lib/utils"
+import { Card } from "@/app/components/ui/card"
+import { translateGrade } from "@/app/lib/utils"
 
 function ProgressBar({
   current,

@@ -9,9 +9,16 @@ export type Grade = 0 | 5 | 4 | 3 | 2 | 1 | -1 | -2
 
 export type Profile = typeof profileWithIdSchema.infer
 
-type PagePath = { name: string; href: string; desc: string }
+interface PagePath {
+  name: string
+  href: string
+  desc: string
+}
 
-type ActionResult<T = unknown> = { data: T; result: boolean }
+interface ActionResult<T = unknown> {
+  data: T
+  result: boolean
+}
 
 export interface DailyActivityItem extends ActivityType {
   isDeleted?: boolean

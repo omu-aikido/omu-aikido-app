@@ -2,7 +2,7 @@ import type { ClerkAPIError } from "@clerk/types"
 import { ArkErrors, type } from "arktype"
 import { useReducer } from "react"
 
-import { JoinedAtYearRange, year } from "~/lib/utils"
+import { JoinedAtYearRange, year } from "@/app/lib/utils"
 
 const yearUnion = year.map(y => `'${y.year}'`).join("|")
 
@@ -23,7 +23,7 @@ export type ClientActionReturn =
   | { success: true; formData: typeof formDataSchema.infer }
   | { success: false; errors: Record<string, string> }
 
-export type LocalFormState = {
+export interface LocalFormState {
   email: string
   newPassword: string
   confirmPassword: string
@@ -37,7 +37,7 @@ export type LocalFormState = {
   legalAccepted: boolean
 }
 
-export type FormState = {
+export interface FormState {
   step: "basic" | "personal" | "profile"
   clerkErrors: ClerkAPIError[]
   formErrors: Record<string, string>

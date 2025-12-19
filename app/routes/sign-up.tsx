@@ -8,13 +8,13 @@ import { Link, redirect, useFetcher, useNavigate } from "react-router"
 
 import type { Route } from "./+types/sign-up"
 
-import { ProgressIndicator } from "~/components/component/sign-up/ProgressIndicator"
-import { SignUpStepBasic } from "~/components/component/sign-up/SignUpStepBasic"
-import { SignUpStepPersonal } from "~/components/component/sign-up/SignUpStepPersonal"
-import { SignUpStepProfile } from "~/components/component/sign-up/SignUpStepProfile"
-import type { ClientActionReturn } from "~/hooks/useSignUpForm"
-import { formDataSchema, useSignUpForm } from "~/hooks/useSignUpForm"
-import { style } from "~/styles/component"
+import { ProgressIndicator } from "@/app/components/component/sign-up/ProgressIndicator"
+import { SignUpStepBasic } from "@/app/components/component/sign-up/SignUpStepBasic"
+import { SignUpStepPersonal } from "@/app/components/component/sign-up/SignUpStepPersonal"
+import { SignUpStepProfile } from "@/app/components/component/sign-up/SignUpStepProfile"
+import type { ClientActionReturn } from "@/app/hooks/useSignUpForm"
+import { formDataSchema, useSignUpForm } from "@/app/hooks/useSignUpForm"
+import { style } from "@/app/styles/component"
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {

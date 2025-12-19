@@ -3,11 +3,11 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import type { FetcherWithComponents } from "react-router"
 import { toast } from "sonner"
 
-import { Button } from "~/components/ui/button"
-import { DatePicker } from "~/components/ui/date-picker"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
-import { style } from "~/styles/component"
+import { Button } from "@/app/components/ui/button"
+import { DatePicker } from "@/app/components/ui/date-picker"
+import { Input } from "@/app/components/ui/input"
+import { Label } from "@/app/components/ui/label"
+import { style } from "@/app/styles/component"
 
 interface AddRecordProps {
   fetcher: FetcherWithComponents<unknown>
