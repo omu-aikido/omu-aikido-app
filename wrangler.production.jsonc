@@ -7,15 +7,9 @@
   "name": "record",
   "compatibility_date": "2025-09-15",
   "main": "./build/server/index.js",
-  "assets": {
-    "directory": "./build/client"
-  },
+  "assets": { "directory": "./build/client" },
   "no_bundle": true,
   "kv_namespaces": [
-    {
-      "binding": "KV",
-      "id": "96b9a7a8f5574a8eabf9472fe1ca05db",
-      "preview_id": "",
-    },
+    { "binding": "KV", "id": "96b9a7a8f5574a8eabf9472fe1ca05db", "preview_id": "" },
   ],
 }
