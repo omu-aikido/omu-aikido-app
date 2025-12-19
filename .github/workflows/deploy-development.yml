@@ -40,6 +40,9 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: conf-check
+        run: cat worker-configuration.d.ts
+
       - name: Deploy Development
         uses: cloudflare/wrangler-action@v3
         with:
