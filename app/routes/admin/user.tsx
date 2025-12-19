@@ -1,4 +1,4 @@
-import type { ExternalAccount, User } from "@clerk/react-router/server"
+import type { ApiExternalAccount } from "@/type/api-user"
 import { useEffect, useRef, useState } from "react"
 import { Link, redirect, useFetcher } from "react-router"
 import { toast } from "sonner"
@@ -233,7 +233,7 @@ export default function AdminUser(args: Route.ComponentProps) {
     const discordAccount = user.externalAccounts.find(
       acc => acc.provider === "oauth_discord",
     )
-    return discordAccount as ExternalAccount | undefined
+    return discordAccount as ApiExternalAccount | undefined
   })()
 
   const fetcher = useFetcher()
@@ -288,7 +288,7 @@ export default function AdminUser(args: Route.ComponentProps) {
     <>
       {/* User Profile Section */}
       <UserProfileSection
-        user={user as User}
+        user={user}
         unSafeprofile={profile}
         profile={safeProfile}
         discord={discord}

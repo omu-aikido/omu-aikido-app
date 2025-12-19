@@ -15,6 +15,7 @@ import {
 } from "./lib/db/activity"
 import { getUserMonthlyRank } from "./lib/db/ranking"
 import { userActivitySummaryAndRecent } from "./lib/db/summary"
+import { toApiUser } from "./lib/clerk"
 import { getProfile } from "./lib/profile"
 
 import { userProfileRequestSchema } from "@/type/account"
@@ -239,7 +240,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
     const auth = getAuth(c)
     if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
     const user: User = await clerkClient.users.getUser(auth.userId)
-    return c.json({ user }, 200)
+    return c.json({ user: toApiUser(user) }, 200)
   })
   .patch(
     "/account",
@@ -293,7 +294,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
 
       const user: User = await clerkClient.users.getUser(auth.userId)
       purgeUserCache(c, auth.userId, ["/account"])
-      return c.json({ user }, 200)
+      return c.json({ user: toApiUser(user) }, 200)
     },
   )
   .get("/summary", async c => {

@@ -1,4 +1,4 @@
-import type { ExternalAccount, User } from "@clerk/react-router/server"
+import type { ApiExternalAccount, ApiUser } from "@/type/api-user"
 import { tv } from "tailwind-variants"
 
 import { Icon } from "@/app/components/ui/Icon"
@@ -6,10 +6,10 @@ import { Role } from "@/app/lib/role"
 import type { Profile } from "@/app/type"
 
 interface UserProfileSectionProps {
-  user: User
+  user: ApiUser
   unSafeprofile: Profile | null
   profile: Profile
-  discord?: ExternalAccount
+  discord?: ApiExternalAccount
 }
 export function UserProfileSection({
   user,

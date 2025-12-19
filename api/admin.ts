@@ -6,10 +6,12 @@ import { and, desc, eq, gte, lte, or, sql } from "drizzle-orm"
 import { Hono } from "hono"
 import type { Context } from "hono"
 
+import { toApiUser } from "./lib/clerk"
 import { createDb } from "./lib/db/drizzle"
 import { getProfile as getCurrentProfile } from "./lib/profile"
 
 import { coerceProfileMetadata, publicMetadataProfileSchema } from "@/type/account"
+import type { ApiUser } from "@/type/api-user"
 import { Role } from "@/type/role"
 import { activity } from "@/app/db/schema"
 import { formatDateToJSTString, getJST, timeForNextGrade } from "@/app/lib/utils"
@@ -107,10 +109,7 @@ const getMonthlyRanking = async (env: Env) => {
   return result
 }
 
-const getUsersNorm = async (
-  env: Env,
-  users: { id: string; publicMetadata: unknown }[],
-) => {
+const getUsersNorm = async (env: Env, users: ApiUser[]) => {
   const db = createDb(env)
   const parsedProfiles = users
     .map(user => {
@@ -188,7 +187,11 @@ export const adminApp = new Hono<{ Bindings: Env }>()
       })
 
       const ranking = await getMonthlyRanking(c.env)
-      return c.json({ users: clerkUsers.data, query: query ?? "", ranking })
+      return c.json({
+        users: clerkUsers.data.map(toApiUser),
+        query: query ?? "",
+        ranking,
+      })
     },
   )
   .get(
@@ -206,8 +209,9 @@ export const adminApp = new Hono<{ Bindings: Env }>()
         query: query ?? "",
         orderBy: "created_at",
       })
-      const norms = await getUsersNorm(c.env, clerkUsers.data)
-      return c.json({ users: clerkUsers.data, norms, search: query ?? "" })
+      const users = clerkUsers.data.map(toApiUser)
+      const norms = await getUsersNorm(c.env, users)
+      return c.json({ users, norms, search: query ?? "" })
     },
   )
   .get(
@@ -260,7 +264,7 @@ export const adminApp = new Hono<{ Bindings: Env }>()
         const doneTrain = Math.floor(trainsAfterGrade / 1.5)
 
         return c.json({
-          user,
+          user: toApiUser(user),
           profile,
           activities,
           trainCount,

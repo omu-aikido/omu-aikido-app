@@ -1,4 +1,4 @@
-import type { User } from "@clerk/react-router/server"
+import type { ApiUser } from "@/type/api-user"
 import React from "react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { useNavigate, useSearchParams } from "react-router"
@@ -28,10 +28,14 @@ export async function loader(args: LoaderFunctionArgs) {
     }
 
     const data = await response.json()
-    return { users: data.users as User[], query: data.query, ranking: data.ranking }
+    return {
+      users: data.users as ApiUser[],
+      query: data.query,
+      ranking: data.ranking,
+    }
   } catch {
     return {
-      users: [] as User[],
+      users: [] as ApiUser[],
       query,
       ranking: [] as { userId: string; total: number }[],
     }
@@ -220,7 +224,7 @@ export default function AdminAccounts(args: Route.ComponentProps) {
   return (
     <div className="space-y-6">
       {args.loaderData.ranking.length > 0 && (
-        <Ranking data={args.loaderData.ranking} users={users as User[]} />
+        <Ranking data={args.loaderData.ranking} users={users as ApiUser[]} />
       )}
 
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -241,7 +245,7 @@ export default function AdminAccounts(args: Route.ComponentProps) {
       </div>
 
       <ClerkUsers
-        users={paginatedUsers as User[]}
+        users={paginatedUsers as ApiUser[]}
         totalPages={totalPages}
         currentPage={currentPage}
         sortBy={sortBy}

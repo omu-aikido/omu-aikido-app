@@ -1,4 +1,4 @@
-import type { User } from "@clerk/react-router/server"
+import type { ApiUser } from "@/type/api-user"
 import React from "react"
 import { useNavigate } from "react-router"
 
@@ -6,10 +6,8 @@ import { Role } from "@/app/lib/role"
 import { translateGrade, translateYear } from "@/app/lib/utils"
 
 // MARK: UserListRow
-export const UserListRow = React.memo<{ key: string; user: User }>(function UserListRow({
-  key,
-  user,
-}) {
+export const UserListRow = React.memo<{ key: string; user: ApiUser }>(
+  function UserListRow({ key, user }) {
   const navigate = useNavigate()
 
   const handleRowClick = React.useCallback(() => {
@@ -52,10 +50,11 @@ export const UserListRow = React.memo<{ key: string; user: User }>(function User
       </td>
     </tr>
   )
-})
+  },
+)
 
 // MARK: UserCell
-export const UserCell = React.memo<{ key: string; user: User }>(function UserCell({
+export const UserCell = React.memo<{ key: string; user: ApiUser }>(function UserCell({
   key,
   user,
 }) {

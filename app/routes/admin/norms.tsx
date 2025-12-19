@@ -1,4 +1,4 @@
-import type { User } from "@clerk/react-router/server"
+import type { ApiUser } from "@/type/api-user"
 import { ArrowDown01, ArrowUp01, Search } from "lucide-react"
 import { useMemo } from "react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
@@ -56,9 +56,13 @@ export async function loader(args: LoaderFunctionArgs) {
     }
 
     const data = await response.json()
-    return { users: data.users as User[], search: data.search, norms: data.norms }
+    return {
+      users: data.users as ApiUser[],
+      search: data.search,
+      norms: data.norms,
+    }
   } catch {
-    return { users: [] as User[], search, norms: [] as UserNorm[] }
+    return { users: [] as ApiUser[], search, norms: [] as UserNorm[] }
   }
 }
 

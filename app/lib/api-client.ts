@@ -14,10 +14,13 @@ const createBaseUrl = (request: Request, path: string) => {
 }
 
 // oxlint-disable @typescript-eslint/no-explicit-any
+type HonoClient<T extends Hono<{ Bindings: Env }, any, any>> = ReturnType<typeof hc<T>>
+
+// oxlint-disable @typescript-eslint/no-explicit-any
 const createClient = <T extends Hono<{ Bindings: Env }, any, any>>(config: {
   request: Request
   path: string
-}) => {
+}): HonoClient<T> => {
   const baseUrl = createBaseUrl(config.request, config.path)
   const cookie = config.request.headers.get("cookie")
   if (cookie) {
@@ -28,12 +31,12 @@ const createClient = <T extends Hono<{ Bindings: Env }, any, any>>(config: {
 
 export const uc: ({
   request,
-}: ClientArgs) => ReturnType<typeof createClient<UserApp>> = ({ request }) => {
+}: ClientArgs) => HonoClient<UserApp> = ({ request }) => {
   return createClient<UserApp>({ request, path: "/api/user" })
 }
 
 export const ac: ({
   request,
-}: ClientArgs) => ReturnType<typeof createClient<AdminApp>> = ({ request }) => {
+}: ClientArgs) => HonoClient<AdminApp> = ({ request }) => {
   return createClient<AdminApp>({ request, path: "/api/admin" })
 }
