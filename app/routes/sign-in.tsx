@@ -7,12 +7,12 @@ const logger = getLogger("routes/sign-in")
 
 import type { Route } from "./+types/sign-in"
 
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { Icon } from "~/components/ui/Icon"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
-import { style } from "~/styles/component"
+import { Button } from "@/app/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card"
+import { Icon } from "@/app/components/ui/Icon"
+import { Input } from "@/app/components/ui/input"
+import { Label } from "@/app/components/ui/label"
+import { style } from "@/app/styles/component"
 
 // MARK: Loader
 export async function loader(args: Route.LoaderArgs) {

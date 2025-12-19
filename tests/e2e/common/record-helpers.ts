@@ -122,7 +122,7 @@ export class DesktopRecordHelpers implements RecordTestHelpers {
     await this.page.getByTestId("add-record").click()
   }
 
-  async deleteRecord(index: number = 0): Promise<void> {
+  async deleteRecord(index = 0): Promise<void> {
     await expect(this.page.getByTestId("daily-activity-card")).toBeVisible()
     await expect(
       this.page.getByTestId("daily-activity-item-" + index).getByTestId("delete-record"),
@@ -230,7 +230,7 @@ export class MobileRecordHelpers implements RecordTestHelpers {
     await this.page.getByTestId("add-record").click()
   }
 
-  async deleteRecord(index: number = 0): Promise<void> {
+  async deleteRecord(index = 0): Promise<void> {
     await expect(this.page.getByTestId("daily-activity-card")).toBeVisible()
     await expect(
       this.page.getByTestId("daily-activity-item-" + index).getByTestId("delete-record"),

@@ -24,21 +24,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          run_install: false
+      - name: Setup mise
+        uses: jdx/mise-action@v2
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm build
+        run: mise run build-preview
 
       - name: conf-check
         run: cat worker-configuration.d.ts

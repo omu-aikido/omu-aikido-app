@@ -3,9 +3,9 @@ import { Outlet, redirect } from "react-router"
 
 import type { Route } from "./+types/unauth"
 
-import { Footer } from "~/components/component/Footer"
-import { ReactHeader } from "~/components/component/Header"
-import "~/styles/global.css"
+import { Footer } from "@/app/components/component/Footer"
+import { ReactHeader } from "@/app/components/component/Header"
+import "@/app/styles/global.css"
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

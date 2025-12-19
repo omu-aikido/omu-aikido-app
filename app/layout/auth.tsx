@@ -4,21 +4,21 @@ import { Outlet, redirect } from "react-router"
 
 import type { Route } from "./+types/auth"
 
-import { AccountUi } from "~/components/component/AccountUi"
-import { Footer } from "~/components/component/Footer"
-import { ReactHeader } from "~/components/component/Header"
-import { Button } from "~/components/ui/button"
+import { AccountUi } from "@/app/components/component/AccountUi"
+import { Footer } from "@/app/components/component/Footer"
+import { ReactHeader } from "@/app/components/component/Header"
+import { Button } from "@/app/components/ui/button"
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "~/components/ui/sheet"
-import { getProfile } from "~/lib/query/profile"
-import { Role } from "~/lib/role"
-import "~/styles/global.css"
-import type { PagePath } from "~/type"
+} from "@/app/components/ui/sheet"
+import { getProfile } from "@/app/lib/query/profile"
+import { Role } from "@/app/lib/role"
+import "@/app/styles/global.css"
+import type { PagePath } from "@/app/type"
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

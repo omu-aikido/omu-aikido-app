@@ -5,13 +5,13 @@ import { useNavigate, useSearchParams } from "react-router"
 
 import type { Route } from "./+types/accounts"
 
-import ClerkUsers from "~/components/component/ClerkUsers"
-import Ranking from "~/components/component/Ranking"
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import { ac } from "~/lib/api-client"
-import { Role } from "~/lib/role"
-import { style } from "~/styles/component"
+import ClerkUsers from "@/app/components/component/ClerkUsers"
+import Ranking from "@/app/components/component/Ranking"
+import { Button } from "@/app/components/ui/button"
+import { Input } from "@/app/components/ui/input"
+import { ac } from "@/app/lib/api-client"
+import { Role } from "@/app/lib/role"
+import { style } from "@/app/styles/component"
 
 // MARK: Loader
 export async function loader(args: LoaderFunctionArgs) {

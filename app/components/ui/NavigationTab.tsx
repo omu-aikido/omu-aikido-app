@@ -1,9 +1,12 @@
 import React from "react"
 import { Link, useLocation } from "react-router-dom"
 
-import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
 
-export type NavigationTabProp = { to: string; label: string }
+export interface NavigationTabProp {
+  to: string
+  label: string
+}
 
 export const NavigationTab = React.memo<{ tabs?: NavigationTabProp[] }>(
   function NavigationTab({ tabs = [] }) {
@@ -11,7 +14,7 @@ export const NavigationTab = React.memo<{ tabs?: NavigationTabProp[] }>(
     const activeTab = tabs.find(tab => location.pathname === tab.to)?.to || ""
 
     // タブの数に応じてクラス名をマッピング
-    const gridColsMap: { [key: number]: string } = {
+    const gridColsMap: Record<number, string> = {
       1: "grid-cols-1",
       2: "grid-cols-2",
       3: "grid-cols-3",

@@ -1,16 +1,16 @@
 import type { FetcherWithComponents } from "react-router"
 
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
+import { Button } from "@/app/components/ui/button"
+import { Input } from "@/app/components/ui/input"
+import { Label } from "@/app/components/ui/label"
 import type {
   ClientActionReturn,
   FormAction,
   LocalFormState,
-} from "~/hooks/useSignUpForm"
-import { style } from "~/styles/component"
+} from "@/app/hooks/useSignUpForm"
+import { style } from "@/app/styles/component"
 
-type SignUpStepPersonalProps = {
+interface SignUpStepPersonalProps {
   formValues: LocalFormState
   formErrors: Record<string, string>
   dispatch: React.Dispatch<FormAction>

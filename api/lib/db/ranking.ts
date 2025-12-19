@@ -2,7 +2,7 @@ import { and, desc, gte, lte, sql } from "drizzle-orm"
 
 import { createDb } from "./drizzle"
 
-import { activity } from "~/db/schema"
+import { activity } from "@/app/db/schema"
 
 export async function getUserMonthlyRank(input: {
   userId: string

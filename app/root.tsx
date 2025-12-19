@@ -12,10 +12,10 @@ import {
 
 import type { Route } from "./+types/root"
 
-import { Footer } from "~/components/component/Footer"
-import { ReactHeader } from "~/components/component/Header"
-import { Toaster } from "~/components/ui/sonner"
-import "~/styles/global.css"
+import { Footer } from "@/app/components/component/Footer"
+import { ReactHeader } from "@/app/components/component/Header"
+import { Toaster } from "@/app/components/ui/sonner"
+import "@/app/styles/global.css"
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -59,7 +59,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "エラーが発生しました"
   let details = "予期しないエラーが発生しました。"
-  let status: number = 503
+  let status = 503
   let is404 = false
 
   if (isRouteErrorResponse(error)) {

@@ -1,7 +1,7 @@
 import { and, desc, eq, gte, inArray, lte, sql } from "drizzle-orm"
 
-import { activity } from "~/db/schema"
-import { createDb } from "~/lib/drizzle"
+import { activity } from "@/app/db/schema"
+import { createDb } from "@/app/lib/drizzle"
 
 export const selectActivity = activity.$inferSelect
 export const inputActivity = activity.$inferInsert
@@ -111,7 +111,7 @@ export async function userActivitySummaryAndRecent(input: {
 // MARK: createActivities
 export async function createActivities(input: {
   userId: string
-  activities: Array<typeof inputActivity>
+  activities: (typeof inputActivity)[]
   env: Env
 }) {
   const db = createDb(input.env)
@@ -133,7 +133,7 @@ export async function createActivities(input: {
 // MARK: updateActivities
 export async function updateActivities(input: {
   userId: string
-  activities: Array<typeof inputActivity>
+  activities: (typeof inputActivity)[]
   env: Env
 }) {
   const db = createDb(input.env)

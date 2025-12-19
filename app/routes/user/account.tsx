@@ -3,15 +3,15 @@ import { Link, useFetcher, useOutletContext } from "react-router"
 
 import type { Route } from "./+types/account"
 
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
-import { StateButton } from "~/components/ui/StateButton"
-import type { UserLayoutComponentProps } from "~/layout/user"
-import { uc } from "~/lib/api-client"
-import { style } from "~/styles/component"
+import { Input } from "@/app/components/ui/input"
+import { Label } from "@/app/components/ui/label"
+import { StateButton } from "@/app/components/ui/StateButton"
+import type { UserLayoutComponentProps } from "@/app/layout/user"
+import { uc } from "@/app/lib/api-client"
+import { style } from "@/app/styles/component"
 
 // MARK: Meta
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "プロフィール | ハム大合気ポータル" },
     { name: "description", content: "アカウントのアカウント設定" },

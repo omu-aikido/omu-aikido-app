@@ -1,9 +1,9 @@
 import React from "react"
 
-import { style } from "~/styles/component"
-import type { DailyActivityItem } from "~/type"
+import { style } from "@/app/styles/component"
+import type { DailyActivityItem } from "@/app/type"
 
-type DayActivitySummaryProps = {
+interface DayActivitySummaryProps {
   totalHours: number
   count: number
   status: DailyActivityItem["status"]

@@ -11,8 +11,8 @@ import { getProfile as getCurrentProfile } from "./lib/profile"
 
 import { coerceProfileMetadata, publicMetadataProfileSchema } from "@/type/account"
 import { Role } from "@/type/role"
-import { activity } from "~/db/schema"
-import { formatDateToJSTString, getJST, timeForNextGrade } from "~/lib/utils"
+import { activity } from "@/app/db/schema"
+import { formatDateToJSTString, getJST, timeForNextGrade } from "@/app/lib/utils"
 
 const clerkUserLimit = 500
 
@@ -109,7 +109,7 @@ const getMonthlyRanking = async (env: Env) => {
 
 const getUsersNorm = async (
   env: Env,
-  users: Array<{ id: string; publicMetadata: unknown }>,
+  users: { id: string; publicMetadata: unknown }[],
 ) => {
   const db = createDb(env)
   const parsedProfiles = users

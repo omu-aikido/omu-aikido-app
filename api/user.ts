@@ -1,4 +1,5 @@
 import { createClerkClient } from "@clerk/backend"
+import type { User } from "@clerk/backend"
 import { arktypeValidator } from "@hono/arktype-validator"
 import { getAuth } from "@hono/clerk-auth"
 import { type } from "arktype"
@@ -17,7 +18,7 @@ import { userActivitySummaryAndRecent } from "./lib/db/summary"
 import { getProfile } from "./lib/profile"
 
 import { userProfileRequestSchema } from "@/type/account"
-import { JoinedAtYearRange, getJST } from "~/lib/utils"
+import { JoinedAtYearRange, getJST } from "@/app/lib/utils"
 
 const ONBOARDING_MESSAGE = "プロファイル情報を設定してください。"
 
@@ -220,7 +221,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
       const parsed = c.req.valid("json")
       const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
       const normalizedGetGradeAt = normalizeGetGradeAt(parsed.getGradeAt)
-      const newMetadata = await clerkClient.users.updateUserMetadata(auth.userId, {
+      const newMetadata: User = await clerkClient.users.updateUserMetadata(auth.userId, {
         publicMetadata: {
           grade: parsed.grade,
           getGradeAt: normalizedGetGradeAt,
@@ -237,7 +238,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
     const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
     const auth = getAuth(c)
     if (!auth || !auth.userId) return c.json({ error: "Unauthorized" }, 401)
-    const user = await clerkClient.users.getUser(auth.userId)
+    const user: User = await clerkClient.users.getUser(auth.userId)
     return c.json({ user }, 200)
   })
   .patch(
@@ -290,7 +291,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
         }
       }
 
-      const user = await clerkClient.users.getUser(auth.userId)
+      const user: User = await clerkClient.users.getUser(auth.userId)
       purgeUserCache(c, auth.userId, ["/account"])
       return c.json({ user }, 200)
     },
@@ -412,7 +413,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
     if (!auth || !auth.userId) return c.json({ status: "unauthorized" }, 401)
     const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
     try {
-      const user = await clerkClient.users.getUser(auth.userId)
+      const user: User = await clerkClient.users.getUser(auth.userId)
       if (
         user.publicMetadata &&
         typeof user.publicMetadata === "object" &&
@@ -443,7 +444,7 @@ export const userApp = new Hono<{ Bindings: Env }>()
       return c.json({ success: false, error: "認証が必要です" }, 401)
     const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
     try {
-      const user = await clerkClient.users.getUser(auth.userId)
+      const user: User = await clerkClient.users.getUser(auth.userId)
       if (
         user.publicMetadata &&
         typeof user.publicMetadata === "object" &&

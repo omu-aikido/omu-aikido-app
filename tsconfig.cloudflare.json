@@ -20,9 +20,12 @@
     "module": "ES2022",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "rootDirs": [".", "./.react-router/types"],
-    "paths": { "~/*": ["./app/*"], "@/api/*": ["./api/*"], "@/type/*": ["./types/*"] },
+    "paths": {
+      "@/app/*": ["./app/*"],
+      "@/api/*": ["./api/*"],
+      "@/type/*": ["./types/*"]
+    },
     "esModuleInterop": true,
     "resolveJsonModule": true
   }

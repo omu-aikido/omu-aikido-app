@@ -4,8 +4,8 @@ import { Outlet, redirect } from "react-router"
 import type { Route } from "./+types/user"
 export type UserLayoutComponentProps = Route.ComponentProps
 
-import { NavigationTab } from "~/components/ui/NavigationTab"
-import { uc } from "~/lib/api-client"
+import { NavigationTab } from "@/app/components/ui/NavigationTab"
+import { uc } from "@/app/lib/api-client"
 
 // MARK: Loader - 共通の認証処理
 export async function loader(args: Route.LoaderArgs) {

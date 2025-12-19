@@ -1,8 +1,8 @@
 import { useUser } from "@clerk/react-router"
 import { useState } from "react"
 
-import { Button } from "~/components/ui/button"
-import { Icon } from "~/components/ui/Icon"
+import { Button } from "@/app/components/ui/button"
+import { Icon } from "@/app/components/ui/Icon"
 
 export function meta() {
   return [

@@ -2,7 +2,7 @@ import { and, eq, gte, inArray, lte } from "drizzle-orm"
 
 import { createDb } from "./drizzle"
 
-import { activity } from "~/db/schema"
+import { activity } from "@/app/db/schema"
 
 export const selectActivity = activity.$inferSelect
 export const inputActivity = activity.$inferInsert
@@ -63,7 +63,7 @@ export async function getActivitiesByDateRange(input: {
 // MARK: createActivities
 export async function createActivities(input: {
   userId: string
-  activities: Array<typeof inputActivity>
+  activities: (typeof inputActivity)[]
   env: Env
 }) {
   const db = createDb(input.env)
@@ -83,7 +83,7 @@ export async function createActivities(input: {
 // MARK: updateActivities
 export async function updateActivities(input: {
   userId: string
-  activities: Array<typeof inputActivity>
+  activities: (typeof inputActivity)[]
   env: Env
 }) {
   const db = createDb(input.env)

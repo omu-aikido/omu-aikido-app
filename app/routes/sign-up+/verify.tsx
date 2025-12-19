@@ -7,10 +7,10 @@ import { useState } from "react"
 import type { LoaderFunctionArgs } from "react-router"
 import { redirect, useNavigate } from "react-router"
 
-import { Button } from "~/components/ui/button"
-import { Label } from "~/components/ui/label"
-import { OTPInput } from "~/components/ui/otp-input"
-import { style } from "~/styles/component"
+import { Button } from "@/app/components/ui/button"
+import { Label } from "@/app/components/ui/label"
+import { OTPInput } from "@/app/components/ui/otp-input"
+import { style } from "@/app/styles/component"
 
 // MARK: Loader
 export async function loader(args: LoaderFunctionArgs) {
@@ -57,15 +57,10 @@ export default function VerifyPage() {
         await setActive({ session: signUpAttempt.createdSessionId })
         navigate("/onboarding")
       } else {
-        // eslint-disable-next-line no-console
-        console.error("認証が完了しませんでした。", signUpAttempt.missingFields)
         setFormErrors({ general: "認証が完了しませんでした。再度お試しください。" })
         setLoading(false)
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      // eslint-disable-next-line no-console
-      console.error("認証コードの検証に失敗しました。", err)
+    } catch (err) {
       if (isClerkAPIResponseError(err)) setClerkErrors(err.errors)
       const errorMessage = "認証に失敗しました。再度お試しください。"
       setFormErrors({ general: errorMessage })

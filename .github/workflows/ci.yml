@@ -26,13 +26,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup mise
+        uses: jdx/mise-action@v2
 
       - name: Get pnpm store directory
         shell: bash
@@ -51,7 +46,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build project
-        run: pnpm run build
+        run: mise run build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -70,13 +65,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup mise
+        uses: jdx/mise-action@v2
 
       - name: Get pnpm store directory
         shell: bash
@@ -100,13 +90,13 @@ jobs:
           echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.dev.vars
 
       - name: Type check
-        run: pnpm run check
+        run: mise run check
 
       - name: Lint check
-        run: pnpm run lint
+        run: mise run lint
 
       - name: Format check
-        run: pnpm run format:check
+        run: mise run format-check
 
   unit-test:
     name: Unit Test
@@ -120,13 +110,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup mise
+        uses: jdx/mise-action@v2
 
       - name: Get pnpm store directory
         shell: bash
@@ -145,4 +130,4 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run Unit Tests
-        run: pnpm test:unit
+        run: mise run test-unit

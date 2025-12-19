@@ -1,6 +1,6 @@
 import { Link } from "react-router"
 
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card"
 
 interface AppIconProps {
   title: string

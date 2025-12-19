@@ -3,9 +3,9 @@ import { Outlet, redirect } from "react-router"
 
 import type { Route } from "./+types/admin"
 
-import { getProfile } from "~/lib/query/profile"
-import { Role } from "~/lib/role"
-import { style } from "~/styles/component"
+import { getProfile } from "@/app/lib/query/profile"
+import { Role } from "@/app/lib/role"
+import { style } from "@/app/styles/component"
 
 // MARK: Loader - 共通の認証処理
 export async function loader(args: Route.LoaderArgs) {

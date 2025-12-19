@@ -6,16 +6,16 @@ import { useSearchParams } from "react-router"
 
 import type { Route } from "./+types/norms"
 
-import { NormCard } from "~/components/component/NormCard"
-import { Input } from "~/components/ui/input"
-import { ac } from "~/lib/api-client"
+import { NormCard } from "@/app/components/component/NormCard"
+import { Input } from "@/app/components/ui/input"
+import { ac } from "@/app/lib/api-client"
 
 // MARK: Constants
 const MAX_SEARCH_LENGTH = 100
 const PERCENTAGE_MULTIPLIER = 100
 
 // MARK: Types
-type UserNorm = {
+interface UserNorm {
   userId: string
   current: number
   required: number

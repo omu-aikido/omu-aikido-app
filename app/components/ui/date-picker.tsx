@@ -1,7 +1,7 @@
-import { Button } from "app/components/ui/button"
-import { Calendar } from "app/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "app/components/ui/popover"
-import { cn } from "app/lib/utils"
+import { Button } from "@/app/components/ui/button"
+import { Calendar } from "@/app/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/app/components/ui/popover"
+import { cn } from "@/app/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 

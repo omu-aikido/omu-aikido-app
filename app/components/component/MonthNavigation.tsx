@@ -1,4 +1,4 @@
-type Props = {
+interface Props {
   isChanged: boolean
   currentMonth: Date
   onSelect: (date: Date) => void

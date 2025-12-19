@@ -3,5 +3,4 @@ onlyBuiltDependencies:
   - "@tailwindcss/oxide"
   - esbuild
   - workerd
-minimumReleaseAge: 4320
 resolutionMode: time-based

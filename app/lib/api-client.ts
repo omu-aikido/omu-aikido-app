@@ -4,14 +4,16 @@ import { hc } from "hono/client"
 import type { AdminApp } from "@/api/admin"
 import type { UserApp } from "@/api/user"
 
-type ClientArgs = { request: Request }
+interface ClientArgs {
+  request: Request
+}
 
 const createBaseUrl = (request: Request, path: string) => {
   const reqUrl = new URL(request.url)
   return `${reqUrl.origin}${path}`
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable @typescript-eslint/no-explicit-any
 const createClient = <T extends Hono<{ Bindings: Env }, any, any>>(config: {
   request: Request
   path: string
@@ -24,10 +26,14 @@ const createClient = <T extends Hono<{ Bindings: Env }, any, any>>(config: {
   return hc<T>(baseUrl)
 }
 
-export const uc = ({ request }: ClientArgs) => {
+export const uc: ({
+  request,
+}: ClientArgs) => ReturnType<typeof createClient<UserApp>> = ({ request }) => {
   return createClient<UserApp>({ request, path: "/api/user" })
 }
 
-export const ac = ({ request }: ClientArgs) => {
+export const ac: ({
+  request,
+}: ClientArgs) => ReturnType<typeof createClient<AdminApp>> = ({ request }) => {
   return createClient<AdminApp>({ request, path: "/api/admin" })
 }

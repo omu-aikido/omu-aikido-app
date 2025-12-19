@@ -1,6 +1,6 @@
-import { style } from "~/styles/component" // Import style
+import { style } from "@/app/styles/component" // Import style
 
-type Props = {
+interface Props {
   isChanged: boolean
   submitting: boolean
   className?: string

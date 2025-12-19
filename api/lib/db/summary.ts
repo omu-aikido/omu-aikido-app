@@ -2,7 +2,7 @@ import { and, desc, eq, gte, lte, sql } from "drizzle-orm"
 
 import { createDb } from "./drizzle"
 
-import { activity } from "~/db/schema"
+import { activity } from "@/app/db/schema"
 
 export const selectActivity = activity.$inferSelect
 export const inputActivity = activity.$inferInsert

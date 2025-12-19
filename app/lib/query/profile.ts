@@ -1,13 +1,13 @@
 import { createClerkClient, type User } from "@clerk/react-router/server"
 import { ArkErrors } from "arktype"
 
-import { Role } from "~/lib/role"
+import { Role } from "@/app/lib/role"
 import {
   coerceProfileMetadata,
   publicMetadataProfileSchema,
   type AdminUpdateProfileInput,
-} from "~/lib/schemas"
-import type { Profile } from "~/type"
+} from "@/app/lib/schemas"
+import type { Profile } from "@/app/type"
 
 // Env型は worker-configuration.d.ts で定義されているグローバル型を使用
 

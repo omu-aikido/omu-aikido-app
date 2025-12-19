@@ -1,27 +1,27 @@
 import type { FetcherWithComponents } from "react-router"
 import { Link } from "react-router"
 
-import { Button } from "~/components/ui/button"
-import { Checkbox } from "~/components/ui/checkbox"
-import { DatePicker } from "~/components/ui/date-picker"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
+import { Button } from "@/app/components/ui/button"
+import { Checkbox } from "@/app/components/ui/checkbox"
+import { DatePicker } from "@/app/components/ui/date-picker"
+import { Input } from "@/app/components/ui/input"
+import { Label } from "@/app/components/ui/label"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select"
+} from "@/app/components/ui/select"
 import type {
   ClientActionReturn,
   FormAction,
   LocalFormState,
-} from "~/hooks/useSignUpForm"
-import { JoinedAtYearRange, grade, year } from "~/lib/utils"
-import { style } from "~/styles/component"
+} from "@/app/hooks/useSignUpForm"
+import { JoinedAtYearRange, grade, year } from "@/app/lib/utils"
+import { style } from "@/app/styles/component"
 
-type SignUpStepProfileProps = {
+interface SignUpStepProfileProps {
   formValues: LocalFormState
   formErrors: Record<string, string>
   dispatch: React.Dispatch<FormAction>
