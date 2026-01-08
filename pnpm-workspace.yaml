@@ -1,7 +1,5 @@
 onlyBuiltDependencies:
-  - "@clerk/shared"
-  - "@tailwindcss/oxide"
+  - '@clerk/shared'
   - esbuild
+  - sharp
   - workerd
-minimumReleaseAge: 4320
-resolutionMode: time-based

@@ -1,13 +1,29 @@
 {
-  "extends": "./tsconfig.json",
-  "include": ["vite.config.ts"],
   "compilerOptions": {
-    "composite": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "strict": true,
-    "types": ["node"],
-    "lib": ["ES2022"],
-    "target": "ES2022",
-    "module": "ES2022",
-    "moduleResolution": "bundler"
-  }
+    "skipLibCheck": true,
+    "types": ["node", "./worker-configuration.d.ts"],
+    "paths": { "@/*": ["./*"] },
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "vite.config.*",
+    "vitest.config.*",
+    "cypress.config.*",
+    "nightwatch.conf.*",
+    "playwright.config.*",
+    "eslint.config.*"
+  ]
 }

@@ -1,0 +1,6 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "entry": ["src/main.ts", "server/index.ts"],
+  "project": ["src/**/*.{ts,vue}", "server/**/*.ts", "share/**/*.ts"],
+  "ignore": ["**/*.d.ts", "worker-configuration.d.ts"]
+}
