@@ -8,6 +8,7 @@ import PracticeRanking from "@/src/components/home/PracticeRanking.vue"
 import ActivityForm from "@/src/components/record/ActivityForm.vue"
 import { useActivity } from "@/src/composable/useActivity"
 import hc from "@/src/lib/honoClient"
+import type { RankingResponse } from "@/share/types/records"
 
 // Types
 interface PracticeCountData {
@@ -25,25 +26,6 @@ interface UserProfile {
     joinedAt: number
     year: string
   }
-}
-
-interface RankingUser {
-  rank: number
-  userId: string
-  userName: string
-  isCurrentUser: boolean
-  totalPeriod: number
-  practiceCount: number
-}
-
-interface RankingResponse {
-  period: string
-  periodType: string
-  startDate: string
-  endDate: string
-  ranking: RankingUser[]
-  currentUserRanking: RankingUser | null
-  totalUsers: number
 }
 
 interface MenuItem {

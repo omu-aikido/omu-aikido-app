@@ -1,22 +1,5 @@
 <script setup lang="ts">
-interface RankingUser {
-  rank: number
-  userId: string
-  userName: string
-  isCurrentUser: boolean
-  totalPeriod: number
-  practiceCount: number
-}
-
-interface RankingResponse {
-  period: string
-  periodType: string
-  startDate: string
-  endDate: string
-  ranking: RankingUser[]
-  currentUserRanking: RankingUser | null
-  totalUsers: number
-}
+import type { RankingResponse } from '@/share/types/records'
 
 interface Props {
   rankingData: RankingResponse | null

@@ -7,6 +7,8 @@ import { dbClient } from '@/server/db/drizzle'
 import { activity } from '@/server/db/schema'
 import * as records from '@/share/types/records'
 
+import { calculatePeriodRange, getRankingData, maskRankingData } from './ranking'
+
 export const record = new Hono<{ Bindings: Env }>()
   // GET /api/user/record - 活動記録一覧取得
   .get(
@@ -165,7 +167,7 @@ export const record = new Hono<{ Bindings: Env }>()
     }
   )
 
-  // GET /api/user/record/ranking - 最適化されたランキング取得
+  // GET /api/user/record/ranking - キャッシュ最適化されたランキング取得
   .get(
     '/ranking',
     arktypeValidator('query', records.rankingQuerySchema, (result, c) => {
@@ -178,10 +180,8 @@ export const record = new Hono<{ Bindings: Env }>()
       const auth = getAuth(c)
       if (!auth || !auth.userId) return c.json({ error: 'Unauthorized' }, 401)
 
-      const db = dbClient(c.env)
       const query = c.req.valid('query')
 
-      // クエリパラメータから年月を取得（デフォルト: 今月）
       // JST (UTC+9) で現在時刻を取得
       const utcNow = new Date()
       const jstNow = new Date(utcNow.getTime() + 9 * 60 * 60 * 1000)
@@ -189,88 +189,19 @@ export const record = new Hono<{ Bindings: Env }>()
       const targetMonth = query.month ?? jstNow.getUTCMonth() + 1
       const period = (query.period ?? 'monthly') as 'monthly' | 'annual' | 'fiscal'
 
-      // 日付範囲の算出（ISOフォーマット統一）
-      let startDate: string
-      let endDate: string
-      let periodLabel: string
-
-      if (period === 'annual') {
-        startDate = `${targetYear}-01-01`
-        endDate = `${targetYear}-12-31`
-        periodLabel = `${targetYear}年`
-      } else if (period === 'fiscal') {
-        startDate = `${targetYear}-04-01`
-        endDate = `${targetYear + 1}-03-31`
-        periodLabel = `${targetYear}年度`
-      } else {
-        // 月の開始日と終了日をJST用に計算
-        const monthStart = new Date(Date.UTC(targetYear, targetMonth - 1, 1))
-        const monthEnd = new Date(Date.UTC(targetYear, targetMonth, 0))
-        startDate = monthStart.toISOString().split('T')[0] || ''
-        endDate = monthEnd.toISOString().split('T')[0] || ''
-        periodLabel = new Date(targetYear, targetMonth - 1, 1).toLocaleDateString('ja-JP', {
-          year: 'numeric',
-          month: 'long',
-        })
-      }
-
-      // Fetch ranking stats from DB
-      const monthlyStats = await db
-        .select({
-          userId: activity.userId,
-          totalPeriod: drizzleOrm.sql<number>`COALESCE(SUM(${activity.period}), 0)`,
-        })
-        .from(activity)
-        .where(drizzleOrm.and(drizzleOrm.gte(activity.date, startDate), drizzleOrm.lte(activity.date, endDate)))
-        .groupBy(activity.userId)
-        .orderBy(drizzleOrm.desc(drizzleOrm.sql<number>`COALESCE(SUM(${activity.period}), 0)`))
-        .limit(50)
-
-      // No need to fetch user details from Clerk - frontend already has this info
-      const currentUserName = 'あなた'
-
-      type RankingEntry = {
-        rank: number
-        userId: string
-        userName: string
-        isCurrentUser: boolean
-        totalPeriod: number
-        practiceCount: number
-      }
-
-      const ranking: RankingEntry[] = []
-      let currentUserRanking: RankingEntry | null = null
-      let currentRank = 1
-      let previousTotalPeriod: number | null = null
-
-      monthlyStats.forEach((stat, index) => {
-        // 前の人と同じtotalPeriodでなければ、rankをindexに基づいて更新
-        if (previousTotalPeriod !== null && stat.totalPeriod !== previousTotalPeriod) {
-          currentRank = index + 1
-        }
-
-        const isCurrentUser = stat.userId === auth.userId
-        const rankData = {
-          rank: currentRank,
-          userId: stat.userId,
-          userName: isCurrentUser ? currentUserName : '匿名',
-          isCurrentUser,
-          totalPeriod: stat.totalPeriod,
-          practiceCount: Math.floor(stat.totalPeriod / 1.5),
-        }
-
-        ranking.push(rankData)
-
-        if (isCurrentUser) {
-          currentUserRanking = rankData
-        }
-
-        previousTotalPeriod = stat.totalPeriod
+      // 日付範囲の算出
+      const { startDate, endDate, periodLabel } = calculatePeriodRange({
+        year: targetYear,
+        month: targetMonth,
+        period,
       })
 
-      // If user is not in top 50, fetch their stats separately?
-      // Current implementation only returns currentUserRanking if they are in top 50.
-      // This logic remains unchanged for now to minimize risk.
+      // Edge Cacheからランキングデータを取得（キャッシュミス時はDBから取得してキャッシュ）
+      const rawRankingData = await getRankingData(c, startDate, endDate)
+
+      // ユーザーIDでマスク処理
+      const ranking = maskRankingData(rawRankingData, auth.userId)
+      const currentUserRanking = ranking.find((entry) => entry.isCurrentUser) ?? null
 
       return c.json(
         {
@@ -280,7 +211,7 @@ export const record = new Hono<{ Bindings: Env }>()
           endDate,
           ranking,
           currentUserRanking,
-          totalUsers: monthlyStats.length,
+          totalUsers: ranking.length,
         },
         200
       )
