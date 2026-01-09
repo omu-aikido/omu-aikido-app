@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": {
+    "types": ["./worker-configuration.d.ts"],
+    "baseUrl": ".",
+    "paths": { "@/*": ["./*"] },
+    "noEmit": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["server", "share"],
+  "typeAcquisition": { "enable": true }
+}

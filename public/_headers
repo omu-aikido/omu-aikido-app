@@ -1,0 +1,6 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://*.clerk.accounts.dev https://accounts.omu-aikido.com; connect-src 'self' https://*.clerk.accounts.dev https://accounts.omu-aikido.com; img-src 'self' https://img.clerk.com data:; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()

@@ -61,12 +61,6 @@
   },
   "views": {},
   "enums": {},
-  "_meta": {
-    "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "internal": {
-    "indexes": {}
-  }
+  "_meta": { "schemas": {}, "tables": {}, "columns": {} },
+  "internal": { "indexes": {} }
 }

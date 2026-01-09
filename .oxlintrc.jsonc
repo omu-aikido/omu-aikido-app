@@ -1,0 +1,55 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["import", "unicorn", "promise"],
+  "categories": {
+    "correctness": "error", // 正確性に関わる問題
+    "suspicious": "warn", // 疑わしいコード
+    "pedantic": "warn", // 厳密なルール
+    "restriction": "warn", // 制限ルール
+  },
+  "rules": {
+    "eqeqeq": "error", // 厳密等価演算子 (===) を強制
+    "no-var": "error", // varの使用を禁止（const/letを強制）
+    "prefer-const": "error", // 再代入されない変数はconstを強制
+    "no-inline-comments": "allow", // 行末コメントは許可
+    "no-console": "off", // console.log等の使用を許可
+    "no-useless-return": "off", // 不要なreturn文を許可
+    "max-dependencies": [
+      "warn",
+      {
+        "max": 25, // 1ファイルのimport数
+      },
+    ],
+    "max-lines": [
+      "warn",
+      {
+        "max": 350, // ファイル行数
+      },
+    ],
+    "max-lines-per-function": [
+      "warn",
+      {
+        "max": 160, // 関数の行数
+      },
+    ],
+    "complexity": [
+      "warn",
+      {
+        "max": 20, // 循環的複雑度の制限
+      },
+    ],
+    "max-depth": [
+      "warn",
+      {
+        "max": 4, // ネストの深さ制限
+      },
+    ],
+    "no-shadow": "warn", // 変数のシャドーイング
+    "no-bitwise": "error", // ビット演算
+    "no-negated-condition": "off", // if (!condition) 形式
+    "unicorn/prefer-top-level-await": "off", // Top-level await
+    "unicorn/prefer-add-event-listener": "off", // onEventプロパティの使用
+    "import/no-unassigned-import": "warn", // 副作用のみのimport (import "foo")
+  },
+  "ignorePatterns": ["tests/*"],
+}

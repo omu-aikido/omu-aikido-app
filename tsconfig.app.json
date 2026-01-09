@@ -1,0 +1,22 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "server/**/*", "share/**/*"],
+  "exclude": ["src/**/__tests__/*"],
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": ".",
+    "strict": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["./worker-configuration.d.ts"],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}

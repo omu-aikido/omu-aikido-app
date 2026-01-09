@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  // 基本・インデント
+  "printWidth": 120,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": false,
+
+  // 文字列・クォート
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "quoteProps": "as-needed",
+
+  // 構造
+  "trailingComma": "es5",
+  "bracketSpacing": true,
+  "bracketSameLine": true,
+
+  // 改行・空白
+  "endOfLine": "lf",
+  "insertFinalNewline": true,
+  "htmlWhitespaceSensitivity": "css",
+
+  // メタデータ
+  "insertPragma": false,
+  "requirePragma": false,
+
+  // ソート
+  "experimentalSortImports": {
+    "ignoreCase": false,
+    "order": "asc",
+    "sortSideEffects": true,
+  },
+
+  // Ignore
+  "ignorePatterns": ["node_modules", "dist"],
+}

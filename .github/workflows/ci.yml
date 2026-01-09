@@ -7,29 +7,30 @@ on:
   push:
     branches-ignore:
       - main
-  workflow_dispatch:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  pull_request:
+    types:
+      - opened
 
 jobs:
-  build:
-    name: Build
+  ci:
     runs-on: ubuntu-latest
-    environment: testing
+    environment: development
+    env:
+      VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      CLERK_FRONTEND_API_URL: ${{ secrets.CLERK_FRONTEND_API_URL }}
+      CLERK_WEBHOOK_SECRET: ${{ secrets.CLERK_WEBHOOK_SECRET }}
+      TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+
     steps:
-      - name: Create .env file
-        run: |
-          echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.env
-          echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.dev.vars
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: "package.json"
+          node-version-file: 'package.json'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -50,99 +51,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build project
-        run: pnpm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            build/
-            !build/**/*.map
-          retention-days: 1
-
-  lint-and-typecheck:
-    name: Lint and TypeCheck
-    runs-on: ubuntu-latest
-    environment: testing
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Get pnpm store directory
-        shell: bash
+      - name: Generate Env File for Cloudflare Types
         run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          touch .env
+          echo "VITE_CLERK_PUBLISHABLE_KEY=''" >> .env
+          echo "CLERK_SECRET_KEY=''" >> .env
+          echo "CLERK_FRONTEND_API_URL=''" >> .env
+          echo "CLERK_WEBHOOK_SECRET=''" >> .env
+          echo "TURSO_AUTH_TOKEN=''" >> .env
+          echo "TURSO_DATABASE_URL=''" >> .env
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+      - name: Build
+        run: pnpm build
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Check (format, lint, type-check, knip)
+        run: pnpm check
 
-      - name: Create .env file
-        run: |
-          echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.env
-          echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.dev.vars
-
-      - name: Type check
-        run: pnpm run check
-
-      - name: Lint check
-        run: pnpm run lint
-
-      - name: Format check
-        run: pnpm run format:check
-
-  unit-test:
-    name: Unit Test
-    runs-on: ubuntu-latest
-    environment: testing
-    steps:
-      - name: Create .env file
-        run: |
-          echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.env
-          echo "${{ secrets.DOTENV }}" > $GITHUB_WORKSPACE/.dev.vars
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: "package.json"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run Unit Tests
-        run: pnpm test:unit
+      - name: Test
+        run: pnpm test run
