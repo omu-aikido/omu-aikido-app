@@ -31,10 +31,7 @@ app.use(VueQueryPlugin, { queryClient })
 app.use(router)
 ;(async () => {
   try {
-    await initAuthState()
-    console.log(new Date().toLocaleTimeString(), 'AuthState Initialized')
-    await router.isReady()
-    console.log(new Date().toLocaleTimeString(), 'router ready')
+    initAuthState()
     app.mount('#app')
   } catch {
     console.error(new Date().toLocaleTimeString(), 'Failed to initialize app')

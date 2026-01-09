@@ -2,15 +2,17 @@ import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 
 import { createRouter, createWebHistory } from 'vue-router'
 
+// HomeView remains eager for FCP
 import { Role } from '@/share/types/role'
 import HomeView from '@/src/views/Home.vue'
 import NotFoundView from '@/src/views/NotFound.vue'
-import RecordView from '@/src/views/Record.vue'
-import SignInView from '@/src/views/SignIn.vue'
-import SignUpView from '@/src/views/SignUp.vue'
-import SignUpVerifyView from '@/src/views/SignUpVerify.vue'
-import UserView from '@/src/views/account/User.vue'
-import AdminAccountsView from '@/src/views/admin/Accounts.vue'
+// Lazy load other views
+const RecordView = () => import('@/src/views/Record.vue')
+const SignInView = () => import('@/src/views/SignIn.vue')
+const SignUpView = () => import('@/src/views/SignUp.vue')
+const SignUpVerifyView = () => import('@/src/views/SignUpVerify.vue')
+const UserView = () => import('@/src/views/account/User.vue')
+const AdminAccountsView = () => import('@/src/views/admin/Accounts.vue')
 
 const router = createRouter({
   history: createWebHistory(),
