@@ -103,7 +103,9 @@ describe('useActivity', () => {
 
       // Execute onSuccess
       onSuccess()
-      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['activities'] })
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['user', 'record'] })
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['user', 'record', 'count'] })
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['user', 'record', 'ranking'] })
     })
 
     it('should handle error in mutationFn', async () => {
@@ -142,7 +144,9 @@ describe('useActivity', () => {
       })
 
       onSuccess()
-      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['activities'] })
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['user', 'record'] })
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['user', 'record', 'count'] })
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['user', 'record', 'ranking'] })
     })
   })
 })
