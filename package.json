@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "NODE_OPTIONS='--max-old-space-size=8192' vite",
+    "dev": "NODE_OPTIONS='--max-old-space-size=4096' vite",
     "check": "pnpm format && pnpm lint:fix && pnpm type-check && pnpm knip",
     "check:all": "pnpm check && pnpm audit && pnpm test",
     "build": "run-p type-check \"build-only {@}\" --",
