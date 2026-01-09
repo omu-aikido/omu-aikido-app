@@ -115,7 +115,7 @@
                 <input
                   type="number"
                   v-model.number="formData.joinedAt"
-                  class="w-full rounded-md border border-neutral-300 dark:border-neutral-600 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  class="w-full rounded-md border border-neutral-300 dark:border-neutral-600 bg-transparent px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   min="1950"
                   :max="new Date().getFullYear() + 1" />
               </div>
@@ -123,10 +123,12 @@
                 <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
                   >級段位取得日</label
                 >
-                <input
-                  type="date"
-                  v-model="formData.getGradeAt"
-                  class="w-full rounded-md border border-neutral-300 dark:border-neutral-600 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <div class="flex-1">
+                  <input
+                    type="date"
+                    v-model="formData.getGradeAt"
+                    class="w-full rounded-md border border-neutral-300 dark:border-neutral-600 bg-transparent px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
               </div>
 
               <div class="md:col-span-2 flex justify-end gap-2 mt-2">

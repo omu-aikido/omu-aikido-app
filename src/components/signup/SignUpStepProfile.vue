@@ -53,7 +53,7 @@
           )
         "
         :disabled="isSignUpCreated"
-        class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed" />
+        class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-base text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed" />
       <p v-if="formErrors.joinedAt" class="text-sm text-red-600 dark:text-red-400">
         {{ formErrors.joinedAt }}
       </p>
@@ -63,15 +63,17 @@
       <label for="getGradeAt" class="text-sm font-medium text-neutral-700 dark:text-neutral-300"
         >取得年月日 (任意)</label
       >
-      <input
-        id="getGradeAt"
-        type="date"
-        :value="formValues.getGradeAt"
-        @input="
-          onUpdate('getGradeAt', ($event.target as HTMLInputElement).value)
-        "
-        :disabled="isSignUpCreated"
-        class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed" />
+      <div class="flex-1">
+        <input
+          id="getGradeAt"
+          type="date"
+          :value="formValues.getGradeAt"
+          @input="
+            onUpdate('getGradeAt', ($event.target as HTMLInputElement).value)
+          "
+          :disabled="isSignUpCreated"
+          class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-base text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed" />
+      </div>
       <p v-if="formErrors.getGradeAt" class="text-sm text-red-600 dark:text-red-400">
         {{ formErrors.getGradeAt }}
       </p>

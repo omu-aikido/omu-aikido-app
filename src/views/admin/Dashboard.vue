@@ -6,7 +6,7 @@
       <Loading />
     </div>
 
-    <div v-else-if="error" class="bg-red-50 p-4 rounded-md border border-red-200 text-red-700">
+    <div v-else-if="error" class="bg-red-50 dark:bg-red-950 p-4 rounded-md border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300">
       {{ error }}
     </div>
 
@@ -19,7 +19,7 @@
           <span class="text-sm text-neutral-500 dark:text-neutral-400">{{ thresholdDate }} 以降の記録なし</span>
         </div>
 
-        <div v-if="inactiveUsers.length === 0" class="p-8 text-center text-neutral-500">
+        <div v-if="inactiveUsers.length === 0" class="p-8 text-center text-neutral-500 dark:text-neutral-400">
           該当する部員はいません。全員活動中です！
         </div>
 
@@ -27,14 +27,14 @@
           <div
             v-for="user in inactiveUsers"
             :key="user.id"
-            class="flex items-center gap-3 p-4 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-colors cursor-pointer"
+            class="flex items-center gap-3 p-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors cursor-pointer"
             @click="$router.push(`/admin/users/${user.id}`)">
             <img :src="user.imageUrl" alt="" class="w-10 h-10 rounded-full bg-neutral-200 object-cover" />
             <div class="flex-1 min-w-0">
               <div class="font-medium text-neutral-900 dark:text-neutral-100 truncate">
                 {{ user.lastName }} {{ user.firstName }}
               </div>
-              <div class="text-xs text-neutral-500 truncate">
+              <div class="text-xs text-neutral-500 dark:text-neutral-400 truncate">
                 {{ user.profile.roleLabel }}
               </div>
             </div>
