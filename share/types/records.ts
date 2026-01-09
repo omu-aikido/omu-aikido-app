@@ -58,4 +58,3 @@ export type PracticeCountData = {
   totalPeriod: number
   since: string
 }
-

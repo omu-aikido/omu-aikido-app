@@ -108,43 +108,38 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue"
+import { ref, computed } from "vue"
+import { useQuery } from "@tanstack/vue-query"
+import { queryKeys } from "@/src/lib/queryKeys"
 import hc from "@/src/lib/honoClient"
 import Loading from "@/src/components/ui/Loading.vue"
 import AdminMenu from "@/src/components/admin/AdminMenu.vue"
-import type { AdminUserType } from "@/share/types/admin"
 
-const users = ref<AdminUserType[]>([])
-const loading = ref(false)
-const error = ref("")
+
 const searchQuery = ref("")
 const sortBy = ref<string>("role")
 const sortOrder = ref<"asc" | "desc">("asc")
 
-const fetchAccounts = async () => {
-  loading.value = true
-  error.value = ""
-  try {
+const {
+  data,
+  isLoading: loading,
+  error: queryError,
+} = useQuery({
+  queryKey: computed(() => queryKeys.admin.accounts({ query: { query: searchQuery.value, limit: 50 } })),
+  queryFn: async () => {
     const res = await hc.admin.accounts.$get({
       query: { query: searchQuery.value, limit: 50 },
     })
+    if (!res.ok) throw new Error("Failed to fetch accounts")
+    return res.json()
+  },
+})
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch accounts")
-    }
-
-    const data = await res.json()
-    users.value = data.users
-  } catch (e) {
-    console.error(e)
-    error.value = "データの取得に失敗しました"
-  } finally {
-    loading.value = false
-  }
-}
+const users = computed(() => data.value?.users ?? [])
+const error = computed(() => (queryError.value ? "データの取得に失敗しました" : ""))
 
 const handleSearch = () => {
-  fetchAccounts()
+  // Triggered by v-model update or enter key, causing query key change
 }
 
 const toggleSort = (field: string) => {
@@ -186,9 +181,5 @@ const sortedUsers = computed(() => {
     if (valA > valB) return sortOrder.value === "asc" ? 1 : -1
     return 0
   })
-})
-
-onMounted(() => {
-  fetchAccounts()
 })
 </script>

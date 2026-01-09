@@ -2,9 +2,10 @@ import type { Context } from 'hono'
 
 import * as drizzleOrm from 'drizzle-orm'
 
+import type { RankingEntry } from '@/share/types/records'
+
 import { dbClient } from '@/server/db/drizzle'
 import { activity } from '@/server/db/schema'
-import type { RankingEntry } from '@/share/types/records'
 
 const CACHE_TTL = 300 // 5 minutes
 
@@ -120,4 +121,28 @@ export const maskRankingData = (rawData: RawRankingEntry[], currentUserId: strin
       practiceCount: Math.floor(entry.totalPeriod / 1.5),
     }
   })
+}
+
+export const invalidateRankingCache = async (dateStr: string) => {
+  const date = new Date(dateStr)
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const keys: string[] = []
+
+  // Monthly
+  const monthly = calculatePeriodRange({ year, month, period: 'monthly' })
+  keys.push(buildCacheKey(monthly.startDate, monthly.endDate))
+
+  // Annual
+  const annual = calculatePeriodRange({ year, month, period: 'annual' })
+  keys.push(buildCacheKey(annual.startDate, annual.endDate))
+
+  // Fiscal
+  // Fiscal year starts in April. If month is Jan-Mar, fiscal year is previous year.
+  const fiscalYear = month < 4 ? year - 1 : year
+  const fiscal = calculatePeriodRange({ year: fiscalYear, month, period: 'fiscal' })
+  keys.push(buildCacheKey(fiscal.startDate, fiscal.endDate))
+
+  const cache = (caches as unknown as { default: Cache }).default
+  await Promise.all(keys.map((key) => cache.delete(key)))
 }

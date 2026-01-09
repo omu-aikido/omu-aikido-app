@@ -7,7 +7,7 @@ import { dbClient } from '@/server/db/drizzle'
 import { activity } from '@/server/db/schema'
 import * as records from '@/share/types/records'
 
-import { calculatePeriodRange, getRankingData, maskRankingData } from './ranking'
+import { calculatePeriodRange, getRankingData, invalidateRankingCache, maskRankingData } from './ranking'
 
 export const record = new Hono<{ Bindings: Env }>()
   // GET /api/user/record - 活動記録一覧取得
@@ -71,6 +71,8 @@ export const record = new Hono<{ Bindings: Env }>()
         updatedAt: now,
       })
 
+      c.executionCtx.waitUntil(invalidateRankingCache(body.date))
+
       return c.json({ success: true }, 201)
     }
   )
@@ -91,9 +93,13 @@ export const record = new Hono<{ Bindings: Env }>()
       const body = c.req.valid('json')
       const db = dbClient(c.env)
 
-      await db
+      const deleted = await db
         .delete(activity)
         .where(drizzleOrm.and(drizzleOrm.inArray(activity.id, body.ids), drizzleOrm.eq(activity.userId, auth.userId)))
+        .returning({ date: activity.date })
+
+      const deletedDates = [...new Set(deleted.map((d) => d.date))]
+      c.executionCtx.waitUntil(Promise.all(deletedDates.map((date) => invalidateRankingCache(date))))
 
       return c.json({ success: true }, 200)
     }
