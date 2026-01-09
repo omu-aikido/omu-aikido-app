@@ -10,7 +10,7 @@ services:
       - TURSO_AUTH_TOKEN=dev-token
     depends_on:
       - libsql-server
-    command: sh -c "TURSO_DATABASE_URL=http://libsql-server:8080; pnpm db:push && pnpm dev --host"
+    command: sh -c "pnpm db:migrate && if [ \"$MODE\" = 'preview' ]; then pnpm preview --ip 0.0.0.0 --port 5173; else pnpm dev --host; fi"
 
   libsql-server:
     image: ghcr.io/tursodatabase/libsql-server:latest

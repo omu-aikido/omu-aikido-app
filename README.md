@@ -38,10 +38,10 @@ pnpm dev
 ```sh
 # 全サービスを起動（libSQL + アプリ）
 docker-compose up
-```
 
-> [!NOTE]
-> Docker Composeでは`.env`の`TURSO_DATABASE_URL`は`http://libsql-server:8080`に上書きされます。
+# Wranglerを使用してアプリサービスを起動（libSQL + アプリ）
+MODE=preview docker-compose up
+```
 
 ## Scripts
 
