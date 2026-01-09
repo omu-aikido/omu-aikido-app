@@ -16,13 +16,11 @@ export const getProfile = async (c: Context) => {
 
   const cacheKey = `profile:${auth.userId}`
 
-  // Try to get from KV cache
   const cached = (await c.env.KV.get(cacheKey, 'json')) as CachedProfile | null
   if (cached) {
     return cached
   }
 
-  // Cache miss - fetch from Clerk
   const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
   const user = await clerkClient.users.getUser(auth.userId)
 
@@ -30,7 +28,6 @@ export const getProfile = async (c: Context) => {
   const profile = AccountMetadata(user.publicMetadata)
   if (profile instanceof ArkErrors) return null
 
-  // Store only profile data in KV cache
   await c.env.KV.put(cacheKey, JSON.stringify(profile), {
     expirationTtl: CACHE_TTL,
   })
@@ -41,7 +38,6 @@ export const getUser = async (c: Context) => {
   const auth = getAuth(c)
   if (!auth || !auth.userId) return null
 
-  // No caching for full user data - fetch directly from Clerk
   const clerkClient = createClerkClient({ secretKey: c.env.CLERK_SECRET_KEY })
   const user = await clerkClient.users.getUser(auth.userId)
 
@@ -60,9 +56,10 @@ export const patchProfile = async (c: Context, data: typeof AccountMetadata.infe
   try {
     const updatedUser = await clerkClient.users.updateUserMetadata(auth.userId, { publicMetadata: { ...validated } })
 
-    // Invalidate profile cache after update
     const cacheKey = `profile:${auth.userId}`
-    await c.env.KV.delete(cacheKey)
+    await c.env.KV.put(cacheKey, JSON.stringify(validated), {
+      expirationTtl: CACHE_TTL,
+    })
 
     return updatedUser
   } catch {
