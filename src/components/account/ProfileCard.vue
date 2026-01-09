@@ -218,7 +218,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from "vue"
+import { ref, reactive, computed, watch } from "vue"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/vue-query"
+import { queryKeys } from "@/src/lib/queryKeys"
 
 import {
   Listbox,
@@ -234,7 +236,7 @@ import { ArkErrors } from "arktype"
 import { translateGrade, grade } from "@/share/lib/grade"
 import { translateYear, year } from "@/share/lib/year"
 
-type Metadata = typeof AccountMetadata.infer
+
 
 interface FormData {
   grade: number
@@ -243,12 +245,9 @@ interface FormData {
   year: `b${number}` | `m${number}` | `d${number}`
 }
 
-const $profile = hc.user.clerk.profile.$get
-const $updateProfile = hc.user.clerk.profile.$patch
+const queryClient = useQueryClient()
 
-const profile = ref<Metadata | null>(null)
 const isEditing = ref(false)
-const isSubmitting = ref(false)
 const message = ref("")
 const isError = ref(false)
 const gradeOptions = grade
@@ -267,29 +266,36 @@ const messageClass = computed(() =>
     : "text-green-600 dark:text-green-400"
 )
 
-
-
-async function fetchProfile() {
-  try {
-    const res = await $profile()
-    if (!res.ok) {
-      console.error("Failed to fetch profile")
-      return
-    }
+// Query
+const { data: profileData } = useQuery({
+  queryKey: queryKeys.user.clerk.profile(),
+  queryFn: async () => {
+    const res = await hc.user.clerk.profile.$get()
+    if (!res.ok) throw new Error("Failed to fetch profile")
     const data = await res.json()
     if (data.profile) {
       const profileParsed = AccountMetadata(data.profile)
       if (profileParsed instanceof ArkErrors) {
         console.error(profileParsed)
-        return
+        throw new Error("Invalid profile data")
       }
-      profile.value = profileParsed
-      updateFormData()
+      return profileParsed
     }
-  } catch (error) {
-    console.error("Error fetching profile:", error)
+    return null
+  },
+})
+
+const profile = computed(() => profileData.value ?? null)
+
+// Sync form data
+watch(profile, (newProfile) => {
+  if (newProfile) {
+    formData.grade = Number(newProfile.grade) || 0
+    formData.getGradeAt = newProfile.getGradeAt || ""
+    formData.joinedAt = Number(newProfile.joinedAt) || new Date().getFullYear()
+    formData.year = newProfile.year || "b1"
   }
-}
+}, { immediate: true })
 
 function updateFormData() {
   if (profile.value) {
@@ -301,11 +307,40 @@ function updateFormData() {
   }
 }
 
+// Mutation
+const { mutateAsync: updateProfile, isPending: isSubmitting } = useMutation({
+  mutationFn: async (json: any) => {
+    const res = await hc.user.clerk.profile.$patch({ json })
+    if (!res.ok) throw new Error("プロフィールの更新に失敗しました")
+    return res.json()
+  },
+  onSuccess: (responseData) => {
+    if (responseData.profile) {
+      const validatedProfile = AccountMetadata({
+         role: responseData.profile.role,
+         grade: responseData.profile.grade,
+         getGradeAt: responseData.profile.getGradeAt,
+         joinedAt: responseData.profile.joinedAt,
+         year: responseData.profile.year,
+      })
+      if (validatedProfile instanceof ArkErrors) {
+         console.error(validatedProfile)
+         // Not throwing here to avoid breaking UI, but logging
+      }
+    }
+    queryClient.invalidateQueries({ queryKey: queryKeys.user.clerk.profile() })
+    message.value = "プロフィールを更新しました"
+    isEditing.value = false
+  },
+  onError: (error) => {
+    isError.value = true
+    message.value = error instanceof Error ? error.message : "プロフィールの更新に失敗しました"
+  }
+})
+
 async function handleSubmit() {
-  isSubmitting.value = true
   message.value = ""
   isError.value = false
-
   try {
     const getGradeAtValue = (formData.getGradeAt || null) as
       | `${number}-${number}-${number}`
@@ -318,41 +353,9 @@ async function handleSubmit() {
       year: formData.year as `b${number}` | `m${number}` | `d${number}`,
     }
 
-    const res = await $updateProfile({ json: updateData })
-
-    if (!res.ok) {
-      throw new Error("プロフィールの更新に失敗しました")
-    }
-
-    const responseData = await res.json()
-    if (responseData.profile) {
-      const validatedProfile = AccountMetadata({
-        role: responseData.profile.role,
-        grade: responseData.profile.grade,
-        getGradeAt: responseData.profile.getGradeAt,
-        joinedAt: responseData.profile.joinedAt,
-        year: responseData.profile.year,
-      })
-
-      if (validatedProfile instanceof ArkErrors) {
-        throw new TypeError(
-          "サーバーから無効なプロフィールデータが返されました"
-        )
-      }
-
-      profile.value = validatedProfile
-    }
-
-    message.value = "プロフィールを更新しました"
-    isEditing.value = false
-  } catch (error) {
-    isError.value = true
-    message.value =
-      error instanceof Error
-        ? error.message
-        : "プロフィールの更新に失敗しました"
-  } finally {
-    isSubmitting.value = false
+    await updateProfile(updateData)
+  } catch {
+    // handled in onError
   }
 }
 
@@ -361,6 +364,4 @@ function cancelEdit() {
   isEditing.value = false
   message.value = ""
 }
-
-onMounted(fetchProfile)
 </script>

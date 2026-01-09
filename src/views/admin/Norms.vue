@@ -99,47 +99,48 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue"
+import { ref, computed } from "vue"
+import { useQuery } from "@tanstack/vue-query"
+import { queryKeys } from "@/src/lib/queryKeys"
 import hc from "@/src/lib/honoClient"
 import Loading from "@/src/components/ui/Loading.vue"
 import NormCard from "@/src/components/admin/NormCard.vue"
 import AdminMenu from "@/src/components/admin/AdminMenu.vue"
-import type { AdminUserType } from "@/share/types/admin"
-import type { InferResponseType } from "hono/client"
 
-type NormsRes = InferResponseType<typeof hc.admin.norms.$get>
-type NormItem = Extract<NormsRes, { norms: unknown }>["norms"][number]
 
-const users = ref<AdminUserType[]>([])
-const norms = ref<NormItem[]>([])
-const loading = ref(false)
-const error = ref("")
 const searchTerm = ref("")
 const filterStatus = ref<"all" | "met" | "unmet">("all")
 const sortOrder = ref<"asc" | "desc">("desc")
 
-const fetchNorms = async () => {
-  loading.value = true
-  error.value = ""
-  try {
+const {
+  data,
+  isLoading: loading,
+  error: queryError,
+} = useQuery({
+  queryKey: computed(() => queryKeys.admin.norms({ query: { query: searchTerm.value, limit: 100 } })),
+  queryFn: async () => {
     const res = await hc.admin.norms.$get({
       query: { query: searchTerm.value, limit: 100 },
     })
-
     if (!res.ok) throw new Error("Failed to fetch norms")
+    return res.json()
+  },
+})
 
-    const data = await res.json()
-    if ("norms" in data) {
-      users.value = data.users
-      norms.value = data.norms
-    }
-  } catch (e) {
-    console.error(e)
-    error.value = "データの取得に失敗しました"
-  } finally {
-    loading.value = false
-  }
-}
+const users = computed(() => {
+  if (!data.value || !('users' in data.value)) return []
+  return data.value.users
+})
+
+const norms = computed(() => {
+  if (!data.value || !('norms' in data.value)) return []
+  return data.value.norms
+})
+
+const error = computed(() => (queryError.value ? "データの取得に失敗しました" : ""))
+
+// Reactivity handled by queryKey
+// const fetchNorms = ... removed
 
 const processedData = computed(() => {
   return users.value
@@ -180,9 +181,5 @@ const filteredUsers = computed(() => {
   })
 
   return result
-})
-
-onMounted(() => {
-  fetchNorms()
 })
 </script>

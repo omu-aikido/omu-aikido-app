@@ -1,80 +1,61 @@
-import type { Ref } from 'vue'
+import type { InferRequestType } from 'hono/client'
 
-import { ref, readonly } from 'vue'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, type Ref } from 'vue'
 
-import hc from '@/src/lib/honoClient'
 import type { Activity } from '@/share/types/records'
 
-interface ActivityFilters {
-  startDate?: string
-  endDate?: string
+import hc from '@/src/lib/honoClient'
+import { queryKeys } from '@/src/lib/queryKeys'
+
+type RecordQuery = InferRequestType<typeof hc.user.record.$get>['query']
+
+export function useActivities(filters: Ref<RecordQuery | undefined>) {
+  return useQuery({
+    queryKey: computed(() => queryKeys.user.record({ query: filters.value ?? {} })),
+    queryFn: async () => {
+      const query = filters.value || {}
+      const res = await hc.user.record.$get({ query })
+      if (!res.ok) throw new Error('Failed to fetch activities')
+      const data = await res.json()
+      return data.activities as Activity[]
+    },
+  })
 }
 
-export function useActivity() {
-  const activities: Ref<Activity[]> = ref([])
-  const loading = ref(false)
-  const error = ref<string | null>(null)
+export function useAddActivity() {
+  const queryClient = useQueryClient()
 
-  const fetchActivities = async (filters?: ActivityFilters) => {
-    loading.value = true
-    error.value = null
-    try {
-      const query: { userId?: string; startDate?: string; endDate?: string } = {}
-      if (filters?.startDate) query.startDate = filters.startDate
-      if (filters?.endDate) query.endDate = filters.endDate
-
-      const response = await hc.user.record.$get({ query })
-      if (!response.ok) throw new Error('Failed to fetch activities')
-      const data = await response.json()
-      activities.value = data.activities
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error'
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const addActivity = async (date: string, period: number) => {
-    loading.value = true
-    error.value = null
-    try {
-      const json: { date: string; period: number } = { date, period }
-
-      const response = await hc.user.record.$post({ json })
-      if (!response.ok) {
-        const { error } = await response.json()
-        throw new Error(`Failed to add activity: ${error}`)
+  return useMutation({
+    mutationFn: async ({ date, period }: { date: string; period: number }) => {
+      const res = await hc.user.record.$post({ json: { date, period } })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(`Failed to add activity: ${data.error}`)
       }
-      await fetchActivities()
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error'
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user', 'record'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.record.count() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.record.ranking() })
+    },
+  })
+}
 
-  const deleteActivity = async (ids: string[]) => {
-    loading.value = true
-    error.value = null
-    try {
-      const response = await hc.user.record.$delete({ json: { ids } })
-      if (!response.ok) throw new Error('Failed to delete activities')
-      await fetchActivities()
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error'
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
+export function useDeleteActivity() {
+  const queryClient = useQueryClient()
 
-  return {
-    activities: readonly(activities),
-    loading: readonly(loading),
-    error: readonly(error),
-    fetchActivities,
-    addActivity,
-    deleteActivity,
-  }
+  return useMutation({
+    mutationFn: async (ids: string[]) => {
+      const res = await hc.user.record.$delete({ json: { ids } })
+      if (!res.ok) throw new Error('Failed to delete activities')
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user', 'record'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.record.count() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.record.ranking() })
+    },
+  })
 }

@@ -337,13 +337,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, computed, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/vue-query"
+import { queryKeys } from "@/src/lib/queryKeys"
 import hc from "@/src/lib/honoClient"
 import Loading from "@/src/components/ui/Loading.vue"
 import MessageDisplay from "@/src/components/common/MessageDisplay.vue"
 import AdminMenu from "@/src/components/admin/AdminMenu.vue"
-import type { AdminUserType } from "@/share/types/admin"
 
 const route = useRoute()
 const router = useRouter()
@@ -384,19 +385,46 @@ const yearLabels: Record<string, string> = {
   d2: "博士2年",
 }
 
-const user = ref<AdminUserType | null>(null)
-const activities = ref<{ id: string; date: string; period: number }[]>([])
-const stats = ref<{
-  trainCount: number
-  doneTrain: number
-  totalDays: number
-  totalHours: number
-  totalActivitiesCount: number
-} | null>(null)
-const loading = ref(false)
-const error = ref("")
+// Reactivity via standard refs
 const page = ref(1)
 const limit = 10
+const queryClient = useQueryClient()
+
+// Query
+const {
+  data: apiData,
+  isLoading: loading,
+  error: queryError,
+} = useQuery({
+  queryKey: computed(() => queryKeys.admin.users(userId, { page: page.value, limit })),
+  queryFn: async () => {
+    if (!userId) throw new Error("Invalid User ID")
+    const res = await hc.admin.users[":userId"].$get({
+      param: { userId },
+      query: { page: page.value, limit },
+    })
+    if (!res.ok) throw new Error("Failed to fetch user data")
+    return res.json()
+  },
+  placeholderData: (previousData) => previousData, // Keep data while fetching new page
+})
+
+const user = computed(() => apiData.value?.user ?? null)
+const activities = computed(() => (apiData.value?.activities as any[]) ?? [])
+const stats = computed(() => {
+  if (!apiData.value) return null
+  return {
+    trainCount: apiData.value.trainCount,
+    doneTrain: apiData.value.doneTrain,
+    totalDays: apiData.value.totalDays,
+    totalHours: apiData.value.totalHours,
+    totalActivitiesCount: apiData.value.totalActivitiesCount,
+  }
+})
+
+const error = computed(() =>
+  queryError.value ? "ユーザー情報の読み込みに失敗しました" : ""
+)
 
 // Edit form state
 const formData = ref({
@@ -406,7 +434,6 @@ const formData = ref({
   joinedAt: new Date().getFullYear(),
   getGradeAt: "",
 })
-const updating = ref(false)
 const updateSuccess = ref("")
 const updateError = ref("")
 const isEditing = ref(false)
@@ -415,77 +442,23 @@ const isEditing = ref(false)
 const showDeleteConfirm = ref(false)
 const showFinalConfirm = ref(false)
 const deleteConfirmName = ref("")
-const deleting = ref(false)
 const deleteError = ref("")
 
-const startEditing = () => {
-  isEditing.value = true
-  updateSuccess.value = ""
-  updateError.value = ""
-  // Reset form data to current user state just in case
-  if (user.value && user.value.profile) {
-    formData.value = {
-      role: (user.value.profile.role as string) || "member",
-      grade: Number(user.value.profile.grade || 0),
-      year: (user.value.profile.year as string) || "b1",
-      joinedAt: Number(user.value.profile.joinedAt || new Date().getFullYear()),
-      getGradeAt: user.value.profile.getGradeAt
-        ? new Date(user.value.profile.getGradeAt).toISOString().split("T")[0]!
-        : "",
-    }
-  }
-}
-
-const cancelEditing = () => {
-  isEditing.value = false
-  updateSuccess.value = ""
-  updateError.value = ""
-}
-
-const fetchData = async () => {
-  loading.value = true
-  error.value = ""
-  if (!userId) {
-    error.value = "ユーザーIDが無効です"
-    loading.value = false
-    return
-  }
-  try {
-    const res = await hc.admin.users[":userId"].$get({
-      param: { userId },
-      query: { page: page.value, limit },
-    })
-
-    if (!res.ok) throw new Error("Failed to fetch user data")
-
-    const data = await res.json()
-    user.value = data.user
-    activities.value = data.activities as {
-      id: string
-      date: string
-      period: number
-    }[]
-    stats.value = {
-      trainCount: data.trainCount,
-      doneTrain: data.doneTrain,
-      totalDays: data.totalDays,
-      totalHours: data.totalHours,
-      totalActivitiesCount: data.totalActivitiesCount,
-    }
-
-    // Initialize form data
-    if (data.profile) {
+// Initialize form data when data arrives or changes
+watch(
+  user,
+  (newUser) => {
+    if (newUser && newUser.profile) {
       formData.value = {
-        role: (data.profile.role as string) || "member",
-        grade: Number(data.profile.grade || 0),
-        year: (data.profile.year as string) || "b1",
-        joinedAt: Number(data.profile.joinedAt || new Date().getFullYear()),
-        getGradeAt: data.profile.getGradeAt
-          ? new Date(data.profile.getGradeAt).toISOString().split("T")[0]!
+        role: (newUser.profile.role as string) || "member",
+        grade: Number(newUser.profile.grade || 0),
+        year: (newUser.profile.year as string) || "b1",
+        joinedAt: Number(newUser.profile.joinedAt || new Date().getFullYear()),
+        getGradeAt: newUser.profile.getGradeAt
+          ? new Date(newUser.profile.getGradeAt).toISOString().split("T")[0]!
           : "",
       }
     } else {
-      // Default if no profile
       formData.value = {
         role: "member",
         grade: 0,
@@ -494,87 +467,102 @@ const fetchData = async () => {
         getGradeAt: "",
       }
     }
-  } catch (e) {
-    console.error(e)
-    error.value = "ユーザー情報の読み込みに失敗しました"
-  } finally {
-    loading.value = false
-  }
+  },
+  { immediate: true }
+)
+
+const startEditing = () => {
+  isEditing.value = true
+  updateSuccess.value = ""
+  updateError.value = ""
+  // Form data is already synced via watch or we can reset it here if needed
+  // ... (keeping reset logic implies we trust user.value is fresh)
+}
+
+const cancelEditing = () => {
+  isEditing.value = false
+  updateSuccess.value = ""
+  updateError.value = ""
 }
 
 const changePage = (newPage: number) => {
   page.value = newPage
-  fetchData() // Simplest way, though better to just fetch activities
+  // Auto-refetch via reactive queryKey
 }
 
+// Mutations
+const { mutateAsync: updateProfile, isPending: updating } = useMutation({
+  mutationFn: async (payload: any) => {
+    const res = await hc.admin.users[":userId"].profile.$patch({
+      param: { userId },
+      json: payload,
+    })
+    if (!res.ok) {
+      const errData = (await res.json()) as { error?: string }
+      throw new Error(errData.error || "更新に失敗しました")
+    }
+    return res.json()
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.admin.users(userId), // Invalidate all pages
+    })
+    updateSuccess.value = "プロファイルを更新しました"
+    isEditing.value = false
+  },
+  onError: (e) => {
+    updateError.value = e instanceof Error ? e.message : "更新中にエラーが発生しました"
+  },
+})
+
 const handleUpdateProfile = async () => {
-  updating.value = true
   updateError.value = ""
   updateSuccess.value = ""
 
   if (!userId) {
     updateError.value = "ユーザーIDが無効です"
-    updating.value = false
     return
   }
 
+  const payload = {
+    role: formData.value.role,
+    grade: formData.value.grade,
+    year: formData.value.year,
+    joinedAt: formData.value.joinedAt,
+    getGradeAt: formData.value.getGradeAt ? formData.value.getGradeAt : null,
+  }
+
   try {
-    const payload = {
-      role: formData.value.role,
-      grade: formData.value.grade,
-      year: formData.value.year,
-      joinedAt: formData.value.joinedAt,
-      getGradeAt: formData.value.getGradeAt ? formData.value.getGradeAt : null,
-    }
-
-    const res = await hc.admin.users[":userId"].profile.$patch({
-      param: { userId },
-      json: payload,
-    })
-
-    if (!res.ok) {
-      const errData = (await res.json()) as { error?: string }
-      throw new Error(errData.error || "更新に失敗しました")
-    }
-
-    updateSuccess.value = "プロファイルを更新しました"
-    isEditing.value = false
-    // Optionally refetch or rely on reactive update if backend returned updated data
-    fetchData() // Refresh data to update view mode
-  } catch (e) {
-    console.error(e)
-    updateError.value =
-      e instanceof Error ? e.message : "更新中にエラーが発生しました"
-  } finally {
-    updating.value = false
+    await updateProfile(payload)
+  } catch {
+    // Error handled in onError
   }
 }
 
-const handleDeleteUser = async () => {
-  deleting.value = true
-  deleteError.value = ""
-
-  try {
+const { mutateAsync: deleteUserMutation, isPending: deleting } = useMutation({
+  mutationFn: async () => {
     const res = await hc.admin.users[":userId"].$delete({ param: { userId } })
-
     if (!res.ok) {
       const errData = (await res.json()) as { error?: string }
       throw new Error(errData.error || "削除に失敗しました")
     }
-
-    // Redirect to accounts list
+    return res.json()
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.accounts() })
     router.push("/admin/accounts")
-  } catch (e) {
-    console.error(e)
-    deleteError.value =
-      e instanceof Error ? e.message : "削除中にエラーが発生しました"
-  } finally {
-    deleting.value = false
+  },
+  onError: (e) => {
+    deleteError.value = e instanceof Error ? e.message : "削除中にエラーが発生しました"
+  },
+})
+
+const handleDeleteUser = async () => {
+  deleteError.value = ""
+  try {
+    await deleteUserMutation()
+  } catch {
+    // Error handled in onError
   }
 }
-
-onMounted(() => {
-  if (userId) fetchData()
-  else error.value = "ユーザーIDが指定されていません"
-})
 </script>

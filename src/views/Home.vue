@@ -1,49 +1,28 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { computed, ref } from "vue"
 import { SignedIn } from "@clerk/vue"
 import { ClipboardListIcon, UserIcon, SettingsIcon } from "lucide-vue-next"
 
 import PracticeCountGraph from "@/src/components/home/PracticeCountGraph.vue"
 import PracticeRanking from "@/src/components/home/PracticeRanking.vue"
 import ActivityForm from "@/src/components/record/ActivityForm.vue"
-import { useActivity } from "@/src/composable/useActivity"
+import { useAddActivity } from "@/src/composable/useActivity"
 import hc from "@/src/lib/honoClient"
-import type { PracticeCountData, RankingResponse } from "@/share/types/records"
+import { queryKeys } from "@/src/lib/queryKeys"
+import { useQuery, useQueryClient } from "@tanstack/vue-query"
+import type { InferResponseType } from "hono/client"
 
 // Types
+type ProfileResponse = InferResponseType<typeof hc.user.clerk.profile.$get, 200>
+type PracticeCountResponse = InferResponseType<typeof hc.user.record.count.$get, 200>
+type RankingResponse = InferResponseType<typeof hc.user.record.ranking.$get, 200>
+type MenuResponse = InferResponseType<typeof hc.user.clerk.menu.$get, 200>
 
-interface UserProfile {
-  profile: {
-    id: string
-    role: string
-    grade: number
-    getGradeAt: string | null | ""
-    joinedAt: number
-    year: string
-  }
-}
-
-interface MenuItem {
-  id: string
-  title: string
-  href: string
-  icon: string
-  theme: string
-}
-
-const { addActivity } = useActivity()
+const { mutateAsync: addActivity } = useAddActivity()
+const queryClient = useQueryClient()
 
 // State
-const countLoading = ref(true)
-const rankingLoading = ref(true)
-const activityLoading = ref(false) // Helper for activity submission loading state
-const error = ref<string | null>(null)
-const rankingError = ref<string | null>(null)
-
-const practiceData = ref<PracticeCountData | null>(null)
-const currentGrade = ref(0)
-const rankingData = ref<RankingResponse | null>(null)
-const menuItems = ref<MenuItem[]>([])
+const activityLoading = ref(false)
 
 const iconMap = {
   "clipboard-list": ClipboardListIcon,
@@ -51,81 +30,84 @@ const iconMap = {
   settings: SettingsIcon,
 }
 
-// Independent Fetch Functions
-const fetchProfileAndCount = async () => {
-  countLoading.value = true
-  try {
-    const [profileRes, countRes] = await Promise.all([
-      hc.user.clerk.profile.$get(),
-      hc.user.record.count.$get(),
-    ])
+// Queries
+const { data: profileData } = useQuery({
+  queryKey: queryKeys.user.clerk.profile(),
+  queryFn: async () => {
+    const res = await hc.user.clerk.profile.$get()
+    if (!res.ok) throw new Error("Failed to fetch profile")
+    return res.json() as Promise<ProfileResponse>
+  },
+})
 
-    if (!profileRes.ok || !countRes.ok)
-      throw new Error("Failed to fetch profile/count data")
+const {
+  data: practiceDataRaw,
+  isLoading: countLoading,
+  error: validationError,
+} = useQuery({
+  queryKey: queryKeys.user.record.count(),
+  queryFn: async () => {
+    const res = await hc.user.record.count.$get()
+    if (!res.ok) throw new Error("Failed to fetch practice count")
+    return res.json() as Promise<PracticeCountResponse>
+  },
+})
 
-    const profileData = (await profileRes.json()) as UserProfile
-    const countData = await countRes.json()
+const practiceData = computed(() => practiceDataRaw.value ?? null)
 
-    currentGrade.value = profileData.profile.grade
-    practiceData.value = countData
-  } catch (err) {
-    console.error("Fetch Profile/Count Error:", err)
-    error.value = "稽古データの取得に失敗しました"
-  } finally {
-    countLoading.value = false
-  }
-}
+// Error handling wrapper for template compatibility
+const error = computed(() =>
+  validationError.value ? "稽古データの取得に失敗しました" : null,
+)
 
-const fetchRanking = async () => {
-  rankingLoading.value = true
-  rankingError.value = null
-  try {
+const currentGrade = computed(() => {
+  if (!profileData.value || !('profile' in profileData.value)) return 0
+  return profileData.value.profile.grade ?? 0
+})
+
+const {
+  data: rankingDataRaw,
+  isLoading: rankingLoading,
+  //  error: rankingErrorObj,
+} = useQuery({
+  queryKey: queryKeys.user.record.ranking(),
+  queryFn: async () => {
     const res = await hc.user.record.ranking.$get({ query: {} })
-    if (!res.ok) throw new Error("Failed to fetch ranking data")
+    if (!res.ok) throw new Error("Failed to fetch ranking")
+    return res.json() as Promise<RankingResponse>
+  },
+})
 
-    const data = (await res.json()) as RankingResponse
-    rankingData.value = data
-  } catch (err) {
-    console.error("Fetch Ranking Error:", err)
-    rankingError.value = "ランキングの取得に失敗しました"
-  } finally {
-    rankingLoading.value = false
-  }
-}
+const rankingData = computed(() => rankingDataRaw.value ?? null)
 
-const fetchMenu = async () => {
-  try {
+/*
+const rankingError = computed(() =>
+  rankingErrorObj.value ? "ランキングの取得に失敗しました" : null
+)
+*/
+
+const { data: menuData } = useQuery({
+  queryKey: queryKeys.user.clerk.menu(),
+  queryFn: async () => {
     const res = await hc.user.clerk.menu.$get()
-    if (res.ok) {
-      const data = await res.json()
-      menuItems.value = data.menu
-    }
-  } catch (err) {
-    console.error("Failed to fetch menu", err)
-  }
-}
+    if (!res.ok) throw new Error("Failed to fetch menu")
+    return res.json() as Promise<MenuResponse>
+  },
+})
 
-// Fetch All Staggered
-const fetchData = async () => {
-  error.value = null // Reset error
-
-  // 1. Critical Data (Progress Graph)
-  // We await this so it gets full bandwidth/priority
-  await fetchProfileAndCount()
-
-  // 2. Secondary Data (Ranking, Menu)
-  // Fire these in parallel after critical data is loaded
-  fetchRanking()
-  fetchMenu()
-}
+const menuItems = computed(() => menuData.value?.menu ?? [])
 
 const handleAddActivity = async (date: string, period: number) => {
   activityLoading.value = true
-  await addActivity(date, period)
-  // Re-fetch data relevant to updates
-  fetchProfileAndCount()
-  fetchRanking()
-  activityLoading.value = false
+  try {
+    await addActivity({ date, period })
+    // Re-fetch data relevant to updates
+    queryClient.invalidateQueries({ queryKey: queryKeys.user.clerk.profile() })
+    queryClient.invalidateQueries({ queryKey: queryKeys.user.record.count() })
+    queryClient.invalidateQueries({ queryKey: queryKeys.user.record.ranking() })
+  } finally {
+    activityLoading.value = false
+  }
 }
 
 const getIconBgClass = (theme: string) => {
@@ -160,10 +142,6 @@ const getTextHoverClass = (theme: string) => {
       return ""
   }
 }
-
-onMounted(() => {
-  fetchData()
-})
 </script>
 
 <template>

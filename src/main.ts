@@ -1,4 +1,5 @@
 import { clerkPlugin } from '@clerk/vue'
+import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
 import { createApp } from 'vue'
 
 import App from './App.vue'
@@ -13,10 +14,21 @@ if (!PUBLISHABLE_KEY) {
 
 const app = createApp(App)
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60, // 1 minute
+      gcTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
+
 app.use(clerkPlugin, { publishableKey: PUBLISHABLE_KEY })
+app.use(VueQueryPlugin, { queryClient })
 
 app.use(router)
-
 ;(async () => {
   try {
     await initAuthState()

@@ -26,8 +26,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from "vue"
-import type { InferResponseType } from "hono/client"
+import { computed } from "vue"
+import { useQuery } from "@tanstack/vue-query"
+import { queryKeys } from "@/src/lib/queryKeys"
 import hc from "@/src/lib/honoClient"
 import UserHeader from "@/src/components/account/UserHeader.vue"
 import MessageDisplay from "@/src/components/common/MessageDisplay.vue"
@@ -35,26 +36,25 @@ import ProfileCard from "@/src/components/account/ProfileCard.vue"
 
 import { ArrowUpRightFromSquareIcon } from "lucide-vue-next"
 
-const $account = hc.user.clerk.account.$get
-type AccountRes = InferResponseType<typeof $account>
+// Queries
+const {
+  data: userData,
+  error: queryError,
+  refetch,
+} = useQuery({
+  queryKey: queryKeys.user.clerk.account(),
+  queryFn: async () => {
+    const res = await hc.user.clerk.account.$get()
+    if (!res.ok) throw new Error("Failed to fetch user")
+    return res.json()
+  },
+})
 
-const user: Ref<AccountRes | null> = ref(null)
-const errorMessage = ref("")
-const successMessage = ref("")
+const user = computed(() => userData.value ?? null)
+const errorMessage = computed(() =>
+  queryError.value ? "ユーザーデータの読み込みに失敗しました" : ""
+)
+const successMessage = computed(() => "") // Or handle success message if needed
 
-async function fetchUser() {
-  try {
-    const res = await $account()
-    if (!res.ok) {
-      console.error("Failed to fetch user")
-      return
-    }
-    user.value = await res.json()
-  } catch (error) {
-    console.error("Error loading user data:", error)
-    errorMessage.value = "ユーザーデータの読み込みに失敗しました"
-  }
-}
-
-onMounted(fetchUser)
+const fetchUser = () => refetch() // Keep for compatibility if needed, or remove usage from UserHeader event
 </script>

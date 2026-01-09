@@ -50,36 +50,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { computed } from "vue"
+import { useQuery } from "@tanstack/vue-query"
+import { queryKeys } from "@/src/lib/queryKeys"
 import hc from "@/src/lib/honoClient"
 import Loading from "@/src/components/ui/Loading.vue"
 import AdminMenu from "@/src/components/admin/AdminMenu.vue"
-import type { AdminUserType } from "@/share/types/admin"
 
-const inactiveUsers = ref<AdminUserType[]>([])
-const thresholdDate = ref("")
-const loading = ref(false)
-const error = ref("")
 
-const fetchDashboardData = async () => {
-  loading.value = true
-  error.value = ""
-  try {
+// Queries
+const {
+  data,
+  isLoading: loading,
+  error: queryError,
+} = useQuery({
+  queryKey: queryKeys.admin.dashboard(),
+  queryFn: async () => {
     const res = await hc.admin.dashboard.$get()
     if (!res.ok) throw new Error("Failed to fetch dashboard data")
-
-    const data = await res.json()
-    inactiveUsers.value = data.inactiveUsers
-    thresholdDate.value = data.thresholdDate
-  } catch (e) {
-    console.error(e)
-    error.value = "ダッシュボード情報の取得に失敗しました"
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(() => {
-  fetchDashboardData()
+    return res.json()
+  },
 })
+
+const inactiveUsers = computed(() => data.value?.inactiveUsers ?? [])
+const thresholdDate = computed(() => data.value?.thresholdDate ?? "")
+const error = computed(() =>
+  queryError.value ? "ダッシュボード情報の取得に失敗しました" : ""
+)
 </script>

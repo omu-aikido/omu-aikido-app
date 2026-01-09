@@ -1,36 +1,43 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue"
+import { ref, computed } from "vue"
 import { format, startOfMonth, endOfMonth, parseISO, isSameDay } from "date-fns"
 import { SignedIn } from "@clerk/vue"
 import { XIcon, Trash2Icon } from "lucide-vue-next"
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/vue"
-import { useActivity } from "@/src/composable/useActivity"
+import { useActivities, useAddActivity, useDeleteActivity } from "@/src/composable/useActivity"
 import ActivityList from "@/src/components/record/ActivityList.vue"
 import ActivityForm from "@/src/components/record/ActivityForm.vue"
 import ConfirmDialog from "@/src/components/ui/ConfirmDialog.vue"
 
-const {
-  activities,
-  loading,
-  error,
-  fetchActivities,
-  deleteActivity,
-  addActivity,
-} = useActivity()
+// Mutations
+const { mutateAsync: addActivity } = useAddActivity()
+const { mutateAsync: deleteActivity } = useDeleteActivity()
 
+// State
 const currentMonth = ref(new Date())
 const isModalOpen = ref(false)
 const selectedDate = ref(format(new Date(), "yyyy-MM-dd"))
-
-// Confirm Dialog State
 const confirmDialogOpen = ref(false)
 const activityToDelete = ref<string | null>(null)
 
-const fetchWithMonth = async () => {
-  const startDate = format(startOfMonth(currentMonth.value), "yyyy-MM-dd")
-  const endDate = format(endOfMonth(currentMonth.value), "yyyy-MM-dd")
-  await fetchActivities({ startDate, endDate })
-}
+// Query
+const filters = computed(() => ({
+  startDate: format(startOfMonth(currentMonth.value), "yyyy-MM-dd"),
+  endDate: format(endOfMonth(currentMonth.value), "yyyy-MM-dd"),
+}))
+
+const {
+  data: activitiesRaw,
+  isLoading: loading,
+  error: queryError,
+} = useActivities(filters)
+
+const activities = computed(() => activitiesRaw.value ?? [])
+const error = computed(() =>
+  queryError.value ? "活動記録の取得に失敗しました" : null
+)
+
+
 
 const handleDelete = (id: string) => {
   activityToDelete.value = id
@@ -42,13 +49,12 @@ const handleConfirmDelete = async () => {
     await deleteActivity([activityToDelete.value])
     confirmDialogOpen.value = false
     activityToDelete.value = null
-    await fetchWithMonth()
+    // Auto-refetch handled by mutation onSuccess
   }
 }
 
-const handleChangeMonth = async (date: Date) => {
+const handleChangeMonth = (date: Date) => {
   currentMonth.value = date
-  await fetchWithMonth()
 }
 
 const handleSelectDate = (date: string) => {
@@ -61,9 +67,8 @@ const closeModal = () => {
 }
 
 const handleSubmit = async (date: string, period: number) => {
-  await addActivity(date, period)
+  await addActivity({ date, period })
   closeModal()
-  await fetchWithMonth()
 }
 
 const selectedDateActivities = computed(() => {
@@ -72,9 +77,11 @@ const selectedDateActivities = computed(() => {
   )
 })
 
+/*
 onMounted(() => {
-  fetchWithMonth()
+  // Initial fetch handled by useQuery
 })
+*/
 </script>
 
 <template>
