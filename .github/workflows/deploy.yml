@@ -26,8 +26,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate Cloudflare Types
-        run: pnpm run cf-typegen
+      - name: Generate Env File for Cloudflare Types
+        run: |
+          touch .env
+          echo "VITE_CLERK_PUBLISHABLE_KEY=''" >> .env
+          echo "CLERK_SECRET_KEY=''" >> .env
+          echo "CLERK_FRONTEND_API_URL=''" >> .env
+          echo "CLERK_WEBHOOK_SECRET=''" >> .env
+          echo "TURSO_AUTH_TOKEN=''" >> .env
+          echo "TURSO_DATABASE_URL=''" >> .env
+
 
       - name: Build
         run: pnpm build --minify
