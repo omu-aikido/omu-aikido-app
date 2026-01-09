@@ -505,7 +505,10 @@ const { mutateAsync: updateProfile, isPending: updating } = useMutation({
   },
   onSuccess: () => {
     queryClient.invalidateQueries({
-      queryKey: queryKeys.admin.users(userId), // Invalidate all pages
+      queryKey: ['admin', 'users'], // Invalidate all user details
+    })
+    queryClient.invalidateQueries({
+      queryKey: ['admin', 'accounts'], // Invalidate list as well (e.g. valid order might change)
     })
     updateSuccess.value = "プロファイルを更新しました"
     isEditing.value = false
@@ -549,7 +552,8 @@ const { mutateAsync: deleteUserMutation, isPending: deleting } = useMutation({
     return res.json()
   },
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.admin.accounts() })
+    queryClient.invalidateQueries({ queryKey: ['admin', 'accounts'] })
+    queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
     router.push("/admin/accounts")
   },
   onError: (e) => {
