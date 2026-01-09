@@ -3,6 +3,19 @@ name: Deploy
 on:
   push:
     branches: [main]
+    paths:
+      - '.github/workflows/deploy.yml'
+      - 'src/**'
+      - 'server/**'
+      - 'share/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'vite.config.ts'
+      - 'wrangler.jsonc'
+      - 'tsconfig*.json'
+      - 'env.d.ts'
 
 permissions:
   contents: read
