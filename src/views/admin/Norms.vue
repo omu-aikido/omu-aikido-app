@@ -72,14 +72,14 @@
         v-model="searchTerm"
         type="text"
         placeholder="名前で検索..."
-        class="w-full px-3 py-2 pl-9 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        class="w-full px-3 py-2 pl-9 text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
     </div>
 
     <div v-if="loading" class="flex justify-center py-12">
       <Loading />
     </div>
 
-    <div v-else-if="error" class="p-4 bg-red-50 text-red-700 rounded-md border border-red-200">
+    <div v-else-if="error" class="p-4 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 rounded-md border border-red-200 dark:border-red-800">
       {{ error }}
     </div>
 
@@ -92,7 +92,7 @@
         :progress="item.norm.progress" />
     </div>
 
-    <div v-if="!loading && !error && filteredUsers.length === 0" class="text-center py-12 text-neutral-500">
+    <div v-if="!loading && !error && filteredUsers.length === 0" class="text-center py-12 text-neutral-500 dark:text-neutral-400">
       該当するユーザーが見つかりません
     </div>
   </div>

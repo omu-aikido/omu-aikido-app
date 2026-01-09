@@ -8,7 +8,7 @@
           @keyup.enter="handleSearch"
           type="text"
           placeholder="名前・メアドで検索..."
-          class="flex-1 sm:w-64 px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-800 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          class="flex-1 sm:w-64 px-3 py-2 text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
 
         <button
           @click="handleSearch"
@@ -22,7 +22,7 @@
       <Loading />
     </div>
 
-    <div v-else-if="error" class="p-4 bg-red-50 text-red-700 rounded-md border border-red-200">
+    <div v-else-if="error" class="p-4 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 rounded-md border border-red-200 dark:border-red-800">
       {{ error }}
     </div>
 
@@ -86,17 +86,23 @@
                 </div>
               </td>
               <td>
-                {{ user.profile.roleLabel }}
+                <span class="text-neutral-900 dark:text-neutral-100">
+                  {{ user.profile.roleLabel }}
+                </span>
               </td>
               <td>
-                {{ user.profile.gradeLabel }}
+                <span class="text-neutral-900 dark:text-neutral-100">
+                  {{ user.profile.gradeLabel }}
+                </span>
               </td>
               <td>
-                {{ user.profile.yearLabel }}
+                <span class="text-neutral-900 dark:text-neutral-100">
+                  {{ user.profile.yearLabel }}
+                </span>
               </td>
             </tr>
             <tr v-if="sortedUsers.length === 0">
-              <td colspan="5" class="px-3 md:px-6 py-12 text-center text-neutral-500">
+              <td colspan="5" class="px-3 md:px-6 py-12 text-center text-neutral-500 dark:text-neutral-400">
                 ユーザーが見つかりませんでした
               </td>
             </tr>

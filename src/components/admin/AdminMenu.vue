@@ -1,5 +1,5 @@
 <template>
-  <h1 class="text-2xl font-bold mb-2">管理メニュー</h1>
+  <h1 class="text-2xl font-bold mb-2 text-neutral-900 dark:text-neutral-100">管理メニュー</h1>
   <TabGroup
     :selectedIndex="selectedIndex"
     @change="handleTabChange"
