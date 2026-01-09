@@ -3,15 +3,7 @@ import type { Ref } from 'vue'
 import { ref, readonly } from 'vue'
 
 import hc from '@/src/lib/honoClient'
-
-interface Activity {
-  id: string
-  userId: string
-  date: string
-  period: number
-  createAt: string
-  updatedAt: string | null
-}
+import type { Activity } from '@/share/types/records'
 
 interface ActivityFilters {
   startDate?: string

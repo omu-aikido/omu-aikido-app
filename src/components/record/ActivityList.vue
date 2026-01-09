@@ -12,15 +12,7 @@ import {
 } from "date-fns"
 import { ja } from "date-fns/locale"
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-vue-next"
-
-interface Activity {
-  id: string
-  date: string
-  period: number
-  userId: string
-  createAt: string
-  updatedAt: string | null
-}
+import type { Activity } from "@/share/types/records"
 
 interface Props {
   activities: readonly Activity[]

@@ -22,3 +22,40 @@ export const rankingQuerySchema = type({
   'month?': '1 <= number.integer <= 12',
   'period?': "'monthly' | 'annual' | 'fiscal'",
 })
+
+// Ranking Types
+export type RankingEntry = {
+  rank: number
+  userName: string
+  isCurrentUser: boolean
+  totalPeriod: number
+  practiceCount: number
+}
+
+export type RankingResponse = {
+  period: string
+  periodType: string
+  startDate: string
+  endDate: string
+  ranking: RankingEntry[]
+  currentUserRanking: RankingEntry | null
+  totalUsers: number
+}
+
+// Activity Types
+export type Activity = {
+  id: string
+  userId: string
+  date: string
+  period: number
+  createAt: string
+  updatedAt: string | null
+}
+
+// Practice Count Types
+export type PracticeCountData = {
+  practiceCount: number
+  totalPeriod: number
+  since: string
+}
+

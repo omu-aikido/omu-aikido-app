@@ -56,10 +56,6 @@ export const clerk = new Hono<{ Bindings: Env }>() //
 
         const updatedUser = await clerkClient.users.getUser(auth.userId)
 
-        // Invalidate cache after update
-        const cacheKey = `user:${auth.userId}`
-        await c.env.KV.delete(cacheKey)
-
         return c.json(
           {
             userId: updatedUser.id,

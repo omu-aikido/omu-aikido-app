@@ -1,15 +1,22 @@
 import type { Context, Next } from 'hono'
 
+// [pathPattern, cacheControl, isPrefix]
+export const CACHED_ROUTES: Array<[string, string, boolean]> = [
+  // Admin routes (public cache - all admin users see same data)
+  ['/api/admin/dashboard', 'public, max-age=60', false],
+  ['/api/admin/norms', 'public, max-age=60', false],
+  ['/api/admin/accounts', 'public, max-age=30', false],
+  ['/api/admin/users', 'public, max-age=30', false],
+  ['/api/admin/accounts/', 'public, max-age=30', true],
+  ['/api/admin/users/', 'public, max-age=30', true],
+]
+
 const getCacheControlForPath = (path: string): string | null => {
-  if (path === '/admin/accounts') return 'public, max-age=60'
-  if (path === '/admin/norms') return 'public, max-age=60'
-  if (path.startsWith('/admin/users/')) return 'public, max-age=30'
-  if (path === '/user/profile') return 'private, max-age=60'
-  if (path === '/user/account') return 'private, max-age=60'
-  if (path === '/user/summary') return 'private, max-age=30'
-  if (path === '/user/ranking') return 'private, max-age=60'
-  if (path === '/user/activities') return 'private, max-age=15'
-  if (path === '/user/onboarding') return 'private, max-age=10'
+  for (const [pattern, cacheControl, isPrefix] of CACHED_ROUTES) {
+    if (isPrefix ? path.startsWith(pattern) : path === pattern) {
+      return cacheControl
+    }
+  }
   return null
 }
 
