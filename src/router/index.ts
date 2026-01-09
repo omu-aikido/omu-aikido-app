@@ -2,6 +2,7 @@ import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { Role } from '@/share/types/role'
 import HomeView from '@/src/views/Home.vue'
 import NotFoundView from '@/src/views/NotFound.vue'
 import RecordView from '@/src/views/Record.vue'
@@ -119,8 +120,9 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
       next({ name: 'signIn' })
     } else if (requiresAdmin && isAuthenticated) {
       // 管理者権限チェック
-      const role = (clerk.user?.publicMetadata as { role?: string })?.role
-      const isAdmin = role === 'president' || role === 'vice_president' || role === 'executive' || role === 'admin'
+      const roleValue = (clerk.user?.publicMetadata as { role?: string })?.role
+      const role = Role.fromString(`${roleValue}`)
+      const isAdmin = role ? role.isManagement : false
 
       if (!isAdmin) {
         next({ name: 'home' }) // Not authorized, redirect to home

@@ -39,7 +39,6 @@ jobs:
           echo "TURSO_AUTH_TOKEN=''" >> .env
           echo "TURSO_DATABASE_URL=''" >> .env
 
-
       - name: Build
         run: pnpm build --minify
 
