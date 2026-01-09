@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import { timeForNextGrade, translateGrade } from "@/share/lib/grade"
-
-interface PracticeCountData {
-  practiceCount: number
-  totalPeriod: number
-  since: string
-}
+import type { PracticeCountData } from "@/share/types/records"
 
 interface Props {
   practiceData: PracticeCountData | null

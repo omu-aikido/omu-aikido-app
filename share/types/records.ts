@@ -42,3 +42,20 @@ export type RankingResponse = {
   totalUsers: number
 }
 
+// Activity Types
+export type Activity = {
+  id: string
+  userId: string
+  date: string
+  period: number
+  createAt: string
+  updatedAt: string | null
+}
+
+// Practice Count Types
+export type PracticeCountData = {
+  practiceCount: number
+  totalPeriod: number
+  since: string
+}
+

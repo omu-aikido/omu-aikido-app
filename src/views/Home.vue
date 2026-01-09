@@ -8,14 +8,9 @@ import PracticeRanking from "@/src/components/home/PracticeRanking.vue"
 import ActivityForm from "@/src/components/record/ActivityForm.vue"
 import { useActivity } from "@/src/composable/useActivity"
 import hc from "@/src/lib/honoClient"
-import type { RankingResponse } from "@/share/types/records"
+import type { PracticeCountData, RankingResponse } from "@/share/types/records"
 
 // Types
-interface PracticeCountData {
-  practiceCount: number
-  totalPeriod: number
-  since: string
-}
 
 interface UserProfile {
   profile: {
