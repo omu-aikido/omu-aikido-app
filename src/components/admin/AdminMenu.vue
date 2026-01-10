@@ -68,6 +68,9 @@ const handleTabChange = (index: number) => {
 
 .tab {
   padding: var(--space-2-5) var(--space-4);
+
+  /* padding-block overrides padding shorthand, so we can just update the top/bottom padding above or merge it */
+  padding-block: 0.625rem;
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
   background: transparent;
@@ -78,20 +81,11 @@ const handleTabChange = (index: number) => {
   transition: color var(--transition-normal), border-color var(--transition-normal);
 }
 
-.tab:hover:not(.tab-selected) {
-  color: var(--primary);
-}
-
 .tab:focus {
   outline: none;
 }
 
-.tab-selected {
+.tab:hover:not(.tab-selected) {
   color: var(--primary);
-  border-bottom-color: var(--primary);
-}
-
-.tab {
-  padding-block: 0.625rem;
 }
 </style>

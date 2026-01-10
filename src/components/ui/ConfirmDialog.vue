@@ -71,7 +71,7 @@ const emit = defineEmits<Emits>()
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgb(0 0 0 / 0.5);
+  background: rgb(0 0 0 / 50%);
   backdrop-filter: blur(4px);
 }
 

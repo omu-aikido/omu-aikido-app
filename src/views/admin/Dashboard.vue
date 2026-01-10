@@ -78,7 +78,7 @@ const error = computed(() =>
   padding-bottom: var(--space-12);
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .dashboard-page {
     padding-inline: var(--space-6);
   }
@@ -92,11 +92,11 @@ const error = computed(() =>
 
 .error-banner {
   background: var(--red-100); /* Fallback */
-  background: rgba(239, 68, 68, 0.1);
+  background: rgb(239 68 68 / 10%);
   color: var(--red-500);
   padding: var(--space-4);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid rgb(239 68 68 / 20%);
 }
 
 .content {
@@ -194,7 +194,7 @@ const error = computed(() =>
   font-weight: var(--font-medium);
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-md);
-  background: rgba(239, 68, 68, 0.1);
+  background: rgb(239 68 68 / 10%);
   color: var(--red-500);
   margin-left: auto;
 }

@@ -171,7 +171,7 @@ const sortedUsers = computed(() => {
   padding: var(--space-4) var(--space-3);
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .page-container {
     gap: var(--space-6);
     padding-inline: var(--space-6);
@@ -185,7 +185,7 @@ const sortedUsers = computed(() => {
   align-items: flex-start;
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
   .controls {
     flex-direction: row;
     align-items: center;
@@ -199,7 +199,7 @@ const sortedUsers = computed(() => {
   width: 100%;
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
   .search-group {
     width: auto;
     margin-left: auto;
@@ -218,7 +218,7 @@ const sortedUsers = computed(() => {
   transition: box-shadow var(--transition-normal);
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
   .search-input {
     width: 16rem;
   }
@@ -257,10 +257,10 @@ const sortedUsers = computed(() => {
 
 .error-banner {
   padding: var(--space-4);
-  background: rgba(239, 68, 68, 0.1);
+  background: rgb(239 68 68 / 10%);
   color: var(--red-500);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid rgb(239 68 68 / 20%);
 }
 
 .table-container {
@@ -291,7 +291,7 @@ const sortedUsers = computed(() => {
   transition: background var(--transition-normal);
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .sortable {
     padding-inline: var(--space-6);
   }
@@ -323,7 +323,7 @@ const sortedUsers = computed(() => {
   padding: var(--space-4);
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .table-row td {
     padding-inline: var(--space-6);
   }

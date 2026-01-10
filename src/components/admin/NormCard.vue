@@ -62,7 +62,7 @@ defineProps<{ user: AdminUserType; norm: NormData; progress: number }>()
   gap: var(--space-4);
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .card {
     padding: var(--space-6);
   }
@@ -117,12 +117,12 @@ defineProps<{ user: AdminUserType; norm: NormData; progress: number }>()
 }
 
 .status-complete {
-  background: rgba(34, 197, 94, 0.1);
+  background: rgb(34 197 94 / 10%);
   color: var(--green-500);
 }
 
 .status-pending {
-  background: rgba(234, 179, 8, 0.1);
+  background: rgb(234 179 8 / 10%);
   color: var(--yellow-400);
 }
 

@@ -76,7 +76,7 @@ const selectedDateActivities = computed(() => {
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="container">
     <SignedIn>
       <div class="content">
         <h1 class="title">活動記録</h1>
@@ -139,7 +139,7 @@ const selectedDateActivities = computed(() => {
 </template>
 
 <style scoped>
-.page-container {
+.container {
   min-height: calc(100vh - 4rem);
   display: flex;
   flex-direction: column;
@@ -186,7 +186,7 @@ const selectedDateActivities = computed(() => {
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 50%);
   backdrop-filter: blur(4px);
 }
 

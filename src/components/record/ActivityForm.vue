@@ -96,7 +96,6 @@ const handleSubmit = () => {
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   appearance: none;
-  -webkit-appearance: none;
   color: var(--text-primary);
   background: var(--bg-card);
   padding: var(--space-2) var(--space-3);
@@ -119,6 +118,9 @@ const handleSubmit = () => {
   border-radius: var(--radius-md);
   background: var(--primary);
   padding: var(--space-2-5) 0;
+
+  /* Generate --space-2-5 inline since it wasn't defined */
+  padding-block: 0.625rem;
   font-size: var(--text-base);
   font-weight: var(--font-medium);
   color: white;
@@ -126,10 +128,6 @@ const handleSubmit = () => {
   box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition: background var(--transition-normal);
-}
-
-.submit-btn:hover:not(:disabled) {
-  background: var(--primary-hover);
 }
 
 .submit-btn:focus {
@@ -142,8 +140,7 @@ const handleSubmit = () => {
   cursor: not-allowed;
 }
 
-/* Generate --space-2-5 inline since it wasn't defined */
-.submit-btn {
-  padding-block: 0.625rem;
+.submit-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
 }
 </style>

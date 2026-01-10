@@ -144,7 +144,7 @@ watch(isOpen, value => {
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 50%);
   backdrop-filter: blur(4px);
   z-index: 100;
 }
@@ -319,6 +319,7 @@ watch(isOpen, value => {
 </style>
 
 <style>
+/* stylelint-disable selector-class-pattern */
 .cl-avatarBox, .cl-userAvatarBox {
   height: 1.5rem;
   width: 1.5rem;

@@ -319,7 +319,7 @@ const handleSignInWithDiscord = async () => {
 
 .input {
   width: -webkit-fill-available;
-  height: -webkit-fit-content;
+  height: fit-content;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--bg-card);
@@ -367,10 +367,6 @@ const handleSignInWithDiscord = async () => {
   transition: background var(--transition-normal);
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
-}
-
 .btn-primary:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--primary);
@@ -379,6 +375,10 @@ const handleSignInWithDiscord = async () => {
 .btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
 }
 
 .btn-discord {
@@ -397,10 +397,6 @@ const handleSignInWithDiscord = async () => {
   transition: background var(--transition-normal);
 }
 
-.btn-discord:hover:not(:disabled) {
-  background: #4752c4;
-}
-
 .btn-discord:focus {
   outline: none;
   box-shadow: 0 0 0 2px #5865f2;
@@ -409,6 +405,10 @@ const handleSignInWithDiscord = async () => {
 .btn-discord:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-discord:hover:not(:disabled) {
+  background: #4752c4;
 }
 
 .discord-icon {

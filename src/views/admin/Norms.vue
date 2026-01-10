@@ -155,7 +155,7 @@ const filteredUsers = computed(() => {
   padding: var(--space-4) var(--space-3);
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .page-container {
     padding-inline: var(--space-6);
   }
@@ -168,7 +168,7 @@ const filteredUsers = computed(() => {
   align-items: flex-start;
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
   .controls {
     flex-direction: row;
     align-items: center;
@@ -183,7 +183,7 @@ const filteredUsers = computed(() => {
   width: 100%;
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
   .filters {
     width: auto;
   }
@@ -230,7 +230,7 @@ const filteredUsers = computed(() => {
   width: 100%;
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
   .search-container {
     width: 18rem;
   }
@@ -238,7 +238,7 @@ const filteredUsers = computed(() => {
 
 .search-input {
   width: -webkit-fill-available;
-      height: -webkit-fit-content;
+  height: fit-content;
   padding: var(--space-2) var(--space-3);
   padding-left: 2.5rem; /* For icon if needed */
   background: var(--bg-card);
@@ -262,10 +262,10 @@ const filteredUsers = computed(() => {
 
 .error-banner {
   padding: var(--space-4);
-  background: rgba(239, 68, 68, 0.1);
+  background: rgb(239 68 68 / 10%);
   color: var(--red-500);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid rgb(239 68 68 / 20%);
 }
 
 .content {
@@ -278,13 +278,13 @@ const filteredUsers = computed(() => {
   gap: var(--space-6);
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .cards-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .cards-grid {
     grid-template-columns: repeat(3, 1fr);
   }

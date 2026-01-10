@@ -184,7 +184,7 @@ const getThemeClass = (theme: string) => {
   gap: var(--space-4);
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
   .nav-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -237,19 +237,19 @@ const getThemeClass = (theme: string) => {
 }
 
 .nav-icon.theme-blue {
-  background: rgba(59, 130, 246, 0.1);
+  background: rgb(59 130 246 / 10%);
   color: var(--blue-500);
   stroke: var(--blue-500);
 }
 
 .nav-icon.theme-indigo {
-  background: rgba(99, 102, 241, 0.1);
+  background: rgb(99 102 241 / 10%);
   color: var(--indigo-500);
   stroke: var(--indigo-500);
 }
 
 .nav-icon.theme-green {
-  background: rgba(34, 197, 94, 0.1);
+  background: rgb(34 197 94 / 10%);
   color: var(--teal-400);
   stroke: var(--teal-400);
 }

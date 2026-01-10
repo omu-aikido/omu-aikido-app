@@ -119,7 +119,7 @@ onUnmounted(() => {
   color: var(--red-500);
   font-family: monospace;
   text-align: left;
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .error-actions {

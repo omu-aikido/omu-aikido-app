@@ -136,7 +136,7 @@ const onUpdate = (key: keyof SignUpFormData, value: any) => {
 .input,
 .select {
   width: -webkit-fill-available;
-  height: -webkit-fit-content;
+  height: fit-content;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--bg-card);
@@ -200,10 +200,6 @@ const onUpdate = (key: keyof SignUpFormData, value: any) => {
   transition: background var(--transition-normal);
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
-}
-
 .btn-primary:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--primary);
@@ -212,6 +208,10 @@ const onUpdate = (key: keyof SignUpFormData, value: any) => {
 .btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
 }
 
 .btn-secondary {
@@ -226,10 +226,6 @@ const onUpdate = (key: keyof SignUpFormData, value: any) => {
   transition: background var(--transition-normal);
 }
 
-.btn-secondary:hover:not(:disabled) {
-  background: var(--bg-muted);
-}
-
 .btn-secondary:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--primary);
@@ -238,5 +234,9 @@ const onUpdate = (key: keyof SignUpFormData, value: any) => {
 .btn-secondary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-muted);
 }
 </style>

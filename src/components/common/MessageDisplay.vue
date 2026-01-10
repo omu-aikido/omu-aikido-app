@@ -27,7 +27,7 @@ defineProps<{ errorMessage?: string; successMessage?: string }>()
 }
 
 .success {
-  background: rgba(34, 197, 94, 0.1);
+  background: rgb(34 197 94 / 10%);
   border: 1px solid var(--green-500);
   color: var(--green-500);
 }

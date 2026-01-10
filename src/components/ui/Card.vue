@@ -17,7 +17,7 @@
   height: 100%;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .card {
     padding: var(--space-5);
   }

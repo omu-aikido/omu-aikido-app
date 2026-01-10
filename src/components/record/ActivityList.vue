@@ -245,7 +245,7 @@ const isToday = (date: Date) => {
 }
 
 .day-today {
-  background: rgba(137, 180, 250, 0.1);
+  background: rgb(137 180 250 / 10%);
 }
 
 .date-column {

@@ -251,7 +251,7 @@ function cancelEdit() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgb(0 0 0 / 60%);
   opacity: 0.6;
   cursor: pointer;
   transition: opacity var(--transition-normal);
@@ -271,7 +271,7 @@ function cancelEdit() {
   position: absolute;
   inset: 0;
   width: -webkit-fill-available;
-  height: -webkit-fit-content;
+  height: fit-content;
   cursor: pointer;
   opacity: 0;
 }
@@ -393,7 +393,7 @@ function cancelEdit() {
 
 .input {
   width: -webkit-fill-available;
-  height: -webkit-fit-content;
+  height: fit-content;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--bg-card);
@@ -441,10 +441,6 @@ function cancelEdit() {
   transition: background var(--transition-normal);
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
-}
-
 .btn-primary:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px var(--bg-card);
@@ -453,6 +449,10 @@ function cancelEdit() {
 .btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
 }
 
 .btn-secondary {

@@ -490,7 +490,7 @@ const handleDeleteUser = async () => {
   padding: var(--space-4) var(--space-3);
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .page-container {
     padding-inline: var(--space-6);
   }
@@ -522,10 +522,10 @@ const handleDeleteUser = async () => {
 
 .error-banner {
   padding: var(--space-4);
-  background: rgba(239, 68, 68, 0.1);
+  background: rgb(239 68 68 / 10%);
   color: var(--red-500);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid rgb(239 68 68 / 20%);
 }
 
 .content {
@@ -646,7 +646,7 @@ const handleDeleteUser = async () => {
   grid-template-columns: 1fr;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .form-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -666,7 +666,7 @@ const handleDeleteUser = async () => {
 
 .input {
   width: -webkit-fill-available;
-  height: -webkit-fit-content;
+  height: fit-content;
   padding: var(--space-2) var(--space-3);
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -699,13 +699,18 @@ const handleDeleteUser = async () => {
   transition: background var(--transition-normal);
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
+.btn-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
 }
 
 .btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
 }
 
 .btn-secondary {
@@ -846,15 +851,15 @@ const handleDeleteUser = async () => {
 
 .danger-zone {
   margin-top: var(--space-8);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid rgb(239 68 68 / 30%);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
 .danger-header {
   padding: var(--space-3) var(--space-4);
-  background: rgba(239, 68, 68, 0.1);
-  border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgb(239 68 68 / 10%);
+  border-bottom: 1px solid rgb(239 68 68 / 20%);
 }
 
 .danger-title {
@@ -900,12 +905,12 @@ const handleDeleteUser = async () => {
 }
 
 .btn-danger-outline:hover {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgb(239 68 68 / 10%);
 }
 
 .confirm-box {
   padding: var(--space-4);
-  background: rgba(239, 68, 68, 0.05); /* very light red */
+  background: rgb(239 68 68 / 5%); /* very light red */
   border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
@@ -920,7 +925,7 @@ const handleDeleteUser = async () => {
 .confirm-input {
   width: 100%;
   padding: var(--space-2) var(--space-3);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid rgb(239 68 68 / 30%);
   border-radius: var(--radius-md);
   font-size: var(--text-base);
   background: var(--bg-card);
@@ -962,13 +967,13 @@ const handleDeleteUser = async () => {
   transition: background var(--transition-normal);
 }
 
-.btn-danger:hover:not(:disabled) {
-  background: #dc2626; /* darker red */
-}
-
 .btn-danger:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #dc2626; /* darker red */
 }
 
 /* Modal */
@@ -979,7 +984,7 @@ const handleDeleteUser = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 50%);
   backdrop-filter: blur(4px);
 }
 
@@ -1006,7 +1011,7 @@ const handleDeleteUser = async () => {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: var(--radius-full);
-  background: rgba(239, 68, 68, 0.1);
+  background: rgb(239 68 68 / 10%);
   display: flex;
   align-items: center;
   justify-content: center;
