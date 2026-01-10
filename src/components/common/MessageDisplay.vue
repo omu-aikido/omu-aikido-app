@@ -1,15 +1,9 @@
 <template>
-  <div
-    v-if="errorMessage"
-    class="mt-4 p-3 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 rounded text-red-700 dark:text-red-300 text-sm"
-    data-testid="error-message">
+  <div v-if="errorMessage" class="message error" data-testid="error-message">
     {{ errorMessage }}
   </div>
 
-  <div
-    v-if="successMessage"
-    class="mt-4 p-3 bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 rounded text-green-700 dark:text-green-300 text-sm"
-    data-testid="success-message">
+  <div v-if="successMessage" class="message success" data-testid="success-message">
     {{ successMessage }}
   </div>
 </template>
@@ -17,3 +11,24 @@
 <script setup lang="ts">
 defineProps<{ errorMessage?: string; successMessage?: string }>()
 </script>
+
+<style scoped>
+.message {
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+}
+
+.error {
+  background: var(--error-bg);
+  border: 1px solid var(--red-500);
+  color: var(--red-500);
+}
+
+.success {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid var(--green-500);
+  color: var(--green-500);
+}
+</style>

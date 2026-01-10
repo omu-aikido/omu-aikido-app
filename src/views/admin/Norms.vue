@@ -1,103 +1,66 @@
 <template>
-  <div class="space-y-4 md:space-y-6 px-3 md:px-6">
+  <div class="page-container">
     <AdminMenu />
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <!-- Filter & Sort Controls -->
-      <div class="flex flex-wrap items-center gap-4 w-full sm:w-auto">
-        <!-- Status Filter -->
-        <div class="flex bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1">
-          <button
-            @click="filterStatus = 'all'"
-            :class="[
-              'px-3 py-1.5 text-sm font-medium rounded-md transition-all',
-              filterStatus === 'all'
-                ? 'bg-white dark:bg-neutral-700 shadow-sm text-neutral-900 dark:text-neutral-100'
-                : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300',
-            ]">
+    <div class="controls">
+      <div class="filters">
+        <div class="filter-group">
+          <button :class="['filter-btn', { active: filterStatus === 'all' }]" @click="filterStatus = 'all'">
             全て
           </button>
           <button
-            @click="filterStatus = 'unmet'"
-            :class="[
-              'px-3 py-1.5 text-sm font-medium rounded-md transition-all',
-              filterStatus === 'unmet'
-                ? 'bg-white dark:bg-neutral-700 shadow-sm text-red-600 dark:text-red-400'
-                : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300',
-            ]">
+            :class="['filter-btn', 'filter-btn-red', { active: filterStatus === 'unmet' }]"
+            @click="filterStatus = 'unmet'">
             未達成
           </button>
           <button
-            @click="filterStatus = 'met'"
-            :class="[
-              'px-3 py-1.5 text-sm font-medium rounded-md transition-all',
-              filterStatus === 'met'
-                ? 'bg-white dark:bg-neutral-700 shadow-sm text-emerald-600 dark:text-emerald-400'
-                : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300',
-            ]">
+            :class="['filter-btn', 'filter-btn-green', { active: filterStatus === 'met' }]"
+            @click="filterStatus = 'met'">
             達成済
           </button>
         </div>
 
-        <!-- Sort Order -->
-        <div class="flex bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1">
+        <div class="filter-group">
           <button
-            @click="sortOrder = 'asc'"
             title="進捗率: 低→高"
-            :class="[
-              'px-3 py-1.5 text-sm font-medium rounded-md transition-all',
-              sortOrder === 'asc'
-                ? 'bg-white dark:bg-neutral-700 shadow-sm text-neutral-900 dark:text-neutral-100'
-                : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300',
-            ]">
+            :class="['filter-btn', { active: sortOrder === 'asc' }]"
+            @click="sortOrder = 'asc'">
             昇順
           </button>
           <button
-            @click="sortOrder = 'desc'"
             title="進捗率: 高→低"
-            :class="[
-              'px-3 py-1.5 text-sm font-medium rounded-md transition-all',
-              sortOrder === 'desc'
-                ? 'bg-white dark:bg-neutral-700 shadow-sm text-neutral-900 dark:text-neutral-100'
-                : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300',
-            ]">
+            :class="['filter-btn', { active: sortOrder === 'desc' }]"
+            @click="sortOrder = 'desc'">
             降順
           </button>
         </div>
       </div>
+
+      <div class="search-container">
+        <input v-model="searchTerm" type="text" placeholder="名前で検索..." class="search-input" />
+      </div>
     </div>
 
-    <!-- Search Bar -->
-    <div class="relative w-full sm:w-72">
-      <input
-        v-model="searchTerm"
-        type="text"
-        placeholder="名前で検索..."
-        class="w-full px-3 py-2 pl-9 text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-    </div>
-
-    <div v-if="loading" class="flex justify-center py-12">
+    <div v-if="loading" class="loading-container">
       <Loading />
     </div>
 
-    <div
-      v-else-if="error"
-      class="p-4 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 rounded-md border border-red-200 dark:border-red-800">
+    <div v-else-if="error" class="error-banner">
       {{ error }}
     </div>
 
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <NormCard
-        v-for="item in filteredUsers"
-        :key="item.user.id"
-        :user="item.user"
-        :norm="item.norm"
-        :progress="item.norm.progress" />
-    </div>
+    <div v-else class="content">
+      <div class="cards-grid">
+        <NormCard
+          v-for="item in filteredUsers"
+          :key="item.user.id"
+          :user="item.user"
+          :norm="item.norm"
+          :progress="item.norm.progress" />
+      </div>
 
-    <div
-      v-if="!loading && !error && filteredUsers.length === 0"
-      class="text-center py-12 text-neutral-500 dark:text-neutral-400">
-      該当するユーザーが見つかりません
+      <div v-if="!loading && !error && filteredUsers.length === 0" class="empty-state">
+        該当するユーザーが見つかりません
+      </div>
     </div>
   </div>
 </template>
@@ -110,7 +73,6 @@ import hc from "@/src/lib/honoClient"
 import Loading from "@/src/components/ui/Loading.vue"
 import NormCard from "@/src/components/admin/NormCard.vue"
 import AdminMenu from "@/src/components/admin/AdminMenu.vue"
-
 
 const searchTerm = ref("")
 const filterStatus = ref<"all" | "met" | "unmet">("all")
@@ -142,9 +104,6 @@ const norms = computed(() => {
 })
 
 const error = computed(() => (queryError.value ? "データの取得に失敗しました" : ""))
-
-// Reactivity handled by queryKey
-// const fetchNorms = ... removed
 
 const processedData = computed(() => {
   return users.value
@@ -187,3 +146,153 @@ const filteredUsers = computed(() => {
   return result
 })
 </script>
+
+<style scoped>
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .page-container {
+    padding-inline: var(--space-6);
+  }
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+@media (min-width: 640px) {
+  .controls {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .filters {
+    width: auto;
+  }
+}
+
+.filter-group {
+  display: flex;
+  background: var(--bg-muted-active);
+  border-radius: var(--radius-lg);
+  padding: var(--space-1);
+}
+
+.filter-btn {
+  padding: var(--space-1-5) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.filter-btn:hover {
+  color: var(--text-primary);
+}
+
+.filter-btn.active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-btn-red.active {
+  color: var(--red-500);
+}
+
+.filter-btn-green.active {
+  color: var(--green-500);
+}
+
+.search-container {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .search-container {
+    width: 18rem;
+  }
+}
+
+.search-input {
+  width: -webkit-fill-available;
+      height: -webkit-fit-content;
+  padding: var(--space-2) var(--space-3);
+  padding-left: 2.5rem; /* For icon if needed */
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  transition: box-shadow var(--transition-normal);
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.error-banner {
+  padding: var(--space-4);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--red-500);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.content {
+  width: 100%;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--space-12) 0;
+  color: var(--text-secondary);
+}
+</style>

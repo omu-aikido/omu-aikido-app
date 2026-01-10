@@ -1,44 +1,42 @@
 <template>
-  <div class="space-y-4">
-    <div class="space-y-2">
-      <label for="email" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">メールアドレス</label>
+  <div class="form-container">
+    <div class="field">
+      <label for="email" class="label">メールアドレス</label>
       <input
         id="email"
         name="email"
         type="email"
         :value="formValues.email"
         autocomplete="email"
-        @input="onUpdate('email', ($event.target as HTMLInputElement).value)"
         required
         placeholder="name@example.com"
         :disabled="isSignUpCreated"
-        class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed" />
-      <p v-if="formErrors.email" class="text-sm text-red-600 dark:text-red-400">
+        class="input"
+        @input="onUpdate('email', ($event.target as HTMLInputElement).value)" />
+      <p v-if="formErrors.email" class="error">
         {{ formErrors.email }}
       </p>
     </div>
-    <div class="space-y-2">
-      <label for="password" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">パスワード</label>
-      <div class="relative">
+    <div class="field">
+      <label for="password" class="label">パスワード</label>
+      <div class="input-wrapper">
         <input
           id="password"
           name="password"
           autocomplete="new-password"
           :type="showPassword ? 'text' : 'password'"
           :value="formValues.newPassword"
-          @input="
-            onUpdate('newPassword', ($event.target as HTMLInputElement).value)
-          "
           required
           placeholder="10文字以上のパスワード"
           :disabled="isSignUpCreated"
-          class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 pr-10 text-sm placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed" />
+          class="input input-with-icon"
+          @input="onUpdate('newPassword', ($event.target as HTMLInputElement).value)" />
         <button
           type="button"
-          @click="showPassword = !showPassword"
           :disabled="isSignUpCreated"
-          class="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          :aria-label="showPassword ? 'パスワードを隠す' : 'パスワードを表示'">
+          class="icon-btn"
+          :aria-label="showPassword ? 'パスワードを隠す' : 'パスワードを表示'"
+          @click="showPassword = !showPassword">
           <svg
             v-if="!showPassword"
             xmlns="http://www.w3.org/2000/svg"
@@ -46,7 +44,7 @@
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="w-5 h-5">
+            class="icon">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -60,7 +58,7 @@
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="w-5 h-5">
+            class="icon">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -68,34 +66,30 @@
           </svg>
         </button>
       </div>
-      <p v-if="formErrors.newPassword" class="text-sm text-red-600 dark:text-red-400">
+      <p v-if="formErrors.newPassword" class="error">
         {{ formErrors.newPassword }}
       </p>
     </div>
-    <div class="space-y-2">
-      <label for="password-confirm" class="text-sm font-medium text-neutral-700 dark:text-neutral-300"
-        >パスワード（確認）</label
-      >
-      <div class="relative">
+    <div class="field">
+      <label for="password-confirm" class="label">パスワード（確認）</label>
+      <div class="input-wrapper">
         <input
           id="password-confirm"
+          v-model="passwordConfirm"
           name="password-confirm"
           autocomplete="new-password"
           :type="showPasswordConfirm ? 'text' : 'password'"
-          v-model="passwordConfirm"
-          @input="validatePasswordMatch"
           required
           placeholder="パスワードを再入力"
           :disabled="isSignUpCreated"
-          class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 pr-10 text-sm placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed" />
+          class="input input-with-icon"
+          @input="validatePasswordMatch" />
         <button
           type="button"
-          @click="showPasswordConfirm = !showPasswordConfirm"
           :disabled="isSignUpCreated"
-          class="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          :aria-label="
-            showPasswordConfirm ? 'パスワードを隠す' : 'パスワードを表示'
-          ">
+          class="icon-btn"
+          :aria-label="showPasswordConfirm ? 'パスワードを隠す' : 'パスワードを表示'"
+          @click="showPasswordConfirm = !showPasswordConfirm">
           <svg
             v-if="!showPasswordConfirm"
             xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +97,7 @@
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="w-5 h-5">
+            class="icon">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -117,7 +111,7 @@
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="w-5 h-5">
+            class="icon">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -125,16 +119,12 @@
           </svg>
         </button>
       </div>
-      <p v-if="passwordConfirmError" class="text-sm text-red-600 dark:text-red-400">
+      <p v-if="passwordConfirmError" class="error">
         {{ passwordConfirmError }}
       </p>
     </div>
-    <div class="flex justify-end pt-2">
-      <button
-        type="button"
-        @click="handleNextClick"
-        :disabled="isSignUpCreated || !canProceed"
-        class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+    <div class="actions-end">
+      <button type="button" :disabled="isSignUpCreated || !canProceed" class="btn-primary" @click="handleNextClick">
         次へ
       </button>
     </div>
@@ -166,10 +156,7 @@ const onUpdate = (key: keyof SignUpFormData, value: any) => {
 }
 
 const validatePasswordMatch = () => {
-  if (
-    passwordConfirm.value &&
-    passwordConfirm.value !== props.formValues.newPassword
-  ) {
+  if (passwordConfirm.value && passwordConfirm.value !== props.formValues.newPassword) {
     passwordConfirmError.value = "パスワードが一致しません"
   } else {
     passwordConfirmError.value = ""
@@ -202,3 +189,120 @@ watch(
   }
 )
 </script>
+
+<style scoped>
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.input {
+  width: -webkit-fill-available;
+  height: -webkit-fit-content;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  transition: box-shadow var(--transition-normal);
+}
+
+.input::placeholder {
+  color: var(--border-strong);
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-with-icon {
+  padding-right: 2.5rem;
+}
+
+.icon-btn {
+  position: absolute;
+  right: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-normal);
+}
+
+.icon-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+.icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.error {
+  font-size: var(--text-sm);
+  color: var(--red-500);
+}
+
+.actions-end {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--space-2);
+}
+
+.btn-primary {
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-normal);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+</style>

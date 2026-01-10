@@ -1,10 +1,39 @@
+<script setup lang="ts"></script>
+
 <template>
-  <div class="flex flex-col items-center justify-center min-h-50" data-testid="loading-container">
-    <div
-      class="w-10 h-10 mb-4 border-4 border-neutral-200 dark:border-neutral-700 border-t-indigo-600 dark:border-t-indigo-400 rounded-full animate-spin"
-      data-testid="loading-spinner" />
-    <p class="text-sm text-neutral-600 dark:text-neutral-400">Loading...</p>
+  <div class="loading" data-testid="loading-container">
+    <div class="spinner" data-testid="loading-spinner" />
+    <p class="text">Loading...</p>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<style scoped>
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 12.5rem;
+}
+
+.spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: var(--space-4);
+  border: 4px solid var(--bg-muted-active);
+  border-top-color: var(--primary);
+  border-radius: var(--radius-full);
+  animation: spin 1s linear infinite;
+}
+
+.text {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>

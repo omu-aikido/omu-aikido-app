@@ -32,40 +32,118 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <div class="space-y-4 p-2">
-    <form @submit.prevent="handleSubmit" class="space-y-4" data-testid="activity-form">
-      <div class="space-y-2">
-        <label for="date" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">日付</label>
-        <div class="flex-1">
-          <input
-            type="date"
-            id="date"
-            v-model="newDate"
-            required
-            class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-base text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
-            data-testid="date-input" />
+  <div class="container">
+    <form class="form" data-testid="activity-form" @submit.prevent="handleSubmit">
+      <div class="field">
+        <label for="date" class="label">日付</label>
+        <div class="input-wrapper">
+          <input id="date" v-model="newDate" type="date" required class="input" data-testid="date-input" />
         </div>
       </div>
-      <div class="space-y-2">
-        <label for="period" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">時間 (時間)</label>
+      <div class="field">
+        <label for="period" class="label">時間 (時間)</label>
         <input
-          type="number"
           id="period"
           v-model.number="newPeriod"
+          type="number"
           step="0.5"
           min="0.5"
           max="8"
           required
-          class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-base text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+          class="input"
           data-testid="period-input" />
       </div>
-      <button
-        type="submit"
-        :disabled="loading"
-        class="w-full rounded-md bg-indigo-600 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-        data-testid="submit-btn">
+      <button type="submit" :disabled="loading" class="submit-btn" data-testid="submit-btn">
         {{ loading ? "保存中..." : "記録を追加" }}
       </button>
     </form>
   </div>
 </template>
+
+<style scoped>
+.container {
+  padding: var(--space-2);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  display: block;
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.input-wrapper {
+  flex: 1;
+  width: 100%;
+  line-height: normal;
+}
+
+.input {
+  width: -webkit-fill-available;
+  height:var(--text-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  appearance: none;
+  -webkit-appearance: none;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  transition: box-shadow var(--transition-normal);
+}
+
+.input::placeholder {
+  color: var(--border-strong);
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+  border-color: transparent;
+}
+
+.submit-btn {
+  width: 100%;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  padding: var(--space-2-5) 0;
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.submit-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px var(--bg-card);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Generate --space-2-5 inline since it wasn't defined */
+.submit-btn {
+  padding-block: 0.625rem;
+}
+</style>

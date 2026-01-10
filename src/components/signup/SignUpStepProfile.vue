@@ -1,114 +1,85 @@
 <template>
-  <div class="space-y-4">
-    <div class="grid grid-cols-2 gap-4">
-      <div class="space-y-2">
-        <label for="year" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">学年</label>
+  <div class="form-container">
+    <div class="grid-2">
+      <div class="field">
+        <label for="year" class="label">学年</label>
         <select
           id="year"
           :value="formValues.year"
-          @change="onUpdate('year', ($event.target as HTMLSelectElement).value)"
           :disabled="isSignUpCreated"
-          class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+          class="select"
+          @change="onUpdate('year', ($event.target as HTMLSelectElement).value)">
           <option v-for="y in yearOptions" :key="y.year" :value="y.year">
             {{ y.name }}
           </option>
         </select>
-        <p v-if="formErrors.year" class="text-sm text-red-600 dark:text-red-400">
+        <p v-if="formErrors.year" class="error">
           {{ formErrors.year }}
         </p>
       </div>
-      <div class="space-y-2">
-        <label for="grade" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">級段位</label>
+      <div class="field">
+        <label for="grade" class="label">級段位</label>
         <select
           id="grade"
           :value="formValues.grade"
-          @change="
-            onUpdate(
-              'grade',
-              Number(($event.target as HTMLSelectElement).value)
-            )
-          "
           :disabled="isSignUpCreated"
-          class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+          class="select"
+          @change="onUpdate('grade', Number(($event.target as HTMLSelectElement).value))">
           <option v-for="g in gradeOptions" :key="g.grade" :value="g.grade">
             {{ g.name }}
           </option>
         </select>
-        <p v-if="formErrors.grade" class="text-sm text-red-600 dark:text-red-400">
+        <p v-if="formErrors.grade" class="error">
           {{ formErrors.grade }}
         </p>
       </div>
     </div>
 
-    <div class="space-y-2">
-      <label for="joinedAt" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">入部年度</label>
+    <div class="field">
+      <label for="joinedAt" class="label">入部年度</label>
       <input
         id="joinedAt"
         type="number"
         :value="formValues.joinedAt"
-        @input="
-          onUpdate(
-            'joinedAt',
-            Number(($event.target as HTMLInputElement).value)
-          )
-        "
         :disabled="isSignUpCreated"
-        class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-base text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed" />
-      <p v-if="formErrors.joinedAt" class="text-sm text-red-600 dark:text-red-400">
+        class="input"
+        @input="onUpdate('joinedAt', Number(($event.target as HTMLInputElement).value))" />
+      <p v-if="formErrors.joinedAt" class="error">
         {{ formErrors.joinedAt }}
       </p>
     </div>
 
-    <div class="space-y-2">
-      <label for="getGradeAt" class="text-sm font-medium text-neutral-700 dark:text-neutral-300"
-        >取得年月日 (任意)</label
-      >
-      <div class="flex-1">
-        <input
-          id="getGradeAt"
-          type="date"
-          :value="formValues.getGradeAt"
-          @input="
-            onUpdate('getGradeAt', ($event.target as HTMLInputElement).value)
-          "
-          :disabled="isSignUpCreated"
-          class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-base text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed" />
-      </div>
-      <p v-if="formErrors.getGradeAt" class="text-sm text-red-600 dark:text-red-400">
+    <div class="field">
+      <label for="getGradeAt" class="label">取得年月日 (任意)</label>
+      <input
+        id="getGradeAt"
+        type="date"
+        :value="formValues.getGradeAt"
+        :disabled="isSignUpCreated"
+        class="input"
+        @input="onUpdate('getGradeAt', ($event.target as HTMLInputElement).value)" />
+      <p v-if="formErrors.getGradeAt" class="error">
         {{ formErrors.getGradeAt }}
       </p>
     </div>
 
-    <div class="flex items-center space-x-2">
+    <div class="checkbox-field">
       <input
         id="legalAccepted"
         type="checkbox"
         :checked="formValues.legalAccepted"
-        @change="
-          onUpdate('legalAccepted', ($event.target as HTMLInputElement).checked)
-        "
         :disabled="isSignUpCreated"
-        class="h-4 w-4 rounded border-neutral-300 text-indigo-600 focus:ring-indigo-600 dark:border-neutral-700 dark:bg-neutral-900" />
-      <label for="legalAccepted" class="text-sm text-neutral-700 dark:text-neutral-300">
-        利用規約とプライバシーポリシーに同意します。
-      </label>
+        class="checkbox"
+        @change="onUpdate('legalAccepted', ($event.target as HTMLInputElement).checked)" />
+      <label for="legalAccepted" class="checkbox-label"> 利用規約とプライバシーポリシーに同意します。 </label>
     </div>
-    <p v-if="formErrors.legalAccepted" class="text-sm text-red-600 dark:text-red-400">
+    <p v-if="formErrors.legalAccepted" class="error">
       {{ formErrors.legalAccepted }}
     </p>
 
-    <div class="flex justify-between pt-2">
-      <button
-        type="button"
-        @click="prevStep"
-        :disabled="isSignUpCreated"
-        class="rounded-md border border-neutral-300 dark:border-neutral-600 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
-        戻る
-      </button>
-      <button
-        type="submit"
-        :disabled="!canSubmit"
-        class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+    <div class="actions-between">
+      <button type="button" :disabled="isSignUpCreated" class="btn-secondary" @click="prevStep">戻る</button>
+      <button type="submit" :disabled="!canSubmit" class="btn-primary">
         {{ isSignUpCreated ? "登録中..." : "登録" }}
       </button>
     </div>
@@ -136,3 +107,136 @@ const onUpdate = (key: keyof SignUpFormData, value: any) => {
   emit("update:formValue", key, value)
 }
 </script>
+
+<style scoped>
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.input,
+.select {
+  width: -webkit-fill-available;
+  height: -webkit-fit-content;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  transition: box-shadow var(--transition-normal);
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.input:disabled,
+.select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  accent-color: var(--primary);
+}
+
+.checkbox-label {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.error {
+  font-size: var(--text-sm);
+  color: var(--red-500);
+}
+
+.actions-between {
+  display: flex;
+  justify-content: space-between;
+  padding-top: var(--space-2);
+}
+
+.btn-primary {
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-normal);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  border-radius: var(--radius-md);
+  background: transparent;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-muted);
+}
+
+.btn-secondary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+</style>

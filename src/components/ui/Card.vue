@@ -1,13 +1,25 @@
-<script setup lang="ts">
-import { tv } from "tailwind-variants"
-
-const card = tv({
-  base: "bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 p-4 md:p-5 w-full h-full",
-})
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <div :class="card()" data-testid="card">
+  <div class="card" data-testid="card">
     <slot />
   </div>
 </template>
+
+<style scoped>
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  padding: var(--space-4);
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: var(--space-5);
+  }
+}
+</style>

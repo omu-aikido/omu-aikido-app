@@ -1,112 +1,84 @@
 <template>
-  <div class="space-y-4 md:space-y-6 px-3 md:px-6">
+  <div class="page-container">
     <AdminMenu />
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div class="flex ml-auto gap-2 w-full sm:w-auto">
+    <div class="controls">
+      <div class="search-group">
         <input
           v-model="searchQuery"
-          @keyup.enter="handleSearch"
           type="text"
           placeholder="名前・メアドで検索..."
-          class="flex-1 sm:w-64 px-3 py-2 text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-
-        <button
-          @click="handleSearch"
-          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          検索
-        </button>
+          class="search-input"
+          @keyup.enter="handleSearch" />
+        <button class="search-btn" @click="handleSearch">検索</button>
       </div>
     </div>
 
-    <div v-if="loading" class="flex justify-center py-12">
+    <div v-if="loading" class="loading-container">
       <Loading />
     </div>
 
-    <div
-      v-else-if="error"
-      class="p-4 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 rounded-md border border-red-200 dark:border-red-800">
+    <div v-else-if="error" class="error-banner">
       {{ error }}
     </div>
 
-    <div v-else>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead class="border-b border-neutral-200 dark:border-neutral-800">
+    <div v-else class="table-container">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
             <tr>
-              <th
-                @click="toggleSort('name')"
-                class="px-3 md:px-6 py-3 font-medium text-neutral-500 dark:text-neutral-400 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800">
+              <th class="sortable" @click="toggleSort('name')">
                 名前
-                <span v-if="sortBy === 'name'">{{
+                <span v-if="sortBy === 'name'" class="sort-icon">{{
                   sortOrder === "asc" ? "↑" : "↓"
                 }}</span>
               </th>
-              <th
-                @click="toggleSort('role')"
-                class="px-3 md:px-6 py-3 font-medium text-neutral-500 dark:text-neutral-400 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800">
+              <th class="sortable" @click="toggleSort('role')">
                 役職
-                <span v-if="sortBy === 'role'">{{
+                <span v-if="sortBy === 'role'" class="sort-icon">{{
                   sortOrder === "asc" ? "↑" : "↓"
                 }}</span>
               </th>
-              <th
-                @click="toggleSort('grade')"
-                class="px-3 md:px-6 py-3 font-medium text-neutral-500 dark:text-neutral-400 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800">
+              <th class="sortable" @click="toggleSort('grade')">
                 級段位
-                <span v-if="sortBy === 'grade'">{{
+                <span v-if="sortBy === 'grade'" class="sort-icon">{{
                   sortOrder === "asc" ? "↑" : "↓"
                 }}</span>
               </th>
-              <th
-                @click="toggleSort('year')"
-                class="px-3 md:px-6 py-3 font-medium text-neutral-500 dark:text-neutral-400 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800">
+              <th class="sortable" @click="toggleSort('year')">
                 学年
-                <span v-if="sortBy === 'year'">{{
+                <span v-if="sortBy === 'year'" class="sort-icon">{{
                   sortOrder === "asc" ? "↑" : "↓"
                 }}</span>
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
+          <tbody>
             <tr
               v-for="user in sortedUsers"
               :key="user.id"
-              class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors cursor-pointer [&_td]:py-4 [&_td]:text-center"
+              class="table-row"
               @click="$router.push(`/admin/users/${user.id}`)">
               <td>
-                <div class="flex items-center gap-2">
-                  <img :src="user.imageUrl" alt="" class="w-6 h-6 ml-1 rounded-full bg-neutral-200" />
-                  <div class="flex flex-col text-start">
-                    <span class="font-medium text-neutral-900 dark:text-neutral-100">
-                      {{ user.lastName }}
-                      {{ user.firstName }}
-                    </span>
-                    <small class="text-xs text-neutral-500">{{
-                      user.emailAddress
-                    }}</small>
+                <div class="user-cell">
+                  <img :src="user.imageUrl" alt="" class="avatar" />
+                  <div class="user-details">
+                    <span class="user-name"> {{ user.lastName }} {{ user.firstName }} </span>
+                    <small class="user-email">{{ user.emailAddress }}</small>
                   </div>
                 </div>
               </td>
-              <td>
-                <span class="text-neutral-900 dark:text-neutral-100">
-                  {{ user.profile.roleLabel }}
-                </span>
+              <td class="cell-center">
+                <span class="cell-text">{{ user.profile.roleLabel }}</span>
               </td>
-              <td>
-                <span class="text-neutral-900 dark:text-neutral-100">
-                  {{ user.profile.gradeLabel }}
-                </span>
+              <td class="cell-center">
+                <span class="cell-text">{{ user.profile.gradeLabel }}</span>
               </td>
-              <td>
-                <span class="text-neutral-900 dark:text-neutral-100">
-                  {{ user.profile.yearLabel }}
-                </span>
+              <td class="cell-center">
+                <span class="cell-text">{{ user.profile.yearLabel }}</span>
               </td>
             </tr>
             <tr v-if="sortedUsers.length === 0">
-              <td colspan="5" class="px-3 md:px-6 py-12 text-center text-neutral-500 dark:text-neutral-400">
-                ユーザーが見つかりませんでした
-              </td>
+              <td colspan="4" class="empty-cell">ユーザーが見つかりませんでした</td>
             </tr>
           </tbody>
         </table>
@@ -122,7 +94,6 @@ import { queryKeys } from "@/src/lib/queryKeys"
 import hc from "@/src/lib/honoClient"
 import Loading from "@/src/components/ui/Loading.vue"
 import AdminMenu from "@/src/components/admin/AdminMenu.vue"
-
 
 const searchQuery = ref("")
 const sortBy = ref<string>("role")
@@ -191,3 +162,214 @@ const sortedUsers = computed(() => {
   })
 })
 </script>
+
+<style scoped>
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .page-container {
+    gap: var(--space-6);
+    padding-inline: var(--space-6);
+  }
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+@media (min-width: 640px) {
+  .controls {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.search-group {
+  display: flex;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .search-group {
+    width: auto;
+    margin-left: auto;
+  }
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  transition: box-shadow var(--transition-normal);
+}
+
+@media (min-width: 640px) {
+  .search-input {
+    width: 16rem;
+  }
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.search-btn {
+  padding: var(--space-2) var(--space-4);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+}
+
+.search-btn:hover {
+  background: var(--primary-hover);
+}
+
+.search-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.error-banner {
+  padding: var(--space-4);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--red-500);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.table-container {
+  width: 100%;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  font-size: var(--text-base);
+}
+
+.data-table thead {
+  border-bottom: 1px solid var(--border);
+}
+
+.sortable {
+  padding: var(--space-3);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition-normal);
+}
+
+@media (min-width: 768px) {
+  .sortable {
+    padding-inline: var(--space-6);
+  }
+}
+
+.sortable:hover {
+  background: var(--bg-muted);
+}
+
+.sort-icon {
+  margin-left: var(--space-1);
+}
+
+.table-row {
+  cursor: pointer;
+  transition: background var(--transition-normal);
+  border-bottom: 1px solid var(--border);
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row:hover {
+  background: var(--bg-muted);
+}
+
+.table-row td {
+  padding: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .table-row td {
+    padding-inline: var(--space-6);
+  }
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-muted-active);
+  object-fit: cover;
+  margin-left: 0.25rem;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+.user-email {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.cell-center {
+  text-align: center;
+}
+
+.cell-text {
+  color: var(--text-primary);
+}
+
+.empty-cell {
+  padding: var(--space-12);
+  text-align: center;
+  color: var(--text-secondary);
+}
+</style>

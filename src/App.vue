@@ -6,9 +6,9 @@ import ErrorBoundary from "./components/common/ErrorBoundary.vue"
 
 <template>
   <ErrorBoundary>
-    <div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex flex-col transition-colors duration-200">
+    <div class="app-container">
       <AppHeader />
-      <main class="grow container mx-auto px-4 py-4 md:py-8 max-w-4xl w-full">
+      <main class="main">
         <RouterView />
       </main>
       <AppFooter />
@@ -16,4 +16,26 @@ import ErrorBoundary from "./components/common/ErrorBoundary.vue"
   </ErrorBoundary>
 </template>
 
-<style scoped></style>
+<style scoped>
+.app-container {
+  min-height: 100vh;
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  transition: color var(--transition-normal), background var(--transition-normal);
+}
+
+.main {
+  flex-grow: 1;
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .main {
+    padding: var(--space-8) var(--space-4);
+  }
+}
+</style>

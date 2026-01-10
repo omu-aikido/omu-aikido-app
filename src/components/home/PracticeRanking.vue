@@ -9,95 +9,185 @@ interface Props {
 
 withDefaults(defineProps<Props>(), { loading: false, error: null })
 
-const getRankColor = (rank: number) => {
-  if (rank === 1) return "text-yellow-500"
-  if (rank === 2) return "text-slate-400"
-  if (rank === 3) return "text-orange-500"
-  return "text-neutral-900 dark:text-neutral-100"
+const getRankClass = (rank: number) => {
+  if (rank === 1) return "rank-gold"
+  if (rank === 2) return "rank-silver"
+  if (rank === 3) return "rank-bronze"
+  return ""
 }
 </script>
 
 <template>
-  <div class="w-full" data-testid="practice-ranking">
-    <div
-      v-if="loading"
-      class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 overflow-hidden animate-pulse">
-      <div class="p-5 flex items-center justify-between">
-        <!-- Left: Header & Rank Skeleton -->
-        <div class="flex flex-col">
-          <div class="text-[10px] font-medium mb-1 text-transparent bg-neutral-200 dark:bg-neutral-700 rounded w-fit">
-            月間ランキング (2024年1月)
-          </div>
-          <div class="flex items-baseline gap-1.5">
-            <span
-              class="text-4xl font-bold tracking-tight loading-none text-transparent bg-neutral-200 dark:bg-neutral-700 rounded">
-              1
-            </span>
-            <span class="text-sm font-medium text-transparent bg-neutral-200 dark:bg-neutral-700 rounded"> / 100 </span>
+  <div class="container" data-testid="practice-ranking">
+    <div v-if="loading" class="card loading-skeleton">
+      <div class="card-content">
+        <div class="left">
+          <div class="label skeleton-text">月間ランキング (2024年1月)</div>
+          <div class="rank-row">
+            <span class="rank-number skeleton-text">1</span>
+            <span class="rank-total skeleton-text">/ 100</span>
           </div>
         </div>
-
-        <!-- Right: Stats Skeleton -->
-        <div class="flex flex-col items-end">
-          <div class="text-sm">
-            <span class="font-bold text-lg text-transparent bg-neutral-200 dark:bg-neutral-700 rounded">100</span>
-            <span class="text-xs ml-0.5 text-transparent bg-neutral-200 dark:bg-neutral-700 rounded">回</span>
+        <div class="right">
+          <div class="stat-row">
+            <span class="stat-value skeleton-text">100</span>
+            <span class="stat-unit skeleton-text">回</span>
           </div>
-          <div class="text-sm">
-            <span class="font-bold text-lg text-transparent bg-neutral-200 dark:bg-neutral-700 rounded">100.5</span>
-            <span class="text-xs ml-0.5 text-transparent bg-neutral-200 dark:bg-neutral-700 rounded">時間</span>
+          <div class="stat-row">
+            <span class="stat-value skeleton-text">100.5</span>
+            <span class="stat-unit skeleton-text">時間</span>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-else-if="error" class="text-center py-8">
-      <div class="text-red-500 dark:text-red-400 text-sm">エラー: {{ error }}</div>
+    <div v-else-if="error" class="error-state">
+      <div class="error-text">エラー: {{ error }}</div>
     </div>
 
-    <div
-      v-else-if="rankingData?.currentUserRanking"
-      class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 p-5">
-      <div class="flex items-center justify-between">
-        <!-- Left: Header & Rank -->
-        <div class="flex flex-col">
-          <div class="text-[10px] text-neutral-400 dark:text-neutral-500 font-medium mb-1">
-            月間ランキング ({{ rankingData.period }})
-          </div>
-          <div class="flex items-baseline gap-1.5" data-testid="rank-display">
-            <span
-              :class="[
-                'text-4xl font-bold tracking-tight loading-none',
-                getRankColor(rankingData.currentUserRanking.rank),
-              ]">
+    <div v-else-if="rankingData?.currentUserRanking" class="card">
+      <div class="card-content">
+        <div class="left">
+          <div class="label">月間ランキング ({{ rankingData.period }})</div>
+          <div class="rank-row" data-testid="rank-display">
+            <span :class="['rank-number', getRankClass(rankingData.currentUserRanking.rank)]">
               {{ rankingData.currentUserRanking.rank }}
             </span>
-            <span class="text-sm text-neutral-400 dark:text-neutral-500 font-medium">
-              / {{ rankingData.totalUsers }}
-            </span>
+            <span class="rank-total">/ {{ rankingData.totalUsers }}</span>
           </div>
         </div>
-
-        <!-- Right: Stats -->
-        <div class="flex flex-col items-end" data-testid="stats-display">
-          <div class="text-sm text-neutral-900 dark:text-neutral-100">
-            <span class="font-bold text-lg">{{
-              rankingData.currentUserRanking.practiceCount
-            }}</span>
-            <span class="text-xs text-neutral-500 dark:text-neutral-400 ml-0.5">回</span>
+        <div class="right" data-testid="stats-display">
+          <div class="stat-row">
+            <span class="stat-value">{{ rankingData.currentUserRanking.practiceCount }}</span>
+            <span class="stat-unit">回</span>
           </div>
-          <div class="text-sm text-neutral-900 dark:text-neutral-100">
-            <span class="font-bold text-lg">{{
-              rankingData.currentUserRanking.totalPeriod
-            }}</span>
-            <span class="text-xs text-neutral-500 dark:text-neutral-400 ml-0.5">時間</span>
+          <div class="stat-row">
+            <span class="stat-value">{{ rankingData.currentUserRanking.totalPeriod }}</span>
+            <span class="stat-unit">時間</span>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-else-if="rankingData" class="text-center py-8">
-      <div class="text-neutral-500 dark:text-neutral-400 text-sm">この期間の稽古記録がありません</div>
+    <div v-else-if="rankingData" class="empty-state">
+      <div class="empty-text">この期間の稽古記録がありません</div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.container {
+  width: 100%;
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  padding: var(--space-5);
+}
+
+.loading-skeleton {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.skeleton-text {
+  color: transparent;
+  background: var(--bg-muted-active);
+  border-radius: var(--radius-md);
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 10px;
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-1);
+}
+
+.rank-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1-5);
+}
+
+.rank-number {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  letter-spacing: -0.025em;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.rank-gold {
+  color: var(--rank-gold);
+}
+
+.rank-silver {
+  color: var(--rank-silver);
+}
+
+.rank-bronze {
+  color: var(--rank-bronze);
+}
+
+.rank-total {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.stat-row {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.stat-value {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+}
+
+.stat-unit {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  margin-left: var(--space-0-5);
+}
+
+.error-state,
+.empty-state {
+  text-align: center;
+  padding: var(--space-8);
+}
+
+.error-text {
+  font-size: var(--text-sm);
+  color: var(--red-500);
+}
+
+.empty-text {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+</style>

@@ -1,105 +1,67 @@
 <template>
-  <div class="space-y-4">
-    <div v-if="!user" class="flex items-center justify-between gap-4 animate-pulse">
-      <div class="flex items-center gap-4 min-w-0">
-        <!-- Profile Image Skeleton -->
-        <div class="h-14 w-14 shrink-0 rounded-full bg-neutral-200 dark:bg-neutral-700"></div>
-        <div class="min-w-0 space-y-1">
-          <!-- Name Skeleton -->
-          <div class="h-7 w-32 bg-neutral-200 dark:bg-neutral-700 rounded text-lg font-bold text-transparent">
-            User Name
-          </div>
-          <!-- Username Skeleton -->
-          <div class="h-5 w-24 bg-neutral-200 dark:bg-neutral-700 rounded text-sm text-transparent">@username</div>
+  <div class="container">
+    <div v-if="!user" class="skeleton header-row">
+      <div class="left">
+        <div class="avatar-skeleton" />
+        <div class="text-skeleton">
+          <div class="name-skeleton">User Name</div>
+          <div class="username-skeleton">@username</div>
         </div>
       </div>
-      <!-- Edit Button Skeleton -->
-      <div class="h-8 w-14 shrink-0 rounded-md bg-neutral-200 dark:bg-neutral-700"></div>
+      <div class="btn-skeleton" />
     </div>
 
-    <div v-else-if="!isEditing" class="flex items-center justify-between gap-4">
-      <div class="flex items-center gap-4 min-w-0">
-        <!-- Profile Image -->
-        <div class="h-14 w-14 shrink-0 overflow-hidden rounded-full ring-2 ring-neutral-100 dark:ring-neutral-700">
-          <img :src="safeImageUrl" :alt="user?.firstName || 'Profile'" class="h-full w-full object-cover" />
+    <div v-else-if="!isEditing" class="header-row">
+      <div class="left">
+        <div class="avatar">
+          <img :src="safeImageUrl" :alt="user?.firstName || 'Profile'" class="avatar-img" />
         </div>
-        <div class="min-w-0">
-          <h2 class="text-lg font-bold text-neutral-900 dark:text-neutral-100 truncate">
-            {{ user?.lastName }} {{ user?.firstName }}
-          </h2>
-          <p class="text-sm text-neutral-500 dark:text-neutral-400 truncate">@{{ user?.username }}</p>
+        <div class="text-content">
+          <h2 class="name">{{ user?.lastName }} {{ user?.firstName }}</h2>
+          <p class="username">@{{ user?.username }}</p>
         </div>
       </div>
-      <button
-        @click="isEditing = true"
-        class="shrink-0 rounded-md bg-white dark:bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-700 dark:text-neutral-300 shadow-sm ring-1 ring-inset ring-neutral-300 dark:ring-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">
-        編集
-      </button>
+      <button class="btn-edit" @click="isEditing = true">編集</button>
     </div>
 
-    <!-- Edit Mode -->
-    <form v-else @submit.prevent="handleSubmit" enctype="multipart/form-data" class="space-y-4">
-      <!-- Image Upload -->
-      <div class="flex items-start gap-4">
-        <div
-          class="group relative h-14 w-14 shrink-0 overflow-hidden rounded-full ring-2 ring-neutral-100 dark:ring-neutral-700">
-          <img :src="safePreviewImageUrl" :alt="user?.firstName || 'Profile'" class="h-full w-full object-cover" />
-          <label
-            class="absolute inset-0 flex cursor-pointer flex-col items-center justify-center bg-black/60 opacity-60 transition-opacity group-hover:opacity-100">
-            <span class="text-[10px] text-white font-medium">変更</span>
-            <input
-              type="file"
-              accept="image/*"
-              class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-              @change="handleImageChange" />
+    <form v-else enctype="multipart/form-data" class="edit-form" @submit.prevent="handleSubmit">
+      <div class="edit-row">
+        <div class="avatar-edit">
+          <img :src="safePreviewImageUrl" :alt="user?.firstName || 'Profile'" class="avatar-img" />
+          <label class="avatar-overlay">
+            <span class="change-text">変更</span>
+            <input type="file" accept="image/*" class="file-input" @change="handleImageChange" />
           </label>
         </div>
 
-        <div class="flex-1 space-y-4">
-          <div class="space-y-1.5">
-            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300"> ユーザー名 </label>
-            <input
-              v-model="formData.username"
-              type="text"
-              class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow" />
+        <div class="fields">
+          <div class="field">
+            <label class="label">ユーザー名</label>
+            <input v-model="formData.username" type="text" class="input" />
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
-            <div class="space-y-1.5">
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300"> 姓 </label>
-              <input
-                v-model="formData.lastName"
-                type="text"
-                class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow" />
+          <div class="grid-2">
+            <div class="field">
+              <label class="label">姓</label>
+              <input v-model="formData.lastName" type="text" class="input" />
             </div>
-            <div class="space-y-1.5">
-              <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300"> 名 </label>
-              <input
-                v-model="formData.firstName"
-                type="text"
-                class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow" />
+            <div class="field">
+              <label class="label">名</label>
+              <input v-model="formData.firstName" type="text" class="input" />
             </div>
           </div>
         </div>
       </div>
 
-      <p v-if="message" :class="messageClass" class="text-xs font-medium">
+      <p v-if="message" :class="['message', isError ? 'message-error' : 'message-success']">
         {{ message }}
       </p>
 
-      <div class="flex gap-3 pt-2">
-        <button
-          type="submit"
-          :disabled="isSubmitting"
-          class="flex-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+      <div class="actions">
+        <button type="submit" :disabled="isSubmitting" class="btn-primary">
           {{ isSubmitting ? "保存中..." : "保存" }}
         </button>
-        <button
-          type="button"
-          @click="cancelEdit"
-          class="flex-1 rounded-md bg-white dark:bg-neutral-800 px-3 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 shadow-sm ring-1 ring-inset ring-neutral-300 dark:ring-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">
-          キャンセル
-        </button>
+        <button type="button" class="btn-secondary" @click="cancelEdit">キャンセル</button>
       </div>
     </form>
   </div>
@@ -133,13 +95,11 @@ const formData = reactive<FormData>({
   firstName: props.user?.firstName || "",
 })
 
-// 画像URL の安全性チェック（XSS対策）
 function isSafeImageUrl(url: string): boolean {
   if (!url) return false
   if (typeof url !== "string") return false
   return (
-    ((url.startsWith("http://") || url.startsWith("https://")) &&
-      !url.includes(" ")) ||
+    ((url.startsWith("http://") || url.startsWith("https://")) && !url.includes(" ")) ||
     url.startsWith("data:image/")
   )
 }
@@ -153,13 +113,6 @@ const safePreviewImageUrl = computed(() => {
   return previewImage.value || safeImageUrl.value
 })
 
-const messageClass = computed(() =>
-  isError.value
-    ? "text-red-600 dark:text-red-400"
-    : "text-green-600 dark:text-green-400"
-)
-
-// propsの変更を監視してformDataを更新
 watch(
   () => props.user,
   newUser => {
@@ -235,3 +188,288 @@ function cancelEdit() {
   isEditing.value = false
 }
 </script>
+
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.skeleton {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.avatar,
+.avatar-edit {
+  position: relative;
+  width: 3.5rem;
+  height: 3.5rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 2px var(--bg-muted);
+}
+
+.avatar-skeleton {
+  width: 3.5rem;
+  height: 3.5rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--bg-muted-active);
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity var(--transition-normal);
+}
+
+.avatar-edit:hover .avatar-overlay {
+  opacity: 1;
+}
+
+.change-text {
+  font-size: 10px;
+  color: white;
+  font-weight: var(--font-medium);
+}
+
+.file-input {
+  position: absolute;
+  inset: 0;
+  width: -webkit-fill-available;
+  height: -webkit-fit-content;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.text-content {
+  min-width: 0;
+}
+
+.text-skeleton {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.name {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: var(--space-0);
+  margin-bottom: var(--space-0);
+}
+
+.name-skeleton {
+  height: 1.75rem;
+  width: 8rem;
+  background: var(--bg-muted-active);
+  border-radius: var(--radius-md);
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: transparent;
+}
+
+.username {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: var(--space-0);
+  margin-bottom: var(--space-0);
+}
+
+.username-skeleton {
+  height: 1.25rem;
+  width: 6rem;
+  background: var(--bg-muted-active);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  color: transparent;
+}
+
+.btn-skeleton {
+  height: 2rem;
+  width: 3.5rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-muted-active);
+}
+
+.btn-edit {
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  padding: var(--space-1-5) var(--space-3);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+}
+
+.btn-edit:hover {
+  background: var(--bg-muted);
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.edit-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+}
+
+.label {
+  display: block;
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.input {
+  width: -webkit-fill-available;
+  height: -webkit-fit-content;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  transition: box-shadow var(--transition-normal);
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.message {
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+}
+
+.message-error {
+  color: var(--red-500);
+}
+
+.message-success {
+  color: var(--green-500);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+
+.btn-primary {
+  flex: 1;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px var(--bg-card);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  flex: 1;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-muted);
+}
+</style>
