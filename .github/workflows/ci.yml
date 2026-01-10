@@ -52,7 +52,7 @@ jobs:
         run: pnpm run lint
 
       - name: Type Generation
-        run: pnpm run cf-typege
+        run: pnpm run cf-typegen
 
       - name: Type Check
         run: pnpm run type-check
