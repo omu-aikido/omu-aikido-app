@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div v-if="!profile" class="skeleton">
+    <div v-if="!profile" class="skeleton" data-testid="loading-skeleton">
       <div class="header-row">
         <h3 class="title">プロフィール</h3>
         <div class="skeleton-btn" />

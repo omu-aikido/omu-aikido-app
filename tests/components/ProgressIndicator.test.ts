@@ -9,12 +9,12 @@ describe('ProgressIndicator.vue', () => {
       props: { step: 'basic' },
     })
 
-    // Basic should be blue/bold
+    // Basic should be active
     const basic = wrapper.find('[data-testid="step-basic"]')
-    expect(basic.classes()).toContain('text-blue-600')
+    expect(basic.classes()).toContain('step-active')
 
-    // Others gray
-    expect(wrapper.find('[data-testid="step-personal"]').classes()).toContain('text-gray-500')
+    // Others inactive
+    expect(wrapper.find('[data-testid="step-personal"]').classes()).toContain('step-inactive')
   })
 
   it('highlights personal step correctly', () => {
@@ -22,11 +22,11 @@ describe('ProgressIndicator.vue', () => {
       props: { step: 'personal' },
     })
 
-    // Basic should be green (completed)
-    expect(wrapper.find('[data-testid="step-basic"]').classes()).toContain('text-green-600')
+    // Basic should be complete
+    expect(wrapper.find('[data-testid="step-basic"]').classes()).toContain('step-complete')
 
-    // Personal should be blue (active)
-    expect(wrapper.find('[data-testid="step-personal"]').classes()).toContain('text-blue-600')
+    // Personal should be active
+    expect(wrapper.find('[data-testid="step-personal"]').classes()).toContain('step-active')
   })
 
   it('highlights profile step correctly', () => {
@@ -34,8 +34,8 @@ describe('ProgressIndicator.vue', () => {
       props: { step: 'profile' },
     })
 
-    expect(wrapper.find('[data-testid="step-basic"]').classes()).toContain('text-green-600')
-    expect(wrapper.find('[data-testid="step-personal"]').classes()).toContain('text-green-600')
-    expect(wrapper.find('[data-testid="step-profile"]').classes()).toContain('text-blue-600')
+    expect(wrapper.find('[data-testid="step-basic"]').classes()).toContain('step-complete')
+    expect(wrapper.find('[data-testid="step-personal"]').classes()).toContain('step-complete')
+    expect(wrapper.find('[data-testid="step-profile"]').classes()).toContain('step-active')
   })
 })

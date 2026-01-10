@@ -19,7 +19,7 @@ const getRankClass = (rank: number) => {
 
 <template>
   <div class="container" data-testid="practice-ranking">
-    <div v-if="loading" class="card loading-skeleton">
+    <div v-if="loading" class="card loading-skeleton" data-testid="loading-state">
       <div class="card-content">
         <div class="left">
           <div class="label skeleton-text">月間ランキング (2024年1月)</div>
