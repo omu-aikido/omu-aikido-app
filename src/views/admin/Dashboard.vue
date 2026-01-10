@@ -6,7 +6,9 @@
       <Loading />
     </div>
 
-    <div v-else-if="error" class="bg-red-50 dark:bg-red-950 p-4 rounded-md border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300">
+    <div
+      v-else-if="error"
+      class="bg-red-50 dark:bg-red-950 p-4 rounded-md border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300">
       {{ error }}
     </div>
 

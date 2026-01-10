@@ -79,7 +79,9 @@
       <Loading />
     </div>
 
-    <div v-else-if="error" class="p-4 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 rounded-md border border-red-200 dark:border-red-800">
+    <div
+      v-else-if="error"
+      class="p-4 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 rounded-md border border-red-200 dark:border-red-800">
       {{ error }}
     </div>
 
@@ -92,7 +94,9 @@
         :progress="item.norm.progress" />
     </div>
 
-    <div v-if="!loading && !error && filteredUsers.length === 0" class="text-center py-12 text-neutral-500 dark:text-neutral-400">
+    <div
+      v-if="!loading && !error && filteredUsers.length === 0"
+      class="text-center py-12 text-neutral-500 dark:text-neutral-400">
       該当するユーザーが見つかりません
     </div>
   </div>

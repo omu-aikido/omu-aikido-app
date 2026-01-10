@@ -3,6 +3,19 @@ name: Deploy
 on:
   push:
     branches: [main]
+    paths:
+      - '.github/workflows/deploy.yml'
+      - 'src/**'
+      - 'server/**'
+      - 'share/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'vite.config.ts'
+      - 'wrangler.jsonc'
+      - 'tsconfig*.json'
+      - 'env.d.ts'
 
 permissions:
   contents: read
@@ -18,13 +31,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup mise
+        uses: jdx/mise-action@v2
         with:
-          run_install: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+          cache: true
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
