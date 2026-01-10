@@ -1,0 +1,16 @@
+[tools]
+lefthook = "latest"
+node = "22.12.0"
+pnpm = "10.27.0"
+
+[tasks]
+format = "pnpm run format"
+lint = "pnpm run lint"
+type-check = "pnpm run type-check"
+build = "pnpm run build"
+deploy = "pnpm run deploy"
+db-setup = "docker-compose up -d libsql-server && pnpm run db:migrate"
+
+[tasks.dev]
+run = "pnpm run dev"
+depends = "db-setup"
