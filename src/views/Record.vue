@@ -37,8 +37,6 @@ const error = computed(() =>
   queryError.value ? "活動記録の取得に失敗しました" : null
 )
 
-
-
 const handleDelete = (id: string) => {
   activityToDelete.value = id
   confirmDialogOpen.value = true
@@ -49,7 +47,6 @@ const handleConfirmDelete = async () => {
     await deleteActivity([activityToDelete.value])
     confirmDialogOpen.value = false
     activityToDelete.value = null
-    // Auto-refetch handled by mutation onSuccess
   }
 }
 
@@ -76,27 +73,19 @@ const selectedDateActivities = computed(() => {
     isSameDay(parseISO(a.date), parseISO(selectedDate.value))
   )
 })
-
-/*
-onMounted(() => {
-  // Initial fetch handled by useQuery
-})
-*/
 </script>
 
 <template>
-  <div class="min-h-[calc(100vh-4rem)] flex flex-col container mx-auto px-4">
+  <div class="container">
     <SignedIn>
-      <div class="flex-1 flex flex-col max-w-2xl mx-auto w-full space-y-4">
-        <h1 class="text-2xl font-bold text-neutral-800 dark:text-neutral-200 shrink-0">活動記録</h1>
+      <div class="content">
+        <h1 class="title">活動記録</h1>
 
-        <!-- Error Message -->
-        <div v-if="error" class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 p-4 rounded-lg shrink-0">
+        <div v-if="error" class="error-banner">
           {{ error }}
         </div>
 
-        <!-- Calendar List -->
-        <div class="flex-1 min-h-0">
+        <div class="calendar-container">
           <ActivityList
             :activities="activities"
             :loading="loading"
@@ -106,47 +95,29 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Add Activity Modal (Headless UI) -->
-      <Dialog :open="isModalOpen" @close="closeModal" class="relative z-50">
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" />
-
-        <!-- Full-screen scrollable container -->
-        <div class="fixed inset-0 flex w-screen items-center justify-center p-4">
-          <DialogPanel
-            class="w-full max-w-md bg-white dark:bg-neutral-800 rounded-xl shadow-xl p-6 border border-neutral-200 dark:border-neutral-700 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between mb-4">
-              <DialogTitle class="text-lg font-bold text-neutral-900 dark:text-neutral-100"
-                >記録を追加・編集</DialogTitle
-              >
-              <button
-                @click="closeModal"
-                class="p-1 rounded-full text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
-                <XIcon class="w-5 h-5" />
+      <Dialog :open="isModalOpen" class="modal" @close="closeModal">
+        <div class="backdrop" aria-hidden="true" />
+        <div class="modal-container">
+          <DialogPanel class="modal-panel">
+            <div class="modal-header">
+              <DialogTitle class="modal-title"> 記録を追加・編集 </DialogTitle>
+              <button class="close-btn" @click="closeModal">
+                <XIcon class="close-icon" />
               </button>
             </div>
 
             <ActivityForm :loading="loading" :initial-date="selectedDate" @submit="handleSubmit" />
 
-            <!-- Existing Activities List -->
-            <div
-              v-if="selectedDateActivities.length > 0"
-              class="mt-8 pt-6 border-t border-neutral-200 dark:border-neutral-700">
-              <h4 class="text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-3">この日の記録</h4>
-              <div class="space-y-2">
-                <div
-                  v-for="activity in selectedDateActivities"
-                  :key="activity.id"
-                  class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg">
-                  <div class="flex items-baseline gap-2">
-                    <span class="text-lg font-bold text-neutral-900 dark:text-neutral-100">{{ activity.period }}</span>
-                    <span class="text-sm text-neutral-500 dark:text-neutral-400">時間</span>
+            <div v-if="selectedDateActivities.length > 0" class="existing-records">
+              <h4 class="records-title">この日の記録</h4>
+              <div class="records-list">
+                <div v-for="activity in selectedDateActivities" :key="activity.id" class="record-item">
+                  <div class="record-info">
+                    <span class="record-value">{{ activity.period }}</span>
+                    <span class="record-unit">時間</span>
                   </div>
-                  <button
-                    @click="handleDelete(activity.id)"
-                    class="p-2 text-neutral-400 hover:text-red-600 dark:hover:text-red-400 transition-colors rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                    title="記録を削除">
-                    <Trash2Icon class="w-4 h-4" />
+                  <button class="delete-btn" title="記録を削除" @click="handleDelete(activity.id)">
+                    <Trash2Icon class="delete-icon" />
                   </button>
                 </div>
               </div>
@@ -166,3 +137,175 @@ onMounted(() => {
     </SignedIn>
   </div>
 </template>
+
+<style scoped>
+.container {
+  min-height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 42rem;
+  margin-inline: auto;
+  width: 100%;
+  gap: var(--space-4);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.error-banner {
+  background: var(--error-bg);
+  color: var(--red-500);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+}
+
+.calendar-container {
+  flex: 1;
+  min-height: 0;
+}
+
+.modal {
+  position: relative;
+  z-index: var(--z-dropdown);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 50%);
+  backdrop-filter: blur(4px);
+}
+
+.modal-container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  width: 100vw;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.modal-panel {
+  width: 100%;
+  max-width: 28rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-6);
+  border: 1px solid var(--border-dim);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.modal-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.close-btn {
+  padding: var(--space-1);
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+}
+
+.close-btn:hover {
+  background: var(--bg-muted);
+}
+
+.close-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.existing-records {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border-dim);
+}
+
+.records-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.record-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+}
+
+.record-info {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.record-value {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.record-unit {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.delete-btn {
+  padding: var(--space-2);
+  color: var(--border-strong);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: color var(--transition-normal), background var(--transition-normal);
+}
+
+.delete-btn:hover {
+  color: var(--red-500);
+  background: var(--bg-muted);
+}
+
+.delete-icon {
+  width: 1rem;
+  height: 1rem;
+}
+</style>

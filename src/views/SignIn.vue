@@ -1,144 +1,119 @@
 <template>
-  <div class="flex items-center justify-center p-4">
+  <div class="page-container">
     <SignedIn>
       <Card>
-        <h1 class="text-3xl text-center font-bold text-neutral-800 dark:text-neutral-100 tracking-tight">
-          Welcome Back
-        </h1>
-        <p class="text-base text-neutral-600 dark:text-neutral-300 opacity-80">
+        <h1 class="title">Welcome Back</h1>
+        <p class="subtitle">
           ログインが完了しました。<br />
           ホームへリダイレクトしています。
         </p>
-        <div class="w-full mt-4 mb-2 flex justify-center">
-          <div class="w-48 h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
-            <div :style="{ width: gaugePercent + '%' }" class="h-full bg-blue-500 transition-all duration-1000"></div>
+        <div class="gauge-container">
+          <div class="gauge-bg">
+            <div :style="{ width: gaugePercent + '%' }" class="gauge-fill" />
           </div>
         </div>
-        <p class="text-xs text-neutral-500 dark:text-neutral-400">
+        <p class="redirect-text">
           画面が切り替わらない場合は
-          <RouterLink
-            :to="redirectUrl"
-            class="text-blue-600 dark:text-blue-300 underline hover:text-blue-800 dark:hover:text-blue-400 transition-colors">
-            こちら
-          </RouterLink>
+          <RouterLink :to="redirectUrl" class="link"> こちら </RouterLink>
         </p>
       </Card>
     </SignedIn>
 
     <SignedOut>
-      <Card class="mx-auto max-w-md">
-        <div class="p-2">
-          <h1 class="text-2xl font-bold text-neutral-800 dark:text-neutral-100">サインイン</h1>
+      <Card class="form-card">
+        <div class="card-header">
+          <h1 class="form-title">サインイン</h1>
         </div>
-        <div class="p-2 pt-0">
-          <div class="flex flex-col gap-6">
+        <div class="card-body">
+          <div class="form-container">
             <form v-if="needsVerification" @submit.prevent="handleVerifyCode">
-              <div class="grid gap-2">
-                <label for="code" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">認証コード</label>
-                <input
-                  id="code"
-                  v-model="code"
-                  type="text"
-                  name="code"
-                  required
-                  placeholder="認証コードを入力"
-                  class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-neutral-100" />
-                <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ email }} に認証コードを送信しました</p>
-              </div>
-              <div v-if="error" class="mt-4 text-sm text-red-600 dark:text-red-400">
+              <Input id="code" v-model="code" label="認証コード" name="code" required placeholder="認証コードを入力" />
+              <p class="hint">{{ email }} に認証コードを送信しました</p>
+
+              <div v-if="error" class="error">
                 <p>{{ error }}</p>
               </div>
-              <button
-                type="submit"
-                :disabled="isLoading"
-                class="mt-4 w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+              <Button type="submit" :disabled="isLoading" full-width class="mt-4">
                 {{ isLoading ? "認証中..." : "認証" }}
-              </button>
+              </Button>
             </form>
 
             <form v-else @submit.prevent="handleSignIn">
-              <div class="grid gap-2">
-                <label for="email" class="text-sm font-medium text-neutral-700 dark:text-neutral-300"
-                  >メールアドレス</label
-                >
-                <input
-                  id="email"
-                  v-model="email"
-                  type="email"
-                  name="email"
-                  required
-                  autoComplete="email"
-                  placeholder="example@mail.com"
-                  class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-neutral-100" />
-              </div>
-              <div class="mt-4 grid gap-2">
-                <div class="flex items-center">
-                  <label for="password" class="text-sm font-medium text-neutral-700 dark:text-neutral-300"
-                    >パスワード</label
-                  >
+              <Input
+                id="email"
+                v-model="email"
+                type="email"
+                label="メールアドレス"
+                name="email"
+                required
+                autocomplete="email"
+                placeholder="example@mail.com" />
+
+              <div class="mt-4 user-select-none">
+                <!-- added wrapper for layout spacing if needed, though Input handles vertical gap -->
+                <!-- Password input needs custom label layout for 'Forgot Password' link?
+                      Input component has internal label. If we want the link next to label, we might need a slot or different approach.
+                      The Input component puts label above.
+                      Let's use the Input component but maybe we can't easily put the link *inside* the label line without a slot.
+                      However, the Input component doesn't have a label-right slot.
+
+                      Workaround: Don't use 'label' prop on Input, render label manually above it.
+                 -->
+                <div class="label-row">
+                  <label for="password" class="field-label">パスワード</label>
                   <a
                     href="https://accounts.omu-aikido.com/sign-in/"
-                    class="ml-auto inline-block text-sm text-neutral-600 dark:text-neutral-400 underline-offset-4 hover:underline"
+                    class="forgot-link"
                     target="_blank"
                     rel="noopener noreferrer">
                     パスワードを忘れた
                   </a>
                 </div>
-                <input
+                <Input
                   id="password"
                   v-model="password"
                   type="password"
                   name="password"
                   required
-                  autoComplete="current-password"
-                  class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-neutral-100" />
+                  autocomplete="current-password" />
               </div>
-              <div v-if="error" class="mt-4 text-sm text-red-600 dark:text-red-400">
+
+              <div v-if="error" class="error">
                 <p>{{ error }}</p>
-                <div class="mt-4 text-sm text-neutral-600 dark:text-neutral-400">
+                <div class="error-help">
                   サインインに失敗する場合は、
-                  <a
-                    href="https://accounts.omu-aikido.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="underline hover:text-neutral-900 dark:hover:text-neutral-200">
+                  <a href="https://accounts.omu-aikido.com" target="_blank" rel="noopener noreferrer" class="link">
                     こちら
                   </a>
                   からサインインをお試しください。
                 </div>
               </div>
-              <button
-                type="submit"
-                :disabled="isLoading"
-                class="mt-6 w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+
+              <Button type="submit" :disabled="isLoading" full-width class="mt-6">
                 {{ isLoading ? "サインイン中..." : "サインイン" }}
-              </button>
+              </Button>
             </form>
-            <button
-              type="button"
-              class="w-full rounded-md bg-[#5865F2]! px-4 py-2 text-sm font-medium text-white! hover:bg-[#4752C4]! focus:outline-none focus:ring-2 focus:ring-[#5865F2] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              @click="handleSignInWithDiscord"
-              :disabled="isLoading">
+
+            <Button type="button" variant="discord" full-width :disabled="isLoading" @click="handleSignInWithDiscord">
               <svg
-                class="h-5 w-5 fill-white stroke-white"
+                class="discord-icon"
                 aria-hidden="true"
                 focusable="false"
-                data-prefix="fab"
-                data-icon="discord"
-                role="img"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 256 256">
                 <g>
-                  <circle stroke="none" cx="96" cy="144" r="12" />
-                  <circle stroke="none" cx="160" cy="144" r="12" />
+                  <circle stroke="none" cx="96" cy="144" r="12" fill="currentColor" />
+                  <circle stroke="none" cx="160" cy="144" r="12" fill="currentColor" />
                   <path
                     fill="none"
+                    stroke="currentColor"
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="16"
                     d="M74 80a175 175 0 0 1 54-8 175 175 0 0 1 54 8m0 96a175 175 0 0 1-54 8 175 175 0 0 1-54-8" />
                   <path
                     fill="none"
+                    stroke="currentColor"
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="16"
@@ -146,12 +121,12 @@
                 </g>
               </svg>
               Discordで認証
-            </button>
+            </Button>
           </div>
-          <hr class="my-6" />
-          <div class="mt-4 text-center text-sm text-neutral-700 dark:text-neutral-300">
+          <hr class="divider" />
+          <div class="footer-text">
             まだアカウントがありませんか?
-            <RouterLink to="/sign-up" class="underline underline-offset-4"> サインアップ </RouterLink>
+            <RouterLink to="/sign-up" class="link"> サインアップ </RouterLink>
           </div>
         </div>
       </Card>
@@ -164,7 +139,9 @@ import { useRouter, useRoute } from "vue-router"
 import { SignedOut, SignedIn } from "@clerk/vue"
 import { useAuth } from "@/src/composable/useAuth"
 import { useSignIn } from "@/src/composable/useSignIn"
-import Card from "@/src/components/ui/Card.vue"
+import Card from "@/src/components/ui/UiCard.vue"
+import Button from "@/src/components/ui/UiButton.vue"
+import Input from "@/src/components/ui/UiInput.vue"
 import { ref, onMounted, watch } from "vue"
 
 const router = useRouter()
@@ -201,7 +178,6 @@ onMounted(() => {
 
   if (redirectParam) {
     try {
-      // Prevent open redirection vulnerability
       const parsedRedirectUrl = new URL(redirectParam, url.origin)
       if (parsedRedirectUrl.origin === url.origin) {
         redirectUrl.value =
@@ -209,7 +185,7 @@ onMounted(() => {
           parsedRedirectUrl.search +
           parsedRedirectUrl.hash
       }
-    } catch (e) {
+    } catch {
       console.error(`Invalid redirect_url: ${redirectParam}`)
     }
   }
@@ -226,20 +202,168 @@ watch(isAuthenticated, newValue => {
 })
 
 const handleSignIn = async () => {
-  const success = await signIn()
-  if (success) {
-    // The watcher will handle the redirect
-  }
+  await signIn()
 }
 
 const handleVerifyCode = async () => {
-  const success = await verifyCode()
-  if (success) {
-    // The watcher will handle the redirect
-  }
+  await verifyCode()
 }
 
 const handleSignInWithDiscord = async () => {
   await signInWithDiscord()
 }
 </script>
+
+<style scoped>
+.page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.title {
+  font-size: var(--text-3xl);
+  text-align: center;
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  letter-spacing: -0.025em;
+}
+
+.subtitle {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.gauge-container {
+  width: 100%;
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-2);
+  display: flex;
+  justify-content: center;
+}
+
+.gauge-bg {
+  width: 12rem;
+  height: 0.75rem;
+  background: var(--bg-muted-active);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 1s ease;
+}
+
+.redirect-text {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.form-card {
+  margin-inline: auto;
+  max-width: 28rem;
+}
+
+.card-header {
+  padding: var(--space-2);
+}
+
+.form-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.card-body {
+  padding: var(--space-2);
+  padding-top: 0;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.field-label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--text-secondary);
+}
+
+.label-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-1-5);
+}
+
+.forgot-link {
+  margin-left: auto;
+  display: inline-block;
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+.hint {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-top: var(--space-2);
+}
+
+.error {
+  margin-top: var(--space-4);
+  font-size: var(--text-base);
+  color: var(--red-500);
+}
+
+.error-help {
+  margin-top: var(--space-4);
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
+
+.discord-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: var(--space-2);
+}
+
+.mt-4 {
+  margin-top: var(--space-4);
+}
+
+.mt-6 {
+  margin-top: var(--space-6);
+}
+
+.divider {
+  margin: var(--space-6) 0;
+}
+
+.footer-text {
+  margin-top: var(--space-4);
+  text-align: center;
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
+
+.link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.link:hover {
+  color: var(--accent-hover);
+}
+</style>

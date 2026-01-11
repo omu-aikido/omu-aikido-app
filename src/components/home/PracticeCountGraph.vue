@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from "vue"
 import { timeForNextGrade, translateGrade } from "@/share/lib/grade"
 import type { PracticeCountData } from "@/share/types/records"
+import { computed } from "vue"
 
 interface Props {
   practiceData: PracticeCountData | null
@@ -63,82 +63,215 @@ const progressComment = computed(() => {
 </script>
 
 <template>
-  <div class="w-full" data-testid="practice-count-graph">
-    <div
-      v-if="loading"
-      class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 p-5 animate-pulse"
-      data-testid="loading-skeleton">
-      <div class="flex flex-col items-center">
-        <div class="flex justify-center items-baseline-last">
-          <!-- Title Dummy -->
-          <span class="text-lg font-medium text-transparent bg-neutral-200 dark:bg-neutral-700 rounded">
-            初段昇段まで
-          </span>
-          <!-- Number Dummy -->
-          <span class="text-4xl font-bold tracking-tight text-transparent bg-neutral-200 dark:bg-neutral-700 rounded">
-            &ThinSpace;88&ThinSpace;
-          </span>
-          <!-- Unit Dummy -->
-          <span class="text-transparent bg-neutral-200 dark:bg-neutral-700 rounded font-medium"> 日 </span>
+  <div class="container" data-testid="practice-count-graph">
+    <div v-if="loading" class="card loading-skeleton" data-testid="loading-skeleton">
+      <div class="content-center">
+        <div class="title-row skeleton-text">
+          <span class="number"> &nbsp;&nbsp; </span>
         </div>
-        <div class="w-full mt-4 max-w-sm">
-          <!-- Progress Bar: h-2 -->
-          <div class="h-2 w-full bg-neutral-200 dark:bg-neutral-700 rounded-full"></div>
+        <div class="progress-container">
+          <div class="progress-bar-bg">
+            <div class="progress-bar" style="width: 0" />
+          </div>
         </div>
       </div>
     </div>
 
-    <div v-else-if="error" class="text-center py-8">
-      <div class="text-red-500 dark:text-red-400 text-sm">エラー: {{ error }}</div>
+    <div v-else-if="error" class="error-state">
+      <div class="error-text">エラー: {{ error }}</div>
     </div>
 
-    <details
-      v-else-if="practiceData"
-      class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 overflow-hidden transition-colors duration-200 group">
-      <summary class="p-5 cursor-pointer transition-colors list-none [&::-webkit-details-marker]:hidden">
-        <div class="flex flex-col items-center">
-          <div class="flex justify-center items-baseline-last">
-            <span class="text-lg font-medium text-neutral-600 dark:text-neutral-300">
-              {{ translateGrade(targetGrade) }}{{ promotionType }}まで
-            </span>
-            <span class="text-4xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight">
-              &ThinSpace;{{ needToNextGrade }}&ThinSpace;
-            </span>
-            <span class="text-neutral-500 dark:text-neutral-400 font-medium">日</span>
+    <details v-else-if="practiceData" class="card details-card">
+      <summary class="summary">
+        <div class="content-center">
+          <div class="title-row">
+            <span class="title">{{ translateGrade(targetGrade) }}{{ promotionType }}まで</span>
+            <span class="number">&ThinSpace;{{ needToNextGrade }}&ThinSpace;</span>
+            <span class="unit">日</span>
           </div>
 
-          <div class="w-full mt-4 max-w-sm">
-            <div class="h-2 w-full rounded-full bg-neutral-100 dark:bg-neutral-700 overflow-hidden">
-              <div
-                class="h-full rounded-full bg-indigo-600 dark:bg-indigo-500 transition-all duration-500 ease-out"
-                :style="{ width: `${progressPercentage}%` }"
-                data-testid="progress-bar" />
+          <div class="progress-container">
+            <div class="progress-bar-bg">
+              <div class="progress-bar" :style="{ width: `${progressPercentage}%` }" data-testid="progress-bar" />
             </div>
           </div>
         </div>
       </summary>
 
-      <div
-        class="px-5 pb-5 pt-0 border-t border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50">
-        <div class="pt-4 text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed text-center">
-          <p class="font-medium text-indigo-600 dark:text-indigo-400 mb-2">
+      <div class="details-content">
+        <div class="details-inner">
+          <p class="comment">
             {{ progressComment }}
           </p>
           <p>
-            目標の<span class="font-medium">{{
-              translateGrade(targetGrade)
-            }}</span
+            目標の<span class="highlight">{{ translateGrade(targetGrade) }}</span
             >への{{ promotionType }}まで
-            <span class="font-bold text-neutral-900 dark:text-neutral-100">{{ requiredCount }}日分</span>
+            <span class="bold">{{ requiredCount }}日分</span>
             の稽古が必要です。
           </p>
           <p class="mt-1">
-            現在、<span class="font-bold text-green-600 dark:text-green-400">{{ practiceData.practiceCount }}日</span
-            >達成しています。
+            現在、<span class="success">{{ practiceData.practiceCount }}日</span>達成しています。
           </p>
-          <p class="mt-1 text-xs text-neutral-700 dark:text-neutral-400">※ 1.5時間の稽古を1日分として換算</p>
+          <p class="note">※ 1.5時間の稽古を1日分として換算</p>
         </div>
       </div>
     </details>
   </div>
 </template>
+
+<style scoped>
+.container {
+  width: 100%;
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-dim);
+}
+
+.loading-skeleton {
+  padding: var(--space-5);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton-text {
+  color: transparent;
+  background: var(--bg-muted-active);
+  border-radius: var(--radius-md);
+}
+
+.content-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title-row {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+}
+
+.title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.number {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  color: var(--primary);
+  letter-spacing: -0.025em;
+}
+
+.unit {
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.progress-container {
+  width: 100%;
+  margin-top: var(--space-4);
+  max-width: 24rem;
+}
+
+.progress-bar-bg {
+  height: 0.5rem;
+  width: 100%;
+  border-radius: var(--radius-full);
+  background: var(--bg-muted);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  transition: width 500ms ease-out;
+}
+
+.error-state {
+  text-align: center;
+  padding: var(--space-8);
+}
+
+.error-text {
+  font-size: var(--text-sm);
+  color: var(--red-500);
+}
+
+.details-card {
+  overflow: hidden;
+  transition: background var(--transition-normal);
+}
+
+.summary {
+  padding: var(--space-5);
+  cursor: pointer;
+  list-style: none;
+  transition: background var(--transition-normal);
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.details-content {
+  padding: 0 var(--space-5) var(--space-5);
+  border-top: 1px solid var(--border-dim);
+  background: var(--bg-card);
+}
+
+.details-inner {
+  padding-top: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  text-align: center;
+}
+
+.comment {
+  font-weight: var(--font-medium);
+  color: var(--primary);
+  margin-bottom: var(--space-2);
+}
+
+.highlight {
+  font-weight: var(--font-medium);
+}
+
+.bold {
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.mt-1 {
+  margin-top: var(--space-1);
+}
+
+.success {
+  font-weight: var(--font-bold);
+  color: var(--green-500);
+}
+
+.note {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+}
+</style>

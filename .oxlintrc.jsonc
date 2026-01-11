@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["import", "unicorn", "promise"],
+  "plugins": ["import", "unicorn", "promise", "typescript", "oxc"],
   "categories": {
     "correctness": "error", // 正確性に関わる問題
     "suspicious": "warn", // 疑わしいコード
@@ -8,48 +8,111 @@
     "restriction": "warn", // 制限ルール
   },
   "rules": {
+    "complexity": ["warn", { "max": 20 }],
     "eqeqeq": "error", // 厳密等価演算子 (===) を強制
-    "no-var": "error", // varの使用を禁止（const/letを強制）
-    "prefer-const": "error", // 再代入されない変数はconstを強制
-    "no-inline-comments": "allow", // 行末コメントは許可
-    "no-console": "off", // console.log等の使用を許可
-    "no-useless-return": "off", // 不要なreturn文を許可
-    "max-dependencies": [
-      "warn",
-      {
-        "max": 25, // 1ファイルのimport数
-      },
-    ],
-    "max-lines": [
-      "warn",
-      {
-        "max": 350, // ファイル行数
-      },
-    ],
-    "max-lines-per-function": [
-      "warn",
-      {
-        "max": 160, // 関数の行数
-      },
-    ],
-    "complexity": [
-      "warn",
-      {
-        "max": 20, // 循環的複雑度の制限
-      },
-    ],
-    "max-depth": [
-      "warn",
-      {
-        "max": 4, // ネストの深さ制限
-      },
-    ],
-    "no-shadow": "warn", // 変数のシャドーイング
-    "no-bitwise": "error", // ビット演算
-    "no-negated-condition": "off", // if (!condition) 形式
-    "unicorn/prefer-top-level-await": "off", // Top-level await
-    "unicorn/prefer-add-event-listener": "off", // onEventプロパティの使用
+    "for-direction": "warn",
     "import/no-unassigned-import": "warn", // 副作用のみのimport (import "foo")
+    "max-dependencies": ["warn", { "max": 25 }],
+    "max-depth": ["warn", { "max": 4 }],
+    "max-lines-per-function": ["warn", { "max": 160 }],
+    "max-lines": ["warn", { "max": 350 }],
+    "no-async-promise-executor": "warn",
+    "no-bitwise": "error", // ビット演算
+    "no-caller": "warn",
+    "no-class-assign": "warn",
+    "no-compare-neg-zero": "warn",
+    "no-cond-assign": "warn",
+    "no-console": "off", // console.log等の使用を許可
+    "no-const-assign": "warn",
+    "no-constant-binary-expression": "warn",
+    "no-constant-condition": "warn",
+    "no-control-regex": "warn",
+    "no-debugger": "warn",
+    "no-delete-var": "warn",
+    "no-dupe-class-members": "warn",
+    "no-dupe-else-if": "warn",
+    "no-dupe-keys": "warn",
+    "no-duplicate-case": "warn",
+    "no-empty-character-class": "warn",
+    "no-empty-pattern": "warn",
+    "no-empty-static-block": "warn",
+    "no-eval": "warn",
+    "no-ex-assign": "warn",
+    "no-extra-boolean-cast": "warn",
+    "no-func-assign": "warn",
+    "no-global-assign": "warn",
+    "no-import-assign": "warn",
+    "no-inline-comments": "allow", // 行末コメントは許可
+    "no-invalid-regexp": "warn",
+    "no-irregular-whitespace": "warn",
+    "no-loss-of-precision": "warn",
+    "no-negated-condition": "off", // if (!condition) 形式
+    "no-new-native-nonconstructor": "warn",
+    "no-nonoctal-decimal-escape": "warn",
+    "no-obj-calls": "warn",
+    "no-self-assign": "warn",
+    "no-setter-return": "warn",
+    "no-shadow-restricted-names": "warn",
+    "no-shadow": "warn", // 変数のシャドーイング
+    "no-sparse-arrays": "warn",
+    "no-this-before-super": "warn",
+    "no-unassigned-vars": "warn",
+    "no-unsafe-finally": "warn",
+    "no-unsafe-negation": "warn",
+    "no-unsafe-optional-chaining": "warn",
+    "no-unused-labels": "warn",
+    "no-unused-private-class-members": "warn",
+    "no-unused-vars": "warn",
+    "no-useless-backreference": "warn",
+    "no-useless-catch": "warn",
+    "no-useless-escape": "warn",
+    "no-useless-rename": "warn",
+    "no-useless-return": "off", // 不要なreturn文を許可
+    "no-var": "error", // varの使用を禁止（const/letを強制）
+    "no-with": "warn",
+    "oxc/bad-array-method-on-arguments": "warn",
+    "oxc/bad-char-at-comparison": "warn",
+    "oxc/bad-comparison-sequence": "warn",
+    "oxc/bad-min-max-func": "warn",
+    "oxc/bad-object-literal-comparison": "warn",
+    "oxc/bad-replace-all-arg": "warn",
+    "oxc/const-comparisons": "warn",
+    "oxc/double-comparisons": "warn",
+    "oxc/erasing-op": "warn",
+    "oxc/missing-throw": "warn",
+    "oxc/number-arg-out-of-range": "warn",
+    "oxc/only-used-in-recursion": "warn",
+    "oxc/uninvoked-array-callback": "warn",
+    "prefer-const": "error", // 再代入されない変数はconstを強制
+    "require-yield": "warn",
+    "typescript/no-duplicate-enum-values": "warn",
+    "typescript/no-extra-non-null-assertion": "warn",
+    "typescript/no-misused-new": "warn",
+    "typescript/no-non-null-asserted-optional-chain": "warn",
+    "typescript/no-this-alias": "warn",
+    "typescript/no-unnecessary-parameter-property-assignment": "warn",
+    "typescript/no-unsafe-declaration-merging": "warn",
+    "typescript/no-useless-empty-export": "warn",
+    "typescript/no-wrapper-object-types": "warn",
+    "typescript/prefer-as-const": "warn",
+    "typescript/triple-slash-reference": "warn",
+    "unicorn/no-await-in-promise-methods": "warn",
+    "unicorn/no-empty-file": "warn",
+    "unicorn/no-invalid-fetch-options": "warn",
+    "unicorn/no-invalid-remove-event-listener": "warn",
+    "unicorn/no-new-array": "warn",
+    "unicorn/no-single-promise-in-promise-methods": "warn",
+    "unicorn/no-thenable": "warn",
+    "unicorn/no-unnecessary-await": "warn",
+    "unicorn/no-useless-fallback-in-spread": "warn",
+    "unicorn/no-useless-length-check": "warn",
+    "unicorn/no-useless-spread": "warn",
+    "unicorn/prefer-add-event-listener": "off", // onEventプロパティの使用
+    "unicorn/prefer-set-size": "warn",
+    "unicorn/prefer-string-starts-ends-with": "warn",
+    "unicorn/prefer-top-level-await": "off", // Top-level await
+    "use-isnan": "warn",
+    "valid-typeof": "warn",
   },
   "ignorePatterns": ["tests/*"],
 }

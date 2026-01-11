@@ -1,7 +1,7 @@
 import type { UserResource } from '@clerk/types'
 import type { Ref } from 'vue'
 
-import { useClerk, useUser, useAuth as useClerkAuth } from '@clerk/vue'
+import { useClerk, useAuth as useClerkAuth, useUser } from '@clerk/vue'
 import { computed, ref } from 'vue'
 
 import hc from '@/src/lib/honoClient'

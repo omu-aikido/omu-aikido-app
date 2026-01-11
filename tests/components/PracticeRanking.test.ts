@@ -41,7 +41,7 @@ describe('PracticeRanking.vue', () => {
       },
     })
 
-    expect(wrapper.find('.animate-pulse').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="loading-state"]').exists()).toBe(true)
   })
 
   it('renders error state', () => {

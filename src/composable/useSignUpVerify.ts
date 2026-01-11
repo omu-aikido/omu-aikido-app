@@ -33,8 +33,8 @@ export function useSignUpVerify() {
       console.error('Sign up status is not complete:', signUpAttempt)
       error.value = 'Verification failed. Please try again.'
       return false
-    } catch (err: any) {
-      const clerkError = err.errors?.[0] as ClerkAPIError | undefined
+    } catch (err: unknown) {
+      const clerkError = (err as { errors?: ClerkAPIError[] }).errors?.[0]
       error.value = clerkError?.longMessage || clerkError?.message || 'An unknown error occurred.'
       return false
     } finally {
