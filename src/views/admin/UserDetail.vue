@@ -1,298 +1,212 @@
 <template>
-  <div class="space-y-4 md:space-y-6 px-3 md:px-6">
+  <div class="page-container">
     <AdminMenu />
-    <!-- Breadcrumb -->
-    <div class="flex items-center gap-2 text-sm text-neutral-500">
-      <router-link to="/admin/accounts" class="hover:underline hover:text-indigo-600">アカウント一覧</router-link>
-      <span>/</span>
-      <span class="text-neutral-800 dark:text-neutral-200 font-medium">ユーザー詳細</span>
+    <div class="breadcrumb">
+      <router-link to="/admin/accounts" class="breadcrumb-link"> アカウント一覧 </router-link>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">ユーザー詳細</span>
     </div>
 
-    <div v-if="loading" class="flex justify-center py-12">
+    <div v-if="loading" class="loading-container">
       <Loading />
     </div>
 
-    <div v-else-if="error" class="bg-red-50 p-4 rounded-md border border-red-200 text-red-700">
+    <div v-else-if="error" class="error-banner">
       {{ error }}
     </div>
 
-    <!-- Content -->
-    <div v-else-if="user" class="space-y-6">
-      <!-- Profile -->
-      <div>
-        <div class="flex flex-col md:flex-row gap-6">
-          <div class="flex-1 w-full space-y-3">
-            <div class="flex flex-row items-start justify-between gap-4">
-              <div class="flex flex-row items-center gap-4">
-                <img :src="user.imageUrl" alt="" class="w-14 h-14 rounded-full bg-neutral-200" />
-                <div>
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <h1 class="text-xl font-bold text-neutral-900 dark:text-neutral-100">
-                      {{ user.lastName }}
-                      {{ user.firstName }}
-                    </h1>
-                    <div v-if="!isEditing" class="flex items-center gap-1.5">
-                      <span
-                        class="px-2 py-0.5 rounded text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
-                        {{ roleLabels[user.profile?.role as string] || "部員" }}
-                      </span>
-                      <span
-                        class="px-2 py-0.5 rounded text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
-                        {{
-                          gradeLabels[user.profile?.grade as number] || "無級"
-                        }}
-                      </span>
-                    </div>
-                  </div>
-                  <div
-                    class="text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-x-3 gap-y-1 flex-wrap mt-0.5">
-                    <span>{{ user.emailAddress }}</span>
-                    <span v-if="!isEditing" class="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
-                    <span v-if="!isEditing">{{
-                      yearLabels[user.profile?.year as string] ||
-                      user.profile?.year
-                    }}</span>
-                    <span v-if="!isEditing" class="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
-                    <span v-if="!isEditing">{{ user.profile?.joinedAt }}年度入部</span>
+    <div v-else-if="user" class="content">
+      <div class="profile-section">
+        <div class="profile-header">
+          <div class="profile-info">
+            <div class="flex-row">
+              <img :src="user.imageUrl" alt="" class="avatar" />
+              <div class="info-text">
+                <div class="name-row">
+                  <h1 class="name">{{ user.lastName }} {{ user.firstName }}</h1>
+                  <div v-if="!isEditing" class="badges">
+                    <span class="badge">
+                      {{ roleLabels[user.profile?.role as string] || "部員" }}
+                    </span>
+                    <span class="badge">
+                      {{ gradeLabels[user.profile?.grade as number] || "無級" }}
+                    </span>
                   </div>
                 </div>
+                <div class="meta-row">
+                  <span>{{ user.emailAddress }}</span>
+                  <template v-if="!isEditing">
+                    <span class="dot" />
+                    <span>{{ yearLabels[user.profile?.year as string] || user.profile?.year }}</span>
+                    <span class="dot" />
+                    <span>{{ user.profile?.joinedAt }}年度入部</span>
+                  </template>
+                </div>
               </div>
-
-              <button
-                v-if="!isEditing"
-                @click="startEditing"
-                class="p-2 text-neutral-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                title="編集">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round">
-                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                </svg>
-              </button>
             </div>
 
-            <!-- Edit Mode Form -->
-            <form v-if="isEditing" @submit.prevent="handleUpdateProfile" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">役職</label>
-                <select
-                  v-model="formData.role"
-                  class="w-full rounded-md border border-neutral-300 dark:border-neutral-600 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button v-if="!isEditing" class="edit-btn" title="編集" @click="startEditing">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+              </svg>
+            </button>
+          </div>
+
+          <form v-if="isEditing" class="edit-form" @submit.prevent="handleUpdateProfile">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="label">役職</label>
+                <select v-model="formData.role" class="select">
                   <option v-for="(label, key) in roleLabels" :key="key" :value="key">
                     {{ label }}
                   </option>
                 </select>
               </div>
-              <div>
-                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">級段位</label>
-                <select
-                  v-model.number="formData.grade"
-                  class="w-full rounded-md border border-neutral-300 dark:border-neutral-600 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <div class="form-group">
+                <label class="label">級段位</label>
+                <select v-model.number="formData.grade" class="select">
                   <option v-for="(label, key) in gradeLabels" :key="key" :value="key">
                     {{ label }}
                   </option>
                 </select>
               </div>
-              <div>
-                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">学年</label>
-                <select
-                  v-model="formData.year"
-                  class="w-full rounded-md border border-neutral-300 dark:border-neutral-600 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <div class="form-group">
+                <label class="label">学年</label>
+                <select v-model="formData.year" class="select">
                   <option v-for="(label, key) in yearLabels" :key="key" :value="key">
                     {{ label }}
                   </option>
                 </select>
               </div>
-              <div>
-                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">入部年度</label>
-                <input
-                  type="number"
-                  v-model.number="formData.joinedAt"
-                  class="w-full rounded-md border border-neutral-300 dark:border-neutral-600 bg-transparent px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  min="1950"
-                  :max="new Date().getFullYear() + 1" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
-                  >級段位取得日</label
-                >
-                <div class="flex-1">
-                  <input
-                    type="date"
-                    v-model="formData.getGradeAt"
-                    class="w-full rounded-md border border-neutral-300 dark:border-neutral-600 bg-transparent px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                </div>
-              </div>
+              <Input
+                v-model.number="formData.joinedAt"
+                type="number"
+                label="入部年度"
+                :min="1950"
+                :max="new Date().getFullYear() + 1" />
+              <Input v-model="formData.getGradeAt" type="date" label="級段位取得日" />
+            </div>
 
-              <div class="md:col-span-2 flex justify-end gap-2 mt-2">
-                <button
-                  type="button"
-                  @click="cancelEditing"
-                  class="px-4 py-2 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-500 dark:hover:text-neutral-300 focus:outline-none">
-                  キャンセル
-                </button>
-                <button
-                  type="submit"
-                  :disabled="updating"
-                  class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
-                  <span v-if="updating" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                  更新
-                </button>
-              </div>
-            </form>
-            <MessageDisplay :error-message="updateError" :success-message="updateSuccess" />
+            <div class="form-actions">
+              <Button type="button" variant="secondary" @click="cancelEditing">キャンセル</Button>
+              <Button type="submit" :disabled="updating" variant="primary">
+                {{ updating ? "更新中..." : "更新" }}
+              </Button>
+            </div>
+          </form>
+          <MessageDisplay :error-message="updateError" :success-message="updateSuccess" />
+        </div>
+      </div>
+
+      <div v-if="stats" class="stats-grid">
+        <div class="stat-card stat-left">
+          <div class="stat-item border-bottom">
+            <p class="stat-value">
+              {{ stats.trainCount }}
+            </p>
+            <span class="stat-label">総稽古回数</span>
+          </div>
+          <div class="stat-item">
+            <p class="stat-value">
+              {{ stats.doneTrain }}
+            </p>
+            <span class="stat-label">現在の級での稽古</span>
+          </div>
+        </div>
+        <div class="stat-card stat-right">
+          <div class="stat-item border-bottom">
+            <p class="stat-value">
+              {{ stats.totalDays }}
+            </p>
+            <span class="stat-label">稽古日数</span>
+          </div>
+          <div class="stat-item">
+            <p class="stat-value">
+              {{ stats.totalHours }}
+            </p>
+            <span class="stat-label">総時間</span>
           </div>
         </div>
       </div>
 
-      <!-- Stats Grid -->
-      <div v-if="stats">
-        <div
-          class="grid grid-cols-2 md:divide-y-0 divide-neutral-200 dark:divide-neutral-800 [&_div]:border-neutral-200 [&_div]:dark:border-neutral-800">
-          <div class="border-y border-x rounded-l-lg">
-            <div class="p-4 text-center border-b">
-              <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                {{ stats.trainCount }}
-              </p>
-              <span class="text-xs text-neutral-500">総稽古回数</span>
-            </div>
-            <div class="p-4 text-center">
-              <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                {{ stats.doneTrain }}
-              </p>
-              <span class="text-xs text-neutral-500">現在の級での稽古</span>
-            </div>
-          </div>
-          <div class="border-y border-r rounded-r-lg">
-            <div class="p-4 text-center border-b">
-              <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                {{ stats.totalDays }}
-              </p>
-              <span class="text-xs text-neutral-500">稽古日数</span>
-            </div>
-            <div class="p-4 text-center">
-              <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                {{ stats.totalHours }}
-              </p>
-              <span class="text-xs text-neutral-500">総時間</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Activities Table -->
-      <div>
-        <div class="px-3 md:px-0 py-4 font-medium text-neutral-900 dark:text-neutral-100">アクティビティ履歴</div>
+      <div class="history-section">
+        <h3 class="history-title">アクティビティ履歴</h3>
 
         <div v-if="activities.length > 0">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-              <thead class="border-b border-neutral-200 dark:border-neutral-800">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
                 <tr>
-                  <th class="px-3 md:px-6 py-3 font-medium text-neutral-500">日時</th>
-                  <th class="px-3 md:px-6 py-3 font-medium text-neutral-500">時間 (h)</th>
+                  <th>日時</th>
+                  <th>時間 (h)</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
+              <tbody>
                 <tr v-for="activity in activities" :key="activity.id">
-                  <td class="px-3 md:px-6 py-4">
-                    {{ new Date(activity.date).toLocaleDateString() }}
-                  </td>
-                  <td class="px-3 md:px-6 py-4">
-                    {{ activity.period }}
-                  </td>
+                  <td>{{ new Date(activity.date).toLocaleDateString() }}</td>
+                  <td>{{ activity.period }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <!-- Simple Paging -->
-          <div
-            class="border-t border-neutral-200 dark:border-neutral-800 px-3 md:px-0 py-4 flex justify-between items-center">
-            <button
-              @click="page > 1 && changePage(page - 1)"
-              :disabled="page <= 1"
-              class="px-3 py-1 rounded border border-neutral-300 dark:border-neutral-600 text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
-              前へ
-            </button>
-            <span class="text-sm text-neutral-500">{{ page }} ページ目</span>
-            <button
-              @click="changePage(page + 1)"
-              :disabled="activities.length < limit"
-              class="px-3 py-1 rounded border border-neutral-300 dark:border-neutral-600 text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
-              次へ
-            </button>
+
+          <div class="pagination">
+            <button :disabled="page <= 1" class="page-btn" @click="page > 1 && changePage(page - 1)">前へ</button>
+            <span class="page-info">{{ page }} ページ目</span>
+            <button :disabled="activities.length < limit" class="page-btn" @click="changePage(page + 1)">次へ</button>
           </div>
         </div>
 
-        <div v-else class="py-8 text-center text-neutral-500 text-sm">履歴はありません</div>
+        <div v-else class="empty-history">履歴はありません</div>
       </div>
 
-      <!-- Danger Zone -->
-      <div class="mt-8 border border-red-200 dark:border-red-900 rounded-lg">
-        <div class="px-4 py-3 bg-red-50 dark:bg-red-950 border-b border-red-200 dark:border-red-900 rounded-t-lg">
-          <h3 class="text-sm font-medium text-red-800 dark:text-red-200">危険な操作</h3>
+      <div class="danger-zone">
+        <div class="danger-header">
+          <h3 class="danger-title">危険な操作</h3>
         </div>
-        <div class="p-4 space-y-4">
-          <div class="flex flex-row mb-2 justify-between items-center md:flex-row">
-            <p class="text-sm font-medium text-neutral-900 dark:text-neutral-100">ユーザーを削除</p>
-            <button
-              v-if="!showDeleteConfirm"
-              @click="showDeleteConfirm = true"
-              class="px-4 py-1.5 text-sm font-medium text-red-600 border border-red-300 dark:border-red-700 rounded-md hover:bg-red-50 dark:hover:bg-red-950 transition-colors">
-              削除
-            </button>
+        <div class="danger-content">
+          <div class="danger-row">
+            <p class="danger-text">ユーザーを削除</p>
+            <button v-if="!showDeleteConfirm" class="btn-danger-outline" @click="showDeleteConfirm = true">削除</button>
           </div>
-          <p class="text-xs text-neutral-500 dark:text-neutral-400">
+          <p class="danger-description">
             このユーザーとそのすべてのデータを完全に削除します。<strong>この操作は取り消せません。</strong>
           </p>
 
-          <!-- First Confirmation -->
-          <div v-if="showDeleteConfirm && !showFinalConfirm" class="p-4 bg-red-50 dark:bg-red-950 rounded-md space-y-3">
-            <p class="text-sm text-red-800 dark:text-red-200">
+          <div v-if="showDeleteConfirm && !showFinalConfirm" class="confirm-box">
+            <p class="confirm-msg">
               削除操作を続行するには、以下に
               <strong>{{ user?.lastName }}{{ user?.firstName }}</strong>
               と入力してください：
             </p>
-            <input
-              v-model="deleteConfirmName"
-              type="text"
-              placeholder="ユーザー名を入力"
-              class="w-full rounded-md border border-red-300 dark:border-red-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-            <div class="flex gap-2">
-              <button
-                @click="
-                  showDeleteConfirm = false;deleteConfirmName = ''
-                "
-                class="px-4 py-2 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-500">
-                キャンセル
-              </button>
-              <button
-                @click="showFinalConfirm = true"
-                :disabled="
-                  deleteConfirmName !==
-                  (user?.lastName ?? '') + (user?.firstName ?? '')
-                "
-                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed">
+            <input v-model="deleteConfirmName" type="text" placeholder="ユーザー名を入力" class="confirm-input" />
+            <div class="confirm-actions">
+              <Button variant="ghost" @click="showDeleteConfirm = false; deleteConfirmName = ''">キャンセル</Button>
+              <Button
+                :disabled="deleteConfirmName !== (user?.lastName ?? '') + (user?.firstName ?? '')"
+                variant="danger"
+                @click="showFinalConfirm = true">
                 次へ
-              </button>
+              </Button>
             </div>
           </div>
 
-          <!-- Final Confirmation Modal -->
-          <div v-if="showFinalConfirm" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div class="bg-white dark:bg-neutral-900 rounded-lg shadow-xl max-w-md w-full mx-4 p-6 space-y-4">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+          <div v-if="showFinalConfirm" class="modal-backdrop">
+            <div class="modal">
+              <div class="modal-header">
+                <div class="modal-icon">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="w-5 h-5 text-red-600 dark:text-red-400"
+                    class="icon"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -303,31 +217,23 @@
                       d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">本当に削除しますか？</h3>
+                <h3 class="modal-title">本当に削除しますか？</h3>
               </div>
-              <p class="text-sm text-neutral-600 dark:text-neutral-400">
+              <p class="modal-text">
                 <strong>{{ user?.lastName }} {{ user?.firstName }}</strong>
                 さんのアカウントとすべての活動記録が削除されます。この操作は元に戻せません。
               </p>
-              <div class="flex justify-end gap-3">
-                <button
-                  @click="
-                    showFinalConfirm = false;
-                    showDeleteConfirm = false;
-                    deleteConfirmName = '';
-                  "
-                  class="px-4 py-2 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-500">
+              <div class="modal-actions">
+                <Button
+                  variant="secondary"
+                  @click="showFinalConfirm = false; showDeleteConfirm = false; deleteConfirmName = '';">
                   キャンセル
-                </button>
-                <button
-                  @click="handleDeleteUser"
-                  :disabled="deleting"
-                  class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
-                  <span v-if="deleting" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                  削除する
-                </button>
+                </Button>
+                <Button :disabled="deleting" variant="danger" @click="handleDeleteUser">
+                  {{ deleting ? "削除中..." : "削除する" }}
+                </Button>
               </div>
-              <p v-if="deleteError" class="text-sm text-red-600 dark:text-red-400">
+              <p v-if="deleteError" class="error-text">
                 {{ deleteError }}
               </p>
             </div>
@@ -339,14 +245,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue"
-import { useRoute, useRouter } from "vue-router"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/vue-query"
-import { queryKeys } from "@/src/lib/queryKeys"
-import hc from "@/src/lib/honoClient"
-import Loading from "@/src/components/ui/Loading.vue"
-import MessageDisplay from "@/src/components/common/MessageDisplay.vue"
 import AdminMenu from "@/src/components/admin/AdminMenu.vue"
+import MessageDisplay from "@/src/components/common/MessageDisplay.vue"
+import Button from "@/src/components/ui/UiButton.vue"
+import Input from "@/src/components/ui/UiInput.vue"
+import Loading from "@/src/components/ui/UiLoading.vue"
+import hc from "@/src/lib/honoClient"
+import { queryKeys } from "@/src/lib/queryKeys"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query"
+import { computed, ref, watch } from "vue"
+import { useRoute, useRouter } from "vue-router"
 
 const route = useRoute()
 const router = useRouter()
@@ -408,11 +316,18 @@ const {
     if (!res.ok) throw new Error("Failed to fetch user data")
     return res.json()
   },
-  placeholderData: (previousData) => previousData, // Keep data while fetching new page
+  placeholderData: (previousData) => previousData,
 })
 
 const user = computed(() => apiData.value?.user ?? null)
-const activities = computed(() => (apiData.value?.activities as any[]) ?? [])
+
+interface Activity {
+  id: string
+  date: string
+  period: number
+}
+
+const activities = computed(() => (apiData.value?.activities as Activity[]) ?? [])
 const stats = computed(() => {
   if (!apiData.value) return null
   return {
@@ -477,8 +392,6 @@ const startEditing = () => {
   isEditing.value = true
   updateSuccess.value = ""
   updateError.value = ""
-  // Form data is already synced via watch or we can reset it here if needed
-  // ... (keeping reset logic implies we trust user.value is fresh)
 }
 
 const cancelEditing = () => {
@@ -489,12 +402,17 @@ const cancelEditing = () => {
 
 const changePage = (newPage: number) => {
   page.value = newPage
-  // Auto-refetch via reactive queryKey
 }
 
 // Mutations
 const { mutateAsync: updateProfile, isPending: updating } = useMutation({
-  mutationFn: async (payload: any) => {
+  mutationFn: async (payload: {
+    role: string
+    grade: number
+    year: string
+    joinedAt: number
+    getGradeAt: string | null
+  }) => {
     const res = await hc.admin.users[":userId"].profile.$patch({
       param: { userId },
       json: payload,
@@ -507,10 +425,10 @@ const { mutateAsync: updateProfile, isPending: updating } = useMutation({
   },
   onSuccess: () => {
     queryClient.invalidateQueries({
-      queryKey: ['admin', 'users'], // Invalidate all user details
+      queryKey: ['admin', 'users'],
     })
     queryClient.invalidateQueries({
-      queryKey: ['admin', 'accounts'], // Invalidate list as well (e.g. valid order might change)
+      queryKey: ['admin', 'accounts'],
     })
     updateSuccess.value = "プロファイルを更新しました"
     isEditing.value = false
@@ -572,3 +490,495 @@ const handleDeleteUser = async () => {
   }
 }
 </script>
+
+<style scoped>
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-3);
+}
+
+@media (width >= 768px) {
+  .page-container {
+    padding-inline: var(--space-6);
+  }
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+  color: var(--primary);
+}
+
+.breadcrumb-current {
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.error-banner {
+  padding: var(--space-4);
+  background: rgb(239 68 68 / 10%);
+  color: var(--red-500);
+  border-radius: var(--radius-md);
+  border: 1px solid rgb(239 68 68 / 20%);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.profile-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.profile-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.flex-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.avatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-muted-active);
+  object-fit: cover;
+}
+
+.info-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.name {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.badge {
+  padding: 0.125rem 0.5rem;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  border-radius: var(--radius-sm);
+  background: var(--bg-muted-active);
+  color: var(--text-secondary);
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.dot {
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: var(--radius-full);
+  background: var(--border-strong);
+}
+
+.edit-btn {
+  padding: var(--space-2);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.edit-btn:hover {
+  background: var(--bg-muted-active);
+  color: var(--primary);
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  background: var(--bg-muted);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+}
+
+.form-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;
+}
+
+@media (width >= 768px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.select {
+  width: -webkit-fill-available;
+  height: fit-content;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  transition: box-shadow var(--transition-normal);
+}
+
+.select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-left {
+  border-right: 1px solid var(--border-dim);
+}
+
+.stat-item {
+  padding: var(--space-4);
+  text-align: center;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.stat-value {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.stat-label {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.history-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.history-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  text-align: left;
+}
+
+.data-table thead {
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.data-table th,
+.data-table td {
+  padding: var(--space-3) var(--space-6);
+  white-space: nowrap;
+}
+
+.data-table th {
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.data-table tr {
+  border-bottom: 1px solid var(--border-dim);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--border-dim);
+}
+
+.page-btn {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
+  border: 1px solid var(--border-dim);
+  background: transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: var(--bg-muted);
+}
+
+.page-info {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.empty-history {
+  text-align: center;
+  padding: var(--space-8);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.danger-zone {
+  margin-top: var(--space-8);
+  border: 1px solid rgb(239 68 68 / 30%);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.danger-header {
+  padding: var(--space-3) var(--space-4);
+  background: rgb(239 68 68 / 10%);
+  border-bottom: 1px solid rgb(239 68 68 / 20%);
+}
+
+.danger-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--red-500);
+}
+
+.danger-content {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.danger-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.danger-text {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+.danger-description {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.btn-danger-outline {
+  padding: var(--space-1-5) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--red-500);
+  border: 1px solid var(--red-500);
+  background: transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.btn-danger-outline:hover {
+  background: rgb(239 68 68 / 10%);
+}
+
+.confirm-box {
+  padding: var(--space-4);
+  background: rgb(239 68 68 / 5%); /* very light red */
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.confirm-msg {
+  font-size: var(--text-sm);
+  color: var(--red-500);
+}
+
+.confirm-input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid rgb(239 68 68 / 30%);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.confirm-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--red-500);
+}
+
+.confirm-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 50%);
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  width: 100%;
+  max-width: 28rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: var(--space-4);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.modal-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-full);
+  background: rgb(239 68 68 / 10%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--red-500);
+}
+
+.modal-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.modal-text {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.error-text {
+  font-size: var(--text-sm);
+  color: var(--red-500);
+}
+</style>

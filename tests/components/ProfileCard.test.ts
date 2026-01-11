@@ -71,7 +71,7 @@ describe('ProfileCard.vue', () => {
     const wrapper = mount(ProfileCard)
     // Check for skeleton or loading state
     // The component shows skeleton if !profile
-    expect(wrapper.find('.animate-pulse').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="loading-skeleton"]').exists()).toBe(true)
   })
 
   it('renders profile data correctly', async () => {

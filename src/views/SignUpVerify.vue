@@ -1,37 +1,28 @@
 <template>
-  <div class="flex items-center justify-center p-4">
-    <Card class="mx-auto max-w-md">
-      <div class="px-6 pt-4">
-        <h1 class="text-2xl font-bold text-neutral-800 dark:text-neutral-100">認証コードの確認</h1>
-        <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
-          メールアドレスに送信された認証コードを入力してください。
-        </p>
+  <div class="page-container">
+    <Card class="card-container">
+      <div class="card-header">
+        <h1 class="title">認証コードの確認</h1>
+        <p class="subtitle">メールアドレスに送信された認証コードを入力してください。</p>
       </div>
-      <div class="p-6 pt-0">
-        <form @submit.prevent="handleVerify">
-          <div class="space-y-2">
-            <label for="code" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">認証コード</label>
-            <input
-              id="code"
-              v-model="code"
-              type="text"
-              name="code"
-              required
-              placeholder="123456"
-              :disabled="isLoading"
-              class="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed" />
-          </div>
+      <div class="card-body">
+        <form class="verify-form" @submit.prevent="handleVerify">
+          <Input
+            id="code"
+            v-model="code"
+            label="認証コード"
+            name="code"
+            required
+            placeholder="123456"
+            :disabled="isLoading" />
 
-          <div v-if="error" class="mt-4 text-sm text-red-600 dark:text-red-400">
+          <div v-if="error" class="error">
             {{ error }}
           </div>
 
-          <button
-            type="submit"
-            :disabled="isLoading"
-            class="mt-4 w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+          <Button type="submit" :disabled="isLoading" full-width class="mt-4">
             {{ isLoading ? "確認中..." : "確認してサインアップ" }}
-          </button>
+          </Button>
         </form>
       </div>
     </Card>
@@ -43,7 +34,9 @@ import { onMounted, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useClerk } from "@clerk/vue"
 import { useSignUpVerify } from "@/src/composable/useSignUpVerify"
-import Card from "@/src/components/ui/Card.vue"
+import Card from "@/src/components/ui/UiCard.vue"
+import Button from "@/src/components/ui/UiButton.vue"
+import Input from "@/src/components/ui/UiInput.vue"
 
 const router = useRouter()
 const clerk = useClerk()
@@ -63,7 +56,7 @@ const checkSignUpStatus = () => {
   const signUp = clerk.value.client?.signUp
   console.log(signUp)
   if (!signUp || signUp.status !== "missing_requirements") {
-    router.replace("/sign-up")
+    // router.replace("/sign-up")
   }
 }
 
@@ -79,3 +72,54 @@ watch(
   }
 )
 </script>
+
+<style scoped>
+.page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.card-container {
+  margin-inline: auto;
+  max-width: 28rem;
+}
+
+.card-header {
+  padding: var(--space-6);
+  padding-bottom: var(--space-4);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.subtitle {
+  margin-top: var(--space-2);
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
+
+.card-body {
+  padding: var(--space-6);
+  padding-top: 0;
+}
+
+.verify-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.error {
+  font-size: var(--text-base);
+  color: var(--red-500);
+}
+
+.mt-4 {
+  margin-top: var(--space-4);
+}
+</style>

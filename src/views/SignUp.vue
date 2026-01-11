@@ -1,10 +1,10 @@
 <template>
-  <div class="flex items-center justify-center p-4">
-    <Card class="mx-auto max-w-md">
-      <div class="px-4 pt-2">
-        <h1 class="text-2xl font-bold text-neutral-800 dark:text-neutral-100">サインアップ</h1>
+  <div class="page-container">
+    <Card class="form-card">
+      <div class="card-header">
+        <h1 class="form-title">サインアップ</h1>
       </div>
-      <div class="px-6 pt-0">
+      <div class="card-body">
         <ProgressIndicator :step="step" />
         <form @submit.prevent="handleSubmit">
           <div :class="step === 'basic' ? '' : 'hidden'">
@@ -36,24 +36,24 @@
               @update:form-value="setFormValue" />
           </div>
 
-          <div class="col-span-3 my-4">
+          <div class="captcha-container">
             <div id="clerk-captcha" />
           </div>
         </form>
 
-        <div v-if="formErrors.general" class="mt-4 text-sm text-red-600">
+        <div v-if="formErrors.general" class="error">
           {{ formErrors.general }}
         </div>
-        <div v-if="clerkErrors.length > 0" class="mt-4 text-sm text-red-600">
+        <div v-if="clerkErrors.length > 0" class="error">
           <div v-for="(e, i) in clerkErrors" :key="i">
             {{ e.longMessage ?? e.message }}
           </div>
         </div>
 
-        <hr class="my-6" />
-        <div class="mt-2 text-center text-sm text-neutral-700 dark:text-neutral-300">
+        <hr class="divider" />
+        <div class="footer-text">
           既にアカウントをお持ちですか？<br />
-          <RouterLink to="/sign-in" class="underline">こちら</RouterLink>
+          <RouterLink to="/sign-in" class="link"> こちら </RouterLink>
           からサインインしてください。
         </div>
       </div>
@@ -65,7 +65,7 @@
 import { onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { useSignUpForm } from "@/src/composable/useSignUpForm"
-import Card from "@/src/components/ui/Card.vue"
+import Card from "@/src/components/ui/UiCard.vue"
 import ProgressIndicator from "@/src/components/signup/ProgressIndicator.vue"
 import SignUpStepBasic from "@/src/components/signup/SignUpStepBasic.vue"
 import SignUpStepPersonal from "@/src/components/signup/SignUpStepPersonal.vue"
@@ -106,3 +106,68 @@ const handleSubmit = async () => {
   }
 }
 </script>
+
+<style scoped>
+.page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.form-card {
+  margin-inline: auto;
+  max-width: 28rem;
+}
+
+.card-header {
+  padding: var(--space-4);
+  padding-top: var(--space-2);
+}
+
+.form-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.card-body {
+  padding: var(--space-6);
+  padding-top: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.captcha-container {
+  grid-column: span 3;
+  margin: var(--space-4) 0;
+}
+
+.error {
+  margin-top: var(--space-4);
+  font-size: var(--text-base);
+  color: var(--red-500);
+}
+
+.divider {
+  margin: var(--space-6) 0;
+}
+
+.footer-text {
+  margin-top: var(--space-2);
+  text-align: center;
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
+
+.link {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.link:hover {
+  color: var(--accent-hover);
+}
+</style>

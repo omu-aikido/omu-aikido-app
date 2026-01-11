@@ -132,7 +132,7 @@ export const clerk = new Hono<{ Bindings: Env }>() //
         title: 'アカウント',
         href: '/account',
         icon: 'user',
-        theme: 'neutral',
+        theme: 'green',
       },
     ]
 

@@ -1,56 +1,29 @@
 <template>
-  <h1 class="text-2xl font-bold mb-2 text-neutral-900 dark:text-neutral-100">管理メニュー</h1>
+  <h1 class="title">管理メニュー</h1>
   <TabGroup
-    :selectedIndex="selectedIndex"
-    @change="handleTabChange"
+    :selected-index="selectedIndex"
     as="div"
-    class="border-b border-neutral-200 dark:border-neutral-700"
-    data-testid="admin-menu">
-    <TabList class="flex gap-1">
+    class="tab-container"
+    data-testid="admin-menu"
+    @change="handleTabChange">
+    <TabList class="tab-list">
       <Tab v-slot="{ selected }" as="template">
-        <button
-          :class="[
-            'px-4 py-2.5 text-sm font-medium transition-colors focus:outline-none',
-            selected
-              ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
-              : 'text-neutral-600 dark:text-neutral-400 hover:text-indigo-500 dark:hover:text-indigo-300 border-b-2 border-transparent',
-          ]"
-          data-testid="tab-dashboard">
-          トップ
-        </button>
+        <button :class="['tab', { 'tab-selected': selected }]" data-testid="tab-dashboard">トップ</button>
       </Tab>
       <Tab v-slot="{ selected }" as="template">
-        <button
-          :class="[
-            'px-4 py-2.5 text-sm font-medium transition-colors focus:outline-none',
-            selected
-              ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
-              : 'text-neutral-600 dark:text-neutral-400 hover:text-indigo-500 dark:hover:text-indigo-300 border-b-2 border-transparent',
-          ]"
-          data-testid="tab-accounts">
-          アカウント
-        </button>
+        <button :class="['tab', { 'tab-selected': selected }]" data-testid="tab-accounts">アカウント</button>
       </Tab>
       <Tab v-slot="{ selected }" as="template">
-        <button
-          :class="[
-            'px-4 py-2.5 text-sm font-medium transition-colors focus:outline-none',
-            selected
-              ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
-              : 'text-neutral-600 dark:text-neutral-400 hover:text-indigo-500 dark:hover:text-indigo-300 border-b-2 border-transparent',
-          ]"
-          data-testid="tab-norms">
-          審査
-        </button>
+        <button :class="['tab', { 'tab-selected': selected }]" data-testid="tab-norms">審査</button>
       </Tab>
     </TabList>
   </TabGroup>
 </template>
 
 <script setup lang="ts">
+import { Tab, TabGroup, TabList } from "@headlessui/vue"
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import { TabGroup, TabList, Tab } from "@headlessui/vue"
 
 const route = useRoute()
 const router = useRouter()
@@ -63,7 +36,7 @@ const tabs = [
 
 const selectedIndex = computed(() => {
   const currentPath = route.path
-  if (currentPath.startsWith("/admin/users/")) return 1 // User detail belongs to accounts
+  if (currentPath.startsWith("/admin/users/")) return 1
   const index = tabs.findIndex(tab => tab.path === currentPath)
   return index !== -1 ? index : 0
 })
@@ -75,3 +48,44 @@ const handleTabChange = (index: number) => {
   }
 }
 </script>
+
+<style scoped>
+.title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  margin-bottom: var(--space-2);
+  color: var(--text-primary);
+}
+
+.tab-container {
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.tab-list {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.tab {
+  padding: var(--space-2-5) var(--space-4);
+
+  /* padding-block overrides padding shorthand, so we can just update the top/bottom padding above or merge it */
+  padding-block: 0.625rem;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-normal), border-color var(--transition-normal);
+}
+
+.tab:focus {
+  outline: none;
+}
+
+.tab:hover:not(.tab-selected) {
+  color: var(--primary);
+}
+</style>

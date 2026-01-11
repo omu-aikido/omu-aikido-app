@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
 import { SignedIn } from "@clerk/vue"
-import { ClipboardListIcon, UserIcon, SettingsIcon } from "lucide-vue-next"
+import { ClipboardListIcon, SettingsIcon, UserIcon } from "lucide-vue-next"
+import { computed, ref } from "vue"
 
 import PracticeCountGraph from "@/src/components/home/PracticeCountGraph.vue"
 import PracticeRanking from "@/src/components/home/PracticeRanking.vue"
@@ -55,7 +55,6 @@ const {
 
 const practiceData = computed(() => practiceDataRaw.value ?? null)
 
-// Error handling wrapper for template compatibility
 const error = computed(() =>
   validationError.value ? "稽古データの取得に失敗しました" : null,
 )
@@ -68,7 +67,6 @@ const currentGrade = computed(() => {
 const {
   data: rankingDataRaw,
   isLoading: rankingLoading,
-  //  error: rankingErrorObj,
 } = useQuery({
   queryKey: queryKeys.user.record.ranking(),
   queryFn: async () => {
@@ -79,12 +77,6 @@ const {
 })
 
 const rankingData = computed(() => rankingDataRaw.value ?? null)
-
-/*
-const rankingError = computed(() =>
-  rankingErrorObj.value ? "ランキングの取得に失敗しました" : null
-)
-*/
 
 const { data: menuData } = useQuery({
   queryKey: queryKeys.user.clerk.menu(),
@@ -101,7 +93,6 @@ const handleAddActivity = async (date: string, period: number) => {
   activityLoading.value = true
   try {
     await addActivity({ date, period })
-    // Re-fetch data relevant to updates
     queryClient.invalidateQueries({ queryKey: queryKeys.user.clerk.profile() })
     queryClient.invalidateQueries({ queryKey: queryKeys.user.record.count() })
     queryClient.invalidateQueries({ queryKey: queryKeys.user.record.ranking() })
@@ -110,89 +101,183 @@ const handleAddActivity = async (date: string, period: number) => {
   }
 }
 
-const getIconBgClass = (theme: string) => {
-  switch (theme) {
-    case "blue":
-      return "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-    case "indigo":
-      return "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
-    default:
-      return "bg-neutral-100 dark:bg-neutral-700/50 text-neutral-600 dark:text-neutral-400"
-  }
-}
-
-const getBorderHoverClass = (theme: string) => {
-  switch (theme) {
-    case "blue":
-      return "hover:border-blue-200 dark:hover:border-blue-800"
-    case "indigo":
-      return "hover:border-indigo-200 dark:hover:border-indigo-800"
-    default:
-      return "hover:border-neutral-300 dark:hover:border-neutral-600"
-  }
-}
-
-const getTextHoverClass = (theme: string) => {
-  switch (theme) {
-    case "blue":
-      return "group-hover:text-blue-600 dark:group-hover:text-blue-400"
-    case "indigo":
-      return "group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
-    default:
-      return ""
-  }
+const getThemeClass = (theme: string) => {
+  if (theme === "blue") return "theme-blue"
+  if (theme === "indigo") return "theme-indigo"
+  if (theme === "green") return "theme-green"
+  return ""
 }
 </script>
 
 <template>
-  <div class="container mx-auto px-2">
+  <div class="container">
     <SignedIn>
-      <div class="max-w-3xl mx-auto space-y-4">
-        <!-- Error State -->
-        <div
-          v-if="error"
-          class="bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 p-4 rounded-lg text-sm text-center">
+      <div class="content">
+        <div v-if="error" class="error-banner">
           {{ error }}
         </div>
 
-        <!-- Practice Count Graph -->
         <PracticeCountGraph
           :practice-data="practiceData"
           :current-grade="currentGrade"
           :loading="countLoading"
           :error="error" />
 
-        <!-- Practice Ranking -->
         <PracticeRanking :ranking-data="rankingData" :loading="rankingLoading" />
 
-        <!-- Activity Form -->
         <ActivityForm :loading="activityLoading" @submit="handleAddActivity" />
 
-        <hr class="pb-2 text-neutral-500/60" />
+        <hr class="divider" />
 
-        <!-- Navigation Links -->
-        <div class="grid grid-cols-2 gap-4">
+        <div class="nav-grid">
           <component
             :is="item.href.startsWith('http') ? 'a' : 'RouterLink'"
             v-for="item in menuItems"
             :key="item.id"
             :to="item.href.startsWith('http') ? undefined : item.href"
             :href="item.href.startsWith('http') ? item.href : undefined"
-            class="group flex flex-col items-center cursor-pointer justify-center gap-3 rounded-xl bg-white dark:bg-neutral-800 p-6 shadow-sm border border-neutral-200 dark:border-neutral-700 hover:shadow-md transition-all duration-200"
-            :class="getBorderHoverClass(item.theme)">
-            <div
-              class="rounded-full p-3 group-hover:scale-110 transition-transform duration-200"
-              :class="getIconBgClass(item.theme)">
-              <component :is="iconMap[item.icon as keyof typeof iconMap]" class="h-6 w-6" />
+            :class="['nav-item', getThemeClass(item.theme)]">
+            <div :class="['nav-icon', getThemeClass(item.theme)]">
+              <component :is="iconMap[item.icon as keyof typeof iconMap]" class="icon" />
             </div>
-            <span
-              class="font-bold text-neutral-700 dark:text-neutral-200 transition-colors"
-              :class="getTextHoverClass(item.theme)">
-              {{ item.title }}
-            </span>
+            <span class="nav-label">{{ item.title }}</span>
           </component>
         </div>
       </div>
     </SignedIn>
   </div>
 </template>
+
+<style scoped>
+.container {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+}
+
+.content {
+  max-width: 48rem;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.error-banner {
+  background: var(--error-bg);
+  color: var(--red-500);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.divider {
+  padding-bottom: var(--space-2);
+  border-color: var(--border-strong);
+  opacity: 0.6;
+}
+
+.nav-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (width >= 640px) {
+  .nav-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-dim);
+  cursor: pointer;
+  text-decoration: none;
+  transition: box-shadow var(--transition-normal), border-color var(--transition-normal);
+}
+
+.nav-item:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.nav-item.theme-blue:hover {
+  border-color: var(--blue-500);
+}
+
+.nav-item.theme-indigo:hover {
+  border-color: var(--indigo-500);
+}
+
+.nav-item.theme-green:hover {
+  border-color: var(--teal-400);
+}
+
+.nav-icon {
+  height: 48px;
+  width: 48px;
+  border-radius: var(--radius-full);
+  padding: var(--space-3);
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+  transition: transform var(--transition-normal);
+}
+
+.nav-item:hover .nav-icon {
+  transform: scale(1.1);
+}
+
+.nav-icon.theme-blue {
+  background: rgb(59 130 246 / 10%);
+  color: var(--blue-500);
+  stroke: var(--blue-500);
+}
+
+.nav-icon.theme-indigo {
+  background: rgb(99 102 241 / 10%);
+  color: var(--indigo-500);
+  stroke: var(--indigo-500);
+}
+
+.nav-icon.theme-green {
+  background: rgb(34 197 94 / 10%);
+  color: var(--teal-400);
+  stroke: var(--teal-400);
+}
+
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.nav-label {
+  font-weight: var(--font-bold);
+  color: var(--text-secondary);
+  transition: color var(--transition-normal);
+}
+
+.nav-item:hover .nav-label {
+  color: var(--text-primary);
+}
+
+.nav-item.theme-blue:hover .nav-label {
+  color: var(--blue-500);
+}
+
+.nav-item.theme-indigo:hover .nav-label {
+  color: var(--indigo-500);
+}
+
+.nav-item.theme-green:hover .nav-label {
+  color: var(--teal-400);
+}
+</style>

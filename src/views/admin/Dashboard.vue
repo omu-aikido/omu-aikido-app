@@ -1,49 +1,38 @@
 <template>
-  <div class="space-y-6 px-3 md:px-6 pb-12">
+  <div class="dashboard-page">
     <AdminMenu />
 
-    <div v-if="loading" class="flex justify-center py-12">
+    <div v-if="loading" class="loading-container">
       <Loading />
     </div>
 
-    <div
-      v-else-if="error"
-      class="bg-red-50 dark:bg-red-950 p-4 rounded-md border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300">
+    <div v-else-if="error" class="error-banner">
       {{ error }}
     </div>
 
-    <div v-else class="space-y-8">
-      <section>
-        <div class="px-3 md:px-6 pb-4 flex flex-col justify-between items-center">
-          <h2 class="text-lg font-bold text-red-700 dark:text-red-400 flex items-center gap-2">
-            直近3週間活動のない部員
-          </h2>
-          <span class="text-sm text-neutral-500 dark:text-neutral-400">{{ thresholdDate }} 以降の記録なし</span>
+    <div v-else class="content">
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">直近3週間活動のない部員</h2>
+          <span class="section-subtitle">{{ thresholdDate }} 以降の記録なし</span>
         </div>
 
-        <div v-if="inactiveUsers.length === 0" class="p-8 text-center text-neutral-500 dark:text-neutral-400">
-          該当する部員はいません。全員活動中です！
-        </div>
+        <div v-if="inactiveUsers.length === 0" class="empty-state">該当する部員はいません。全員活動中です！</div>
 
-        <div v-else class="divide-y divide-neutral-200 dark:divide-neutral-700 max-h-125 overflow-y-auto">
+        <div v-else class="user-list">
           <div
             v-for="user in inactiveUsers"
             :key="user.id"
-            class="flex items-center gap-3 p-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors cursor-pointer"
+            class="user-item"
             @click="$router.push(`/admin/users/${user.id}`)">
-            <img :src="user.imageUrl" alt="" class="w-10 h-10 rounded-full bg-neutral-200 object-cover" />
-            <div class="flex-1 min-w-0">
-              <div class="font-medium text-neutral-900 dark:text-neutral-100 truncate">
-                {{ user.lastName }} {{ user.firstName }}
-              </div>
-              <div class="text-xs text-neutral-500 dark:text-neutral-400 truncate">
+            <img :src="user.imageUrl" alt="" class="avatar" />
+            <div class="user-info">
+              <div class="user-name">{{ user.lastName }} {{ user.firstName }}</div>
+              <div class="user-role">
                 {{ user.profile.roleLabel }}
               </div>
             </div>
-            <div
-              class="ml-auto text-xs text-red-600 dark:text-red-400 font-medium px-2 py-1 bg-red-50 dark:bg-red-900/20 rounded">
-              注意
-            </div>
+            <div class="status-badge">注意</div>
           </div>
         </div>
       </section>
@@ -52,13 +41,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
-import { useQuery } from "@tanstack/vue-query"
-import { queryKeys } from "@/src/lib/queryKeys"
-import hc from "@/src/lib/honoClient"
-import Loading from "@/src/components/ui/Loading.vue"
 import AdminMenu from "@/src/components/admin/AdminMenu.vue"
-
+import Loading from "@/src/components/ui/UiLoading.vue"
+import hc from "@/src/lib/honoClient"
+import { queryKeys } from "@/src/lib/queryKeys"
+import { useQuery } from "@tanstack/vue-query"
+import { computed } from "vue"
 
 // Queries
 const {
@@ -80,3 +68,133 @@ const error = computed(() =>
   queryError.value ? "ダッシュボード情報の取得に失敗しました" : ""
 )
 </script>
+
+<style scoped>
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-3);
+  padding-bottom: var(--space-12);
+}
+
+@media (width >= 768px) {
+  .dashboard-page {
+    padding-inline: var(--space-6);
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.error-banner {
+  background: rgb(var(--red-500) / 10%);
+  color: var(--red-500);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid rgb(239 68 68 / 20%);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.section-header {
+  padding: 0 var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--red-500);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.section-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.user-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 31.25rem; /* 500px */
+  overflow-y: auto;
+  border-top: 1px solid var(--border-dim);
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.user-item:last-child {
+  border-bottom: none;
+}
+
+.user-item:hover {
+  background: var(--bg-muted);
+}
+
+.avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-muted-active);
+  object-fit: cover;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-badge {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  background: rgb(239 68 68 / 10%);
+  color: var(--red-500);
+  margin-left: auto;
+}
+</style>

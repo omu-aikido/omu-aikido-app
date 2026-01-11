@@ -1,3 +1,5 @@
+import type { ClerkAPIError } from '@clerk/types'
+
 import { useClerk } from '@clerk/vue'
 import { ref } from 'vue'
 
@@ -40,9 +42,9 @@ export function useSignIn() {
         needsVerification.value = true
         return false
       }
-    } catch (err: any) {
-      error.value =
-        err.errors?.[0]?.longMessage || err.errors?.[0]?.message || 'Sign in failed. Please check your credentials.'
+    } catch (err: unknown) {
+      const clerkError = (err as { errors?: ClerkAPIError[] }).errors?.[0]
+      error.value = clerkError?.longMessage || clerkError?.message || 'Sign in failed. Please check your credentials.'
     } finally {
       isLoading.value = false
     }
@@ -73,8 +75,9 @@ export function useSignIn() {
         })
         return true
       }
-    } catch (err: any) {
-      error.value = err.errors?.[0]?.longMessage || err.errors?.[0]?.message || 'Verification failed.'
+    } catch (err: unknown) {
+      const clerkError = (err as { errors?: ClerkAPIError[] }).errors?.[0]
+      error.value = clerkError?.longMessage || clerkError?.message || 'Verification failed.'
     } finally {
       isLoading.value = false
     }
@@ -95,8 +98,9 @@ export function useSignIn() {
         redirectUrl: '/',
         redirectUrlComplete: '/',
       })
-    } catch (err: any) {
-      error.value = err.errors?.[0]?.longMessage || err.errors?.[0]?.message || 'Discord authentication failed.'
+    } catch (err: unknown) {
+      const clerkError = (err as { errors?: ClerkAPIError[] }).errors?.[0]
+      error.value = clerkError?.longMessage || clerkError?.message || 'Discord authentication failed.'
     } finally {
       isLoading.value = false
     }
