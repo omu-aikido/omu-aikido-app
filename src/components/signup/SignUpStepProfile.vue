@@ -35,33 +35,23 @@
       </div>
     </div>
 
-    <div class="field">
-      <label for="joinedAt" class="label">入部年度</label>
-      <input
-        id="joinedAt"
-        type="number"
-        :value="formValues.joinedAt"
-        :disabled="isSignUpCreated"
-        class="input"
-        @input="onUpdate('joinedAt', Number(($event.target as HTMLInputElement).value))" />
-      <p v-if="formErrors.joinedAt" class="error">
-        {{ formErrors.joinedAt }}
-      </p>
-    </div>
+    <Input
+      id="joinedAt"
+      :model-value="formValues.joinedAt"
+      type="number"
+      label="入部年度"
+      :disabled="isSignUpCreated"
+      :error="formErrors.joinedAt"
+      @update:model-value="onUpdate('joinedAt', Number($event))" />
 
-    <div class="field">
-      <label for="getGradeAt" class="label">取得年月日 (任意)</label>
-      <input
-        id="getGradeAt"
-        type="date"
-        :value="formValues.getGradeAt"
-        :disabled="isSignUpCreated"
-        class="input"
-        @input="onUpdate('getGradeAt', ($event.target as HTMLInputElement).value)" />
-      <p v-if="formErrors.getGradeAt" class="error">
-        {{ formErrors.getGradeAt }}
-      </p>
-    </div>
+    <Input
+      id="getGradeAt"
+      :model-value="formValues.getGradeAt"
+      type="date"
+      label="取得年月日 (任意)"
+      :disabled="isSignUpCreated"
+      :error="formErrors.getGradeAt"
+      @update:model-value="onUpdate('getGradeAt', $event)" />
 
     <div class="checkbox-field">
       <input
@@ -78,20 +68,22 @@
     </p>
 
     <div class="actions-between">
-      <button type="button" :disabled="isSignUpCreated" class="btn-secondary" @click="prevStep">戻る</button>
-      <button type="submit" :disabled="!canSubmit" class="btn-primary">
+      <Button type="button" variant="secondary" :disabled="isSignUpCreated" @click="prevStep"> 戻る </Button>
+      <Button type="submit" variant="primary" :disabled="!canSubmit">
         {{ isSignUpCreated ? "登録中..." : "登録" }}
-      </button>
+      </Button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { year as yearOptions } from "@/share/lib/year"
 import { grade as gradeOptions } from "@/share/lib/grade"
-import type { SignUpFormData, FormErrors } from "@/src/composable/useSignUpForm"
+import { year as yearOptions } from "@/share/lib/year"
+import Button from "@/src/components/ui/UiButton.vue"
+import Input from "@/src/components/ui/UiInput.vue"
+import type { FormErrors, SignUpFormData } from "@/src/composable/useSignUpForm"
 
-const props = defineProps<{
+defineProps<{
   formValues: Partial<SignUpFormData>
   formErrors: Partial<FormErrors>
   isSignUpCreated: boolean
@@ -100,10 +92,10 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: "update:formValue", key: keyof SignUpFormData, value: any): void
+  (e: "update:formValue", key: keyof SignUpFormData, value: string | number | boolean): void
 }>()
 
-const onUpdate = (key: keyof SignUpFormData, value: any) => {
+const onUpdate = (key: keyof SignUpFormData, value: string | number | boolean) => {
   emit("update:formValue", key, value)
 }
 </script>
@@ -133,12 +125,11 @@ const onUpdate = (key: keyof SignUpFormData, value: any) => {
   color: var(--text-secondary);
 }
 
-.input,
 .select {
   width: -webkit-fill-available;
   height: fit-content;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   background: var(--bg-card);
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-base);
@@ -146,13 +137,11 @@ const onUpdate = (key: keyof SignUpFormData, value: any) => {
   transition: box-shadow var(--transition-normal);
 }
 
-.input:focus,
 .select:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--primary);
 }
 
-.input:disabled,
 .select:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -168,7 +157,7 @@ const onUpdate = (key: keyof SignUpFormData, value: any) => {
   width: 1rem;
   height: 1rem;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   accent-color: var(--primary);
 }
 
@@ -186,57 +175,5 @@ const onUpdate = (key: keyof SignUpFormData, value: any) => {
   display: flex;
   justify-content: space-between;
   padding-top: var(--space-2);
-}
-
-.btn-primary {
-  border-radius: var(--radius-md);
-  background: var(--primary);
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-primary:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
-}
-
-.btn-secondary {
-  border-radius: var(--radius-md);
-  background: transparent;
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-secondary:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.btn-secondary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: var(--bg-muted);
 }
 </style>

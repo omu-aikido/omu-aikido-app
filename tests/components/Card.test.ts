@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect } from 'vitest'
 
-import Card from '@/src/components/ui/Card.vue'
+import Card from '@/src/components/ui/UiCard.vue'
 
 describe('Card.vue', () => {
   it('renders default slot content', () => {

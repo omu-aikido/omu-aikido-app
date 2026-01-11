@@ -21,7 +21,7 @@
           <p class="username">@{{ user?.username }}</p>
         </div>
       </div>
-      <button class="btn-edit" @click="isEditing = true">編集</button>
+      <Button variant="secondary" size="sm" @click="isEditing = true">編集</Button>
     </div>
 
     <form v-else enctype="multipart/form-data" class="edit-form" @submit.prevent="handleSubmit">
@@ -35,20 +35,11 @@
         </div>
 
         <div class="fields">
-          <div class="field">
-            <label class="label">ユーザー名</label>
-            <input v-model="formData.username" type="text" class="input" />
-          </div>
+          <Input v-model="formData.username" label="ユーザー名" />
 
           <div class="grid-2">
-            <div class="field">
-              <label class="label">姓</label>
-              <input v-model="formData.lastName" type="text" class="input" />
-            </div>
-            <div class="field">
-              <label class="label">名</label>
-              <input v-model="formData.firstName" type="text" class="input" />
-            </div>
+            <Input v-model="formData.lastName" label="姓" />
+            <Input v-model="formData.firstName" label="名" />
           </div>
         </div>
       </div>
@@ -58,23 +49,33 @@
       </p>
 
       <div class="actions">
-        <button type="submit" :disabled="isSubmitting" class="btn-primary">
+        <Button type="submit" variant="primary" :disabled="isSubmitting" full-width>
           {{ isSubmitting ? "保存中..." : "保存" }}
-        </button>
-        <button type="button" class="btn-secondary" @click="cancelEdit">キャンセル</button>
+        </Button>
+        <Button type="button" variant="secondary" full-width @click="cancelEdit"> キャンセル </Button>
       </div>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from "vue"
+import Button from "@/src/components/ui/UiButton.vue"
+import Input from "@/src/components/ui/UiInput.vue"
 import hc from "@/src/lib/honoClient"
+import { computed, reactive, ref, watch } from "vue"
 
 const $accountPatch = hc.user.clerk.account.$patch
 
 const emit = defineEmits<{ updated: [] }>()
-const props = defineProps<{ user: any | null }>()
+
+interface ClerkUser {
+  username?: string | null
+  lastName?: string | null
+  firstName?: string | null
+  imageUrl?: string
+}
+
+const props = defineProps<{ user: ClerkUser | null }>()
 
 const isEditing = ref(false)
 const isSubmitting = ref(false)
@@ -106,7 +107,7 @@ function isSafeImageUrl(url: string): boolean {
 
 const safeImageUrl = computed(() => {
   const imageUrl = props.user?.imageUrl
-  return isSafeImageUrl(imageUrl) ? imageUrl : ""
+  return isSafeImageUrl(imageUrl || "") ? imageUrl : ""
 })
 
 const safePreviewImageUrl = computed(() => {
@@ -262,8 +263,8 @@ function cancelEdit() {
 }
 
 .change-text {
-  font-size: 10px;
-  color: white;
+  font-size: 0.625rem;
+  color: var(--white);
   font-weight: var(--font-medium);
 }
 
@@ -335,24 +336,6 @@ function cancelEdit() {
   background: var(--bg-muted-active);
 }
 
-.btn-edit {
-  flex-shrink: 0;
-  border-radius: var(--radius-md);
-  background: var(--bg-card);
-  padding: var(--space-1-5) var(--space-3);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-edit:hover {
-  background: var(--bg-muted);
-}
-
 .edit-form {
   display: flex;
   flex-direction: column;
@@ -378,36 +361,6 @@ function cancelEdit() {
   gap: var(--space-3);
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1-5);
-}
-
-.label {
-  display: block;
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-}
-
-.input {
-  width: -webkit-fill-available;
-  height: fit-content;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-base);
-  color: var(--text-primary);
-  transition: box-shadow var(--transition-normal);
-}
-
-.input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
 .message {
   font-size: var(--text-xs);
   font-weight: var(--font-medium);
@@ -425,51 +378,5 @@ function cancelEdit() {
   display: flex;
   gap: var(--space-3);
   padding-top: var(--space-2);
-}
-
-.btn-primary {
-  flex: 1;
-  border-radius: var(--radius-md);
-  background: var(--primary);
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: white;
-  border: none;
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-primary:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px var(--bg-card);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
-}
-
-.btn-secondary {
-  flex: 1;
-  border-radius: var(--radius-md);
-  background: var(--bg-card);
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-secondary:hover {
-  background: var(--bg-muted);
 }
 </style>

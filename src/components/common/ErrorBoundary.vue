@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onErrorCaptured, onMounted, onUnmounted } from "vue"
+import { onErrorCaptured, onMounted, onUnmounted, ref } from "vue"
 import { useRouter } from "vue-router"
 
 const router = useRouter()
@@ -132,7 +132,7 @@ onUnmounted(() => {
   width: 100%;
   padding: var(--space-3) var(--space-6);
   background: var(--accent);
-  color: white;
+  color: var(--on-primary);
   font-weight: var(--font-medium);
   border: none;
   border-radius: var(--radius-lg);

@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect } from 'vitest'
 
-import Loading from '@/src/components/ui/Loading.vue'
+import Loading from '@/src/components/ui/UiLoading.vue'
 
 describe('Loading.vue', () => {
   it('renders correctly', () => {

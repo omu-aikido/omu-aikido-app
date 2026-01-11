@@ -68,20 +68,20 @@ const fetchUser = () => refetch()
   background: var(--bg-card);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   padding: var(--space-6);
 }
 
 .divider {
   margin: var(--space-6) 0;
   border: none;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-dim);
 }
 
 .footer {
   margin-top: var(--space-4);
   padding-top: var(--space-4);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-dim);
 }
 
 .footer-text {

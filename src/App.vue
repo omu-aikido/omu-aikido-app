@@ -30,7 +30,7 @@ import ErrorBoundary from "./components/common/ErrorBoundary.vue"
   width: 100%;
   max-width: var(--container-max);
   margin-inline: auto;
-  padding: var(--space0);
+  padding: var(--space-0);
 }
 
 @media (width >= 768px) {

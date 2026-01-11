@@ -65,7 +65,7 @@
 import { onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { useSignUpForm } from "@/src/composable/useSignUpForm"
-import Card from "@/src/components/ui/Card.vue"
+import Card from "@/src/components/ui/UiCard.vue"
 import ProgressIndicator from "@/src/components/signup/ProgressIndicator.vue"
 import SignUpStepBasic from "@/src/components/signup/SignUpStepBasic.vue"
 import SignUpStepPersonal from "@/src/components/signup/SignUpStepPersonal.vue"

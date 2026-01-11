@@ -21,9 +21,9 @@
 </template>
 
 <script setup lang="ts">
+import { Tab, TabGroup, TabList } from "@headlessui/vue"
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import { TabGroup, TabList, Tab } from "@headlessui/vue"
 
 const route = useRoute()
 const router = useRouter()
@@ -58,7 +58,7 @@ const handleTabChange = (index: number) => {
 }
 
 .tab-container {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-dim);
 }
 
 .tab-list {

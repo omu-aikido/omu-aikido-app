@@ -41,12 +41,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
-import { useQuery } from "@tanstack/vue-query"
-import { queryKeys } from "@/src/lib/queryKeys"
-import hc from "@/src/lib/honoClient"
-import Loading from "@/src/components/ui/Loading.vue"
 import AdminMenu from "@/src/components/admin/AdminMenu.vue"
+import Loading from "@/src/components/ui/UiLoading.vue"
+import hc from "@/src/lib/honoClient"
+import { queryKeys } from "@/src/lib/queryKeys"
+import { useQuery } from "@tanstack/vue-query"
+import { computed } from "vue"
 
 // Queries
 const {
@@ -91,8 +91,7 @@ const error = computed(() =>
 }
 
 .error-banner {
-  background: var(--red-100); /* Fallback */
-  background: rgb(239 68 68 / 10%);
+  background: rgb(var(--red-500) / 10%);
   color: var(--red-500);
   padding: var(--space-4);
   border-radius: var(--radius-md);
@@ -138,8 +137,8 @@ const error = computed(() =>
   flex-direction: column;
   max-height: 31.25rem; /* 500px */
   overflow-y: auto;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border-dim);
+  border-bottom: 1px solid var(--border-dim);
 }
 
 .user-item {
@@ -149,7 +148,7 @@ const error = computed(() =>
   padding: var(--space-4);
   cursor: pointer;
   transition: background var(--transition-normal);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-dim);
 }
 
 .user-item:last-child {

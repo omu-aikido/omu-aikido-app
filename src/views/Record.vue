@@ -207,7 +207,7 @@ const selectedDateActivities = computed(() => {
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
   padding: var(--space-6);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   max-height: 90vh;
   overflow-y: auto;
 }
@@ -247,7 +247,7 @@ const selectedDateActivities = computed(() => {
 .existing-records {
   margin-top: var(--space-8);
   padding-top: var(--space-6);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-dim);
 }
 
 .records-title {

@@ -48,7 +48,7 @@
   display: inline-block;
   padding: var(--space-3) var(--space-6);
   background: var(--accent);
-  color: white;
+  color: var(--white);
   font-weight: var(--font-medium);
   border-radius: var(--radius-lg);
   text-decoration: none;

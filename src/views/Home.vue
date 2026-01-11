@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
 import { SignedIn } from "@clerk/vue"
-import { ClipboardListIcon, UserIcon, SettingsIcon } from "lucide-vue-next"
+import { ClipboardListIcon, SettingsIcon, UserIcon } from "lucide-vue-next"
+import { computed, ref } from "vue"
 
 import PracticeCountGraph from "@/src/components/home/PracticeCountGraph.vue"
 import PracticeRanking from "@/src/components/home/PracticeRanking.vue"
@@ -200,7 +200,7 @@ const getThemeClass = (theme: string) => {
   background: var(--bg-card);
   padding: var(--space-6);
   box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   cursor: pointer;
   text-decoration: none;
   transition: box-shadow var(--transition-normal), border-color var(--transition-normal);

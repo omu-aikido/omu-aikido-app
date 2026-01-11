@@ -91,7 +91,7 @@ const emit = defineEmits<Emits>()
   background: var(--bg-card);
   padding: var(--space-6);
   box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
 }
 
 .content {
@@ -146,7 +146,7 @@ const emit = defineEmits<Emits>()
   font-weight: var(--font-medium);
   color: var(--text-secondary);
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: background var(--transition-normal);
@@ -165,7 +165,7 @@ const emit = defineEmits<Emits>()
   padding: var(--space-2) var(--space-4);
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  color: white;
+  color: var(--on-primary);
   background: var(--red-500);
   border: none;
   border-radius: var(--radius-lg);

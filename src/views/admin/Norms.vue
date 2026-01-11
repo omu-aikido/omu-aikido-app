@@ -66,13 +66,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue"
-import { useQuery } from "@tanstack/vue-query"
-import { queryKeys } from "@/src/lib/queryKeys"
-import hc from "@/src/lib/honoClient"
-import Loading from "@/src/components/ui/Loading.vue"
-import NormCard from "@/src/components/admin/NormCard.vue"
 import AdminMenu from "@/src/components/admin/AdminMenu.vue"
+import NormCard from "@/src/components/admin/NormCard.vue"
+import Loading from "@/src/components/ui/UiLoading.vue"
+import hc from "@/src/lib/honoClient"
+import { queryKeys } from "@/src/lib/queryKeys"
+import { useQuery } from "@tanstack/vue-query"
+import { computed, ref } from "vue"
 
 const searchTerm = ref("")
 const filterStatus = ref<"all" | "met" | "unmet">("all")
@@ -242,7 +242,7 @@ const filteredUsers = computed(() => {
   padding: var(--space-2) var(--space-3);
   padding-left: 2.5rem; /* For icon if needed */
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   border-radius: var(--radius-md);
   color: var(--text-primary);
   font-size: var(--text-base);

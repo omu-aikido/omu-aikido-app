@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { RankingResponse } from '@/share/types/records'
+import type { RankingResponse } from '@/share/types/records';
 
 interface Props {
   rankingData: RankingResponse | null
@@ -84,7 +84,7 @@ const getRankClass = (rank: number) => {
   background: var(--bg-card);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   padding: var(--space-5);
 }
 
@@ -115,7 +115,7 @@ const getRankClass = (rank: number) => {
 }
 
 .label {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: var(--font-medium);
   color: var(--text-secondary);
   margin-bottom: var(--space-1);

@@ -27,42 +27,40 @@
         <div class="card-body">
           <div class="form-container">
             <form v-if="needsVerification" @submit.prevent="handleVerifyCode">
-              <div class="field">
-                <label for="code" class="label">認証コード</label>
-                <input
-                  id="code"
-                  v-model="code"
-                  type="text"
-                  name="code"
-                  required
-                  placeholder="認証コードを入力"
-                  class="input" />
-                <p class="hint">{{ email }} に認証コードを送信しました</p>
-              </div>
+              <Input id="code" v-model="code" label="認証コード" name="code" required placeholder="認証コードを入力" />
+              <p class="hint">{{ email }} に認証コードを送信しました</p>
+
               <div v-if="error" class="error">
                 <p>{{ error }}</p>
               </div>
-              <button type="submit" :disabled="isLoading" class="btn-primary full-width">
+              <Button type="submit" :disabled="isLoading" full-width class="mt-4">
                 {{ isLoading ? "認証中..." : "認証" }}
-              </button>
+              </Button>
             </form>
 
             <form v-else @submit.prevent="handleSignIn">
-              <div class="field">
-                <label for="email" class="label">メールアドレス</label>
-                <input
-                  id="email"
-                  v-model="email"
-                  type="email"
-                  name="email"
-                  required
-                  autoComplete="email"
-                  placeholder="example@mail.com"
-                  class="input" />
-              </div>
-              <div class="field mt-4">
+              <Input
+                id="email"
+                v-model="email"
+                type="email"
+                label="メールアドレス"
+                name="email"
+                required
+                autocomplete="email"
+                placeholder="example@mail.com" />
+
+              <div class="mt-4 user-select-none">
+                <!-- added wrapper for layout spacing if needed, though Input handles vertical gap -->
+                <!-- Password input needs custom label layout for 'Forgot Password' link?
+                      Input component has internal label. If we want the link next to label, we might need a slot or different approach.
+                      The Input component puts label above.
+                      Let's use the Input component but maybe we can't easily put the link *inside* the label line without a slot.
+                      However, the Input component doesn't have a label-right slot.
+
+                      Workaround: Don't use 'label' prop on Input, render label manually above it.
+                 -->
                 <div class="label-row">
-                  <label for="password" class="label">パスワード</label>
+                  <label for="password" class="field-label">パスワード</label>
                   <a
                     href="https://accounts.omu-aikido.com/sign-in/"
                     class="forgot-link"
@@ -71,15 +69,15 @@
                     パスワードを忘れた
                   </a>
                 </div>
-                <input
+                <Input
                   id="password"
                   v-model="password"
                   type="password"
                   name="password"
                   required
-                  autoComplete="current-password"
-                  class="input" />
+                  autocomplete="current-password" />
               </div>
+
               <div v-if="error" class="error">
                 <p>{{ error }}</p>
                 <div class="error-help">
@@ -90,11 +88,13 @@
                   からサインインをお試しください。
                 </div>
               </div>
-              <button type="submit" :disabled="isLoading" class="btn-primary full-width mt-6">
+
+              <Button type="submit" :disabled="isLoading" full-width class="mt-6">
                 {{ isLoading ? "サインイン中..." : "サインイン" }}
-              </button>
+              </Button>
             </form>
-            <button type="button" class="btn-discord full-width" :disabled="isLoading" @click="handleSignInWithDiscord">
+
+            <Button type="button" variant="discord" full-width :disabled="isLoading" @click="handleSignInWithDiscord">
               <svg
                 class="discord-icon"
                 aria-hidden="true"
@@ -121,7 +121,7 @@
                 </g>
               </svg>
               Discordで認証
-            </button>
+            </Button>
           </div>
           <hr class="divider" />
           <div class="footer-text">
@@ -139,7 +139,9 @@ import { useRouter, useRoute } from "vue-router"
 import { SignedOut, SignedIn } from "@clerk/vue"
 import { useAuth } from "@/src/composable/useAuth"
 import { useSignIn } from "@/src/composable/useSignIn"
-import Card from "@/src/components/ui/Card.vue"
+import Card from "@/src/components/ui/UiCard.vue"
+import Button from "@/src/components/ui/UiButton.vue"
+import Input from "@/src/components/ui/UiInput.vue"
 import { ref, onMounted, watch } from "vue"
 
 const router = useRouter()
@@ -287,21 +289,16 @@ const handleSignInWithDiscord = async () => {
   gap: var(--space-6);
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.label {
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
+.field-label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--text-secondary);
 }
 
 .label-row {
   display: flex;
   align-items: center;
+  margin-bottom: var(--space-1-5);
 }
 
 .forgot-link {
@@ -317,30 +314,10 @@ const handleSignInWithDiscord = async () => {
   text-decoration: underline;
 }
 
-.input {
-  width: -webkit-fill-available;
-  height: fit-content;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-base);
-  color: var(--text-primary);
-  transition: box-shadow var(--transition-normal);
-}
-
-.input::placeholder {
-  color: var(--border-strong);
-}
-
-.input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
 .hint {
   font-size: var(--text-xs);
   color: var(--text-secondary);
+  margin-top: var(--space-2);
 }
 
 .error {
@@ -355,69 +332,10 @@ const handleSignInWithDiscord = async () => {
   color: var(--text-secondary);
 }
 
-.btn-primary {
-  border-radius: var(--radius-md);
-  background: var(--primary);
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-primary:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
-}
-
-.btn-discord {
-  border-radius: var(--radius-md);
-  background: #5865f2;
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: white;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  transition: background var(--transition-normal);
-}
-
-.btn-discord:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px #5865f2;
-}
-
-.btn-discord:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-discord:hover:not(:disabled) {
-  background: #4752c4;
-}
-
 .discord-icon {
   width: 1.25rem;
   height: 1.25rem;
-}
-
-.full-width {
-  width: 100%;
+  margin-right: var(--space-2);
 }
 
 .mt-4 {

@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import type { Activity } from "@/share/types/records"
 import {
-  format,
-  parseISO,
-  eachDayOfInterval,
-  startOfMonth,
-  endOfMonth,
-  isSameDay,
-  addMonths,
-  subMonths,
+    addMonths,
+    eachDayOfInterval,
+    endOfMonth,
+    format,
+    isSameDay,
+    parseISO,
+    startOfMonth,
+    subMonths,
 } from "date-fns"
 import { ja } from "date-fns/locale"
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-vue-next"
-import type { Activity } from "@/share/types/records"
+import { computed } from "vue"
 
 interface Props {
   activities: readonly Activity[]
@@ -267,7 +267,7 @@ const isToday = (date: Date) => {
 }
 
 .weekday {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: var(--font-medium);
   line-height: 1;
   margin-top: var(--space-1);

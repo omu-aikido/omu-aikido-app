@@ -73,16 +73,16 @@
 </template>
 
 <script setup lang="ts">
+import { SignedIn, SignedOut, SignOutButton, UserAvatar } from "@clerk/vue"
+import {
+    ClipboardListIcon,
+    LayoutDashboardIcon,
+    LogOutIcon,
+    MenuIcon,
+    XIcon,
+} from "lucide-vue-next"
 import { ref, watch } from "vue"
 import { RouterLink } from "vue-router"
-import {
-  MenuIcon,
-  XIcon,
-  LayoutDashboardIcon,
-  ClipboardListIcon,
-  LogOutIcon,
-} from "lucide-vue-next"
-import { SignedIn, SignedOut, SignOutButton, UserAvatar } from "@clerk/vue"
 
 // State
 const isOpen = ref(false)
@@ -276,7 +276,7 @@ watch(isOpen, value => {
   width: 100%;
   text-align: center;
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   padding: var(--space-3);
   border-radius: var(--radius-lg);
   font-weight: var(--font-medium);
@@ -294,7 +294,7 @@ watch(isOpen, value => {
 
 .footer-border {
   padding-top: var(--space-4);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-dim);
 }
 
 .logout-btn {
@@ -315,17 +315,5 @@ watch(isOpen, value => {
 
 .logout-btn:hover {
   background: var(--error-bg);
-}
-</style>
-
-<style>
-/* stylelint-disable selector-class-pattern */
-.cl-avatarBox, .cl-userAvatarBox {
-  height: 1.5rem;
-  width: 1.5rem;
-  border-radius: var(--radius-full);
-  box-shadow: 0 0 0 2px var(--bg-muted);
-  overflow: hidden;
-  flex-shrink: 0;
 }
 </style>

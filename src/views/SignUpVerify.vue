@@ -7,26 +7,22 @@
       </div>
       <div class="card-body">
         <form class="verify-form" @submit.prevent="handleVerify">
-          <div class="field">
-            <label for="code" class="label">認証コード</label>
-            <input
-              id="code"
-              v-model="code"
-              type="text"
-              name="code"
-              required
-              placeholder="123456"
-              :disabled="isLoading"
-              class="input" />
-          </div>
+          <Input
+            id="code"
+            v-model="code"
+            label="認証コード"
+            name="code"
+            required
+            placeholder="123456"
+            :disabled="isLoading" />
 
           <div v-if="error" class="error">
             {{ error }}
           </div>
 
-          <button type="submit" :disabled="isLoading" class="btn-primary">
+          <Button type="submit" :disabled="isLoading" full-width class="mt-4">
             {{ isLoading ? "確認中..." : "確認してサインアップ" }}
-          </button>
+          </Button>
         </form>
       </div>
     </Card>
@@ -38,7 +34,9 @@ import { onMounted, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useClerk } from "@clerk/vue"
 import { useSignUpVerify } from "@/src/composable/useSignUpVerify"
-import Card from "@/src/components/ui/Card.vue"
+import Card from "@/src/components/ui/UiCard.vue"
+import Button from "@/src/components/ui/UiButton.vue"
+import Input from "@/src/components/ui/UiInput.vue"
 
 const router = useRouter()
 const clerk = useClerk()
@@ -116,70 +114,12 @@ watch(
   gap: var(--space-4);
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.label {
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-}
-
-.input {
-  width: -webkit-fill-available;
-  height: fit-content;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-base);
-  color: var(--text-primary);
-  transition: box-shadow var(--transition-normal);
-}
-
-.input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .error {
   font-size: var(--text-base);
   color: var(--red-500);
 }
 
-.btn-primary {
-  margin-top: var(--space-2);
-  width: 100%;
-  border-radius: var(--radius-md);
-  background: var(--primary);
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-primary:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
+.mt-4 {
+  margin-top: var(--space-4);
 }
 </style>

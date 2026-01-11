@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import Button from "@/src/components/ui/UiButton.vue"
+import Input from "@/src/components/ui/UiInput.vue"
 import { format } from "date-fns"
+import { ref, watch } from "vue"
 
 interface Props {
   loading?: boolean
@@ -34,28 +36,22 @@ const handleSubmit = () => {
 <template>
   <div class="container">
     <form class="form" data-testid="activity-form" @submit.prevent="handleSubmit">
-      <div class="field">
-        <label for="date" class="label">日付</label>
-        <div class="input-wrapper">
-          <input id="date" v-model="newDate" type="date" required class="input" data-testid="date-input" />
-        </div>
-      </div>
-      <div class="field">
-        <label for="period" class="label">時間 (時間)</label>
-        <input
-          id="period"
-          v-model.number="newPeriod"
-          type="number"
-          step="0.5"
-          min="0.5"
-          max="8"
-          required
-          class="input"
-          data-testid="period-input" />
-      </div>
-      <button type="submit" :disabled="loading" class="submit-btn" data-testid="submit-btn">
+      <Input id="date" v-model="newDate" label="日付" type="date" required data-testid="date-input" />
+
+      <Input
+        id="period"
+        v-model.number="newPeriod"
+        label="時間 (時間)"
+        type="number"
+        step="0.5"
+        min="0.5"
+        max="8"
+        required
+        data-testid="period-input" />
+
+      <Button type="submit" variant="primary" full-width :disabled="loading" data-testid="submit-btn">
         {{ loading ? "保存中..." : "記録を追加" }}
-      </button>
+      </Button>
     </form>
   </div>
 </template>
@@ -69,78 +65,5 @@ const handleSubmit = () => {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.label {
-  display: block;
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-}
-
-.input-wrapper {
-  flex: 1;
-  width: 100%;
-  line-height: normal;
-}
-
-.input {
-  width: -webkit-fill-available;
-  height:var(--text-md);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  appearance: none;
-  color: var(--text-primary);
-  background: var(--bg-card);
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-base);
-  transition: box-shadow var(--transition-normal);
-}
-
-.input::placeholder {
-  color: var(--border-strong);
-}
-
-.input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-  border-color: transparent;
-}
-
-.submit-btn {
-  width: 100%;
-  border-radius: var(--radius-md);
-  background: var(--primary);
-  padding: var(--space-2-5) 0;
-
-  /* Generate --space-2-5 inline since it wasn't defined */
-  padding-block: 0.625rem;
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: white;
-  border: none;
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.submit-btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px var(--bg-card);
-}
-
-.submit-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.submit-btn:hover:not(:disabled) {
-  background: var(--primary-hover);
 }
 </style>

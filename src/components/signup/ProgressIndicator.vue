@@ -51,7 +51,7 @@ defineProps<{ step: SignUpStep }>()
 
 .divider {
   flex: 1;
-  border-top: 2px solid var(--border);
+  border-top: 2px solid var(--border-dim);
   transition: border-color 500ms ease-in-out;
 }
 </style>

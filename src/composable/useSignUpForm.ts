@@ -1,7 +1,7 @@
 import type { ClerkAPIError } from '@clerk/types'
 
 import { useClerk } from '@clerk/vue'
-import { type, ArkErrors } from 'arktype'
+import { ArkErrors, type } from 'arktype'
 import { reactive, readonly, ref } from 'vue'
 
 // Schema for form data validation using ArkType
@@ -150,11 +150,11 @@ export function useSignUpForm(currentYear: number) {
       })
 
       return true
-    } catch (err: any) {
+    } catch (err: unknown) {
       isSignUpCreated.value = false // Reset on error
       const errorMsg = 'User registration failed'
-      if (err.errors) {
-        clerkErrors.value = err.errors as ClerkAPIError[]
+      if (err && typeof err === 'object' && 'errors' in err) {
+        clerkErrors.value = (err as { errors: ClerkAPIError[] }).errors
       } else {
         formErrors.general = errorMsg
       }

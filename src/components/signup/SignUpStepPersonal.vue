@@ -1,66 +1,53 @@
 <template>
   <div class="form-container">
     <div class="grid-2">
-      <div class="field">
-        <label for="lastName" class="label">姓</label>
-        <input
-          id="lastName"
-          name="lastName"
-          type="text"
-          :value="formValues.lastName"
-          required
-          placeholder="山田"
-          :disabled="isSignUpCreated"
-          class="input"
-          @input="onUpdate('lastName', ($event.target as HTMLInputElement).value)" />
-        <p v-if="formErrors.lastName" class="error">
-          {{ formErrors.lastName }}
-        </p>
-      </div>
-      <div class="field">
-        <label for="firstName" class="label">名</label>
-        <input
-          id="firstName"
-          name="firstName"
-          type="text"
-          :value="formValues.firstName"
-          required
-          placeholder="太郎"
-          :disabled="isSignUpCreated"
-          class="input"
-          @input="onUpdate('firstName', ($event.target as HTMLInputElement).value)" />
-        <p v-if="formErrors.firstName" class="error">
-          {{ formErrors.firstName }}
-        </p>
-      </div>
-    </div>
-    <div class="field">
-      <label for="username" class="label">ユーザー名 (任意・6文字以上)</label>
-      <input
-        id="username"
-        name="username"
-        type="text"
-        autocomplete="username"
-        :value="formValues.username"
-        placeholder="aikido_taro"
+      <Input
+        id="lastName"
+        name="lastName"
+        label="姓"
+        :model-value="formValues.lastName"
+        required
+        placeholder="山田"
         :disabled="isSignUpCreated"
-        class="input"
-        @input="onUpdate('username', ($event.target as HTMLInputElement).value)" />
-      <p v-if="formErrors.username" class="error">
-        {{ formErrors.username }}
-      </p>
+        :error="formErrors.lastName"
+        @update:model-value="onUpdate('lastName', $event)" />
+      <Input
+        id="firstName"
+        name="firstName"
+        label="名"
+        :model-value="formValues.firstName"
+        required
+        placeholder="太郎"
+        :disabled="isSignUpCreated"
+        :error="formErrors.firstName"
+        @update:model-value="onUpdate('firstName', $event)" />
     </div>
+
+    <Input
+      id="username"
+      name="username"
+      label="ユーザー名 (任意・6文字以上)"
+      type="text"
+      autocomplete="username"
+      :model-value="formValues.username"
+      placeholder="aikido_taro"
+      :disabled="isSignUpCreated"
+      :error="formErrors.username"
+      @update:model-value="onUpdate('username', $event)" />
+
     <div class="actions-between">
-      <button type="button" :disabled="isSignUpCreated" class="btn-secondary" @click="prevStep">戻る</button>
-      <button type="button" :disabled="isSignUpCreated" class="btn-primary" @click="handleNext">次へ</button>
+      <Button type="button" variant="secondary" :disabled="isSignUpCreated" @click="prevStep"> 戻る </Button>
+      <Button type="button" variant="primary" :disabled="isSignUpCreated" @click="handleNext"> 次へ </Button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { SignUpFormData, FormErrors } from "@/src/composable/useSignUpForm"
+import Button from "@/src/components/ui/UiButton.vue";
+import Input from "@/src/components/ui/UiInput.vue";
+import type { FormErrors, SignUpFormData } from "@/src/composable/useSignUpForm";
 
-const props = defineProps<{
+defineProps<{
   formValues: Partial<SignUpFormData>
   formErrors: Partial<FormErrors>
   isSignUpCreated: boolean
@@ -69,10 +56,10 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: "update:formValue", key: keyof SignUpFormData, value: any): void
+  (e: "update:formValue", key: keyof SignUpFormData, value: string | number): void
 }>()
 
-const onUpdate = (key: keyof SignUpFormData, value: any) => {
+const onUpdate = (key: keyof SignUpFormData, value: string | number) => {
   emit("update:formValue", key, value)
 }
 </script>
@@ -90,104 +77,9 @@ const onUpdate = (key: keyof SignUpFormData, value: any) => {
   gap: var(--space-4);
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.label {
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-}
-
-.input {
-  width: -webkit-fill-available;
-  height: fit-content;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-sm);
-  color: var(--text-primary);
-  transition: box-shadow var(--transition-normal);
-}
-
-.input::placeholder {
-  color: var(--border-strong);
-}
-
-.input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.error {
-  font-size: var(--text-sm);
-  color: var(--red-500);
-}
-
 .actions-between {
   display: flex;
   justify-content: space-between;
   padding-top: var(--space-2);
-}
-
-.btn-primary {
-  border-radius: var(--radius-md);
-  background: var(--primary);
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-primary:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
-}
-
-.btn-secondary {
-  border-radius: var(--radius-md);
-  background: transparent;
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-secondary:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.btn-secondary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: var(--bg-muted);
 }
 </style>

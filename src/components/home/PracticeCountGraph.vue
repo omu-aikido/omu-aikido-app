@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from "vue"
 import { timeForNextGrade, translateGrade } from "@/share/lib/grade"
 import type { PracticeCountData } from "@/share/types/records"
+import { computed } from "vue"
 
 interface Props {
   practiceData: PracticeCountData | null
@@ -128,7 +128,7 @@ const progressComment = computed(() => {
   background: var(--bg-card);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
 }
 
 .loading-skeleton {
@@ -137,8 +137,15 @@ const progressComment = computed(() => {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .skeleton-text {
@@ -226,7 +233,7 @@ const progressComment = computed(() => {
 
 .details-content {
   padding: 0 var(--space-5) var(--space-5);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-dim);
   background: var(--bg-card);
 }
 

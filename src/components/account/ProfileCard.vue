@@ -28,7 +28,7 @@
     <div v-else-if="!isEditing" class="display-mode">
       <div class="header-row">
         <h3 class="title">プロフィール</h3>
-        <button class="btn-edit" @click="isEditing = true">編集</button>
+        <Button variant="secondary" size="sm" @click="isEditing = true">編集</Button>
       </div>
       <div class="info-list">
         <div class="info-row">
@@ -85,15 +85,9 @@
         </Listbox>
       </div>
 
-      <div class="field">
-        <label class="label">取得日</label>
-        <input v-model="formData.getGradeAt" type="date" class="input" />
-      </div>
+      <Input v-model="formData.getGradeAt" type="date" label="取得日" />
 
-      <div class="field">
-        <label class="label">入部年</label>
-        <input v-model="formData.joinedAt" type="number" min="2020" max="9999" class="input" />
-      </div>
+      <Input v-model="formData.joinedAt" type="number" label="入部年" min="2020" max="9999" />
 
       <div class="field">
         <label class="label">学年</label>
@@ -132,31 +126,33 @@
       </p>
 
       <div class="actions">
-        <button type="submit" :disabled="isSubmitting" class="btn-primary">
+        <Button type="submit" variant="primary" :disabled="isSubmitting" full-width>
           {{ isSubmitting ? "保存中..." : "保存" }}
-        </button>
-        <button type="button" class="btn-secondary" @click="cancelEdit">キャンセル</button>
+        </Button>
+        <Button type="button" variant="secondary" full-width @click="cancelEdit"> キャンセル </Button>
       </div>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from "vue"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/vue-query"
+import { grade, translateGrade } from "@/share/lib/grade"
+import { translateYear, year } from "@/share/lib/year"
+import { AccountMetadata } from "@/share/types/account"
+import Button from "@/src/components/ui/UiButton.vue"
+import Input from "@/src/components/ui/UiInput.vue"
+import hc from "@/src/lib/honoClient"
 import { queryKeys } from "@/src/lib/queryKeys"
 import {
-  Listbox,
-  ListboxButton,
-  ListboxOptions,
-  ListboxOption,
+    Listbox,
+    ListboxButton,
+    ListboxOption,
+    ListboxOptions,
 } from "@headlessui/vue"
-import { ChevronsUpDownIcon, CheckIcon } from "lucide-vue-next"
-import hc from "@/src/lib/honoClient"
-import { AccountMetadata } from "@/share/types/account"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query"
 import { ArkErrors } from "arktype"
-import { translateGrade, grade } from "@/share/lib/grade"
-import { translateYear, year } from "@/share/lib/year"
+import { CheckIcon, ChevronsUpDownIcon } from "lucide-vue-next"
+import { computed, reactive, ref, watch } from "vue"
 
 interface FormData {
   grade: number
@@ -222,7 +218,12 @@ function updateFormData() {
 
 // Mutation
 const { mutateAsync: updateProfile, isPending: isSubmitting } = useMutation({
-  mutationFn: async (json: any) => {
+  mutationFn: async (json: {
+    grade: number
+    getGradeAt: `${number}-${number}-${number}` | null
+    joinedAt: number
+    year: `b${number}` | `m${number}` | `d${number}`
+  }) => {
     const res = await hc.user.clerk.profile.$patch({ json })
     if (!res.ok) throw new Error("プロフィールの更新に失敗しました")
     return res.json()
@@ -353,24 +354,6 @@ function cancelEdit() {
   color: var(--text-primary);
 }
 
-.btn-edit {
-  flex-shrink: 0;
-  border-radius: var(--radius-md);
-  background: var(--bg-card);
-  padding: var(--space-1-5) var(--space-3);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-edit:hover {
-  background: var(--bg-muted);
-}
-
 .field {
   display: flex;
   flex-direction: column;
@@ -384,23 +367,6 @@ function cancelEdit() {
   color: var(--text-secondary);
 }
 
-.input {
-  width: -webkit-fill-available;
-  height: fit-content;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-base);
-  color: var(--text-primary);
-  transition: box-shadow var(--transition-normal);
-}
-
-.input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
 .listbox-container {
   position: relative;
   margin-top: var(--space-1);
@@ -412,7 +378,7 @@ function cancelEdit() {
   cursor: default;
   border-radius: var(--radius-md);
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   padding: var(--space-2) var(--space-3);
   padding-right: 2.5rem;
   text-align: left;
@@ -460,7 +426,7 @@ function cancelEdit() {
   background: var(--bg-card);
   padding: var(--space-1) 0;
   box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
 }
 
 .listbox-option {
@@ -527,51 +493,5 @@ function cancelEdit() {
   display: flex;
   gap: var(--space-3);
   padding-top: var(--space-2);
-}
-
-.btn-primary {
-  flex: 1;
-  border-radius: var(--radius-md);
-  background: var(--primary);
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: white;
-  border: none;
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-primary:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px var(--bg-card);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
-}
-
-.btn-secondary {
-  flex: 1;
-  border-radius: var(--radius-md);
-  background: var(--bg-card);
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-secondary:hover {
-  background: var(--bg-muted);
 }
 </style>

@@ -55,7 +55,7 @@ defineProps<{ user: AdminUserType; norm: NormData; progress: number }>()
   background: var(--bg-card);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   padding: var(--space-4);
   display: flex;
   flex-direction: column;

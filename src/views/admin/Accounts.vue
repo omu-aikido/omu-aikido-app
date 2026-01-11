@@ -92,7 +92,7 @@ import { ref, computed } from "vue"
 import { useQuery } from "@tanstack/vue-query"
 import { queryKeys } from "@/src/lib/queryKeys"
 import hc from "@/src/lib/honoClient"
-import Loading from "@/src/components/ui/Loading.vue"
+import Loading from "@/src/components/ui/UiLoading.vue"
 import AdminMenu from "@/src/components/admin/AdminMenu.vue"
 
 const searchQuery = ref("")
@@ -211,7 +211,7 @@ const sortedUsers = computed(() => {
   min-width: 0;
   padding: var(--space-2) var(--space-3);
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   border-radius: var(--radius-md);
   color: var(--text-primary);
   font-size: var(--text-base);
@@ -232,7 +232,7 @@ const sortedUsers = computed(() => {
 .search-btn {
   padding: var(--space-2) var(--space-4);
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   border: none;
   border-radius: var(--radius-md);
   font-size: var(--text-base);
@@ -279,7 +279,7 @@ const sortedUsers = computed(() => {
 }
 
 .data-table thead {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-dim);
 }
 
 .sortable {
@@ -308,7 +308,7 @@ const sortedUsers = computed(() => {
 .table-row {
   cursor: pointer;
   transition: background var(--transition-normal);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-dim);
 }
 
 .table-row:last-child {

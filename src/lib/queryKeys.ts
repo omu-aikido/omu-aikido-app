@@ -6,8 +6,8 @@ type Client = typeof hc
 
 type ValidateStructure<TClient, TKeys> = {
   [K in keyof TKeys]: K extends keyof TClient
-    ? TKeys[K] extends (...args: any[]) => any
-      ? TKeys[K] & ValidateStructure<TClient[K], Omit<TKeys[K], keyof Function>>
+    ? TKeys[K] extends (...args: unknown[]) => unknown
+      ? TKeys[K] & ValidateStructure<TClient[K], Omit<TKeys[K], keyof ((...args: unknown[]) => unknown)>>
       : ValidateStructure<TClient[K], TKeys[K]>
     : never
 }

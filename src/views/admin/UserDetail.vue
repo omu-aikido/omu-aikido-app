@@ -65,7 +65,7 @@
             <div class="form-grid">
               <div class="form-group">
                 <label class="label">役職</label>
-                <select v-model="formData.role" class="input">
+                <select v-model="formData.role" class="select">
                   <option v-for="(label, key) in roleLabels" :key="key" :value="key">
                     {{ label }}
                   </option>
@@ -73,7 +73,7 @@
               </div>
               <div class="form-group">
                 <label class="label">級段位</label>
-                <select v-model.number="formData.grade" class="input">
+                <select v-model.number="formData.grade" class="select">
                   <option v-for="(label, key) in gradeLabels" :key="key" :value="key">
                     {{ label }}
                   </option>
@@ -81,32 +81,26 @@
               </div>
               <div class="form-group">
                 <label class="label">学年</label>
-                <select v-model="formData.year" class="input">
+                <select v-model="formData.year" class="select">
                   <option v-for="(label, key) in yearLabels" :key="key" :value="key">
                     {{ label }}
                   </option>
                 </select>
               </div>
-              <div class="form-group">
-                <label class="label">入部年度</label>
-                <input
-                  v-model.number="formData.joinedAt"
-                  type="number"
-                  class="input"
-                  min="1950"
-                  :max="new Date().getFullYear() + 1" />
-              </div>
-              <div class="form-group">
-                <label class="label">級段位取得日</label>
-                <input v-model="formData.getGradeAt" type="date" class="input" />
-              </div>
+              <Input
+                v-model.number="formData.joinedAt"
+                type="number"
+                label="入部年度"
+                :min="1950"
+                :max="new Date().getFullYear() + 1" />
+              <Input v-model="formData.getGradeAt" type="date" label="級段位取得日" />
             </div>
 
             <div class="form-actions">
-              <button type="button" class="btn-secondary" @click="cancelEditing">キャンセル</button>
-              <button type="submit" :disabled="updating" class="btn-primary">
+              <Button type="button" variant="secondary" @click="cancelEditing">キャンセル</Button>
+              <Button type="submit" :disabled="updating" variant="primary">
                 {{ updating ? "更新中..." : "更新" }}
-              </button>
+              </Button>
             </div>
           </form>
           <MessageDisplay :error-message="updateError" :success-message="updateSuccess" />
@@ -196,13 +190,13 @@
             </p>
             <input v-model="deleteConfirmName" type="text" placeholder="ユーザー名を入力" class="confirm-input" />
             <div class="confirm-actions">
-              <button class="btn-text" @click="showDeleteConfirm = false; deleteConfirmName = ''">キャンセル</button>
-              <button
+              <Button variant="ghost" @click="showDeleteConfirm = false; deleteConfirmName = ''">キャンセル</Button>
+              <Button
                 :disabled="deleteConfirmName !== (user?.lastName ?? '') + (user?.firstName ?? '')"
-                class="btn-danger"
+                variant="danger"
                 @click="showFinalConfirm = true">
                 次へ
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -230,14 +224,14 @@
                 さんのアカウントとすべての活動記録が削除されます。この操作は元に戻せません。
               </p>
               <div class="modal-actions">
-                <button
-                  class="btn-secondary"
+                <Button
+                  variant="secondary"
                   @click="showFinalConfirm = false; showDeleteConfirm = false; deleteConfirmName = '';">
                   キャンセル
-                </button>
-                <button :disabled="deleting" class="btn-danger" @click="handleDeleteUser">
+                </Button>
+                <Button :disabled="deleting" variant="danger" @click="handleDeleteUser">
                   {{ deleting ? "削除中..." : "削除する" }}
-                </button>
+                </Button>
               </div>
               <p v-if="deleteError" class="error-text">
                 {{ deleteError }}
@@ -251,14 +245,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue"
-import { useRoute, useRouter } from "vue-router"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/vue-query"
-import { queryKeys } from "@/src/lib/queryKeys"
-import hc from "@/src/lib/honoClient"
-import Loading from "@/src/components/ui/Loading.vue"
-import MessageDisplay from "@/src/components/common/MessageDisplay.vue"
 import AdminMenu from "@/src/components/admin/AdminMenu.vue"
+import MessageDisplay from "@/src/components/common/MessageDisplay.vue"
+import Button from "@/src/components/ui/UiButton.vue"
+import Input from "@/src/components/ui/UiInput.vue"
+import Loading from "@/src/components/ui/UiLoading.vue"
+import hc from "@/src/lib/honoClient"
+import { queryKeys } from "@/src/lib/queryKeys"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query"
+import { computed, ref, watch } from "vue"
+import { useRoute, useRouter } from "vue-router"
 
 const route = useRoute()
 const router = useRouter()
@@ -324,7 +320,14 @@ const {
 })
 
 const user = computed(() => apiData.value?.user ?? null)
-const activities = computed(() => (apiData.value?.activities as any[]) ?? [])
+
+interface Activity {
+  id: string
+  date: string
+  period: number
+}
+
+const activities = computed(() => (apiData.value?.activities as Activity[]) ?? [])
 const stats = computed(() => {
   if (!apiData.value) return null
   return {
@@ -403,7 +406,13 @@ const changePage = (newPage: number) => {
 
 // Mutations
 const { mutateAsync: updateProfile, isPending: updating } = useMutation({
-  mutationFn: async (payload: any) => {
+  mutationFn: async (payload: {
+    role: string
+    grade: number
+    year: string
+    joinedAt: number
+    getGradeAt: string | null
+  }) => {
     const res = await hc.admin.users[":userId"].profile.$patch({
       param: { userId },
       json: payload,
@@ -664,19 +673,19 @@ const handleDeleteUser = async () => {
   color: var(--text-secondary);
 }
 
-.input {
+.select {
   width: -webkit-fill-available;
   height: fit-content;
   padding: var(--space-2) var(--space-3);
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   border-radius: var(--radius-md);
   color: var(--text-primary);
   font-size: var(--text-base);
   transition: box-shadow var(--transition-normal);
 }
 
-.input:focus {
+.select:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--primary);
 }
@@ -687,52 +696,12 @@ const handleDeleteUser = async () => {
   gap: var(--space-2);
 }
 
-.btn-primary {
-  padding: var(--space-2) var(--space-4);
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
 
-.btn-primary:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
-}
-
-.btn-secondary {
-  padding: var(--space-2) var(--space-4);
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-secondary:hover {
-  background: var(--bg-muted-active);
-}
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
@@ -743,7 +712,7 @@ const handleDeleteUser = async () => {
 }
 
 .stat-left {
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--border-dim);
 }
 
 .stat-item {
@@ -752,7 +721,7 @@ const handleDeleteUser = async () => {
 }
 
 .border-bottom {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-dim);
 }
 
 .stat-value {
@@ -790,7 +759,7 @@ const handleDeleteUser = async () => {
 }
 
 .data-table thead {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-dim);
 }
 
 .data-table th,
@@ -805,7 +774,7 @@ const handleDeleteUser = async () => {
 }
 
 .data-table tr {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-dim);
 }
 
 /* Pagination */
@@ -814,13 +783,13 @@ const handleDeleteUser = async () => {
   justify-content: space-between;
   align-items: center;
   padding: var(--space-4) 0;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-dim);
 }
 
 .page-btn {
   padding: var(--space-1) var(--space-3);
   font-size: var(--text-sm);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dim);
   background: transparent;
   border-radius: var(--radius-md);
   color: var(--text-primary);
@@ -942,39 +911,7 @@ const handleDeleteUser = async () => {
   gap: var(--space-2);
 }
 
-.btn-text {
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
 
-.btn-text:hover {
-  color: var(--text-primary);
-}
-
-.btn-danger {
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: white;
-  background: var(--red-500);
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-danger:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background: #dc2626; /* darker red */
-}
 
 /* Modal */
 .modal-backdrop {
