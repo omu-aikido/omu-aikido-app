@@ -36,7 +36,8 @@ const { data: profileData } = useQuery({
   queryFn: async () => {
     const res = await hc.user.clerk.profile.$get()
     if (!res.ok) throw new Error("Failed to fetch profile")
-    return res.json() as Promise<ProfileResponse>
+    const data = await res.json()
+    return data as ProfileResponse
   },
 })
 

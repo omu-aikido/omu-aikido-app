@@ -41,7 +41,7 @@ const {
   queryFn: async () => {
     const res = await hc.user.clerk.account.$get()
     if (!res.ok) throw new Error("Failed to fetch user")
-    return res.json()
+    return await res.json()
   },
 })
 
