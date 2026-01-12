@@ -32,6 +32,8 @@ app.use((c, next) => {
       workerSrc: ["'self'", 'blob:'],
       styleSrc: ["'self'", "'unsafe-inline'"],
     },
+    xFrameOptions: 'DENY',
+    referrerPolicy: 'strict-origin-when-cross-origin',
   })(c, next)
 })
 

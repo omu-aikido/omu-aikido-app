@@ -28,12 +28,12 @@ coverage
 
 .eslintcache
 
-# Cypress
-/cypress/videos/
-/cypress/screenshots/
-
 # Vitest
 __screenshots__/
+
+# Playwright
+test-results
+playwright-report
 
 # wrangler files
 .wrangler

@@ -29,6 +29,8 @@
     "test:coverage": "vitest --coverage",
     "test:ui": "vitest --ui",
     "test": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
@@ -50,12 +52,15 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@clerk/testing": "^1.13.28",
     "@clerk/types": "^4.101.10",
     "@cloudflare/vite-plugin": "^1.20.1",
+    "@playwright/test": "^1.57.0",
     "@testing-library/vue": "^8.1.0",
     "@types/node": "^24.10.4",
     "@vitejs/plugin-vue": "^6.0.3",
     "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.8.1",
     "drizzle-kit": "^0.31.8",
