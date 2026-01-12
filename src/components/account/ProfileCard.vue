@@ -387,7 +387,7 @@ function cancelEdit() {
   padding: var(--space-2) var(--space-3);
   padding-right: 2.5rem;
   text-align: left;
-  font-size: var(--text-md);
+  font-size: var(--text-base);
   color: var(--text-primary);
 }
 
