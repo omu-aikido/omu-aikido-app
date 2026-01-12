@@ -86,7 +86,7 @@ describe('ProfileCard.vue', () => {
     }
 
     mockUseQuery.mockReturnValue({
-      data: ref(mockProfile),
+      data: ref({ profile: mockProfile }),
       isLoading: ref(false),
     })
 
@@ -109,7 +109,7 @@ describe('ProfileCard.vue', () => {
       year: 'b1',
     }
     mockUseQuery.mockReturnValue({
-      data: ref(mockProfile),
+      data: ref({ profile: mockProfile }),
     })
 
     const wrapper = mount(ProfileCard)
@@ -134,7 +134,7 @@ describe('ProfileCard.vue', () => {
       year: 'b1',
     }
     mockUseQuery.mockReturnValue({
-      data: ref(mockProfile),
+      data: ref({ profile: mockProfile }),
     })
 
     const wrapper = mount(ProfileCard)

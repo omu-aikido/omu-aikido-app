@@ -176,7 +176,7 @@ const formData = reactive<FormData>({
   year: "b1",
 })
 
-// Query
+// Query - Returns { profile: ... } to match server response shape
 const { data: profileData } = useQuery({
   queryKey: queryKeys.user.clerk.profile(),
   queryFn: async () => {
@@ -189,13 +189,13 @@ const { data: profileData } = useQuery({
         console.error(profileParsed)
         throw new Error("Invalid profile data")
       }
-      return profileParsed
+      return { profile: profileParsed }
     }
-    return null
+    return { profile: null }
   },
 })
 
-const profile = computed(() => profileData.value ?? null)
+const profile = computed(() => profileData.value?.profile ?? null)
 
 // Sync form data
 watch(profile, (newProfile) => {
@@ -229,6 +229,8 @@ const { mutateAsync: updateProfile, isPending: isSubmitting } = useMutation({
     return res.json()
   },
   onSuccess: (responseData) => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.user.clerk.profile() })
+
     if (responseData.profile) {
       const validatedProfile = AccountMetadata({
          role: responseData.profile.role,
@@ -239,9 +241,12 @@ const { mutateAsync: updateProfile, isPending: isSubmitting } = useMutation({
       })
       if (validatedProfile instanceof ArkErrors) {
          console.error(validatedProfile)
+      } else {
+        // Set cache with consistent { profile: ... } shape
+        queryClient.setQueryData(queryKeys.user.clerk.profile(), { profile: validatedProfile })
       }
     }
-    queryClient.invalidateQueries({ queryKey: queryKeys.user.clerk.profile() })
+
     message.value = "プロフィールを更新しました"
     isEditing.value = false
   },
@@ -382,7 +387,7 @@ function cancelEdit() {
   padding: var(--space-2) var(--space-3);
   padding-right: 2.5rem;
   text-align: left;
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   color: var(--text-primary);
 }
 

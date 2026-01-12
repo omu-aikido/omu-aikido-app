@@ -16,9 +16,26 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const targetGrade = computed(() => {
-  const grade = props.currentGrade
-  return grade === 0 ? 5 : grade - 1
+  const grade: number = props.currentGrade
+  return nextGrade(grade);
 })
+
+const nextGrade = (grade: number): number => {
+  switch (grade) {
+    case 5:
+    case 4:
+      return 3;
+    case 3:
+    case 2:
+      return 1;
+    case 1:
+      return -1;
+    case 0:
+      return 5;
+    default:
+      return grade - 1;
+  }
+}
 
 const promotionType = computed(() => {
   const grade = props.currentGrade

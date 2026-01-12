@@ -54,9 +54,12 @@ export const patchProfile = async (c: Context, data: typeof AccountMetadata.infe
     throw new TypeError('Invalid account data')
   }
   try {
+    const cacheKey = `profile:${auth.userId}`
+
+    await c.env.KV.delete(cacheKey)
+
     const updatedUser = await clerkClient.users.updateUserMetadata(auth.userId, { publicMetadata: { ...validated } })
 
-    const cacheKey = `profile:${auth.userId}`
     await c.env.KV.put(cacheKey, JSON.stringify(validated), {
       expirationTtl: CACHE_TTL,
     })
