@@ -17,7 +17,9 @@ const app = createApp(App)
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 30, // 30 seconds - reduced to refetch more frequently
+      // 30 seconds - shorter than server KV cache (1 hour) to ensure fresher data on navigation
+      // This reduces the window where stale profile data (e.g., default 5級 values) can persist
+      staleTime: 1000 * 30,
       gcTime: 1000 * 60 * 5, // 5 minutes
       retry: 1,
       refetchOnWindowFocus: true, // Enable refetch on window focus to get fresh data
