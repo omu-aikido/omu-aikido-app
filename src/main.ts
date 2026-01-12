@@ -17,10 +17,12 @@ const app = createApp(App)
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60, // 1 minute
+      staleTime: 1000 * 30, // 30 seconds - reduced to refetch more frequently
       gcTime: 1000 * 60 * 5, // 5 minutes
       retry: 1,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true, // Enable refetch on window focus to get fresh data
+      refetchOnMount: true, // Refetch when component mounts if data is stale
+      refetchOnReconnect: true, // Refetch when network reconnects
     },
   },
 })

@@ -51,6 +51,8 @@ export const webhooks = new Hono<{ Bindings: Env }>().post('/clerk', async (c) =
             role: 'member',
           },
         })
+        // Invalidate cache after creating profile
+        await c.env.KV.delete(`profile:${event.data.id}`)
         console.log(`Migrated metadata for user ${event.data.id}`)
       } catch (err) {
         console.error(`Failed to migrate metadata for user ${event.data.id}:`, err)
