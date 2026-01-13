@@ -1,11 +1,10 @@
 services:
   app:
     build: .
-    ports:
-      - '5173:5173'
     volumes:
       - .:/app:cached
       - /app/node_modules
+    network_mode: 'service:libsql-server'
     environment:
       - TURSO_AUTH_TOKEN=dev-token
     depends_on:
@@ -16,6 +15,7 @@ services:
     image: ghcr.io/tursodatabase/libsql-server:latest
     ports:
       - '8080:8080'
+      - '5173:5173'
     environment:
       - SQLE_HTTP_URL=http://0.0.0.0:8080
     volumes:

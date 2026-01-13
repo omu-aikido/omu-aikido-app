@@ -17,10 +17,4 @@ RUN pnpm install
 # Copy source code
 COPY . .
 
-# Expose Vite port
-EXPOSE 5173
-
-
-
-# Start development server
-CMD ["pnpm", "dev"]
+CMD ["pnpm", "check"]

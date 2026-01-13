@@ -103,7 +103,7 @@ jobs:
       - name: Knip
         run: pnpm run knip
 
-  type-generation:
+  type-check:
     runs-on: ubuntu-latest
     environment: development
     steps:
@@ -144,35 +144,6 @@ jobs:
       - name: Type Generation
         run: pnpm run cf-typegen
 
-  type-check:
-    runs-on: ubuntu-latest
-    environment: development
-    needs: type-generation
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup mise
-        uses: jdx/mise-action@v2
-        with:
-          cache: true
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
       - name: Type Check
         run: pnpm run type-check
 
@@ -210,7 +181,14 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     environment: development
-    needs: build
+    env:
+      VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+      CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      CLERK_FRONTEND_API: ${{ secrets.CLERK_FRONTEND_API }}
+      CLERK_WEBHOOK_SECRET: ${{ secrets.CLERK_WEBHOOK_SECRET }}
+      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+      TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -235,6 +213,22 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate Env File for Cloudflare Types
+        run: |
+          touch .env
+          echo "VITE_CLERK_PUBLISHABLE_KEY=''" >> .env
+          echo "CLERK_SECRET_KEY=''" >> .env
+          echo "CLERK_FRONTEND_API_URL=''" >> .env
+          echo "CLERK_WEBHOOK_SECRET=''" >> .env
+          echo "TURSO_AUTH_TOKEN=''" >> .env
+          echo "TURSO_DATABASE_URL=''" >> .env
+
+      - name: Type Generation
+        run: pnpm run cf-typegen
+
+      - name: Build
+        run: pnpm run build
 
       - name: E2E
         run: pnpm run test:e2e
