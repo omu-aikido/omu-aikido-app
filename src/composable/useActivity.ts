@@ -27,6 +27,7 @@ export function useAddActivity() {
   const queryClient = useQueryClient()
 
   return useMutation({
+    retry: 5,
     mutationFn: async ({ date, period }: { date: string; period: number }) => {
       const res = await hc.user.record.$post({ json: { date, period } })
       if (!res.ok) {
@@ -47,6 +48,7 @@ export function useDeleteActivity() {
   const queryClient = useQueryClient()
 
   return useMutation({
+    retry: 3,
     mutationFn: async (ids: string[]) => {
       const res = await hc.user.record.$delete({ json: { ids } })
       if (!res.ok) throw new Error('Failed to delete activities')

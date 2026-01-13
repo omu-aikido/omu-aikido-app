@@ -44,9 +44,14 @@ const handleDelete = (id: string) => {
 
 const handleConfirmDelete = async () => {
   if (activityToDelete.value) {
-    await deleteActivity([activityToDelete.value])
-    confirmDialogOpen.value = false
-    activityToDelete.value = null
+    try {
+      await deleteActivity([activityToDelete.value])
+      confirmDialogOpen.value = false
+      activityToDelete.value = null
+    } catch (e) {
+      console.error("Failed to delete activity:", e)
+      alert("記録の削除に失敗しました。")
+    }
   }
 }
 
@@ -64,8 +69,13 @@ const closeModal = () => {
 }
 
 const handleSubmit = async (date: string, period: number) => {
-  await addActivity({ date, period })
-  closeModal()
+  try {
+    await addActivity({ date, period })
+    closeModal()
+  } catch (e) {
+    console.error("Failed to add activity:", e)
+    alert("記録の追加に失敗しました。")
+  }
 }
 
 const selectedDateActivities = computed(() => {
