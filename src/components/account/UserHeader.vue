@@ -49,7 +49,7 @@
 
       <div class="actions">
         <Button type="submit" variant="primary" :disabled="isSubmitting" full-width>
-          {{ isSubmitting ? "保存中..." : "保存" }}
+          {{ isSubmitting ? '保存中...' : '保存' }}
         </Button>
         <Button type="button" variant="secondary" full-width @click="cancelEdit"> キャンセル </Button>
       </div>
@@ -58,103 +58,102 @@
 </template>
 
 <script setup lang="ts">
-import Button from "@/src/components/ui/UiButton.vue"
-import Input from "@/src/components/ui/UiInput.vue"
-import hc from "@/src/lib/honoClient"
-import { computed, reactive, ref, watch } from "vue"
+import Button from '@/src/components/ui/UiButton.vue';
+import Input from '@/src/components/ui/UiInput.vue';
+import hc from '@/src/lib/honoClient';
+import { computed, reactive, ref, watch } from 'vue';
 
-const $accountPatch = hc.user.clerk.account.$patch
+const $accountPatch = hc.user.clerk.account.$patch;
 
-const emit = defineEmits<{ updated: [] }>()
+const emit = defineEmits<{ updated: [] }>();
 
 interface ClerkUser {
-  username?: string | null
-  lastName?: string | null
-  firstName?: string | null
-  imageUrl?: string
+  username?: string | null;
+  lastName?: string | null;
+  firstName?: string | null;
+  imageUrl?: string;
 }
 
-const props = defineProps<{ user: ClerkUser | null }>()
+const props = defineProps<{ user: ClerkUser | null }>();
 
-const isEditing = ref(false)
-const isSubmitting = ref(false)
-const message = ref("")
-const isError = ref(false)
-const previewImage = ref<string | null>(null)
-const selectedFile = ref<File | null>(null)
+const isEditing = ref(false);
+const isSubmitting = ref(false);
+const message = ref('');
+const isError = ref(false);
+const previewImage = ref<string | null>(null);
+const selectedFile = ref<File | null>(null);
 
 interface FormData {
-  username: string
-  lastName: string
-  firstName: string
+  username: string;
+  lastName: string;
+  firstName: string;
 }
 
 const formData = reactive<FormData>({
-  username: props.user?.username || "",
-  lastName: props.user?.lastName || "",
-  firstName: props.user?.firstName || "",
-})
+  username: props.user?.username || '',
+  lastName: props.user?.lastName || '',
+  firstName: props.user?.firstName || '',
+});
 
 function isSafeImageUrl(url: string): boolean {
-  if (!url) return false
-  if (typeof url !== "string") return false
+  if (!url) return false;
+  if (typeof url !== 'string') return false;
   return (
-    ((url.startsWith("http://") || url.startsWith("https://")) && !url.includes(" ")) ||
-    url.startsWith("data:image/")
-  )
+    ((url.startsWith('http://') || url.startsWith('https://')) && !url.includes(' ')) || url.startsWith('data:image/')
+  );
 }
 
 const safeImageUrl = computed(() => {
-  const imageUrl = props.user?.imageUrl
-  return isSafeImageUrl(imageUrl || "") ? imageUrl : ""
-})
+  const imageUrl = props.user?.imageUrl;
+  return isSafeImageUrl(imageUrl || '') ? imageUrl : '';
+});
 
 const safePreviewImageUrl = computed(() => {
-  return previewImage.value || safeImageUrl.value
-})
+  return previewImage.value || safeImageUrl.value;
+});
 
 watch(
   () => props.user,
-  newUser => {
+  (newUser) => {
     if (newUser && !isEditing.value) {
-      formData.username = newUser.username || ""
-      formData.lastName = newUser.lastName || ""
-      formData.firstName = newUser.firstName || ""
-      previewImage.value = null
-      selectedFile.value = null
+      formData.username = newUser.username || '';
+      formData.lastName = newUser.lastName || '';
+      formData.firstName = newUser.firstName || '';
+      previewImage.value = null;
+      selectedFile.value = null;
     }
   },
   { deep: true }
-)
+);
 
 function updateFormData() {
   if (props.user) {
-    formData.username = props.user.username || ""
-    formData.lastName = props.user.lastName || ""
-    formData.firstName = props.user.firstName || ""
-    previewImage.value = null
-    selectedFile.value = null
+    formData.username = props.user.username || '';
+    formData.lastName = props.user.lastName || '';
+    formData.firstName = props.user.firstName || '';
+    previewImage.value = null;
+    selectedFile.value = null;
   }
 }
 
 function handleImageChange(event: Event) {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
 
   if (file) {
-    selectedFile.value = file
-    const reader = new FileReader()
-    reader.onload = e => {
-      previewImage.value = e.target?.result as string
-    }
-    reader.readAsDataURL(file)
+    selectedFile.value = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImage.value = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 }
 
 async function handleSubmit() {
-  message.value = ""
-  isError.value = false
-  isSubmitting.value = true
+  message.value = '';
+  isError.value = false;
+  isSubmitting.value = true;
 
   try {
     const res = await $accountPatch({
@@ -164,28 +163,28 @@ async function handleSubmit() {
         firstName: formData.firstName,
         profileImage: selectedFile.value,
       },
-    })
+    });
 
-    if (!res.ok) throw new Error("アカウント情報の更新に失敗しました")
+    if (!res.ok) throw new Error('アカウント情報の更新に失敗しました');
 
-    message.value = "アカウント情報を更新しました"
-    emit("updated")
+    message.value = 'アカウント情報を更新しました';
+    emit('updated');
 
     setTimeout(() => {
-      isEditing.value = false
-      message.value = ""
-    }, 1000)
+      isEditing.value = false;
+      message.value = '';
+    }, 1000);
   } catch (err) {
-    isError.value = true
-    message.value = err instanceof Error ? err.message : String(err)
+    isError.value = true;
+    message.value = err instanceof Error ? err.message : String(err);
   } finally {
-    isSubmitting.value = false
+    isSubmitting.value = false;
   }
 }
 
 function cancelEdit() {
-  updateFormData()
-  isEditing.value = false
+  updateFormData();
+  isEditing.value = false;
 }
 </script>
 
@@ -201,8 +200,13 @@ function cancelEdit() {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .header-row {

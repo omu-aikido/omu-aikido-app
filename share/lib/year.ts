@@ -7,18 +7,18 @@ export const year = [
   { name: '修士2年', year: 'm2' },
   { name: '博士1年', year: 'd1' },
   { name: '博士2年', year: 'd2' },
-]
+];
 
 export function translateYear(year_value: string): string {
-  const raw = String(year_value ?? '').trim()
-  if (!raw) return '不明'
+  const raw = String(year_value ?? '').trim();
+  if (!raw) return '不明';
 
-  const code = raw.toLowerCase()
-  const yearByCode = year.find((y) => y.year === code)
-  if (yearByCode) return yearByCode.name
+  const code = raw.toLowerCase();
+  const yearByCode = year.find((y) => y.year === code);
+  if (yearByCode) return yearByCode.name;
 
-  const yearByLabel = year.find((y) => y.name === raw)
-  if (yearByLabel) return yearByLabel.name
+  const yearByLabel = year.find((y) => y.name === raw);
+  if (yearByLabel) return yearByLabel.name;
 
   const uiLabelMap: Record<string, string> = {
     '学部 1年': 'b1',
@@ -29,8 +29,8 @@ export function translateYear(year_value: string): string {
     '修士 2年': 'm2',
     '博士 1年': 'd1',
     '博士 2年': 'd2',
-  }
-  const mappedCode = uiLabelMap[raw]
-  const yearByMapped = mappedCode ? year.find((y) => y.year === mappedCode) : undefined
-  return yearByMapped ? yearByMapped.name : '不明'
+  };
+  const mappedCode = uiLabelMap[raw];
+  const yearByMapped = mappedCode ? year.find((y) => y.year === mappedCode) : undefined;
+  return yearByMapped ? yearByMapped.name : '不明';
 }

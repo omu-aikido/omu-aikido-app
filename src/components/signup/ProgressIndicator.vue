@@ -3,10 +3,7 @@
     <div :class="['step', step === 'basic' ? 'step-active' : 'step-complete']" data-testid="step-basic">基本情報</div>
     <div class="divider" />
     <div
-      :class="[
-        'step',
-        step === 'personal' ? 'step-active' : step === 'profile' ? 'step-complete' : 'step-inactive'
-      ]"
+      :class="['step', step === 'personal' ? 'step-active' : step === 'profile' ? 'step-complete' : 'step-inactive']"
       data-testid="step-personal">
       個人情報
     </div>
@@ -18,9 +15,9 @@
 </template>
 
 <script setup lang="ts">
-type SignUpStep = "basic" | "personal" | "profile"
+type SignUpStep = 'basic' | 'personal' | 'profile';
 
-defineProps<{ step: SignUpStep }>()
+defineProps<{ step: SignUpStep }>();
 </script>
 
 <style scoped>

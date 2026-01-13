@@ -1,10 +1,10 @@
-import pluginOxlint from 'eslint-plugin-oxlint'
-import pluginVue from 'eslint-plugin-vue'
-import eslintPluginVueScopedCSS from 'eslint-plugin-vue-scoped-css'
-import { globalIgnores } from 'eslint/config'
-import globals from 'globals'
-import tseslint from 'typescript-eslint'
-import vueParser from 'vue-eslint-parser'
+import pluginOxlint from 'eslint-plugin-oxlint';
+import pluginVue from 'eslint-plugin-vue';
+import eslintPluginVueScopedCSS from 'eslint-plugin-vue-scoped-css';
+import { globalIgnores } from 'eslint/config';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+import vueParser from 'vue-eslint-parser';
 
 export default [
   globalIgnores(['**/dist/**', '**/tests/**', '**/coverage/**']),
@@ -28,4 +28,4 @@ export default [
       ],
     },
   },
-]
+];

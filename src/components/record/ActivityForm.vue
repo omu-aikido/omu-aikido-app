@@ -1,36 +1,36 @@
 <script setup lang="ts">
-import Button from "@/src/components/ui/UiButton.vue"
-import Input from "@/src/components/ui/UiInput.vue"
-import { format } from "date-fns"
-import { ref, watch } from "vue"
+import Button from '@/src/components/ui/UiButton.vue';
+import Input from '@/src/components/ui/UiInput.vue';
+import { format } from 'date-fns';
+import { ref, watch } from 'vue';
 
 interface Props {
-  loading?: boolean
-  initialDate?: string
+  loading?: boolean;
+  initialDate?: string;
 }
 
 interface Emits {
-  (e: "submit", date: string, period: number): void
+  (e: 'submit', date: string, period: number): void;
 }
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
-const newDate = ref(props.initialDate || format(new Date(), "yyyy-MM-dd"))
-const newPeriod = ref(1.5)
+const newDate = ref(props.initialDate || format(new Date(), 'yyyy-MM-dd'));
+const newPeriod = ref(1.5);
 
 watch(
   () => props.initialDate,
-  val => {
-    if (val) newDate.value = val
+  (val) => {
+    if (val) newDate.value = val;
   }
-)
+);
 
 const handleSubmit = () => {
-  emit("submit", newDate.value, newPeriod.value)
-  newDate.value = format(new Date(), "yyyy-MM-dd")
-  newPeriod.value = 1.5
-}
+  emit('submit', newDate.value, newPeriod.value);
+  newDate.value = format(new Date(), 'yyyy-MM-dd');
+  newPeriod.value = 1.5;
+};
 </script>
 
 <template>
@@ -50,7 +50,7 @@ const handleSubmit = () => {
         data-testid="period-input" />
 
       <Button type="submit" variant="primary" full-width :disabled="loading" data-testid="submit-btn">
-        {{ loading ? "保存中..." : "記録を追加" }}
+        {{ loading ? '保存中...' : '記録を追加' }}
       </Button>
     </form>
   </div>

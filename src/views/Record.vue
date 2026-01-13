@@ -1,88 +1,80 @@
 <script setup lang="ts">
-import { ref, computed } from "vue"
-import { format, startOfMonth, endOfMonth, parseISO, isSameDay } from "date-fns"
-import { SignedIn } from "@clerk/vue"
-import { XIcon, Trash2Icon } from "lucide-vue-next"
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/vue"
-import { useActivities, useAddActivity, useDeleteActivity } from "@/src/composable/useActivity"
-import ActivityList from "@/src/components/record/ActivityList.vue"
-import ActivityForm from "@/src/components/record/ActivityForm.vue"
-import ConfirmDialog from "@/src/components/ui/ConfirmDialog.vue"
+import { ref, computed } from 'vue';
+import { format, startOfMonth, endOfMonth, parseISO, isSameDay } from 'date-fns';
+import { SignedIn } from '@clerk/vue';
+import { XIcon, Trash2Icon } from 'lucide-vue-next';
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue';
+import { useActivities, useAddActivity, useDeleteActivity } from '@/src/composable/useActivity';
+import ActivityList from '@/src/components/record/ActivityList.vue';
+import ActivityForm from '@/src/components/record/ActivityForm.vue';
+import ConfirmDialog from '@/src/components/ui/ConfirmDialog.vue';
 
 // Mutations
-const { mutateAsync: addActivity } = useAddActivity()
-const { mutateAsync: deleteActivity } = useDeleteActivity()
+const { mutateAsync: addActivity } = useAddActivity();
+const { mutateAsync: deleteActivity } = useDeleteActivity();
 
 // State
-const currentMonth = ref(new Date())
-const isModalOpen = ref(false)
-const selectedDate = ref(format(new Date(), "yyyy-MM-dd"))
-const confirmDialogOpen = ref(false)
-const activityToDelete = ref<string | null>(null)
+const currentMonth = ref(new Date());
+const isModalOpen = ref(false);
+const selectedDate = ref(format(new Date(), 'yyyy-MM-dd'));
+const confirmDialogOpen = ref(false);
+const activityToDelete = ref<string | null>(null);
 
 // Query
 const filters = computed(() => ({
-  startDate: format(startOfMonth(currentMonth.value), "yyyy-MM-dd"),
-  endDate: format(endOfMonth(currentMonth.value), "yyyy-MM-dd"),
-}))
+  startDate: format(startOfMonth(currentMonth.value), 'yyyy-MM-dd'),
+  endDate: format(endOfMonth(currentMonth.value), 'yyyy-MM-dd'),
+}));
 
-const {
-  data: activitiesRaw,
-  isLoading: loading,
-  error: queryError,
-} = useActivities(filters)
+const { data: activitiesRaw, isLoading: loading, error: queryError } = useActivities(filters);
 
-const activities = computed(() => activitiesRaw.value ?? [])
-const error = computed(() =>
-  queryError.value ? "活動記録の取得に失敗しました" : null
-)
+const activities = computed(() => activitiesRaw.value ?? []);
+const error = computed(() => (queryError.value ? '活動記録の取得に失敗しました' : null));
 
 const handleDelete = (id: string) => {
-  activityToDelete.value = id
-  confirmDialogOpen.value = true
-}
+  activityToDelete.value = id;
+  confirmDialogOpen.value = true;
+};
 
 const handleConfirmDelete = async () => {
   if (activityToDelete.value) {
     try {
-      await deleteActivity([activityToDelete.value])
-      confirmDialogOpen.value = false
-      activityToDelete.value = null
+      await deleteActivity([activityToDelete.value]);
+      confirmDialogOpen.value = false;
+      activityToDelete.value = null;
     } catch (e) {
-      console.error("Failed to delete activity:", e)
-      alert("記録の削除に失敗しました。")
+      console.error('Failed to delete activity:', e);
+      alert('記録の削除に失敗しました。');
     }
   }
-}
+};
 
 const handleChangeMonth = (date: Date) => {
-  currentMonth.value = date
-}
+  currentMonth.value = date;
+};
 
 const handleSelectDate = (date: string) => {
-  selectedDate.value = date
-  isModalOpen.value = true
-}
+  selectedDate.value = date;
+  isModalOpen.value = true;
+};
 
 const closeModal = () => {
-  isModalOpen.value = false
-}
+  isModalOpen.value = false;
+};
 
 const handleSubmit = async (date: string, period: number) => {
   try {
-    await addActivity({ date, period })
-    closeModal()
+    await addActivity({ date, period });
+    closeModal();
   } catch (e) {
-    console.error("Failed to add activity:", e)
-    alert("記録の追加に失敗しました。")
+    console.error('Failed to add activity:', e);
+    alert('記録の追加に失敗しました。');
   }
-}
+};
 
 const selectedDateActivities = computed(() => {
-  return activities.value.filter(a =>
-    isSameDay(parseISO(a.date), parseISO(selectedDate.value))
-  )
-})
+  return activities.value.filter((a) => isSameDay(parseISO(a.date), parseISO(selectedDate.value)));
+});
 </script>
 
 <template>
@@ -306,7 +298,9 @@ const selectedDateActivities = computed(() => {
   border: none;
   border-radius: var(--radius-full);
   cursor: pointer;
-  transition: color var(--transition-normal), background var(--transition-normal);
+  transition:
+    color var(--transition-normal),
+    background var(--transition-normal);
 }
 
 .delete-btn:hover {

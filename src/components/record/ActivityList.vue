@@ -1,81 +1,81 @@
 <script setup lang="ts">
-import type { Activity } from "@/share/types/records"
+import type { Activity } from '@/share/types/records';
 import {
-    addMonths,
-    eachDayOfInterval,
-    endOfMonth,
-    format,
-    isSameDay,
-    parseISO,
-    startOfMonth,
-    subMonths,
-} from "date-fns"
-import { ja } from "date-fns/locale"
-import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "lucide-vue-next"
-import { computed } from "vue"
+  addMonths,
+  eachDayOfInterval,
+  endOfMonth,
+  format,
+  isSameDay,
+  parseISO,
+  startOfMonth,
+  subMonths,
+} from 'date-fns';
+import { ja } from 'date-fns/locale';
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 interface Props {
-  activities: readonly Activity[]
-  loading?: boolean
-  currentMonth?: Date
+  activities: readonly Activity[];
+  loading?: boolean;
+  currentMonth?: Date;
 }
 
 interface Emits {
-  (e: "changeMonth", date: Date): void
-  (e: "selectDate", date: string): void
+  (e: 'changeMonth', date: Date): void;
+  (e: 'selectDate', date: string): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   currentMonth: () => new Date(),
-})
+});
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<Emits>();
 
 const daysInMonth = computed(() => {
-  const start = startOfMonth(props.currentMonth)
-  const end = endOfMonth(props.currentMonth)
-  return eachDayOfInterval({ start, end })
-})
+  const start = startOfMonth(props.currentMonth);
+  const end = endOfMonth(props.currentMonth);
+  return eachDayOfInterval({ start, end });
+});
 
 const getActivitiesForDay = (date: Date) => {
-  return props.activities.filter(a => isSameDay(parseISO(a.date), date))
-}
+  return props.activities.filter((a) => isSameDay(parseISO(a.date), date));
+};
 
 const handlePrevMonth = () => {
-  emit("changeMonth", subMonths(props.currentMonth, 1))
-}
+  emit('changeMonth', subMonths(props.currentMonth, 1));
+};
 
 const handleNextMonth = () => {
-  emit("changeMonth", addMonths(props.currentMonth, 1))
-}
+  emit('changeMonth', addMonths(props.currentMonth, 1));
+};
 
 const handleDateClick = (date: Date) => {
-  emit("selectDate", format(date, "yyyy-MM-dd"))
-}
+  emit('selectDate', format(date, 'yyyy-MM-dd'));
+};
 
 const formatHeader = (date: Date) => {
-  return format(date, "yyyy年 M月", { locale: ja })
-}
+  return format(date, 'yyyy年 M月', { locale: ja });
+};
 
 const getDay = (date: Date) => {
-  return format(date, "d")
-}
+  return format(date, 'd');
+};
 
 const getWeekday = (date: Date) => {
-  return format(date, "E", { locale: ja })
-}
+  return format(date, 'E', { locale: ja });
+};
 
 const isSunday = (date: Date) => {
-  return date.getDay() === 0
-}
+  return date.getDay() === 0;
+};
 
 const isSaturday = (date: Date) => {
-  return date.getDay() === 6
-}
+  return date.getDay() === 6;
+};
 
 const isToday = (date: Date) => {
-  return isSameDay(date, new Date())
-}
+  return isSameDay(date, new Date());
+};
 </script>
 
 <template>
@@ -109,18 +109,10 @@ const isToday = (date: Date) => {
         data-testid="day-item"
         @click="handleDateClick(day)">
         <div class="date-column">
-          <span
-            :class="[
-              'day-number',
-              isSunday(day) ? 'day-sunday' : isSaturday(day) ? 'day-saturday' : ''
-            ]">
+          <span :class="['day-number', isSunday(day) ? 'day-sunday' : isSaturday(day) ? 'day-saturday' : '']">
             {{ getDay(day) }}
           </span>
-          <span
-            :class="[
-              'weekday',
-              isSunday(day) ? 'day-sunday' : isSaturday(day) ? 'day-saturday' : ''
-            ]">
+          <span :class="['weekday', isSunday(day) ? 'day-sunday' : isSaturday(day) ? 'day-saturday' : '']">
             {{ getWeekday(day) }}
           </span>
         </div>
@@ -208,8 +200,13 @@ const isToday = (date: Date) => {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .skeleton-date {

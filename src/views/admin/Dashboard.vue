@@ -41,12 +41,12 @@
 </template>
 
 <script setup lang="ts">
-import AdminMenu from "@/src/components/admin/AdminMenu.vue"
-import Loading from "@/src/components/ui/UiLoading.vue"
-import hc from "@/src/lib/honoClient"
-import { queryKeys } from "@/src/lib/queryKeys"
-import { useQuery } from "@tanstack/vue-query"
-import { computed } from "vue"
+import AdminMenu from '@/src/components/admin/AdminMenu.vue';
+import Loading from '@/src/components/ui/UiLoading.vue';
+import hc from '@/src/lib/honoClient';
+import { queryKeys } from '@/src/lib/queryKeys';
+import { useQuery } from '@tanstack/vue-query';
+import { computed } from 'vue';
 
 // Queries
 const {
@@ -56,17 +56,15 @@ const {
 } = useQuery({
   queryKey: queryKeys.admin.dashboard(),
   queryFn: async () => {
-    const res = await hc.admin.dashboard.$get()
-    if (!res.ok) throw new Error("Failed to fetch dashboard data")
-    return res.json()
+    const res = await hc.admin.dashboard.$get();
+    if (!res.ok) throw new Error('Failed to fetch dashboard data');
+    return res.json();
   },
-})
+});
 
-const inactiveUsers = computed(() => data.value?.inactiveUsers ?? [])
-const thresholdDate = computed(() => data.value?.thresholdDate ?? "")
-const error = computed(() =>
-  queryError.value ? "ダッシュボード情報の取得に失敗しました" : ""
-)
+const inactiveUsers = computed(() => data.value?.inactiveUsers ?? []);
+const thresholdDate = computed(() => data.value?.thresholdDate ?? '');
+const error = computed(() => (queryError.value ? 'ダッシュボード情報の取得に失敗しました' : ''));
 </script>
 
 <style scoped>

@@ -126,38 +126,38 @@
 </template>
 
 <script setup lang="ts">
-import Button from "@/src/components/ui/UiButton.vue";
-import Input from "@/src/components/ui/UiInput.vue";
-import type { FormErrors, SignUpFormData } from "@/src/composable/useSignUpForm";
-import { computed, ref, watch } from "vue";
+import Button from '@/src/components/ui/UiButton.vue';
+import Input from '@/src/components/ui/UiInput.vue';
+import type { FormErrors, SignUpFormData } from '@/src/composable/useSignUpForm';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
-  formValues: Partial<SignUpFormData>
-  formErrors: Partial<FormErrors>
-  isSignUpCreated: boolean
-  handleNext: () => void
-}>()
+  formValues: Partial<SignUpFormData>;
+  formErrors: Partial<FormErrors>;
+  isSignUpCreated: boolean;
+  handleNext: () => void;
+}>();
 
 const emit = defineEmits<{
-  (e: "update:formValue", key: keyof SignUpFormData, value: string | number): void
-}>()
+  (e: 'update:formValue', key: keyof SignUpFormData, value: string | number): void;
+}>();
 
-const showPassword = ref(false)
-const showPasswordConfirm = ref(false)
-const passwordConfirm = ref("")
-const passwordConfirmError = ref("")
+const showPassword = ref(false);
+const showPasswordConfirm = ref(false);
+const passwordConfirm = ref('');
+const passwordConfirmError = ref('');
 
 const onUpdate = (key: keyof SignUpFormData, value: string | number) => {
-  emit("update:formValue", key, value)
-}
+  emit('update:formValue', key, value);
+};
 
 const validatePasswordMatch = () => {
   if (passwordConfirm.value && passwordConfirm.value !== props.formValues.newPassword) {
-    passwordConfirmError.value = "パスワードが一致しません"
+    passwordConfirmError.value = 'パスワードが一致しません';
   } else {
-    passwordConfirmError.value = ""
+    passwordConfirmError.value = '';
   }
-}
+};
 
 const canProceed = computed(() => {
   return (
@@ -166,24 +166,24 @@ const canProceed = computed(() => {
     props.formValues.newPassword.length >= 10 &&
     passwordConfirm.value &&
     passwordConfirm.value === props.formValues.newPassword
-  )
-})
+  );
+});
 
 const handleNextClick = () => {
   if (canProceed.value) {
-    props.handleNext()
+    props.handleNext();
   }
-}
+};
 
 watch(
   () => props.formValues.newPassword,
-  newPassword => {
+  (newPassword) => {
     if (newPassword && !passwordConfirm.value) {
-      passwordConfirm.value = newPassword
+      passwordConfirm.value = newPassword;
     }
-    validatePasswordMatch()
+    validatePasswordMatch();
   }
-)
+);
 </script>
 
 <style scoped>

@@ -50,16 +50,16 @@
 
 ```typescript
 // 1. Vue ecosystem imports
-import { ref, computed } from "vue"
-import { useRouter } from "vue-router"
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 
 // 2. External library imports
-import { tv } from "tailwind-variants"
-import hc from "@/src/lib/honoClinet"
+import { tv } from 'tailwind-variants';
+import hc from '@/src/lib/honoClinet';
 
 // 3. Internal imports (use @ alias)
-import type { UserResource } from "@clerk/types"
-import { useAuth } from "@/src/composable/useAuth"
+import type { UserResource } from '@clerk/types';
+import { useAuth } from '@/src/composable/useAuth';
 ```
 
 ### Component Structure
@@ -83,13 +83,13 @@ import { useAuth } from "@/src/composable/useAuth"
 // API calls with proper error handling
 async function fetchData() {
   try {
-    const response = await hc.api.endpoint.$get()
-    if (!response.ok) throw new Error("Failed to fetch data")
-    return await response.json()
+    const response = await hc.api.endpoint.$get();
+    if (!response.ok) throw new Error('Failed to fetch data');
+    return await response.json();
   } catch (error) {
-    console.error("Error fetching data:", error)
+    console.error('Error fetching data:', error);
     // Return fallback or re-throw with context
-    return null
+    return null;
   }
 }
 ```

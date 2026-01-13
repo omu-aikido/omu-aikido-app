@@ -28,27 +28,19 @@
             <tr>
               <th class="sortable" @click="toggleSort('name')">
                 名前
-                <span v-if="sortBy === 'name'" class="sort-icon">{{
-                  sortOrder === "asc" ? "↑" : "↓"
-                }}</span>
+                <span v-if="sortBy === 'name'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
               <th class="sortable" @click="toggleSort('role')">
                 役職
-                <span v-if="sortBy === 'role'" class="sort-icon">{{
-                  sortOrder === "asc" ? "↑" : "↓"
-                }}</span>
+                <span v-if="sortBy === 'role'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
               <th class="sortable" @click="toggleSort('grade')">
                 級段位
-                <span v-if="sortBy === 'grade'" class="sort-icon">{{
-                  sortOrder === "asc" ? "↑" : "↓"
-                }}</span>
+                <span v-if="sortBy === 'grade'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
               <th class="sortable" @click="toggleSort('year')">
                 学年
-                <span v-if="sortBy === 'year'" class="sort-icon">{{
-                  sortOrder === "asc" ? "↑" : "↓"
-                }}</span>
+                <span v-if="sortBy === 'year'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
             </tr>
           </thead>
@@ -88,16 +80,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue"
-import { useQuery } from "@tanstack/vue-query"
-import { queryKeys } from "@/src/lib/queryKeys"
-import hc from "@/src/lib/honoClient"
-import Loading from "@/src/components/ui/UiLoading.vue"
-import AdminMenu from "@/src/components/admin/AdminMenu.vue"
+import { ref, computed } from 'vue';
+import { useQuery } from '@tanstack/vue-query';
+import { queryKeys } from '@/src/lib/queryKeys';
+import hc from '@/src/lib/honoClient';
+import Loading from '@/src/components/ui/UiLoading.vue';
+import AdminMenu from '@/src/components/admin/AdminMenu.vue';
 
-const searchQuery = ref("")
-const sortBy = ref<string>("role")
-const sortOrder = ref<"asc" | "desc">("asc")
+const searchQuery = ref('');
+const sortBy = ref<string>('role');
+const sortOrder = ref<'asc' | 'desc'>('asc');
 
 const {
   data,
@@ -108,59 +100,59 @@ const {
   queryFn: async () => {
     const res = await hc.admin.accounts.$get({
       query: { query: searchQuery.value, limit: 50 },
-    })
-    if (!res.ok) throw new Error("Failed to fetch accounts")
-    return res.json()
+    });
+    if (!res.ok) throw new Error('Failed to fetch accounts');
+    return res.json();
   },
-})
+});
 
-const users = computed(() => data.value?.users ?? [])
-const error = computed(() => (queryError.value ? "データの取得に失敗しました" : ""))
+const users = computed(() => data.value?.users ?? []);
+const error = computed(() => (queryError.value ? 'データの取得に失敗しました' : ''));
 
 const handleSearch = () => {
   // Triggered by v-model update or enter key, causing query key change
-}
+};
 
 const toggleSort = (field: string) => {
   if (sortBy.value === field) {
-    sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc"
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
   } else {
-    sortBy.value = field
-    sortOrder.value = "asc"
+    sortBy.value = field;
+    sortOrder.value = 'asc';
   }
-}
+};
 
 const sortedUsers = computed(() => {
-  if (!users.value) return []
+  if (!users.value) return [];
 
   return [...users.value].toSorted((a, b) => {
-    let valA: string | number = ""
-    let valB: string | number = ""
+    let valA: string | number = '';
+    let valB: string | number = '';
 
     switch (sortBy.value) {
-      case "role":
-        valA = a.profile.role || "z"
-        valB = b.profile.role || "z"
-        break
-      case "grade":
-        valA = a.profile.grade ?? 99
-        valB = b.profile.grade ?? 99
-        break
-      case "year":
-        valA = a.profile.year || ""
-        valB = b.profile.year || ""
-        break
-      case "name":
-        valA = `${a.lastName} ${a.firstName}`
-        valB = `${b.lastName} ${b.firstName}`
-        break
+      case 'role':
+        valA = a.profile.role || 'z';
+        valB = b.profile.role || 'z';
+        break;
+      case 'grade':
+        valA = a.profile.grade ?? 99;
+        valB = b.profile.grade ?? 99;
+        break;
+      case 'year':
+        valA = a.profile.year || '';
+        valB = b.profile.year || '';
+        break;
+      case 'name':
+        valA = `${a.lastName} ${a.firstName}`;
+        valB = `${b.lastName} ${b.firstName}`;
+        break;
     }
 
-    if (valA < valB) return sortOrder.value === "asc" ? -1 : 1
-    if (valA > valB) return sortOrder.value === "asc" ? 1 : -1
-    return 0
-  })
-})
+    if (valA < valB) return sortOrder.value === 'asc' ? -1 : 1;
+    if (valA > valB) return sortOrder.value === 'asc' ? 1 : -1;
+    return 0;
+  });
+});
 </script>
 
 <style scoped>

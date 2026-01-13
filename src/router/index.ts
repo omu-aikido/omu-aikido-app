@@ -1,18 +1,18 @@
-import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
+import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
 
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
 
 // HomeView remains eager for FCP
-import { Role } from '@/share/types/role'
-import HomeView from '@/src/views/Home.vue'
-import NotFoundView from '@/src/views/NotFound.vue'
+import { Role } from '@/share/types/role';
+import HomeView from '@/src/views/Home.vue';
+import NotFoundView from '@/src/views/NotFound.vue';
 // Lazy load other views
-const RecordView = () => import('@/src/views/Record.vue')
-const SignInView = () => import('@/src/views/SignIn.vue')
-const SignUpView = () => import('@/src/views/SignUp.vue')
-const SignUpVerifyView = () => import('@/src/views/SignUpVerify.vue')
-const UserView = () => import('@/src/views/account/User.vue')
-const AdminAccountsView = () => import('@/src/views/admin/Accounts.vue')
+const RecordView = () => import('@/src/views/Record.vue');
+const SignInView = () => import('@/src/views/SignIn.vue');
+const SignUpView = () => import('@/src/views/SignUp.vue');
+const SignUpVerifyView = () => import('@/src/views/SignUpVerify.vue');
+const UserView = () => import('@/src/views/account/User.vue');
+const AdminAccountsView = () => import('@/src/views/admin/Accounts.vue');
 
 const router = createRouter({
   history: createWebHistory(),
@@ -84,15 +84,15 @@ const router = createRouter({
       meta: { requiresAuth: false },
     },
   ],
-})
+});
 
 interface ClerkUser {
-  publicMetadata: Record<string, unknown>
+  publicMetadata: Record<string, unknown>;
 }
 
 interface ClerkClient {
-  user: ClerkUser | null | undefined
-  loaded: boolean
+  user: ClerkUser | null | undefined;
+  loaded: boolean;
 }
 
 // Clerkが利用可能になるまで待つ
@@ -100,36 +100,36 @@ function waitForClerk(): Promise<ClerkClient> {
   return new Promise((resolve) => {
     const checkClerk = () => {
       if (window.Clerk?.loaded) {
-        resolve(window.Clerk as unknown as ClerkClient)
+        resolve(window.Clerk as unknown as ClerkClient);
       } else {
-        setTimeout(checkClerk, 100)
+        setTimeout(checkClerk, 100);
       }
-    }
-    checkClerk()
-  })
+    };
+    checkClerk();
+  });
 }
 
 // ナビゲーションガード：Clerkの認証を確認
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
   try {
-    const clerk = await waitForClerk()
-    const requiresAuth = to.meta.requiresAuth === true
-    const requiresAdmin = to.meta.requiresAdmin === true
-    const isAuthenticated = clerk.user !== null && clerk.user !== undefined
+    const clerk = await waitForClerk();
+    const requiresAuth = to.meta.requiresAuth === true;
+    const requiresAdmin = to.meta.requiresAdmin === true;
+    const isAuthenticated = clerk.user !== null && clerk.user !== undefined;
 
     if (requiresAuth && !isAuthenticated) {
       // 認証が必要だが、ログインしていない場合はサインインページへ
-      next({ name: 'signIn' })
+      next({ name: 'signIn' });
     } else if (requiresAdmin && isAuthenticated) {
       // 管理者権限チェック
-      const roleValue = (clerk.user?.publicMetadata as { role?: string })?.role
-      const role = Role.fromString(`${roleValue}`)
-      const isAdmin = role ? role.isManagement : false
+      const roleValue = (clerk.user?.publicMetadata as { role?: string })?.role;
+      const role = Role.fromString(`${roleValue}`);
+      const isAdmin = role ? role.isManagement : false;
 
       if (!isAdmin) {
-        next({ name: 'home' }) // Not authorized, redirect to home
+        next({ name: 'home' }); // Not authorized, redirect to home
       } else {
-        next()
+        next();
       }
     } else if (
       !requiresAuth &&
@@ -137,15 +137,15 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
       (to.name === 'signIn' || to.name === 'signUp' || to.name === 'signUpVerify')
     ) {
       // すでにログインしている場合はホームへリダイレクト
-      next({ name: 'home' })
+      next({ name: 'home' });
     } else {
       // そのほかの場合は通常通り進む
-      next()
+      next();
     }
   } catch (error) {
-    console.error('Router guard error:', error)
-    next()
+    console.error('Router guard error:', error);
+    next();
   }
-})
+});
 
-export default router
+export default router;
