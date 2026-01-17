@@ -185,10 +185,15 @@ jobs:
       VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
       CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-      CLERK_FRONTEND_API: ${{ secrets.CLERK_FRONTEND_API }}
+      CLERK_FRONTEND_API_URL: ${{ secrets.CLERK_FRONTEND_API }}
       CLERK_WEBHOOK_SECRET: ${{ secrets.CLERK_WEBHOOK_SECRET }}
       TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
       TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+      E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
+      E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+      E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+      E2E_FIRSTNAME: ${{ secrets.E2E_FIRSTNAME }}
+      E2E_LASTNAME: ${{ secrets.E2E_LASTNAME }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

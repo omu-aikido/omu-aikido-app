@@ -8,6 +8,11 @@ services:
     environment:
       - TURSO_AUTH_TOKEN=dev-token
       - TURSO_DATABASE_URL=http://127.0.0.1:8080
+      - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
+      - CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY}
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+      - CLERK_FRONTEND_API_URL=${CLERK_FRONTEND_API_URL}
+      - CLERK_WEBHOOK_SECRET=${CLERK_WEBHOOK_SECRET}
     depends_on:
       - libsql-server
     command: sh -c "pnpm db:migrate && if [ \"$MODE\" = 'preview' ]; then pnpm preview --ip 0.0.0.0 --port 5173; else pnpm dev --host; fi"
