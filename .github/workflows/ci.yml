@@ -230,6 +230,9 @@ jobs:
       - name: Build
         run: pnpm run build
 
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
+
       - name: E2E
         run: pnpm run test:e2e
 
