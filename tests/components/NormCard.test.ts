@@ -1,7 +1,7 @@
-import { mount } from '@vue/test-utils'
-import { describe, it, expect } from 'vitest'
+import { mount } from '@vue/test-utils';
+import { describe, it, expect } from 'vitest';
 
-import NormCard from '@/src/components/admin/NormCard.vue'
+import NormCard from '@/src/components/admin/NormCard.vue';
 
 describe('NormCard.vue', () => {
   const mockUser = {
@@ -20,7 +20,7 @@ describe('NormCard.vue', () => {
       joinedAt: 2024,
       getGradeAt: null,
     },
-  }
+  };
 
   const mockNorm = {
     userId: 'user1',
@@ -31,7 +31,7 @@ describe('NormCard.vue', () => {
     grade: 1,
     gradeLabel: '一級',
     lastPromotionDate: '2023-12-01',
-  }
+  };
 
   it('renders user info and progress', () => {
     const wrapper = mount(NormCard, {
@@ -40,17 +40,17 @@ describe('NormCard.vue', () => {
         norm: mockNorm,
         progress: 50,
       },
-    })
+    });
 
-    expect(wrapper.find('[data-testid="norm-card"]').exists()).toBe(true)
-    expect(wrapper.text()).toContain('Last First')
-    expect(wrapper.text()).toContain('一級')
-    expect(wrapper.text()).toContain('50%')
+    expect(wrapper.find('[data-testid="norm-card"]').exists()).toBe(true);
+    expect(wrapper.text()).toContain('Last First');
+    expect(wrapper.text()).toContain('一級');
+    expect(wrapper.text()).toContain('50%');
 
-    const status = wrapper.find('[data-testid="norm-status"]')
-    expect(status.text()).toBe('未達成')
-    expect(status.classes()).toContain('status-pending')
-  })
+    const status = wrapper.find('[data-testid="norm-status"]');
+    expect(status.text()).toBe('未達成');
+    expect(status.classes()).toContain('status-pending');
+  });
 
   it('renders met status correctly', () => {
     const wrapper = mount(NormCard, {
@@ -59,10 +59,10 @@ describe('NormCard.vue', () => {
         norm: { ...mockNorm, isMet: true },
         progress: 100,
       },
-    })
+    });
 
-    const status = wrapper.find('[data-testid="norm-status"]')
-    expect(status.text()).toBe('達成')
-    expect(status.classes()).toContain('status-complete')
-  })
-})
+    const status = wrapper.find('[data-testid="norm-status"]');
+    expect(status.text()).toBe('達成');
+    expect(status.classes()).toContain('status-complete');
+  });
+});

@@ -1,4 +1,4 @@
-FROM node:20-slim
+FROM node:lts-slim
 
 WORKDIR /app
 
@@ -17,10 +17,4 @@ RUN pnpm install
 # Copy source code
 COPY . .
 
-# Expose Vite port
-EXPOSE 5173
-
-
-
-# Start development server
-CMD ["pnpm", "dev"]
+CMD ["pnpm", "check"]

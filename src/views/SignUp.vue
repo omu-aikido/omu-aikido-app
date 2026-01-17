@@ -62,17 +62,17 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue"
-import { useRouter } from "vue-router"
-import { useSignUpForm } from "@/src/composable/useSignUpForm"
-import Card from "@/src/components/ui/UiCard.vue"
-import ProgressIndicator from "@/src/components/signup/ProgressIndicator.vue"
-import SignUpStepBasic from "@/src/components/signup/SignUpStepBasic.vue"
-import SignUpStepPersonal from "@/src/components/signup/SignUpStepPersonal.vue"
-import SignUpStepProfile from "@/src/components/signup/SignUpStepProfile.vue"
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useSignUpForm } from '@/src/composable/useSignUpForm';
+import Card from '@/src/components/ui/UiCard.vue';
+import ProgressIndicator from '@/src/components/signup/ProgressIndicator.vue';
+import SignUpStepBasic from '@/src/components/signup/SignUpStepBasic.vue';
+import SignUpStepPersonal from '@/src/components/signup/SignUpStepPersonal.vue';
+import SignUpStepProfile from '@/src/components/signup/SignUpStepProfile.vue';
 
-const router = useRouter()
-const currentYear = new Date().getFullYear()
+const router = useRouter();
+const currentYear = new Date().getFullYear();
 
 const {
   step,
@@ -85,26 +85,26 @@ const {
   prevStep,
   setFormValue,
   handleClerkSignUp,
-} = useSignUpForm(currentYear)
+} = useSignUpForm(currentYear);
 
 onMounted(() => {
-  document.title = "サインアップ - 稽古記録"
-})
+  document.title = 'サインアップ - 稽古記録';
+});
 
 const handleNext = () => {
   if (validateStep(step.value)) {
-    nextStep()
+    nextStep();
   }
-}
+};
 
 const handleSubmit = async () => {
-  if (!validateStep("profile")) return
+  if (!validateStep('profile')) return;
 
-  const success = await handleClerkSignUp()
+  const success = await handleClerkSignUp();
   if (success) {
-    router.push("/sign-up/verify")
+    router.push('/sign-up/verify');
   }
-}
+};
 </script>
 
 <style scoped>

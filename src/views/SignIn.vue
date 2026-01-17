@@ -34,7 +34,7 @@
                 <p>{{ error }}</p>
               </div>
               <Button type="submit" :disabled="isLoading" full-width class="mt-4">
-                {{ isLoading ? "認証中..." : "認証" }}
+                {{ isLoading ? '認証中...' : '認証' }}
               </Button>
             </form>
 
@@ -90,7 +90,7 @@
               </div>
 
               <Button type="submit" :disabled="isLoading" full-width class="mt-6">
-                {{ isLoading ? "サインイン中..." : "サインイン" }}
+                {{ isLoading ? 'サインイン中...' : 'サインイン' }}
               </Button>
             </form>
 
@@ -135,83 +135,71 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter, useRoute } from "vue-router"
-import { SignedOut, SignedIn } from "@clerk/vue"
-import { useAuth } from "@/src/composable/useAuth"
-import { useSignIn } from "@/src/composable/useSignIn"
-import Card from "@/src/components/ui/UiCard.vue"
-import Button from "@/src/components/ui/UiButton.vue"
-import Input from "@/src/components/ui/UiInput.vue"
-import { ref, onMounted, watch } from "vue"
+import { useRouter, useRoute } from 'vue-router';
+import { SignedOut, SignedIn } from '@clerk/vue';
+import { useAuth } from '@/src/composable/useAuth';
+import { useSignIn } from '@/src/composable/useSignIn';
+import Card from '@/src/components/ui/UiCard.vue';
+import Button from '@/src/components/ui/UiButton.vue';
+import Input from '@/src/components/ui/UiInput.vue';
+import { ref, onMounted, watch } from 'vue';
 
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
-const {
-  email,
-  password,
-  code,
-  isLoading,
-  error,
-  needsVerification,
-  signIn,
-  verifyCode,
-  signInWithDiscord,
-} = useSignIn()
+const { email, password, code, isLoading, error, needsVerification, signIn, verifyCode, signInWithDiscord } =
+  useSignIn();
 
-const { isAuthenticated } = useAuth()
-const gaugePercent = ref(0)
-const redirectUrl = ref("/")
+const { isAuthenticated } = useAuth();
+const gaugePercent = ref(0);
+const redirectUrl = ref('/');
 
 const handleSuccessfulSignIn = () => {
-  gaugePercent.value = 100
+  gaugePercent.value = 100;
   setTimeout(() => {
-    router.push(redirectUrl.value)
-  }, 1000)
-}
+    router.push(redirectUrl.value);
+  }, 1000);
+};
 
 onMounted(() => {
-  document.title = "サインイン - 稽古記録"
+  document.title = 'サインイン - 稽古記録';
 
-  const url = new URL(window.location.href)
-  const redirectParam = route.query.redirect_url as string | undefined
+  const url = new URL(window.location.href);
+  const redirectParam = route.query.redirect_url as string | undefined;
 
   if (redirectParam) {
     try {
-      const parsedRedirectUrl = new URL(redirectParam, url.origin)
+      const parsedRedirectUrl = new URL(redirectParam, url.origin);
       if (parsedRedirectUrl.origin === url.origin) {
-        redirectUrl.value =
-          parsedRedirectUrl.pathname +
-          parsedRedirectUrl.search +
-          parsedRedirectUrl.hash
+        redirectUrl.value = parsedRedirectUrl.pathname + parsedRedirectUrl.search + parsedRedirectUrl.hash;
       }
     } catch {
-      console.error(`Invalid redirect_url: ${redirectParam}`)
+      console.error(`Invalid redirect_url: ${redirectParam}`);
     }
   }
 
   if (isAuthenticated.value) {
-    handleSuccessfulSignIn()
+    handleSuccessfulSignIn();
   }
-})
+});
 
-watch(isAuthenticated, newValue => {
+watch(isAuthenticated, (newValue) => {
   if (newValue) {
-    handleSuccessfulSignIn()
+    handleSuccessfulSignIn();
   }
-})
+});
 
 const handleSignIn = async () => {
-  await signIn()
-}
+  await signIn();
+};
 
 const handleVerifyCode = async () => {
-  await verifyCode()
-}
+  await verifyCode();
+};
 
 const handleSignInWithDiscord = async () => {
-  await signInWithDiscord()
-}
+  await signInWithDiscord();
+};
 </script>
 
 <style scoped>
@@ -290,9 +278,9 @@ const handleSignInWithDiscord = async () => {
 }
 
 .field-label {
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
-    color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
 }
 
 .label-row {

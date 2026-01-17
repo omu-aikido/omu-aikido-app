@@ -1,18 +1,18 @@
-import { clerkPlugin } from '@clerk/vue'
-import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
-import { createApp } from 'vue'
+import { clerkPlugin } from '@clerk/vue';
+import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query';
+import { createApp } from 'vue';
 
-import App from './App.vue'
-import './assets/main.css'
-import { initAuthState } from './composable/useAuth'
-import router from './router'
+import App from './App.vue';
+import './assets/main.css';
+import { initAuthState } from './composable/useAuth';
+import router from './router';
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 if (!PUBLISHABLE_KEY) {
-  throw new Error('VITE_CLERK_PUBLISHABLE_KEY is required')
+  throw new Error('VITE_CLERK_PUBLISHABLE_KEY is required');
 }
 
-const app = createApp(App)
+const app = createApp(App);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,17 +27,17 @@ const queryClient = new QueryClient({
       refetchOnReconnect: true, // Refetch when network reconnects
     },
   },
-})
+});
 
-app.use(clerkPlugin, { publishableKey: PUBLISHABLE_KEY })
-app.use(VueQueryPlugin, { queryClient })
+app.use(clerkPlugin, { publishableKey: PUBLISHABLE_KEY });
+app.use(VueQueryPlugin, { queryClient });
 
-app.use(router)
-;(async () => {
+app.use(router);
+(async () => {
   try {
-    initAuthState()
-    app.mount('#app')
+    initAuthState();
+    app.mount('#app');
   } catch {
-    console.error(new Date().toLocaleTimeString(), 'Failed to initialize app')
+    console.error(new Date().toLocaleTimeString(), 'Failed to initialize app');
   }
-})()
+})();

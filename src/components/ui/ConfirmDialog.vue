@@ -1,32 +1,27 @@
 <script setup lang="ts">
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  DialogDescription,
-} from "@headlessui/vue"
-import { AlertTriangleIcon } from "lucide-vue-next"
+import { Dialog, DialogPanel, DialogTitle, DialogDescription } from '@headlessui/vue';
+import { AlertTriangleIcon } from 'lucide-vue-next';
 
 interface Props {
-  open: boolean
-  title: string
-  description: string
-  confirmText?: string
-  cancelText?: string
+  open: boolean;
+  title: string;
+  description: string;
+  confirmText?: string;
+  cancelText?: string;
 }
 
 interface Emits {
-  (e: "confirm"): void
-  (e: "cancel"): void
+  (e: 'confirm'): void;
+  (e: 'cancel'): void;
 }
 
 withDefaults(defineProps<Props>(), {
-  confirmText: "削除する",
-  cancelText: "キャンセル",
-})
+  confirmText: '削除する',
+  cancelText: 'キャンセル',
+});
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const emit = defineEmits<Emits>()
+const emit = defineEmits<Emits>();
 </script>
 
 <template>
@@ -179,6 +174,8 @@ const emit = defineEmits<Emits>()
 
 .btn-confirm:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--red-500), 0 0 0 4px var(--bg-card);
+  box-shadow:
+    0 0 0 2px var(--red-500),
+    0 0 0 4px var(--bg-card);
 }
 </style>

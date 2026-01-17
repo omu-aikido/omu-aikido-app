@@ -66,17 +66,17 @@
 </template>
 
 <script setup lang="ts">
-import AdminMenu from "@/src/components/admin/AdminMenu.vue"
-import NormCard from "@/src/components/admin/NormCard.vue"
-import Loading from "@/src/components/ui/UiLoading.vue"
-import hc from "@/src/lib/honoClient"
-import { queryKeys } from "@/src/lib/queryKeys"
-import { useQuery } from "@tanstack/vue-query"
-import { computed, ref } from "vue"
+import AdminMenu from '@/src/components/admin/AdminMenu.vue';
+import NormCard from '@/src/components/admin/NormCard.vue';
+import Loading from '@/src/components/ui/UiLoading.vue';
+import hc from '@/src/lib/honoClient';
+import { queryKeys } from '@/src/lib/queryKeys';
+import { useQuery } from '@tanstack/vue-query';
+import { computed, ref } from 'vue';
 
-const searchTerm = ref("")
-const filterStatus = ref<"all" | "met" | "unmet">("all")
-const sortOrder = ref<"asc" | "desc">("desc")
+const searchTerm = ref('');
+const filterStatus = ref<'all' | 'met' | 'unmet'>('all');
+const sortOrder = ref<'asc' | 'desc'>('desc');
 
 const {
   data,
@@ -87,64 +87,63 @@ const {
   queryFn: async () => {
     const res = await hc.admin.norms.$get({
       query: { query: searchTerm.value, limit: 100 },
-    })
-    if (!res.ok) throw new Error("Failed to fetch norms")
-    return res.json()
+    });
+    if (!res.ok) throw new Error('Failed to fetch norms');
+    return res.json();
   },
-})
+});
 
 const users = computed(() => {
-  if (!data.value || !('users' in data.value)) return []
-  return data.value.users
-})
+  if (!data.value || !('users' in data.value)) return [];
+  return data.value.users;
+});
 
 const norms = computed(() => {
-  if (!data.value || !('norms' in data.value)) return []
-  return data.value.norms
-})
+  if (!data.value || !('norms' in data.value)) return [];
+  return data.value.norms;
+});
 
-const error = computed(() => (queryError.value ? "データの取得に失敗しました" : ""))
+const error = computed(() => (queryError.value ? 'データの取得に失敗しました' : ''));
 
 const processedData = computed(() => {
   return users.value
-    .map(user => {
-      const norm = norms.value.find(n => n.userId === user.id)
-      if (!norm) return null
-      return { user, norm }
+    .map((user) => {
+      const norm = norms.value.find((n) => n.userId === user.id);
+      if (!norm) return null;
+      return { user, norm };
     })
-    .filter((item): item is NonNullable<typeof item> => item !== null)
-})
+    .filter((item): item is NonNullable<typeof item> => item !== null);
+});
 
 const filteredUsers = computed(() => {
-  let result = processedData.value
+  let result = processedData.value;
 
   // Filter by Search Term
   if (searchTerm.value) {
-    const term = searchTerm.value.toLowerCase()
-    result = result.filter(item => {
-      const fullName =
-        `${item.user.lastName || ""} ${item.user.firstName || ""}`.toLowerCase()
-      return fullName.includes(term)
-    })
+    const term = searchTerm.value.toLowerCase();
+    result = result.filter((item) => {
+      const fullName = `${item.user.lastName || ''} ${item.user.firstName || ''}`.toLowerCase();
+      return fullName.includes(term);
+    });
   }
 
   // Filter by Status
-  if (filterStatus.value !== "all") {
-    result = result.filter(item => {
-      if (filterStatus.value === "met") return item.norm.isMet
-      if (filterStatus.value === "unmet") return !item.norm.isMet
-      return true
-    })
+  if (filterStatus.value !== 'all') {
+    result = result.filter((item) => {
+      if (filterStatus.value === 'met') return item.norm.isMet;
+      if (filterStatus.value === 'unmet') return !item.norm.isMet;
+      return true;
+    });
   }
 
   // Sort
   result.sort((a, b) => {
-    const diff = a.norm.progress - b.norm.progress
-    return sortOrder.value === "asc" ? diff : -diff
-  })
+    const diff = a.norm.progress - b.norm.progress;
+    return sortOrder.value === 'asc' ? diff : -diff;
+  });
 
-  return result
-})
+  return result;
+});
 </script>
 
 <style scoped>

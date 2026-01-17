@@ -1,4 +1,4 @@
-import { type } from 'arktype'
+import { type } from 'arktype';
 
 /**
  * 管理者API向けのユーザー情報型定義
@@ -20,6 +20,6 @@ export const AdminUser = type({
     joinedAt: 'number | null',
     getGradeAt: 'string | null',
   }),
-})
+});
 
-export type AdminUserType = typeof AdminUser.infer
+export type AdminUserType = typeof AdminUser.infer;

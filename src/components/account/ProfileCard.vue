@@ -33,21 +33,21 @@
       <div class="info-list">
         <div class="info-row">
           <span class="info-label">級段位</span>
-          <span class="info-value">{{ translateGrade(profile?.grade ?? "") || "-" }}</span>
+          <span class="info-value">{{ translateGrade(profile?.grade ?? '') || '-' }}</span>
         </div>
         <div class="info-row">
           <span class="info-label">取得日</span>
           <span class="info-value">
-            {{ profile?.getGradeAt ? new Date(profile.getGradeAt).toLocaleDateString() : "-" }}
+            {{ profile?.getGradeAt ? new Date(profile.getGradeAt).toLocaleDateString() : '-' }}
           </span>
         </div>
         <div class="info-row">
           <span class="info-label">入部年</span>
-          <span class="info-value">{{ profile?.joinedAt || "-" }}</span>
+          <span class="info-value">{{ profile?.joinedAt || '-' }}</span>
         </div>
         <div class="info-row">
           <span class="info-label">学年</span>
-          <span class="info-value">{{ translateYear(profile?.year ?? "") || "-" }}</span>
+          <span class="info-value">{{ translateYear(profile?.year ?? '') || '-' }}</span>
         </div>
       </div>
     </div>
@@ -127,7 +127,7 @@
 
       <div class="actions">
         <Button type="submit" variant="primary" :disabled="isSubmitting" full-width>
-          {{ isSubmitting ? "保存中..." : "保存" }}
+          {{ isSubmitting ? '保存中...' : '保存' }}
         </Button>
         <Button type="button" variant="secondary" full-width @click="cancelEdit"> キャンセル </Button>
       </div>
@@ -136,151 +136,148 @@
 </template>
 
 <script setup lang="ts">
-import { grade, translateGrade } from "@/share/lib/grade"
-import { translateYear, year } from "@/share/lib/year"
-import { AccountMetadata } from "@/share/types/account"
-import Button from "@/src/components/ui/UiButton.vue"
-import Input from "@/src/components/ui/UiInput.vue"
-import hc from "@/src/lib/honoClient"
-import { queryKeys } from "@/src/lib/queryKeys"
-import {
-    Listbox,
-    ListboxButton,
-    ListboxOption,
-    ListboxOptions,
-} from "@headlessui/vue"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query"
-import { ArkErrors } from "arktype"
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-vue-next"
-import { computed, reactive, ref, watch } from "vue"
+import { grade, translateGrade } from '@/share/lib/grade';
+import { translateYear, year } from '@/share/lib/year';
+import { AccountMetadata } from '@/share/types/account';
+import Button from '@/src/components/ui/UiButton.vue';
+import Input from '@/src/components/ui/UiInput.vue';
+import hc from '@/src/lib/honoClient';
+import { queryKeys } from '@/src/lib/queryKeys';
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/vue';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { ArkErrors } from 'arktype';
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-vue-next';
+import { computed, reactive, ref, watch } from 'vue';
 
 interface FormData {
-  grade: number
-  getGradeAt: string
-  joinedAt: number
-  year: `b${number}` | `m${number}` | `d${number}`
+  grade: number;
+  getGradeAt: string;
+  joinedAt: number;
+  year: `b${number}` | `m${number}` | `d${number}`;
 }
 
-const queryClient = useQueryClient()
+const queryClient = useQueryClient();
 
-const isEditing = ref(false)
-const message = ref("")
-const isError = ref(false)
-const gradeOptions = grade
-const yearOptions = year
+const isEditing = ref(false);
+const message = ref('');
+const isError = ref(false);
+const gradeOptions = grade;
+const yearOptions = year;
 
 const formData = reactive<FormData>({
   grade: 0,
-  getGradeAt: "",
+  getGradeAt: '',
   joinedAt: new Date().getFullYear(),
-  year: "b1",
-})
+  year: 'b1',
+});
 
 // Query - Returns { profile: ... } to match server response shape
 const { data: profileData } = useQuery({
   queryKey: queryKeys.user.clerk.profile(),
   queryFn: async () => {
-    const res = await hc.user.clerk.profile.$get()
-    if (!res.ok) throw new Error("Failed to fetch profile")
-    const data = await res.json()
+    const res = await hc.user.clerk.profile.$get();
+    if (!res.ok) throw new Error('Failed to fetch profile');
+    const data = await res.json();
     if (data.profile) {
-      const profileParsed = AccountMetadata(data.profile)
+      const profileParsed = AccountMetadata(data.profile);
       if (profileParsed instanceof ArkErrors) {
-        console.error(profileParsed)
-        throw new Error("Invalid profile data")
+        console.error(profileParsed);
+        throw new Error('Invalid profile data');
       }
-      return { profile: profileParsed }
+      return { profile: profileParsed };
     }
-    return { profile: null }
+    return { profile: null };
   },
-})
+});
 
-const profile = computed(() => profileData.value?.profile ?? null)
+const profile = computed(() => profileData.value?.profile ?? null);
 
 // Sync form data
-watch(profile, (newProfile) => {
-  if (newProfile) {
-    formData.grade = Number(newProfile.grade) || 0
-    formData.getGradeAt = newProfile.getGradeAt || ""
-    formData.joinedAt = Number(newProfile.joinedAt) || new Date().getFullYear()
-    formData.year = newProfile.year || "b1"
-  }
-}, { immediate: true })
+watch(
+  profile,
+  (newProfile) => {
+    if (newProfile) {
+      formData.grade = Number(newProfile.grade) || 0;
+      formData.getGradeAt = newProfile.getGradeAt || '';
+      formData.joinedAt = Number(newProfile.joinedAt) || new Date().getFullYear();
+      formData.year = newProfile.year || 'b1';
+    }
+  },
+  { immediate: true }
+);
 
 function updateFormData() {
   if (profile.value) {
-    formData.grade = Number(profile.value.grade) || 0
-    formData.getGradeAt = profile.value.getGradeAt || ""
-    formData.joinedAt = Number(profile.value.joinedAt) || new Date().getFullYear()
-    formData.year = profile.value.year || "b1"
+    formData.grade = Number(profile.value.grade) || 0;
+    formData.getGradeAt = profile.value.getGradeAt || '';
+    formData.joinedAt = Number(profile.value.joinedAt) || new Date().getFullYear();
+    formData.year = profile.value.year || 'b1';
   }
 }
 
 // Mutation
 const { mutateAsync: updateProfile, isPending: isSubmitting } = useMutation({
   mutationFn: async (json: {
-    grade: number
-    getGradeAt: `${number}-${number}-${number}` | null
-    joinedAt: number
-    year: `b${number}` | `m${number}` | `d${number}`
+    grade: number;
+    getGradeAt: `${number}-${number}-${number}` | null;
+    joinedAt: number;
+    year: `b${number}` | `m${number}` | `d${number}`;
   }) => {
-    const res = await hc.user.clerk.profile.$patch({ json })
-    if (!res.ok) throw new Error("プロフィールの更新に失敗しました")
-    return res.json()
+    const res = await hc.user.clerk.profile.$patch({ json });
+    if (!res.ok) throw new Error('プロフィールの更新に失敗しました');
+    return res.json();
   },
   onSuccess: (responseData) => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.user.clerk.profile() })
+    queryClient.invalidateQueries({ queryKey: queryKeys.user.clerk.profile() });
 
     if (responseData.profile) {
       const validatedProfile = AccountMetadata({
-         role: responseData.profile.role,
-         grade: responseData.profile.grade,
-         getGradeAt: responseData.profile.getGradeAt,
-         joinedAt: responseData.profile.joinedAt,
-         year: responseData.profile.year,
-      })
+        role: responseData.profile.role,
+        grade: responseData.profile.grade,
+        getGradeAt: responseData.profile.getGradeAt,
+        joinedAt: responseData.profile.joinedAt,
+        year: responseData.profile.year,
+      });
       if (validatedProfile instanceof ArkErrors) {
-         console.error(validatedProfile)
+        console.error(validatedProfile);
       } else {
         // Set cache with consistent { profile: ... } shape
-        queryClient.setQueryData(queryKeys.user.clerk.profile(), { profile: validatedProfile })
+        queryClient.setQueryData(queryKeys.user.clerk.profile(), { profile: validatedProfile });
       }
     }
 
-    message.value = "プロフィールを更新しました"
-    isEditing.value = false
+    message.value = 'プロフィールを更新しました';
+    isEditing.value = false;
   },
   onError: (error) => {
-    isError.value = true
-    message.value = error instanceof Error ? error.message : "プロフィールの更新に失敗しました"
-  }
-})
+    isError.value = true;
+    message.value = error instanceof Error ? error.message : 'プロフィールの更新に失敗しました';
+  },
+});
 
 async function handleSubmit() {
-  message.value = ""
-  isError.value = false
+  message.value = '';
+  isError.value = false;
   try {
-    const getGradeAtValue = (formData.getGradeAt || null) as
-      | `${number}-${number}-${number}`
-      | null
+    const getGradeAtValue = (formData.getGradeAt || null) as `${number}-${number}-${number}` | null;
 
     const updateData = {
       grade: formData.grade,
       getGradeAt: getGradeAtValue,
       joinedAt: formData.joinedAt,
       year: formData.year as `b${number}` | `m${number}` | `d${number}`,
-    }
+    };
 
-    await updateProfile(updateData)
+    await updateProfile(updateData);
   } catch {
     // handled in onError
   }
 }
 
 function cancelEdit() {
-  updateFormData()
-  isEditing.value = false
-  message.value = ""
+  updateFormData();
+  isEditing.value = false;
+  message.value = '';
 }
 </script>
 
@@ -297,8 +294,13 @@ function cancelEdit() {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .header-row {

@@ -14,7 +14,7 @@
       </div>
       <div class="status-container">
         <span :class="['status', progress >= 100 ? 'status-complete' : 'status-pending']" data-testid="norm-status">
-          {{ progress >= 100 ? "達成" : "未達成" }}
+          {{ progress >= 100 ? '達成' : '未達成' }}
         </span>
       </div>
     </div>
@@ -34,20 +34,20 @@
 </template>
 
 <script setup lang="ts">
-import type { AdminUserType } from "@/share/types/admin"
+import type { AdminUserType } from '@/share/types/admin';
 
 interface NormData {
-  userId: string
-  current: number
-  required: number
-  progress: number
-  isMet: boolean
-  grade: number
-  gradeLabel: string
-  lastPromotionDate: string | null
+  userId: string;
+  current: number;
+  required: number;
+  progress: number;
+  isMet: boolean;
+  grade: number;
+  gradeLabel: string;
+  lastPromotionDate: string | null;
 }
 
-defineProps<{ user: AdminUserType; norm: NormData; progress: number }>()
+defineProps<{ user: AdminUserType; norm: NormData; progress: number }>();
 </script>
 
 <style scoped>

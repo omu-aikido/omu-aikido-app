@@ -43,25 +43,25 @@
 </template>
 
 <script setup lang="ts">
-import Button from "@/src/components/ui/UiButton.vue";
-import Input from "@/src/components/ui/UiInput.vue";
-import type { FormErrors, SignUpFormData } from "@/src/composable/useSignUpForm";
+import Button from '@/src/components/ui/UiButton.vue';
+import Input from '@/src/components/ui/UiInput.vue';
+import type { FormErrors, SignUpFormData } from '@/src/composable/useSignUpForm';
 
 defineProps<{
-  formValues: Partial<SignUpFormData>
-  formErrors: Partial<FormErrors>
-  isSignUpCreated: boolean
-  handleNext: () => void
-  prevStep: () => void
-}>()
+  formValues: Partial<SignUpFormData>;
+  formErrors: Partial<FormErrors>;
+  isSignUpCreated: boolean;
+  handleNext: () => void;
+  prevStep: () => void;
+}>();
 
 const emit = defineEmits<{
-  (e: "update:formValue", key: keyof SignUpFormData, value: string | number): void
-}>()
+  (e: 'update:formValue', key: keyof SignUpFormData, value: string | number): void;
+}>();
 
 const onUpdate = (key: keyof SignUpFormData, value: string | number) => {
-  emit("update:formValue", key, value)
-}
+  emit('update:formValue', key, value);
+};
 </script>
 
 <style scoped>

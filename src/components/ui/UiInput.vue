@@ -1,30 +1,30 @@
 <script setup lang="ts">
 interface Props {
-  modelValue?: string | number | null | undefined
-  type?: string
-  placeholder?: string
-  disabled?: boolean
-  label?: string
-  id?: string
-  error?: string | undefined
-  required?: boolean
+  modelValue?: string | number | null | undefined;
+  type?: string;
+  placeholder?: string;
+  disabled?: boolean;
+  label?: string;
+  id?: string;
+  error?: string | undefined;
+  required?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
-  modelValue: "",
-  type: "text",
-  placeholder: "",
+  modelValue: '',
+  type: 'text',
+  placeholder: '',
   disabled: false,
   required: false,
-})
+});
 
 defineEmits<{
-  (e: "update:modelValue", value: string | number): void
-}>()
+  (e: 'update:modelValue', value: string | number): void;
+}>();
 
 defineOptions({
   inheritAttrs: false,
-})
+});
 </script>
 
 <template>

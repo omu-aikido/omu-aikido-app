@@ -21,7 +21,7 @@
           </div>
 
           <Button type="submit" :disabled="isLoading" full-width class="mt-4">
-            {{ isLoading ? "確認中..." : "確認してサインアップ" }}
+            {{ isLoading ? '確認中...' : '確認してサインアップ' }}
           </Button>
         </form>
       </div>
@@ -30,47 +30,47 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from "vue"
-import { useRouter } from "vue-router"
-import { useClerk } from "@clerk/vue"
-import { useSignUpVerify } from "@/src/composable/useSignUpVerify"
-import Card from "@/src/components/ui/UiCard.vue"
-import Button from "@/src/components/ui/UiButton.vue"
-import Input from "@/src/components/ui/UiInput.vue"
+import { onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { useClerk } from '@clerk/vue';
+import { useSignUpVerify } from '@/src/composable/useSignUpVerify';
+import Card from '@/src/components/ui/UiCard.vue';
+import Button from '@/src/components/ui/UiButton.vue';
+import Input from '@/src/components/ui/UiInput.vue';
 
-const router = useRouter()
-const clerk = useClerk()
-const { code, isLoading, error, verifyCode } = useSignUpVerify()
+const router = useRouter();
+const clerk = useClerk();
+const { code, isLoading, error, verifyCode } = useSignUpVerify();
 
 const handleVerify = async () => {
-  const success = await verifyCode()
+  const success = await verifyCode();
   if (success) {
-    router.push("/")
+    router.push('/');
   }
-}
+};
 
 const checkSignUpStatus = () => {
   // If clerk is not ready, we wait
-  if (!clerk.value?.loaded) return
+  if (!clerk.value?.loaded) return;
 
-  const signUp = clerk.value.client?.signUp
-  console.log(signUp)
-  if (!signUp || signUp.status !== "missing_requirements") {
+  const signUp = clerk.value.client?.signUp;
+  console.log(signUp);
+  if (!signUp || signUp.status !== 'missing_requirements') {
     // router.replace("/sign-up")
   }
-}
+};
 
 onMounted(() => {
-  document.title = "認証コードの確認 - 稽古記録"
-  checkSignUpStatus()
-})
+  document.title = '認証コードの確認 - 稽古記録';
+  checkSignUpStatus();
+});
 
 watch(
   () => clerk.value?.loaded,
   () => {
-    checkSignUpStatus()
+    checkSignUpStatus();
   }
-)
+);
 </script>
 
 <style scoped>

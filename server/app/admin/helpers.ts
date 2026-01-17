@@ -1,11 +1,11 @@
-import type { User } from '@clerk/backend'
+import type { User } from '@clerk/backend';
 
-import { ArkErrors, type } from 'arktype'
+import { ArkErrors, type } from 'arktype';
 
-import { translateGrade } from '@/share/lib/grade'
-import { translateYear } from '@/share/lib/year'
-import { AdminUser, type AdminUserType } from '@/share/types/admin'
-import { Role } from '@/share/types/role'
+import { translateGrade } from '@/share/lib/grade';
+import { translateYear } from '@/share/lib/year';
+import { AdminUser, type AdminUserType } from '@/share/types/admin';
+import { Role } from '@/share/types/role';
 
 // ============================================================
 // Schemas
@@ -17,12 +17,12 @@ export const accountsQuerySchema = type({
   'page?': 'string | number',
   'sortBy?': 'string',
   'sortOrder?': "'asc' | 'desc'",
-})
+});
 
 export const userActivitiesQuerySchema = type({
   'page?': 'string | number',
   'limit?': 'string | number',
-})
+});
 
 export const adminProfileUpdateSchema = type({
   year: 'string',
@@ -30,7 +30,7 @@ export const adminProfileUpdateSchema = type({
   role: 'string',
   joinedAt: 'number',
   'getGradeAt?': 'string | null',
-})
+});
 
 export const publicMetadataProfileSchema = type({
   'role?': 'string',
@@ -38,24 +38,25 @@ export const publicMetadataProfileSchema = type({
   'joinedAt?': 'number',
   'year?': 'string',
   'getGradeAt?': 'string | null',
-})
+});
 
 // ============================================================
 // User Conversion
 // ============================================================
 
 export function toAdminUser(user: User): AdminUserType {
-  const meta = user.publicMetadata as Record<string, unknown> | undefined
+  const meta = user.publicMetadata as Record<string, unknown> | undefined;
 
-  const roleStr = typeof meta?.role === 'string' ? meta.role : 'member'
-  const roleObj = Role.fromString(roleStr)
+  const roleStr = typeof meta?.role === 'string' ? meta.role : 'member';
+  const roleObj = Role.fromString(roleStr);
 
-  const gradeRaw = meta?.grade
-  const grade = typeof gradeRaw === 'number' ? gradeRaw : typeof gradeRaw === 'string' ? parseInt(gradeRaw, 10) || 0 : 0
+  const gradeRaw = meta?.grade;
+  const grade =
+    typeof gradeRaw === 'number' ? gradeRaw : typeof gradeRaw === 'string' ? parseInt(gradeRaw, 10) || 0 : 0;
 
-  const yearStr = typeof meta?.year === 'string' ? meta.year : ''
-  const joinedAt = typeof meta?.joinedAt === 'number' ? meta.joinedAt : null
-  const getGradeAt = typeof meta?.getGradeAt === 'string' ? meta.getGradeAt : null
+  const yearStr = typeof meta?.year === 'string' ? meta.year : '';
+  const joinedAt = typeof meta?.joinedAt === 'number' ? meta.joinedAt : null;
+  const getGradeAt = typeof meta?.getGradeAt === 'string' ? meta.getGradeAt : null;
 
   const res = AdminUser({
     id: user.id,
@@ -73,17 +74,17 @@ export function toAdminUser(user: User): AdminUserType {
       joinedAt,
       getGradeAt,
     },
-  })
+  });
 
   if (res instanceof ArkErrors) {
-    throw new TypeError(`Failed to convert user`)
+    throw new TypeError(`Failed to convert user`);
   }
-  return res
+  return res;
 }
 
 export function coerceProfileMetadata(metadata: unknown) {
-  if (!metadata || typeof metadata !== 'object') return {}
-  return metadata
+  if (!metadata || typeof metadata !== 'object') return {};
+  return metadata;
 }
 
 // ============================================================
@@ -91,10 +92,10 @@ export function coerceProfileMetadata(metadata: unknown) {
 // ============================================================
 
 export function getJST(date: Date): Date {
-  return new Date(date.getTime() + 9 * 60 * 60 * 1000)
+  return new Date(date.getTime() + 9 * 60 * 60 * 1000);
 }
 
 export function formatDateToJSTString(date: Date): string {
-  const jstDate = getJST(date)
-  return jstDate.toISOString().split('T')[0]!
+  const jstDate = getJST(date);
+  return jstDate.toISOString().split('T')[0]!;
 }

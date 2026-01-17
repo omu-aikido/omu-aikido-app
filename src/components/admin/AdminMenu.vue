@@ -21,32 +21,32 @@
 </template>
 
 <script setup lang="ts">
-import { Tab, TabGroup, TabList } from "@headlessui/vue"
-import { computed } from "vue"
-import { useRoute, useRouter } from "vue-router"
+import { Tab, TabGroup, TabList } from '@headlessui/vue';
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
 const tabs = [
-  { name: "ダッシュボード", path: "/admin" },
-  { name: "アカウント管理", path: "/admin/accounts" },
-  { name: "ノルマ管理", path: "/admin/norms" },
-]
+  { name: 'ダッシュボード', path: '/admin' },
+  { name: 'アカウント管理', path: '/admin/accounts' },
+  { name: 'ノルマ管理', path: '/admin/norms' },
+];
 
 const selectedIndex = computed(() => {
-  const currentPath = route.path
-  if (currentPath.startsWith("/admin/users/")) return 1
-  const index = tabs.findIndex(tab => tab.path === currentPath)
-  return index !== -1 ? index : 0
-})
+  const currentPath = route.path;
+  if (currentPath.startsWith('/admin/users/')) return 1;
+  const index = tabs.findIndex((tab) => tab.path === currentPath);
+  return index !== -1 ? index : 0;
+});
 
 const handleTabChange = (index: number) => {
-  const tab = tabs[index]
+  const tab = tabs[index];
   if (tab) {
-    router.push(tab.path)
+    router.push(tab.path);
   }
-}
+};
 </script>
 
 <style scoped>
@@ -78,7 +78,9 @@ const handleTabChange = (index: number) => {
   border-bottom: 2px solid transparent;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: color var(--transition-normal), border-color var(--transition-normal);
+  transition:
+    color var(--transition-normal),
+    border-color var(--transition-normal);
 }
 
 .tab:focus {

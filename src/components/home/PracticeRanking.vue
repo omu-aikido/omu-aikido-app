@@ -2,19 +2,19 @@
 import type { RankingResponse } from '@/share/types/records';
 
 interface Props {
-  rankingData: RankingResponse | null
-  loading?: boolean
-  error?: string | null
+  rankingData: RankingResponse | null;
+  loading?: boolean;
+  error?: string | null;
 }
 
-withDefaults(defineProps<Props>(), { loading: false, error: null })
+withDefaults(defineProps<Props>(), { loading: false, error: null });
 
 const getRankClass = (rank: number) => {
-  if (rank === 1) return "rank-gold"
-  if (rank === 2) return "rank-silver"
-  if (rank === 3) return "rank-bronze"
-  return ""
-}
+  if (rank === 1) return 'rank-gold';
+  if (rank === 2) return 'rank-silver';
+  if (rank === 3) return 'rank-bronze';
+  return '';
+};
 </script>
 
 <template>
@@ -93,8 +93,13 @@ const getRankClass = (rank: number) => {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .skeleton-text {

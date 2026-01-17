@@ -73,41 +73,35 @@
 </template>
 
 <script setup lang="ts">
-import { SignedIn, SignedOut, SignOutButton, UserAvatar } from "@clerk/vue"
-import {
-    ClipboardListIcon,
-    LayoutDashboardIcon,
-    LogOutIcon,
-    MenuIcon,
-    XIcon,
-} from "lucide-vue-next"
-import { ref, watch } from "vue"
-import { RouterLink } from "vue-router"
+import { SignedIn, SignedOut, SignOutButton, UserAvatar } from '@clerk/vue';
+import { ClipboardListIcon, LayoutDashboardIcon, LogOutIcon, MenuIcon, XIcon } from 'lucide-vue-next';
+import { ref, watch } from 'vue';
+import { RouterLink } from 'vue-router';
 
 // State
-const isOpen = ref(false)
+const isOpen = ref(false);
 
 const open = () => {
-  isOpen.value = true
-}
+  isOpen.value = true;
+};
 
 const close = () => {
-  isOpen.value = false
-}
+  isOpen.value = false;
+};
 
 // Inert & Scroll Lock Logic
-watch(isOpen, value => {
-  const app = document.querySelector("#app")
+watch(isOpen, (value) => {
+  const app = document.querySelector('#app');
   if (value) {
     // Open
-    if (app) app.setAttribute("inert", "")
-    document.body.style.overflow = "hidden"
+    if (app) app.setAttribute('inert', '');
+    document.body.style.overflow = 'hidden';
   } else {
     // Close
-    if (app) app.removeAttribute("inert")
-    document.body.style.overflow = ""
+    if (app) app.removeAttribute('inert');
+    document.body.style.overflow = '';
   }
-})
+});
 </script>
 
 <style scoped>

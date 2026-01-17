@@ -1,21 +1,41 @@
 services:
   app:
     build: .
-    ports:
-      - '5173:5173'
     volumes:
       - .:/app:cached
       - /app/node_modules
+    network_mode: 'service:libsql-server'
     environment:
       - TURSO_AUTH_TOKEN=dev-token
+      - TURSO_DATABASE_URL=http://127.0.0.1:8080
+      - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
+      - CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY}
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+      - CLERK_FRONTEND_API_URL=${CLERK_FRONTEND_API_URL}
+      - CLERK_WEBHOOK_SECRET=${CLERK_WEBHOOK_SECRET}
     depends_on:
       - libsql-server
-    command: sh -c "pnpm db:migrate && if [ \"$MODE\" = 'preview' ]; then pnpm preview --ip 0.0.0.0 --port 5173; else pnpm dev --host; fi"
+    command: >
+      sh -c "
+      echo \"VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY\" > .dev.vars &&
+      echo \"CLERK_PUBLISHABLE_KEY=$CLERK_PUBLISHABLE_KEY\" >> .dev.vars &&
+      echo \"CLERK_SECRET_KEY=$CLERK_SECRET_KEY\" >> .dev.vars &&
+      echo \"CLERK_FRONTEND_API_URL=$CLERK_FRONTEND_API_URL\" >> .dev.vars &&
+      echo \"CLERK_WEBHOOK_SECRET=$CLERK_WEBHOOK_SECRET\" >> .dev.vars &&
+      echo \"TURSO_AUTH_TOKEN=$TURSO_AUTH_TOKEN\" >> .dev.vars &&
+      echo \"TURSO_DATABASE_URL=$TURSO_DATABASE_URL\" >> .dev.vars &&
+      pnpm db:migrate &&
+      if [ \"$MODE\" = 'preview' ]; then
+        pnpm preview --ip 0.0.0.0 --port 5173;
+      else
+        pnpm dev --host;
+      fi"
 
   libsql-server:
     image: ghcr.io/tursodatabase/libsql-server:latest
     ports:
       - '8080:8080'
+      - '5173:5173'
     environment:
       - SQLE_HTTP_URL=http://0.0.0.0:8080
     volumes:

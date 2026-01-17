@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ errorMessage?: string; successMessage?: string }>()
+defineProps<{ errorMessage?: string; successMessage?: string }>();
 </script>
 
 <style scoped>

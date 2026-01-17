@@ -1,9 +1,20 @@
 pre-commit:
-  parallel: false
+  parallel: true
   commands:
     format:
       run: pnpm run format
-      stage_fixed: false
-    lint:
-      run: pnpm run lint
       stage_fixed: true
+    lint:
+      run: pnpm run lint:fix
+      stage_fixed: true
+    type-check:
+      run: pnpm run type-check
+      stage_fixed: false
+    build:
+      run: pnpm run build-only
+      stage_fixed: false
+    knip:
+      run: pnpm run knip
+      stage_fixed: false
+    db-check:
+      run: pnpm run db:check

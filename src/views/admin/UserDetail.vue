@@ -26,10 +26,10 @@
                   <h1 class="name">{{ user.lastName }} {{ user.firstName }}</h1>
                   <div v-if="!isEditing" class="badges">
                     <span class="badge">
-                      {{ roleLabels[user.profile?.role as string] || "部員" }}
+                      {{ roleLabels[user.profile?.role as string] || '部員' }}
                     </span>
                     <span class="badge">
-                      {{ gradeLabels[user.profile?.grade as number] || "無級" }}
+                      {{ gradeLabels[user.profile?.grade as number] || '無級' }}
                     </span>
                   </div>
                 </div>
@@ -99,7 +99,7 @@
             <div class="form-actions">
               <Button type="button" variant="secondary" @click="cancelEditing">キャンセル</Button>
               <Button type="submit" :disabled="updating" variant="primary">
-                {{ updating ? "更新中..." : "更新" }}
+                {{ updating ? '更新中...' : '更新' }}
               </Button>
             </div>
           </form>
@@ -190,7 +190,14 @@
             </p>
             <input v-model="deleteConfirmName" type="text" placeholder="ユーザー名を入力" class="confirm-input" />
             <div class="confirm-actions">
-              <Button variant="ghost" @click="showDeleteConfirm = false; deleteConfirmName = ''">キャンセル</Button>
+              <Button
+                variant="ghost"
+                @click="
+                  showDeleteConfirm = false;
+                  deleteConfirmName = '';
+                "
+                >キャンセル</Button
+              >
               <Button
                 :disabled="deleteConfirmName !== (user?.lastName ?? '') + (user?.firstName ?? '')"
                 variant="danger"
@@ -226,11 +233,15 @@
               <div class="modal-actions">
                 <Button
                   variant="secondary"
-                  @click="showFinalConfirm = false; showDeleteConfirm = false; deleteConfirmName = '';">
+                  @click="
+                    showFinalConfirm = false;
+                    showDeleteConfirm = false;
+                    deleteConfirmName = '';
+                  ">
                   キャンセル
                 </Button>
                 <Button :disabled="deleting" variant="danger" @click="handleDeleteUser">
-                  {{ deleting ? "削除中..." : "削除する" }}
+                  {{ deleting ? '削除中...' : '削除する' }}
                 </Button>
               </div>
               <p v-if="deleteError" class="error-text">
@@ -245,60 +256,56 @@
 </template>
 
 <script setup lang="ts">
-import AdminMenu from "@/src/components/admin/AdminMenu.vue"
-import MessageDisplay from "@/src/components/common/MessageDisplay.vue"
-import Button from "@/src/components/ui/UiButton.vue"
-import Input from "@/src/components/ui/UiInput.vue"
-import Loading from "@/src/components/ui/UiLoading.vue"
-import hc from "@/src/lib/honoClient"
-import { queryKeys } from "@/src/lib/queryKeys"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query"
-import { computed, ref, watch } from "vue"
-import { useRoute, useRouter } from "vue-router"
+import AdminMenu from '@/src/components/admin/AdminMenu.vue';
+import MessageDisplay from '@/src/components/common/MessageDisplay.vue';
+import Button from '@/src/components/ui/UiButton.vue';
+import Input from '@/src/components/ui/UiInput.vue';
+import Loading from '@/src/components/ui/UiLoading.vue';
+import hc from '@/src/lib/honoClient';
+import { queryKeys } from '@/src/lib/queryKeys';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-const route = useRoute()
-const router = useRouter()
-const userId = (
-  Array.isArray(route.params.userId)
-    ? route.params.userId[0]
-    : route.params.userId
-) as string
+const route = useRoute();
+const router = useRouter();
+const userId = (Array.isArray(route.params.userId) ? route.params.userId[0] : route.params.userId) as string;
 
 // Labels configuration
 const roleLabels: Record<string, string> = {
-  admin: "管理者",
-  captain: "主将",
-  "vice-captain": "副主将",
-  treasurer: "会計",
-  member: "部員",
-}
+  admin: '管理者',
+  captain: '主将',
+  'vice-captain': '副主将',
+  treasurer: '会計',
+  member: '部員',
+};
 const gradeLabels: Record<number, string> = {
-  0: "無級",
-  5: "五級",
-  4: "四級",
-  3: "三級",
-  2: "二級",
-  1: "一級",
-  [-1]: "初段",
-  [-2]: "二段",
-  [-3]: "三段",
-  [-4]: "四段",
-}
+  0: '無級',
+  5: '五級',
+  4: '四級',
+  3: '三級',
+  2: '二級',
+  1: '一級',
+  [-1]: '初段',
+  [-2]: '二段',
+  [-3]: '三段',
+  [-4]: '四段',
+};
 const yearLabels: Record<string, string> = {
-  b1: "1回生",
-  b2: "2回生",
-  b3: "3回生",
-  b4: "4回生",
-  m1: "修士1年",
-  m2: "修士2年",
-  d1: "博士1年",
-  d2: "博士2年",
-}
+  b1: '1回生',
+  b2: '2回生',
+  b3: '3回生',
+  b4: '4回生',
+  m1: '修士1年',
+  m2: '修士2年',
+  d1: '博士1年',
+  d2: '博士2年',
+};
 
 // Reactivity via standard refs
-const page = ref(1)
-const limit = 10
-const queryClient = useQueryClient()
+const page = ref(1);
+const limit = 10;
+const queryClient = useQueryClient();
 
 // Query
 const {
@@ -308,58 +315,56 @@ const {
 } = useQuery({
   queryKey: computed(() => queryKeys.admin.users(userId, { page: page.value, limit })),
   queryFn: async () => {
-    if (!userId) throw new Error("Invalid User ID")
-    const res = await hc.admin.users[":userId"].$get({
+    if (!userId) throw new Error('Invalid User ID');
+    const res = await hc.admin.users[':userId'].$get({
       param: { userId },
       query: { page: page.value, limit },
-    })
-    if (!res.ok) throw new Error("Failed to fetch user data")
-    return res.json()
+    });
+    if (!res.ok) throw new Error('Failed to fetch user data');
+    return res.json();
   },
   placeholderData: (previousData) => previousData,
-})
+});
 
-const user = computed(() => apiData.value?.user ?? null)
+const user = computed(() => apiData.value?.user ?? null);
 
 interface Activity {
-  id: string
-  date: string
-  period: number
+  id: string;
+  date: string;
+  period: number;
 }
 
-const activities = computed(() => (apiData.value?.activities as Activity[]) ?? [])
+const activities = computed(() => (apiData.value?.activities as Activity[]) ?? []);
 const stats = computed(() => {
-  if (!apiData.value) return null
+  if (!apiData.value) return null;
   return {
     trainCount: apiData.value.trainCount,
     doneTrain: apiData.value.doneTrain,
     totalDays: apiData.value.totalDays,
     totalHours: apiData.value.totalHours,
     totalActivitiesCount: apiData.value.totalActivitiesCount,
-  }
-})
+  };
+});
 
-const error = computed(() =>
-  queryError.value ? "ユーザー情報の読み込みに失敗しました" : ""
-)
+const error = computed(() => (queryError.value ? 'ユーザー情報の読み込みに失敗しました' : ''));
 
 // Edit form state
 const formData = ref({
-  role: "member",
+  role: 'member',
   grade: 0,
-  year: "b1",
+  year: 'b1',
   joinedAt: new Date().getFullYear(),
-  getGradeAt: "",
-})
-const updateSuccess = ref("")
-const updateError = ref("")
-const isEditing = ref(false)
+  getGradeAt: '',
+});
+const updateSuccess = ref('');
+const updateError = ref('');
+const isEditing = ref(false);
 
 // Delete state
-const showDeleteConfirm = ref(false)
-const showFinalConfirm = ref(false)
-const deleteConfirmName = ref("")
-const deleteError = ref("")
+const showDeleteConfirm = ref(false);
+const showFinalConfirm = ref(false);
+const deleteConfirmName = ref('');
+const deleteError = ref('');
 
 // Initialize form data when data arrives or changes
 watch(
@@ -367,84 +372,82 @@ watch(
   (newUser) => {
     if (newUser && newUser.profile) {
       formData.value = {
-        role: (newUser.profile.role as string) || "member",
+        role: (newUser.profile.role as string) || 'member',
         grade: Number(newUser.profile.grade || 0),
-        year: (newUser.profile.year as string) || "b1",
+        year: (newUser.profile.year as string) || 'b1',
         joinedAt: Number(newUser.profile.joinedAt || new Date().getFullYear()),
-        getGradeAt: newUser.profile.getGradeAt
-          ? new Date(newUser.profile.getGradeAt).toISOString().split("T")[0]!
-          : "",
-      }
+        getGradeAt: newUser.profile.getGradeAt ? new Date(newUser.profile.getGradeAt).toISOString().split('T')[0]! : '',
+      };
     } else {
       formData.value = {
-        role: "member",
+        role: 'member',
         grade: 0,
-        year: "b1",
+        year: 'b1',
         joinedAt: new Date().getFullYear(),
-        getGradeAt: "",
-      }
+        getGradeAt: '',
+      };
     }
   },
   { immediate: true }
-)
+);
 
 const startEditing = () => {
-  isEditing.value = true
-  updateSuccess.value = ""
-  updateError.value = ""
-}
+  isEditing.value = true;
+  updateSuccess.value = '';
+  updateError.value = '';
+};
 
 const cancelEditing = () => {
-  isEditing.value = false
-  updateSuccess.value = ""
-  updateError.value = ""
-}
+  isEditing.value = false;
+  updateSuccess.value = '';
+  updateError.value = '';
+};
 
 const changePage = (newPage: number) => {
-  page.value = newPage
-}
+  page.value = newPage;
+};
 
 // Mutations
 const { mutateAsync: updateProfile, isPending: updating } = useMutation({
   mutationFn: async (payload: {
-    role: string
-    grade: number
-    year: string
-    joinedAt: number
-    getGradeAt: string | null
+    role: string;
+    grade: number;
+    year: string;
+    joinedAt: number;
+    getGradeAt: string | null;
   }) => {
-    const res = await hc.admin.users[":userId"].profile.$patch({
+    const res = await hc.admin.users[':userId'].profile.$patch({
       param: { userId },
       json: payload,
-    })
+    });
     if (!res.ok) {
-      const errData = (await res.json()) as { error?: string }
-      throw new Error(errData.error || "更新に失敗しました")
+      const errData = (await res.json()) as { error?: string };
+      throw new Error(errData.error || '更新に失敗しました');
     }
-    return res.json()
+    return res.json();
   },
   onSuccess: () => {
     queryClient.invalidateQueries({
       queryKey: ['admin', 'users'],
-    })
+    });
     queryClient.invalidateQueries({
       queryKey: ['admin', 'accounts'],
-    })
-    updateSuccess.value = "プロファイルを更新しました"
-    isEditing.value = false
+    });
+    updateSuccess.value = 'プロファイルを更新しました';
+    isEditing.value = false;
   },
   onError: (e) => {
-    updateError.value = e instanceof Error ? e.message : "更新中にエラーが発生しました"
+    updateError.value = e instanceof Error ? e.message : '更新中にエラーが発生しました';
   },
-})
+});
 
 const handleUpdateProfile = async () => {
-  updateError.value = ""
-  updateSuccess.value = ""
+  updateError.value = '';
+  updateSuccess.value = '';
 
   if (!userId) {
-    updateError.value = "ユーザーIDが無効です"
-    return
+    updateError.value = 'ユーザーIDが無効です';
+    return;
   }
 
   const payload = {
@@ -453,42 +456,42 @@ const handleUpdateProfile = async () => {
     year: formData.value.year,
     joinedAt: formData.value.joinedAt,
     getGradeAt: formData.value.getGradeAt ? formData.value.getGradeAt : null,
-  }
+  };
 
   try {
-    await updateProfile(payload)
+    await updateProfile(payload);
   } catch {
     // Error handled in onError
   }
-}
+};
 
 const { mutateAsync: deleteUserMutation, isPending: deleting } = useMutation({
   mutationFn: async () => {
-    const res = await hc.admin.users[":userId"].$delete({ param: { userId } })
+    const res = await hc.admin.users[':userId'].$delete({ param: { userId } });
     if (!res.ok) {
-      const errData = (await res.json()) as { error?: string }
-      throw new Error(errData.error || "削除に失敗しました")
+      const errData = (await res.json()) as { error?: string };
+      throw new Error(errData.error || '削除に失敗しました');
     }
-    return res.json()
+    return res.json();
   },
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['admin', 'accounts'] })
-    queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
-    router.push("/admin/accounts")
+    queryClient.invalidateQueries({ queryKey: ['admin', 'accounts'] });
+    queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+    router.push('/admin/accounts');
   },
   onError: (e) => {
-    deleteError.value = e instanceof Error ? e.message : "削除中にエラーが発生しました"
+    deleteError.value = e instanceof Error ? e.message : '削除中にエラーが発生しました';
   },
-})
+});
 
 const handleDeleteUser = async () => {
-  deleteError.value = ""
+  deleteError.value = '';
   try {
-    await deleteUserMutation()
+    await deleteUserMutation();
   } catch {
     // Error handled in onError
   }
-}
+};
 </script>
 
 <style scoped>
@@ -695,8 +698,6 @@ const handleDeleteUser = async () => {
   justify-content: flex-end;
   gap: var(--space-2);
 }
-
-
 
 .stats-grid {
   display: grid;
@@ -910,8 +911,6 @@ const handleDeleteUser = async () => {
   display: flex;
   gap: var(--space-2);
 }
-
-
 
 /* Modal */
 .modal-backdrop {

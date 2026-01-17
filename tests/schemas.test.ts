@@ -1,10 +1,10 @@
-import { ArkErrors } from 'arktype'
-import { describe, it, expect } from 'vitest'
+import { ArkErrors } from 'arktype';
+import { describe, it, expect } from 'vitest';
 
-import { AccountMetadata, AccountInfo } from '../share/types/account'
-import { updateAccountSchema } from '../share/types/clerkClient'
-import { recordQuerySchema, rankingQuerySchema } from '../share/types/records'
-import { Role } from '../share/types/role'
+import { AccountMetadata, AccountInfo } from '../share/types/account';
+import { updateAccountSchema } from '../share/types/clerkClient';
+import { recordQuerySchema, rankingQuerySchema } from '../share/types/records';
+import { Role } from '../share/types/role';
 
 describe('ArkType スキーマ定義テスト', () => {
   // ============================================
@@ -12,22 +12,22 @@ describe('ArkType スキーマ定義テスト', () => {
   // ============================================
   describe('Role.roleEnum', () => {
     it('有効なロール値を受け入れる', () => {
-      const validRoles = ['admin', 'captain', 'vice-captain', 'treasurer', 'member']
+      const validRoles = ['admin', 'captain', 'vice-captain', 'treasurer', 'member'];
       validRoles.forEach((role) => {
-        const result = Role.roleEnum(role)
-        expect(result).not.toBeInstanceOf(ArkErrors)
-        expect(result).toBe(role)
-      })
-    })
+        const result = Role.roleEnum(role);
+        expect(result).not.toBeInstanceOf(ArkErrors);
+        expect(result).toBe(role);
+      });
+    });
 
     it('無効なロール値を拒否する', () => {
-      const invalidRoles = ['invalid', 'ADMIN', 'user', 123, null, undefined, '', 'admin ', ' admin']
+      const invalidRoles = ['invalid', 'ADMIN', 'user', 123, null, undefined, '', 'admin ', ' admin'];
       invalidRoles.forEach((role) => {
-        const result = Role.roleEnum(role)
-        expect(result).toBeInstanceOf(ArkErrors)
-      })
-    })
-  })
+        const result = Role.roleEnum(role);
+        expect(result).toBeInstanceOf(ArkErrors);
+      });
+    });
+  });
 
   // ============================================
   // AccountMetadata スキーマ テスト
@@ -56,13 +56,13 @@ describe('ArkType スキーマ定義テスト', () => {
           joinedAt: 9999,
           year: 'd1',
         },
-      ]
+      ];
 
       validData.forEach((data) => {
-        const result = AccountMetadata(data)
-        expect(result).not.toBeInstanceOf(ArkErrors)
-      })
-    })
+        const result = AccountMetadata(data);
+        expect(result).not.toBeInstanceOf(ArkErrors);
+      });
+    });
 
     it('無効なアカウントメタデータを拒否する', () => {
       const invalidData = [
@@ -94,14 +94,14 @@ describe('ArkType スキーマ定義テスト', () => {
           joinedAt: '2024',
           year: 'c1', // 無効な学年
         },
-      ]
+      ];
 
       invalidData.forEach((data) => {
-        const result = AccountMetadata(data)
-        expect(result).toBeInstanceOf(ArkErrors)
-      })
-    })
-  })
+        const result = AccountMetadata(data);
+        expect(result).toBeInstanceOf(ArkErrors);
+      });
+    });
+  });
 
   // ============================================
   // AccountInfo スキーマ テスト
@@ -109,7 +109,7 @@ describe('ArkType スキーマ定義テスト', () => {
   describe('AccountInfo', () => {
     it('有効なアカウント情報を受け入れる', () => {
       // profileImage は File オブジェクトまたは undefined を受け入れる
-      const mockFile = new File([''], 'test.png', { type: 'image/png' })
+      const mockFile = new File([''], 'test.png', { type: 'image/png' });
 
       const validData = [
         {
@@ -125,13 +125,13 @@ describe('ArkType スキーマ定義テスト', () => {
           username: 'johndoe',
           profileImage: { some: 'object' },
         },
-      ]
+      ];
 
       validData.forEach((data) => {
-        const result = AccountInfo(data)
-        expect(result).not.toBeInstanceOf(ArkErrors)
-      })
-    })
+        const result = AccountInfo(data);
+        expect(result).not.toBeInstanceOf(ArkErrors);
+      });
+    });
 
     it('無効なアカウント情報を拒否する', () => {
       const invalidData = [
@@ -141,14 +141,14 @@ describe('ArkType スキーマ定義テスト', () => {
           username: 'johndoe',
           profileImage: 'image.png',
         },
-      ]
+      ];
 
       invalidData.forEach((data) => {
-        const result = AccountInfo(data)
-        expect(result).toBeInstanceOf(ArkErrors)
-      })
-    })
-  })
+        const result = AccountInfo(data);
+        expect(result).toBeInstanceOf(ArkErrors);
+      });
+    });
+  });
 
   // ============================================
   // recordQuerySchema テスト
@@ -162,13 +162,13 @@ describe('ArkType スキーマ定義テスト', () => {
           startDate: '2024-01-01',
           endDate: '2024-12-31',
         },
-      ]
+      ];
 
       validData.forEach((data) => {
-        const result = recordQuerySchema(data)
-        expect(result).not.toBeInstanceOf(ArkErrors)
-      })
-    })
+        const result = recordQuerySchema(data);
+        expect(result).not.toBeInstanceOf(ArkErrors);
+      });
+    });
 
     it('無効なレコードクエリを拒否する', () => {
       const invalidData = [
@@ -188,14 +188,14 @@ describe('ArkType スキーマ定義テスト', () => {
           endDate: '2024-12-31',
           extraField: 'extra',
         },
-      ]
+      ];
 
       invalidData.forEach((data) => {
-        const result = recordQuerySchema(data)
-        expect(result).toBeInstanceOf(ArkErrors)
-      })
-    })
-  })
+        const result = recordQuerySchema(data);
+        expect(result).toBeInstanceOf(ArkErrors);
+      });
+    });
+  });
 
   // ============================================
   // rankingQuerySchema テスト
@@ -209,13 +209,13 @@ describe('ArkType スキーマ定義テスト', () => {
         { year: 2024, month: 12, period: 'monthly' },
         { year: 2024, period: 'annual' },
         { year: 2024, period: 'fiscal' },
-      ]
+      ];
 
       validData.forEach((data) => {
-        const result = rankingQuerySchema(data)
-        expect(result).not.toBeInstanceOf(ArkErrors)
-      })
-    })
+        const result = rankingQuerySchema(data);
+        expect(result).not.toBeInstanceOf(ArkErrors);
+      });
+    });
 
     it('無効なランキングクエリを拒否する', () => {
       const invalidData = [
@@ -240,21 +240,21 @@ describe('ArkType スキーマ定義テスト', () => {
         {
           month: '6', // string ではなく number
         },
-      ]
+      ];
 
       invalidData.forEach((data) => {
-        const result = rankingQuerySchema(data)
-        expect(result).toBeInstanceOf(ArkErrors)
-      })
-    })
-  })
+        const result = rankingQuerySchema(data);
+        expect(result).toBeInstanceOf(ArkErrors);
+      });
+    });
+  });
 
   // ============================================
   // updateAccountSchema テスト
   // ============================================
   describe('updateAccountSchema', () => {
     it('有効なアカウント更新を受け入れる', () => {
-      const mockFile = new File([''], 'test.png', { type: 'image/png' })
+      const mockFile = new File([''], 'test.png', { type: 'image/png' });
       const validData = [
         {
           firstName: 'John',
@@ -264,13 +264,13 @@ describe('ArkType スキーマ定義テスト', () => {
         },
         { firstName: 'John' },
         {},
-      ]
+      ];
 
       validData.forEach((data) => {
-        const result = updateAccountSchema(data)
-        expect(result).not.toBeInstanceOf(ArkErrors)
-      })
-    })
+        const result = updateAccountSchema(data);
+        expect(result).not.toBeInstanceOf(ArkErrors);
+      });
+    });
 
     it('無効なアカウント更新を拒否する', () => {
       const invalidData = [
@@ -280,28 +280,28 @@ describe('ArkType スキーマ定義テスト', () => {
           username: 'johndoe',
           profileImage: 'image.png',
         },
-      ]
+      ];
 
       invalidData.forEach((data) => {
-        const result = updateAccountSchema(data)
-        expect(result).toBeInstanceOf(ArkErrors)
-      })
-    })
-  })
+        const result = updateAccountSchema(data);
+        expect(result).toBeInstanceOf(ArkErrors);
+      });
+    });
+  });
 
   // ============================================
   // Role.parse テスト
   // ============================================
   describe('Role.parse', () => {
     it('有効なロール文字列を解析する', () => {
-      expect(Role.parse('admin')?.role).toBe('admin')
-      expect(Role.parse('captain')?.role).toBe('captain')
-      expect(Role.parse('member')?.role).toBe('member')
-    })
+      expect(Role.parse('admin')?.role).toBe('admin');
+      expect(Role.parse('captain')?.role).toBe('captain');
+      expect(Role.parse('member')?.role).toBe('member');
+    });
 
     it('無効なロール文字列は undefined を返す', () => {
-      expect(Role.parse('invalid')).toBeUndefined()
-      expect(Role.parse(123)).toBeUndefined()
-    })
-  })
-})
+      expect(Role.parse('invalid')).toBeUndefined();
+      expect(Role.parse(123)).toBeUndefined();
+    });
+  });
+});

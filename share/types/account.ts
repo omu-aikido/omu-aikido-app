@@ -1,6 +1,6 @@
-import { type } from 'arktype'
+import { type } from 'arktype';
 
-import { Role } from './role'
+import { Role } from './role';
 
 export const AccountMetadata = type({
   role: Role.type,
@@ -9,11 +9,11 @@ export const AccountMetadata = type({
   joinedAt: '(string.numeric.parse |> 2020 <= number.integer <= 9999) | 2020 <= number.integer <= 9999',
   year: '/^(b[1-4]|m[1-2]|d[1-2])$/',
   '+': 'delete',
-})
+});
 
 export const AccountInfo = type({
   firstName: 'string?',
   lastName: 'string?',
   username: 'string?',
   profileImage: 'unknown?',
-})
+});

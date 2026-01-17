@@ -1,30 +1,25 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed } from 'vue';
 
 interface Props {
-  variant?: "primary" | "secondary" | "danger" | "ghost" | "discord"
-  size?: "sm" | "md" | "lg"
-  fullWidth?: boolean
-  disabled?: boolean
-  type?: "button" | "submit" | "reset"
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'discord';
+  size?: 'sm' | 'md' | 'lg';
+  fullWidth?: boolean;
+  disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  variant: "primary",
-  size: "md",
+  variant: 'primary',
+  size: 'md',
   fullWidth: false,
   disabled: false,
-  type: "button",
-})
+  type: 'button',
+});
 
 const classes = computed(() => {
-  return [
-    "btn",
-    `btn-${props.variant}`,
-    `btn-${props.size}`,
-    { "btn-full": props.fullWidth },
-  ]
-})
+  return ['btn', `btn-${props.variant}`, `btn-${props.size}`, { 'btn-full': props.fullWidth }];
+});
 </script>
 
 <template>

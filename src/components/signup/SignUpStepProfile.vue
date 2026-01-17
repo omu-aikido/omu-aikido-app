@@ -70,34 +70,34 @@
     <div class="actions-between">
       <Button type="button" variant="secondary" :disabled="isSignUpCreated" @click="prevStep"> 戻る </Button>
       <Button type="submit" variant="primary" :disabled="!canSubmit">
-        {{ isSignUpCreated ? "登録中..." : "登録" }}
+        {{ isSignUpCreated ? '登録中...' : '登録' }}
       </Button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { grade as gradeOptions } from "@/share/lib/grade"
-import { year as yearOptions } from "@/share/lib/year"
-import Button from "@/src/components/ui/UiButton.vue"
-import Input from "@/src/components/ui/UiInput.vue"
-import type { FormErrors, SignUpFormData } from "@/src/composable/useSignUpForm"
+import { grade as gradeOptions } from '@/share/lib/grade';
+import { year as yearOptions } from '@/share/lib/year';
+import Button from '@/src/components/ui/UiButton.vue';
+import Input from '@/src/components/ui/UiInput.vue';
+import type { FormErrors, SignUpFormData } from '@/src/composable/useSignUpForm';
 
 defineProps<{
-  formValues: Partial<SignUpFormData>
-  formErrors: Partial<FormErrors>
-  isSignUpCreated: boolean
-  canSubmit: boolean
-  prevStep: () => void
-}>()
+  formValues: Partial<SignUpFormData>;
+  formErrors: Partial<FormErrors>;
+  isSignUpCreated: boolean;
+  canSubmit: boolean;
+  prevStep: () => void;
+}>();
 
 const emit = defineEmits<{
-  (e: "update:formValue", key: keyof SignUpFormData, value: string | number | boolean): void
-}>()
+  (e: 'update:formValue', key: keyof SignUpFormData, value: string | number | boolean): void;
+}>();
 
 const onUpdate = (key: keyof SignUpFormData, value: string | number | boolean) => {
-  emit("update:formValue", key, value)
-}
+  emit('update:formValue', key, value);
+};
 </script>
 
 <style scoped>

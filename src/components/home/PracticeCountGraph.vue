@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { timeForNextGrade, translateGrade } from "@/share/lib/grade"
-import type { PracticeCountData } from "@/share/types/records"
-import { computed } from "vue"
+import { timeForNextGrade, translateGrade } from '@/share/lib/grade';
+import type { PracticeCountData } from '@/share/types/records';
+import { computed } from 'vue';
 
 interface Props {
-  practiceData: PracticeCountData | null
-  currentGrade: number
-  loading?: boolean
-  error?: string | null
+  practiceData: PracticeCountData | null;
+  currentGrade: number;
+  loading?: boolean;
+  error?: string | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
   error: null,
-})
+});
 
 const targetGrade = computed(() => {
-  const grade: number = props.currentGrade
+  const grade: number = props.currentGrade;
   return nextGrade(grade);
-})
+});
 
 const nextGrade = (grade: number): number => {
   switch (grade) {
@@ -35,48 +35,44 @@ const nextGrade = (grade: number): number => {
     default:
       return grade - 1;
   }
-}
+};
 
 const promotionType = computed(() => {
-  const grade = props.currentGrade
-  return grade <= 1 ? (grade === 0 ? "昇級" : "昇段") : "昇級"
-})
+  const grade = props.currentGrade;
+  return grade <= 1 ? (grade === 0 ? '昇級' : '昇段') : '昇級';
+});
 
-const requiredCount = computed(() => timeForNextGrade(props.currentGrade))
+const requiredCount = computed(() => timeForNextGrade(props.currentGrade));
 
 const needToNextGrade = computed(() => {
-  if (!props.practiceData) return 0
-  return Math.max(0, requiredCount.value - props.practiceData.practiceCount)
-})
+  if (!props.practiceData) return 0;
+  return Math.max(0, requiredCount.value - props.practiceData.practiceCount);
+});
 
 const progressPercentage = computed(() => {
-  if (!props.practiceData) return 0
-  const percentage =
-    (props.practiceData.practiceCount / requiredCount.value) * 100
-  return Math.min(Math.round(percentage), 100)
-})
+  if (!props.practiceData) return 0;
+  const percentage = (props.practiceData.practiceCount / requiredCount.value) * 100;
+  return Math.min(Math.round(percentage), 100);
+});
 
 const progressComment = computed(() => {
   const progressComments = [
-    "まだ始まったばかりです。焦らずコツコツ続けましょう！",
-    "少し進みました！この調子！",
-    "順調なスタートです。",
-    "良いペースです。",
-    "着実に積み重ねています。",
-    "半分近くまで来ました！",
-    "折り返し地点です。",
-    "後半戦、集中していきましょう！",
-    "ゴールが見えてきました。",
-    "あと少しで達成です！",
-    "もうすぐ目標達成！",
-    "素晴らしい！達成目前です。",
-  ]
-  const commentIndex = Math.min(
-    11,
-    Math.floor((progressPercentage.value / 100) * 12)
-  )
-  return progressComments[commentIndex]
-})
+    'まだ始まったばかりです。焦らずコツコツ続けましょう！',
+    '少し進みました！この調子！',
+    '順調なスタートです。',
+    '良いペースです。',
+    '着実に積み重ねています。',
+    '半分近くまで来ました！',
+    '折り返し地点です。',
+    '後半戦、集中していきましょう！',
+    'ゴールが見えてきました。',
+    'あと少しで達成です！',
+    'もうすぐ目標達成！',
+    '素晴らしい！達成目前です。',
+  ];
+  const commentIndex = Math.min(11, Math.floor((progressPercentage.value / 100) * 12));
+  return progressComments[commentIndex];
+});
 </script>
 
 <template>
@@ -154,7 +150,6 @@ const progressComment = computed(() => {
 }
 
 @keyframes pulse {
-
   0%,
   100% {
     opacity: 1;

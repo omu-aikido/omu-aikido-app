@@ -1,7 +1,7 @@
-import { vi } from 'vitest'
+import { vi } from 'vitest';
 
 // Mock environment variables
-vi.stubGlobal('process', { env: { VITE_CLERK_PUBLISHABLE_KEY: 'test-key' } })
+vi.stubGlobal('process', { env: { VITE_CLERK_PUBLISHABLE_KEY: 'test-key' } });
 
 // Mock Clerk
 vi.mock('@clerk/vue', () => ({
@@ -28,7 +28,7 @@ vi.mock('@clerk/vue', () => ({
     name: 'SignOutButton',
     template: '<button>Sign Out</button>',
   },
-}))
+}));
 
 // Mock Vue Router
 vi.mock('vue-router', () => ({
@@ -42,7 +42,7 @@ vi.mock('vue-router', () => ({
   useRoute: () => ({ path: '/', params: {}, query: {} }),
   RouterLink: { name: 'RouterLink', template: "<a href='#'><slot></slot></a>" },
   RouterView: { name: 'RouterView', template: '<slot></slot>' },
-}))
+}));
 
 // Mock Hono client
 vi.mock('@/src/lib/honoClient', () => ({
@@ -55,4 +55,4 @@ vi.mock('@/src/lib/honoClient', () => ({
       record: { $get: vi.fn(), $post: vi.fn(), $delete: vi.fn() },
     },
   },
-}))
+}));

@@ -21,15 +21,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
-import { useQuery } from "@tanstack/vue-query"
-import { queryKeys } from "@/src/lib/queryKeys"
-import hc from "@/src/lib/honoClient"
-import UserHeader from "@/src/components/account/UserHeader.vue"
-import MessageDisplay from "@/src/components/common/MessageDisplay.vue"
-import ProfileCard from "@/src/components/account/ProfileCard.vue"
+import { computed } from 'vue';
+import { useQuery } from '@tanstack/vue-query';
+import { queryKeys } from '@/src/lib/queryKeys';
+import hc from '@/src/lib/honoClient';
+import UserHeader from '@/src/components/account/UserHeader.vue';
+import MessageDisplay from '@/src/components/common/MessageDisplay.vue';
+import ProfileCard from '@/src/components/account/ProfileCard.vue';
 
-import { ArrowUpRightFromSquareIcon } from "lucide-vue-next"
+import { ArrowUpRightFromSquareIcon } from 'lucide-vue-next';
 
 // Queries
 const {
@@ -39,19 +39,17 @@ const {
 } = useQuery({
   queryKey: queryKeys.user.clerk.account(),
   queryFn: async () => {
-    const res = await hc.user.clerk.account.$get()
-    if (!res.ok) throw new Error("Failed to fetch user")
-    return await res.json()
+    const res = await hc.user.clerk.account.$get();
+    if (!res.ok) throw new Error('Failed to fetch user');
+    return await res.json();
   },
-})
+});
 
-const user = computed(() => userData.value ?? null)
-const errorMessage = computed(() =>
-  queryError.value ? "ユーザーデータの読み込みに失敗しました" : ""
-)
-const successMessage = computed(() => "")
+const user = computed(() => userData.value ?? null);
+const errorMessage = computed(() => (queryError.value ? 'ユーザーデータの読み込みに失敗しました' : ''));
+const successMessage = computed(() => '');
 
-const fetchUser = () => refetch()
+const fetchUser = () => refetch();
 </script>
 
 <style scoped>

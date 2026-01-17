@@ -45,70 +45,70 @@
  *
  **/
 
-import fs from 'node:fs'
-import path from 'node:path'
-import postcss from 'postcss'
-import postcssValueParser from 'postcss-value-parser'
-import { Plugin } from 'vite'
+import fs from 'node:fs';
+import path from 'node:path';
+import postcss from 'postcss';
+import postcssValueParser from 'postcss-value-parser';
+import { Plugin } from 'vite';
 
 type Usage = {
-  file: string
-  line: number
-  column: number
-}
+  file: string;
+  line: number;
+  column: number;
+};
 
 function extractDefinedVars(css: string): Set<string> {
-  const vars = new Set<string>()
+  const vars = new Set<string>();
   postcss.parse(css).walkDecls((decl) => {
     if (decl.prop.startsWith('--')) {
-      vars.add(decl.prop)
+      vars.add(decl.prop);
     }
-  })
-  return vars
+  });
+  return vars;
 }
 
 function extractUsedVars(css: string, file: string): Map<string, Usage[]> {
-  const result = new Map<string, Usage[]>()
-  const root = postcss.parse(css, { from: file })
+  const result = new Map<string, Usage[]>();
+  const root = postcss.parse(css, { from: file });
 
   root.walkDecls((decl) => {
-    const parsed = postcssValueParser(decl.value)
+    const parsed = postcssValueParser(decl.value);
 
     parsed.walk((node) => {
-      if (node.type !== 'function' || node.value !== 'var') return
+      if (node.type !== 'function' || node.value !== 'var') return;
 
-      const name = node.nodes[0]?.value
-      if (!name?.startsWith('--')) return
+      const name = node.nodes[0]?.value;
+      if (!name?.startsWith('--')) return;
 
-      const pos = decl.source?.start
-      if (!pos) return
+      const pos = decl.source?.start;
+      if (!pos) return;
 
-      const list = result.get(name) ?? []
+      const list = result.get(name) ?? [];
       list.push({
         file,
         line: pos.line,
         column: pos.column,
-      })
-      result.set(name, list)
-    })
-  })
+      });
+      result.set(name, list);
+    });
+  });
 
-  return result
+  return result;
 }
 
 function extractStyleBlocksFromVue(source: string): string[] {
-  const styles: string[] = []
-  const styleRE = /<style[^>]*>([\s\S]*?)<\/style>/gi
+  const styles: string[] = [];
+  const styleRE = /<style[^>]*>([\s\S]*?)<\/style>/gi;
 
-  let match: RegExpExecArray | null
+  let match: RegExpExecArray | null;
   while ((match = styleRE.exec(source))) {
-    const styleContent = match[1]
+    const styleContent = match[1];
     if (styleContent !== undefined) {
-      styles.push(styleContent)
+      styles.push(styleContent);
     }
   }
 
-  return styles
+  return styles;
 }
 
 export function checkCssVarsPlugin(options: { style: string }): Plugin {
@@ -117,52 +117,52 @@ export function checkCssVarsPlugin(options: { style: string }): Plugin {
     apply: 'build',
 
     buildStart() {
-      const tokensCss = fs.readFileSync(options.style, 'utf-8')
-      const defined = extractDefinedVars(tokensCss)
+      const tokensCss = fs.readFileSync(options.style, 'utf-8');
+      const defined = extractDefinedVars(tokensCss);
 
-      const used = new Map<string, Usage[]>()
+      const used = new Map<string, Usage[]>();
 
       const merge = (from: Map<string, Usage[]>) => {
         for (const [name, usages] of from) {
-          const list = used.get(name) ?? []
-          list.push(...usages)
-          used.set(name, list)
+          const list = used.get(name) ?? [];
+          list.push(...usages);
+          used.set(name, list);
         }
-      }
+      };
 
       const walk = (dir: string) => {
         for (const file of fs.readdirSync(dir)) {
-          const full = path.join(dir, file)
+          const full = path.join(dir, file);
 
           if (fs.statSync(full).isDirectory()) {
-            walk(full)
-            continue
+            walk(full);
+            continue;
           }
 
           if (full.endsWith('.css')) {
-            const content = fs.readFileSync(full, 'utf-8')
-            merge(extractUsedVars(content, full))
+            const content = fs.readFileSync(full, 'utf-8');
+            merge(extractUsedVars(content, full));
           }
 
           if (full.endsWith('.vue')) {
-            const content = fs.readFileSync(full, 'utf-8')
+            const content = fs.readFileSync(full, 'utf-8');
             for (const css of extractStyleBlocksFromVue(content)) {
-              merge(extractUsedVars(css, full))
+              merge(extractUsedVars(css, full));
             }
           }
         }
-      }
+      };
 
-      walk(path.resolve('src'))
+      walk(path.resolve('src'));
 
-      const errors: string[] = []
+      const errors: string[] = [];
 
       for (const [name, usages] of used) {
-        if (defined.has(name)) continue
+        if (defined.has(name)) continue;
 
-        errors.push(`\n${name}`)
+        errors.push(`\n${name}`);
         for (const u of usages) {
-          errors.push(`  at ${u.file}:${u.line}:${u.column}`)
+          errors.push(`  at ${u.file}:${u.line}:${u.column}`);
         }
       }
 
@@ -170,8 +170,8 @@ export function checkCssVarsPlugin(options: { style: string }): Plugin {
         this.error({
           message: `Undefined CSS variables detected:\n` + errors.join('\n'),
           stack: '',
-        })
+        });
       }
     },
-  }
+  };
 }
