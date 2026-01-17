@@ -22,10 +22,10 @@ export default defineConfig({
     // { name: 'Mobile Safari', use: { ...devices['iPhone 13'] } }, // Initial phase mainly use Chrome
   ],
   webServer: {
-    command: 'docker compose up -d --build',
+    command: 'docker compose up --build',
     url: 'http://localhost:5173',
     reuseExistingServer: true,
-    stdout: 'ignore',
+    stdout: 'pipe',
     stderr: 'pipe',
   },
 });
