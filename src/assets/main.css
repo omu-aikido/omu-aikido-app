@@ -263,46 +263,6 @@
    Base Styles
    ==================================== */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  line-height: 1.5;
-  text-size-adjust: 100%;
-}
-
-body {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: var(--text-base);
-  color: var(--text-primary);
-  background-color: var(--bg-body);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-hr {
-  border: none;
-  border-top: 1px solid var(--border-dim);
-}
-
-a {
-  color: var(--accent);
-  text-decoration: none;
-  transition: color var(--transition-normal);
-}
-
-a:hover {
-  color: var(--accent-hover);
-}
-
-/* ====================================
-   Utility Classes
-   ==================================== */
-
 .container {
   width: 100%;
   max-width: var(--container-max);
@@ -333,4 +293,38 @@ a:hover {
   box-shadow: 0 0 0 2px var(--bg-muted);
   overflow: hidden;
   flex-shrink: 0;
+}
+
+/*
+
+  m""                       m    m                 mmm   mmmm   mmmm
+mm#mm   mmm    m mm         #    # m mm    mmm   m"   " #"   " #"   "
+  #    #" "#   #"  "        #    # #"  #  #" "#  #      "#mmm  "#mmm
+  #    #   #   #            #    # #   #  #   #  #          "#     "#
+  #    "#m#"   #            "mmmm" #   #  "#m#"   "mmm" "mmm#" "mmm#"
+
+*/
+
+:root {
+  --color-bg: #fafafa; /* neutral-50 */
+  --color-bg-dim: #e5e5e5; /* neutral-200 */
+
+  --color-fg: #171717; /* neutral-900 */
+  --color-fg-dim: 262626; /* neutral-800 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0a0a0a; /* neutral-950 */
+    --color-bg-dim: #262626; /* neutral-800 */
+
+    --color-fg: #f5f5f5; /* neutral-100 */
+    --color-fg-dim: #e5e5e5; /* neutral-200 */
+  }
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--color-fg-dim);
+  opacity: 0.4;
 }

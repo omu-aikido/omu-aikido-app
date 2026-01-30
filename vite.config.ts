@@ -1,6 +1,7 @@
 import { cloudflare } from '@cloudflare/vite-plugin';
 import vue from '@vitejs/plugin-vue';
 import { fileURLToPath, URL } from 'node:url';
+import UnoCSS from 'unocss/vite';
 import { defineConfig } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
 
@@ -15,6 +16,7 @@ export default defineConfig({
     checkCssVarsPlugin({
       style: 'src/assets/main.css',
     }),
+    UnoCSS(),
   ],
   resolve: { alias: { '@/': fileURLToPath(new URL('./', import.meta.url)) } },
   server: {

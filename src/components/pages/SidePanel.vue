@@ -1,6 +1,6 @@
 <template>
-  <button class="menu-btn" aria-label="メニューを開く" @click="open">
-    <MenuIcon class="icon" />
+  <button class="w-8 h-8 m-4" aria-label="メニューを開く" @click="open">
+    <div class="i-material-symbols:menu" />
   </button>
 
   <Teleport to="body">
@@ -22,59 +22,47 @@
       leave-from-class="drawer-enter-to"
       leave-to-class="drawer-enter-from">
       <div v-if="isOpen" class="drawer" role="dialog" aria-modal="true" aria-label="サイドメニュー">
-        <div class="drawer-header">
-          <h2 class="drawer-title">メニュー</h2>
+        <div class="drawer-header flex justify-end mt-3 mr-3">
           <button class="close-btn" aria-label="メニューを閉じる" @click="close">
-            <XIcon class="icon" />
+            <div class="i-material-symbols:right-panel-close-sharp" />
           </button>
         </div>
 
         <div class="drawer-content">
           <SignedIn>
-            <nav class="nav">
-              <RouterLink to="/" class="nav-link" @click="close">
-                <LayoutDashboardIcon class="nav-icon" />
+            <nav class="mt-6 flex flex-col gap-5">
+              <RouterLink to="/" class="flex-inline items-center gap-2" @click="close">
+                <div class="i-material-symbols:dashboard-customize-rounded" />
                 トップ
               </RouterLink>
-              <RouterLink to="/record" class="nav-link" @click="close">
-                <ClipboardListIcon class="nav-icon" />
+              <RouterLink to="/record" class="flex-inline items-center gap-2" @click="close">
+                <div class="i-material-symbols:list-alt-add" />
                 活動記録
               </RouterLink>
-              <RouterLink to="/account" class="nav-link" @click="close">
+              <RouterLink to="/account" class="flex-inline items-center gap-2" @click="close">
                 <UserAvatar alt="User Avatar" />
                 アカウント設定
               </RouterLink>
             </nav>
           </SignedIn>
-
-          <SignedOut>
-            <div class="signed-out">
-              <p class="signed-out-text">ログインして稽古の記録を始めましょう。</p>
-              <RouterLink to="/sign-in" class="login-btn" @click="close"> ログイン </RouterLink>
-            </div>
-          </SignedOut>
         </div>
 
-        <div class="drawer-footer">
-          <div class="footer-border">
-            <SignedIn>
-              <SignOutButton>
-                <button class="logout-btn">
-                  <LogOutIcon class="nav-icon" />
-                  ログアウト
-                </button>
-              </SignOutButton>
-            </SignedIn>
-          </div>
-        </div>
+        <SignedIn>
+          <hr class="my-5 mr-2" />
+          <SignOutButton class="w-full">
+            <button class="flex gap-2">
+              <div class="i-material-symbols:logout" />
+              ログアウト
+            </button>
+          </SignOutButton>
+        </SignedIn>
       </div>
     </Transition>
   </Teleport>
 </template>
 
 <script setup lang="ts">
-import { SignedIn, SignedOut, SignOutButton, UserAvatar } from '@clerk/vue';
-import { ClipboardListIcon, LayoutDashboardIcon, LogOutIcon, MenuIcon, XIcon } from 'lucide-vue-next';
+import { SignedIn, SignOutButton, UserAvatar } from '@clerk/vue';
 import { ref, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 
@@ -105,36 +93,6 @@ watch(isOpen, (value) => {
 </script>
 
 <style scoped>
-.menu-btn {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: var(--radius-md);
-  padding: var(--space-2);
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.menu-btn:hover {
-  background: var(--bg-muted);
-}
-
-.menu-btn:focus {
-  outline: none;
-}
-
-.menu-btn:focus-visible {
-  box-shadow: 0 0 0 2px var(--border-strong);
-}
-
-.icon {
-  width: 1.5rem;
-  height: 1.5rem;
-}
-
 .backdrop {
   position: fixed;
   inset: 0;
@@ -161,17 +119,11 @@ watch(isOpen, (value) => {
 
 .drawer {
   position: fixed;
-  top: 0;
-  right: 0;
   height: 100%;
   width: 100%;
   max-width: 20rem;
-  background: var(--bg-card);
   z-index: 101;
-  box-shadow: var(--shadow-md);
-  padding: var(--space-6);
-  display: flex;
-  flex-direction: column;
+  --at-apply: top-0 right-0 p-9 bg-bg opacity-90;
 }
 
 .drawer-enter {
@@ -188,126 +140,5 @@ watch(isOpen, (value) => {
 
 .drawer-enter-to {
   transform: translateX(0);
-}
-
-.drawer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-8);
-}
-
-.drawer-title {
-  font-size: var(--text-xl);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-}
-
-.close-btn {
-  border-radius: var(--radius-md);
-  padding: var(--space-2);
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.close-btn:hover {
-  background: var(--bg-muted);
-}
-
-.close-btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--border-strong);
-}
-
-.drawer-content {
-  flex: 1;
-  overflow-y: auto;
-}
-
-.nav {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--text-primary);
-  border-radius: var(--radius-lg);
-  text-decoration: none;
-  transition: background var(--transition-normal);
-}
-
-.nav-link:hover {
-  background: var(--bg-muted);
-}
-
-.nav-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.signed-out {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.signed-out-text {
-  color: var(--text-secondary);
-}
-
-.login-btn {
-  display: block;
-  width: 100%;
-  text-align: center;
-  background: var(--primary);
-  color: var(--on-primary);
-  padding: var(--space-3);
-  border-radius: var(--radius-lg);
-  font-weight: var(--font-medium);
-  text-decoration: none;
-  transition: background var(--transition-normal);
-}
-
-.login-btn:hover {
-  background: var(--primary-hover);
-}
-
-.drawer-footer {
-  margin-top: auto;
-}
-
-.footer-border {
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border-dim);
-}
-
-.logout-btn {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--red-500);
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.logout-btn:hover {
-  background: var(--error-bg);
 }
 </style>
