@@ -27,8 +27,10 @@ export default defineConfig({
     colors: {
       bg: 'var(--color-bg)',
       'bg-dim': 'var(--color-bg-dim)',
+      'bg-light': 'var(--color-bg-light)',
       fg: 'var(--color-fg)',
       'fg-dim': 'var(--color-fg-dim)',
+      'fg-light': 'var(--color-fg-light)',
       blue: '#3b82f6',
       red: '#e11d48',
       orange: '#fb923c',
@@ -43,6 +45,6 @@ export default defineConfig({
   },
   shortcuts: {
     surface: 'bg-bg text-fg',
-    card: 'bg-bg-dim text-fg-dim',
+    card: 'bg-bg-light text-fg-dim border border-bg-dim rounded-lg',
   },
 });

@@ -22,13 +22,13 @@
       leave-from-class="drawer-enter-to"
       leave-to-class="drawer-enter-from">
       <div v-if="isOpen" class="drawer" role="dialog" aria-modal="true" aria-label="サイドメニュー">
-        <div class="drawer-header flex justify-end mt-3 mr-3">
+        <div class="drawer-header flex justify-end mt-4 mr-4">
           <button class="close-btn" aria-label="メニューを閉じる" @click="close">
             <div class="i-material-symbols:right-panel-close-sharp" />
           </button>
         </div>
 
-        <div class="drawer-content">
+        <div class="mx-5">
           <SignedIn>
             <nav class="mt-6 flex flex-col gap-5">
               <RouterLink to="/" class="flex-inline items-center gap-2" @click="close">
@@ -48,9 +48,9 @@
         </div>
 
         <SignedIn>
-          <hr class="my-5 mr-2" />
-          <SignOutButton class="w-full">
-            <button class="flex gap-2">
+          <hr class="my-5 mx-2" />
+          <SignOutButton>
+            <button class="flex gap-2 mx-5 items-center w-full">
               <div class="i-material-symbols:logout" />
               ログアウト
             </button>
@@ -123,7 +123,7 @@ watch(isOpen, (value) => {
   width: 100%;
   max-width: 20rem;
   z-index: 101;
-  --at-apply: top-0 right-0 p-9 bg-bg opacity-90;
+  --at-apply: top-0 right-0 bg-bg opacity-90;
 }
 
 .drawer-enter {

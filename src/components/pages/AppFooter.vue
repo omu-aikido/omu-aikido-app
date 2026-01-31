@@ -20,6 +20,6 @@
 
 <style scoped>
 .link {
-  --at-apply: text-blue hover: underline;
+  --at-apply: 'text-blue hover:underline';
 }
 </style>

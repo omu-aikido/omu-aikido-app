@@ -310,7 +310,7 @@ mm#mm   mmm    m mm         #    # m mm    mmm   m"   " #"   " #"   "
   --color-bg-dim: #e5e5e5; /* neutral-200 */
 
   --color-fg: #171717; /* neutral-900 */
-  --color-fg-dim: 262626; /* neutral-800 */
+  --color-fg-dim: #262626; /* neutral-800 */
 }
 
 @media (prefers-color-scheme: dark) {
