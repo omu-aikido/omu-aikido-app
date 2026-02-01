@@ -41,11 +41,8 @@ defineOptions({
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
-        :class="[
-          'input-base',
-          'placeholder:text-fg-muted',
-          error ? 'border-red-500/50 focus:ring-red-500/50 focus:border-red-500' : '',
-        ]"
+        :class="['input-base', error ? 'border-red-500/50 focus:ring-red-500/50 focus:border-red-500' : '']"
+        uno-placeholder="text-overlay1"
         v-bind="$attrs"
         @input="
           $emit(
@@ -55,7 +52,7 @@ defineOptions({
               : ($event.target as HTMLInputElement).value
           )
         " />
-      <div v-if="$slots.suffix" class="absolute right-3 flex items-center text-fg-dim pointer-events-none">
+      <div v-if="$slots.suffix" class="absolute right-3 flex items-center text-subtext pointer-events-none">
         <slot name="suffix" />
       </div>
     </div>

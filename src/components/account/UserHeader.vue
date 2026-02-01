@@ -2,18 +2,18 @@
   <div class="stack">
     <div v-if="!user" class="animate-pulse flex-between gap-4">
       <div class="flex items-center gap-4 min-w-0">
-        <div class="avatar-lg bg-overlay" />
+        <div class="avatar-lg bg-overlay1" />
         <div class="min-w-0 flex flex-col gap-1">
-          <div class="h-7 w-32 bg-overlay rounded-md text-lg font-bold text-transparent">User Name</div>
-          <div class="h-5 w-24 bg-overlay rounded-md text-base text-transparent">@username</div>
+          <div class="h-7 w-32 bg-overlay1 rounded-md text-lg font-bold text-transparent">User Name</div>
+          <div class="h-5 w-24 bg-overlay1 rounded-md text-base text-transparent">@username</div>
         </div>
       </div>
-      <div class="h-8 w-14 shrink-0 rounded-md bg-overlay" />
+      <div class="h-8 w-14 shrink-0 rounded-md bg-overlay1" />
     </div>
 
     <div v-else-if="!isEditing" class="flex-between gap-4">
       <div class="flex items-center gap-4 min-w-0">
-        <div class="relative w-14 h-14 shrink-0 overflow-hidden rounded-full shadow-[0_0_0_2px_var(--color-overlay)]">
+        <div class="relative w-14 h-14 shrink-0 overflow-hidden rounded-full shadow-[0_0_0_2px_var(--color-overlay0)]">
           <img :src="safeImageUrl" :alt="user?.firstName || 'Profile'" uno-rounded-img />
         </div>
         <div class="min-w-0">
@@ -28,7 +28,7 @@
       <div class="flex-1 stack">
         <div class="flex items-start gap-4">
           <div
-            class="relative w-14 h-14 shrink-0 overflow-hidden rounded-full shadow-[0_0_0_2px_var(--color-overlay)] group">
+            class="relative w-14 h-14 shrink-0 overflow-hidden rounded-full shadow-[0_0_0_2px_var(--color-overlay0)] group">
             <img :src="safePreviewImageUrl" :alt="user?.firstName || 'Profile'" uno-rounded-img />
             <label
               class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-60 cursor-pointer transition-opacity duration-200 group-hover:opacity-100">

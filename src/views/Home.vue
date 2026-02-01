@@ -137,7 +137,7 @@ const getNavLabelClass = (theme: string) => {
 
         <ActivityForm :loading="activityLoading" @submit="handleAddActivity" />
 
-        <hr class="pb-2 border-overlay opacity-60" />
+        <hr class="pb-2 border-overlay0 opacity-60" />
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <component
@@ -147,7 +147,7 @@ const getNavLabelClass = (theme: string) => {
             :to="item.href.startsWith('http') ? undefined : item.href"
             :href="item.href.startsWith('http') ? item.href : undefined"
             :class="[
-              'group flex flex-col items-center justify-center gap-3 rounded-xl bg-surface border border-overlay p-6 shadow-sm cursor-pointer no-underline transition-shadow transition-colors hover:shadow-md',
+              'group flex flex-col items-center justify-center gap-3 card text-text cursor-pointer no-underline transition-shadow transition-colors hover:shadow-md',
               getNavItemClass(item.theme),
             ]">
             <div

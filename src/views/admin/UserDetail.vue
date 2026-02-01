@@ -48,7 +48,7 @@
 
             <button
               v-if="!isEditing"
-              class="p-2 rounded-full bg-transparent text-text-dim border-none cursor-pointer transition-all hover:bg-overlay hover:text-blue-500"
+              class="p-2 rounded-full bg-transparent text-text-dim border-none cursor-pointer transition-all hover:bg-overlay1 hover:text-blue-500"
               title="編集"
               @click="startEditing">
               <svg
@@ -113,9 +113,9 @@
         </div>
       </div>
 
-      <div v-if="stats" class="grid grid-cols-2 border border-overlay rounded-lg overflow-hidden">
-        <div class="flex flex-col border-r border-overlay">
-          <div class="p-4 text-center border-b border-overlay">
+      <div v-if="stats" class="grid grid-cols-2 border border-overlay0 rounded-lg overflow-hidden">
+        <div class="flex flex-col border-r border-overlay0">
+          <div class="p-4 text-center border-b border-overlay0">
             <p class="heading-1">
               {{ stats.trainCount }}
             </p>
@@ -129,7 +129,7 @@
           </div>
         </div>
         <div class="flex flex-col">
-          <div class="p-4 text-center border-b border-overlay">
+          <div class="p-4 text-center border-b border-overlay0">
             <p class="heading-1">
               {{ stats.totalDays }}
             </p>
@@ -150,14 +150,14 @@
         <div v-if="activities.length > 0">
           <div class="overflow-x-auto">
             <table class="table-base">
-              <thead class="border-b border-overlay">
+              <thead class="border-b border-overlay0">
                 <tr>
                   <th class="th-base">日時</th>
                   <th class="th-base">時間 (h)</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="activity in activities" :key="activity.id" class="border-b border-overlay">
+                <tr v-for="activity in activities" :key="activity.id" class="border-b border-overlay0">
                   <td class="td-base whitespace-nowrap">{{ new Date(activity.date).toLocaleDateString() }}</td>
                   <td class="td-base whitespace-nowrap">{{ activity.period }}</td>
                 </tr>
@@ -165,17 +165,17 @@
             </table>
           </div>
 
-          <div class="flex justify-between items-center py-4 border-t border-overlay">
+          <div class="flex justify-between items-center py-4 border-t border-overlay0">
             <button
               :disabled="page <= 1"
-              class="px-3 py-1 text-sm border border-overlay bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-base-dim disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-1 text-sm border border-overlay0 bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-base-dim disabled:opacity-50 disabled:cursor-not-allowed"
               @click="page > 1 && changePage(page - 1)">
               前へ
             </button>
             <span class="text-sub">{{ page }} ページ目</span>
             <button
               :disabled="activities.length < limit"
-              class="px-3 py-1 text-sm border border-overlay-dim bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-overlay disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-1 text-sm border border-overlay-dim bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-overlay1 disabled:opacity-50 disabled:cursor-not-allowed"
               @click="changePage(page + 1)">
               次へ
             </button>

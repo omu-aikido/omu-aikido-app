@@ -1,15 +1,15 @@
 <template>
   <div class="max-w-7xl mx-auto p-4 stack gap-6">
-    <div class="bg-surface rounded-xl shadow-sm border border-overlay p-6">
+    <div class="bg-surface0 rounded-xl shadow-sm border border-overlay0 p-6">
       <UserHeader :user="user" @updated="fetchUser" />
 
-      <hr class="my-6 border-none border-t border-overlay" />
+      <hr class="my-6 border-none border-t border-overlay0" />
 
       <ProfileCard />
 
       <div v-if="errorMessage" class="alert-error">{{ errorMessage }}</div>
       <div v-if="successMessage" class="alert-success">{{ successMessage }}</div>
-      <div class="mt-4 pt-4 border-t border-overlay">
+      <div class="mt-4 pt-4 border-t border-overlay0">
         <p class="text-sub">
           メールアドレス・パスワード変更などは
           <a

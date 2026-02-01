@@ -30,7 +30,7 @@
         <h3 class="text-lg font-bold text-text">プロフィール</h3>
         <button
           type="button"
-          class="btn bg-surface text-text-dim border border-overlay hover:bg-overlay px-3 py-1.5 text-sm"
+          class="btn bg-surface0 text-text-dim border border-overlay0 hover:bg-overlay11 px-3 py-1.5 text-sm"
           @click="isEditing = true">
           編集
         </button>
@@ -63,7 +63,7 @@
         <Listbox v-model="formData.grade">
           <div class="relative mt-1">
             <ListboxButton
-              class="relative w-full cursor-default rounded-md bg-surface border border-overlay px-3 py-2 pr-10 text-left text-base text-text focus:outline-none focus:ring-2 focus:ring-blue-500">
+              class="relative w-full cursor-default rounded-md bg-surface0 border border-overlay0 px-3 py-2 pr-10 text-left text-base text-text focus:outline-none focus:ring-2 focus:ring-blue-500">
               <span class="block overflow-hidden text-ellipsis whitespace-nowrap">{{
                 translateGrade(formData.grade)
               }}</span>
@@ -76,7 +76,7 @@
               leave-from-class="opacity-100"
               leave-to-class="opacity-0">
               <ListboxOptions
-                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-surface p-1 shadow-md border border-overlay">
+                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-surface0 p-1 shadow-md border border-overlay0">
                 <ListboxOption
                   v-for="gradeOption in gradeOptions"
                   :key="gradeOption.grade"
@@ -111,7 +111,7 @@
         <Listbox v-model="formData.year">
           <div class="relative mt-1">
             <ListboxButton
-              class="relative w-full cursor-default rounded-md bg-surface border border-overlay px-3 py-2 pr-10 text-left text-base text-text focus:outline-none focus:ring-2 focus:ring-blue-500">
+              class="relative w-full cursor-default rounded-md bg-surface0 border border-overlay0 px-3 py-2 pr-10 text-left text-base text-text focus:outline-none focus:ring-2 focus:ring-blue-500">
               <span class="block overflow-hidden text-ellipsis whitespace-nowrap">{{
                 translateYear(formData.year)
               }}</span>
@@ -124,7 +124,7 @@
               leave-from-class="opacity-100"
               leave-to-class="opacity-0">
               <ListboxOptions
-                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-surface p-1 shadow-md border border-overlay">
+                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-surface0 p-1 shadow-md border border-overlay0">
                 <ListboxOption
                   v-for="yearOption in yearOptions"
                   :key="yearOption.year"

@@ -83,7 +83,7 @@ const progressComment = computed(() => {
           <span class="text-transparent"> &nbsp;&nbsp; </span>
         </div>
         <div class="w-full max-w-96 py-4">
-          <div class="rounded-md h-2 w-full bg-overlay">
+          <div class="rounded-md h-2 w-full bg-overlay0">
             <div class="h-full max-w-full rounded-md bg-text" style="width: 0" />
           </div>
         </div>
@@ -104,7 +104,7 @@ const progressComment = computed(() => {
           </div>
 
           <div class="w-full max-w-96 py-4">
-            <div class="rounded-md h-2 w-full bg-overlay">
+            <div class="rounded-md h-2 w-full bg-surface1">
               <div
                 class="h-full max-w-full rounded-md bg-text"
                 :style="{ width: `${progressPercentage}%` }"
@@ -114,7 +114,7 @@ const progressComment = computed(() => {
         </div>
       </summary>
 
-      <div class="p-4 border-t border-overlay">
+      <div class="p-4 border-t border-overlay1">
         <div class="space-y-3">
           <p class="text-text">
             {{ progressComment }}

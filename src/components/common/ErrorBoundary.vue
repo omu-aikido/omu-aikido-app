@@ -1,8 +1,8 @@
 <template>
-  <div v-if="hasError" class="min-h-screen flex items-center justify-center bg-bg p-4" data-testid="error-boundary">
+  <div v-if="hasError" class="min-h-screen flex items-center justify-center bg-base p-4" data-testid="error-boundary">
     <div class="text-center w-full max-w-lg">
       <img src="/500%20InternalServerError.png" alt="500 Internal Server Error" class="w-full h-auto mb-8 mx-auto" />
-      <p class="text-fg-dim mb-8">予期せぬエラーが発生しました。しばらく時間を置いてから再度お試しください。</p>
+      <p class="text-subtext mb-8">予期せぬエラーが発生しました。しばらく時間を置いてから再度お試しください。</p>
       <div
         v-if="errorMessage"
         class="mb-6 p-4 bg-red-50 border border-red-500 rounded-lg dark:bg-red-900/10"
@@ -20,7 +20,7 @@
           ページを再読み込み
         </button>
         <button
-          class="w-full px-6 py-3 bg-gray-200 text-fg font-medium border-none rounded-lg cursor-pointer transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
+          class="w-full px-6 py-3 bg-gray-200 text-text font-medium border-none rounded-lg cursor-pointer transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
           data-testid="home-btn"
           @click="handleGoHome">
           ホームに戻る

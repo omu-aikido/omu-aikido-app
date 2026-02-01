@@ -8,7 +8,7 @@
           ホームへリダイレクトしています。
         </p>
         <div class="w-full mt-4 mb-2 flex justify-center">
-          <div class="w-48 h-3 bg-overlay rounded-full overflow-hidden">
+          <div class="w-48 h-3 bg-overlay1 rounded-full overflow-hidden">
             <div
               :style="{ width: gaugePercent + '%' }"
               class="h-full bg-blue-500 transition-[width] duration-1000 ease" />
@@ -63,7 +63,7 @@
 
                       Workaround: Don't use 'label' prop on Input, render label manually above it.
                  -->
-                <div class="flex items-center mb-1.5">
+                <div class="flex items-center mb-1.5 text-xs">
                   <label for="password" class="form-label">パスワード</label>
                   <a
                     href="https://accounts.omu-aikido.com/sign-in/"

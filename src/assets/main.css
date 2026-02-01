@@ -1,9 +1,10 @@
 :root {
   --color-base: #fafafa; /* zinc-50 - Page Background */
-  --color-surface: #ffffff; /* white - Card Background */
-  --color-overlay: #e4e4e7; /* zinc-200 - Borders, Dividers, Inputs */
-
-  --color-subtext: #52525b; /* zinc-600 - Metadata, Labels */
+  --color-surface0: #ffffff; /* white - Card Background */
+  --color-surface1: #f4f4f5; /* zinc-100 - Elevated Background */
+  --color-overlay0: #e4e4e7; /* zinc-200 - Borders, Dividers */
+  --color-overlay1: #d4d4d8; /* zinc-300 - Input Background, Disabled */
+  --color-subtext: #52525b; /* zinc-600 - Labels, Metadata */
   --color-text: #18181b; /* zinc-900 - Body, Headings */
 
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -14,16 +15,17 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --color-base: #09090b; /* zinc-950 */
-    --color-surface: #18181b; /* zinc-900 */
-    --color-overlay: #27272a; /* zinc-800 */
-
-    --color-subtext: #a1a1aa; /* zinc-400 */
-    --color-text: #f4f4f5; /* zinc-100 */
+    --color-surface0: #18181b; /* zinc-900 */
+    --color-surface1: #27272a; /* zinc-800 */
+    --color-overlay0: #3f3f46; /* zinc-700 */
+    --color-overlay1: #52525b; /* zinc-600 */
+    --color-subtext: #d4d4d8; /* zinc-300 */
+    --color-text: #fafafa; /* zinc-50 */
   }
 }
 
 hr {
   border: none;
-  border-top: 1px solid var(--color-overlay);
+  border-top: 1px solid var(--color-overlay0);
   opacity: 0.2;
 }

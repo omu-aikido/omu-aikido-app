@@ -3,7 +3,7 @@
     <AdminMenu />
     <div class="stack items-start sm:flex-row sm:items-center sm:justify-between">
       <div class="flex flex-wrap gap-4 w-full sm:w-auto">
-        <div class="flex bg-overlay rounded-lg p-1">
+        <div class="flex bg-overlay1 rounded-lg p-1">
           <button
             :class="['filter-btn', { 'filter-btn-active': filterStatus === 'all' }]"
             @click="filterStatus = 'all'">
@@ -21,7 +21,7 @@
           </button>
         </div>
 
-        <div class="flex bg-overlay rounded-lg p-1">
+        <div class="flex bg-overlay1 rounded-lg p-1">
           <button
             title="進捗率: 低→高"
             :class="['filter-btn', { 'filter-btn-active': sortOrder === 'asc' }]"
@@ -39,7 +39,7 @@
 
       <div class="w-full sm:w-72">
         v-model="searchTerm" type="text" placeholder="名前で検索..." class="w-full h-fit px-3 py-2 pl-10 bg-base border
-        border-overlay rounded-md text-text text-base transition-shadow focus:outline-none focus:ring-2
+        border-overlay0 rounded-md text-text text-base transition-shadow focus:outline-none focus:ring-2
         focus:ring-blue-500" />
       </div>
     </div>

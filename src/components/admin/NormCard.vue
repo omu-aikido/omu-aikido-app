@@ -4,7 +4,7 @@
       <div class="flex items-center gap-3">
         <img :src="user.imageUrl" alt="" class="avatar-md" />
         <div>
-          <div class="font-medium text-fg">{{ user.lastName }} {{ user.firstName }}</div>
+          <div class="font-medium text-text">{{ user.lastName }} {{ user.firstName }}</div>
           <div class="text-sub flex flex-wrap gap-x-2 gap-y-0">
             <span>{{ norm.gradeLabel }}</span>
             <span v-if="norm.lastPromotionDate" class="text-gray-400">•</span>
@@ -23,9 +23,9 @@
       <div class="flex flex-col gap-1">
         <div class="flex justify-between text-sub">
           <span>進捗率 {{ Math.min(100, Math.round(progress)) }}%</span>
-          <span class="font-medium text-fg-dim">{{ norm.current }} / {{ norm.required }} 回</span>
+          <span class="font-medium text-subtext">{{ norm.current }} / {{ norm.required }} 回</span>
         </div>
-        <div class="h-1.5 w-full bg-bg-dim rounded-full overflow-hidden">
+        <div class="h-1.5 w-full bg-overlay1 rounded-full overflow-hidden">
           <div
             class="h-full bg-blue-500 rounded-full transition-[width] duration-500 ease-out"
             :style="{ width: `${Math.min(100, progress)}%` }"

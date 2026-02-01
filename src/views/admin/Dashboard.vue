@@ -22,11 +22,11 @@
           該当する部員はいません。全員活動中です！
         </div>
 
-        <div v-else class="flex flex-col max-h-[500px] overflow-y-auto border-t border-b border-overlay">
+        <div v-else class="flex flex-col max-h-[500px] overflow-y-auto border-t border-b border-overlay0">
           <div
             v-for="user in inactiveUsers"
             :key="user.id"
-            class="flex items-center gap-3 p-4 cursor-pointer border-b border-overlay transition-colors last:border-b-0 hover:bg-overlay"
+            class="flex items-center gap-3 p-4 cursor-pointer border-b border-overlay0 transition-colors last:border-b-0 hover:bg-overlay1"
             @click="$router.push(`/admin/users/${user.id}`)">
             <img :src="user.imageUrl" alt="" class="avatar-md" />
             <div class="flex-1 min-w-0">

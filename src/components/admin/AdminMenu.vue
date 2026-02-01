@@ -1,5 +1,5 @@
 <template>
-  <h1 class="text-2xl font-bold mb-2 text-fg">管理メニュー</h1>
+  <h1 class="text-2xl font-bold mb-2 text-text">管理メニュー</h1>
   <TabGroup
     :selected-index="selectedIndex"
     as="div"

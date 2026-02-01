@@ -25,17 +25,16 @@ export default defineConfig({
   ],
   theme: {
     colors: {
-      bg: 'var(--color-bg)',
-      'bg-dim': 'var(--color-bg-dim)',
-      'bg-light': 'var(--color-bg-light)',
-      fg: 'var(--color-fg)',
-      'fg-dim': 'var(--color-fg-dim)',
-      'fg-muted': 'var(--color-fg-muted)',
-      'fg-light': 'var(--color-fg-muted)', // Alias for compatibility
-      'bg-card': 'var(--color-bg)',
-      border: 'var(--color-border)',
-      'border-dim': 'var(--color-border-dim)',
-      'bg-muted': 'var(--color-bg-dim)',
+      base: 'var(--color-base)',
+      surface0: 'var(--color-surface0)',
+      surface1: 'var(--color-surface1)',
+      overlay0: 'var(--color-overlay0)',
+      overlay1: 'var(--color-overlay1)',
+      subtext: 'var(--color-subtext)',
+      text: 'var(--color-text)',
+      // Alias for compatibility
+      border: 'var(--color-overlay0)',
+      'border-dim': 'var(--color-overlay1)',
       rank: {
         '1': '#facc15',
         '2': '#94a3b8',
@@ -45,30 +44,35 @@ export default defineConfig({
   },
   shortcuts: [
     {
-      surface: 'bg-bg text-fg',
-      card: 'bg-bg text-fg-dim border border-border rounded-lg p-4 shadow-sm',
-      skeleton: 'animate-pulse bg-bg-muted rounded',
-      'loading-skeleton': 'animate-pulse bg-bg-muted rounded',
+      base: 'bg-base text-text',
+      surface0: 'bg-surface0 text-text',
+      surface1: 'bg-surface1 text-text',
+      overlay0: 'bg-overlay0 text-text',
+      overlay1: 'bg-overlay1 text-subtext',
+
+      card: 'bg-surface0 text-subtext border border-overlay0 rounded-lg p-4 shadow-sm',
+      skeleton: 'animate-pulse bg-overlay1 rounded',
+      'loading-skeleton': 'animate-pulse bg-overlay1 rounded',
       'loading-container': 'flex flex-col items-center justify-center min-h-[12.5rem]',
       'loading-spinner':
         'w-10 h-10 mb-4 border-4 border-gray-200 dark:border-gray-700 border-t-blue-500 rounded-full animate-spin',
-      'nav-button': 'p-2 rounded-lg hover:bg-bg-muted transition-colors',
+      'nav-button': 'p-2 rounded-lg hover:bg-surface1 transition-colors',
       btn: 'inline-flex items-center justify-center font-medium rounded-md px-4 py-2 text-base cursor-pointer transition-all disabled:(opacity-50 cursor-not-allowed)',
       'rouned-img': 'w-full h-full object-cover rounded',
       'alert-error': 'mt-4 p-3 rounded-md text-sm bg-red-50 border border-red-500 text-red-500 dark:bg-red-900/10',
       'alert-success': 'mt-4 p-3 rounded-md text-sm bg-green-500/10 border border-green-500 text-green-500',
       stack: 'flex flex-col gap-4',
       'form-grid': 'grid grid-cols-1 md:grid-cols-2 gap-4',
-      'text-sub': 'text-sm text-fg-dim',
+      'text-sub': 'text-sm text-subtext',
       'flex-between': 'flex items-center justify-between',
       'input-base':
-        'w-full px-3 py-2 bg-bg border border-border rounded-md text-base transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-bg-muted',
-      'form-label': 'text-sm font-medium text-fg-dim',
+        'w-full px-3 py-2 bg-surface0 border border-overlay0 rounded-md text-text transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-overlay1',
+      'form-label': 'text-sm font-medium text-subtext',
       'table-base': 'w-full text-left border-collapse text-sm',
-      'th-base': 'px-4 py-3 font-medium text-fg-dim border-b border-border-dim text-nowrap',
-      'td-base': 'px-4 py-3 border-b border-border-dim',
-      'heading-1': 'text-2xl font-bold text-fg',
-      'heading-2': 'text-xl font-bold text-fg',
+      'th-base': 'px-4 py-3 font-medium text-subtext border-b border-overlay1 text-nowrap',
+      'td-base': 'px-4 py-3 border-b border-overlay1',
+      'heading-1': 'text-2xl font-bold text-text',
+      'heading-2': 'text-xl font-bold text-text',
       'grid-responsive': 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6',
     },
     [
@@ -104,7 +108,7 @@ export default defineConfig({
         const base = 'btn';
         if (c === 'primary')
           return `${base} bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500)`;
-        if (c === 'secondary') return `${base} bg-bg-card text-fg-dim border border-border hover:bg-bg-muted`;
+        if (c === 'secondary') return `${base} bg-surface0 text-subtext border border-overlay0 hover:bg-surface1`;
         if (c === 'danger') return `${base} bg-red-500 text-white hover:bg-red-600 border-none`;
         return '';
       },

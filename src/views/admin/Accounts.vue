@@ -7,7 +7,7 @@
           v-model="searchQuery"
           type="text"
           placeholder="名前・メアドで検索..."
-          class="flex-1 min-w-0 px-3 py-2 bg-base border border-overlay rounded-md text-text text-base transition-shadow sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="flex-1 min-w-0 px-3 py-2 bg-base border border-overlay0 rounded-md text-text text-base transition-shadow sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
           @keyup.enter="handleSearch" />
         <button
           class="px-4 py-2 bg-blue-500 text-white border-none rounded-md text-base cursor-pointer transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -29,7 +29,7 @@
     <div v-else class="w-full">
       <div class="overflow-x-auto">
         <table class="table-base">
-          <thead class="border-b border-overlay">
+          <thead class="border-b border-overlay0">
             <tr>
               <th
                 class="th-base cursor-pointer select-none transition-colors hover:bg-base-dim md:px-6"
@@ -61,7 +61,7 @@
             <tr
               v-for="user in sortedUsers"
               :key="user.id"
-              class="cursor-pointer transition-colors border-b border-overlay hover:bg-base-dim last:border-b-0"
+              class="cursor-pointer transition-colors border-b border-overlay0 hover:bg-base-dim last:border-b-0"
               @click="$router.push(`/admin/users/${user.id}`)">
               <td class="td-base md:px-6">
                 <div class="flex items-center gap-2">

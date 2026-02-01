@@ -79,20 +79,20 @@ const isToday = (date: Date) => {
 </script>
 
 <template>
-  <div class="sticky top-0 z-20 flex-between p-3 px-4 backdrop-blur-md">
+  <div class="sticky top-0 z-20 flex-between p-3 px-4 bg-surface0">
     <button
-      class="p-1 rounded-full bg-transparent border-none text-fg-dim cursor-pointer transition-colors hover:bg-bg-muted-active"
+      class="p-1 rounded-full bg-transparent border-none text-subtext cursor-pointer transition-colors hover:bg-overlay11-active"
       data-testid="prev-month-btn"
       @click="handlePrevMonth">
       <ChevronLeftIcon class="w-5 h-5" />
     </button>
 
-    <h2 class="text-lg font-bold text-fg" data-testid="month-header">
+    <h2 class="text-lg font-bold text-text" data-testid="month-header">
       {{ formatHeader(currentMonth) }}
     </h2>
 
     <button
-      class="p-1 rounded-full bg-transparent border-none text-fg-dim cursor-pointer transition-colors hover:bg-bg-muted-active"
+      class="p-1 rounded-full bg-transparent border-none text-subtext cursor-pointer transition-colors hover:bg-overlay11-active"
       data-testid="next-month-btn"
       @click="handleNextMonth">
       <ChevronRightIcon class="w-5 h-5" />
@@ -102,8 +102,8 @@ const isToday = (date: Date) => {
   <div class="p-0 overflow-hidden flex flex-col h-full flex-1 overflow-y-auto" data-testid="activity-list">
     <div v-if="loading && activities.length === 0" class="p-4 stack">
       <div v-for="i in 28" :key="i" class="flex items-center gap-4 animate-pulse">
-        <div class="w-12 h-12 rounded-lg flex-shrink-0 bg-bg-muted" />
-        <div class="h-4 w-1/3 rounded-md bg-bg-muted" />
+        <div class="w-12 h-12 rounded-lg flex-shrink-0 bg-overlay1" />
+        <div class="h-4 w-1/3 rounded-md bg-overlay1" />
       </div>
     </div>
 
@@ -112,22 +112,22 @@ const isToday = (date: Date) => {
         v-for="day in daysInMonth"
         :key="day.toISOString()"
         :class="[
-          'flex items-stretch min-h-16 cursor-pointer transition-colors relative border-b border-bg-muted',
-          isToday(day) ? 'bg-blue-50/10' : 'hover:bg-bg-card',
+          'flex items-stretch min-h-16 cursor-pointer transition-colors relative border-b border-overlay0',
+          isToday(day) ? 'bg-blue-50/10' : 'hover:bg-surface0',
         ]"
         data-testid="day-item"
         @click="handleDateClick(day)">
         <div class="stack items-center justify-center w-12 flex-shrink-0 p-2 transition-colors">
           <span
             :class="[
-              'text-lg font-bold leading-none text-fg',
+              'text-lg font-bold leading-none text-text',
               isSunday(day) ? 'text-red-500' : isSaturday(day) ? 'text-blue-500' : '',
             ]">
             {{ getDay(day) }}
           </span>
           <span
             :class="[
-              'text-xs font-medium leading-none mt-1 text-fg-dim',
+              'text-xs font-medium leading-none mt-1 text-subtext',
               isSunday(day) ? 'text-red-500' : isSaturday(day) ? 'text-blue-500' : '',
             ]">
             {{ getWeekday(day) }}
@@ -138,12 +138,12 @@ const isToday = (date: Date) => {
           <div v-if="getActivitiesForDay(day).length > 0" class="flex-between">
             <div class="flex items-baseline gap-2">
               <span class="text-sub">合計</span>
-              <span class="text-xl font-bold text-fg">
+              <span class="text-xl font-bold text-text">
                 {{ getActivitiesForDay(day).reduce((sum, a) => sum + a.period, 0) }}
               </span>
               <span class="text-sub">時間</span>
             </div>
-            <span class="text-sm text-fg-light"> {{ getActivitiesForDay(day).length }}件の記録 </span>
+            <span class="text-sm text-subtext"> {{ getActivitiesForDay(day).length }}件の記録 </span>
           </div>
 
           <div v-else class="h-full flex items-center">

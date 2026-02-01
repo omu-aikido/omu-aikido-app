@@ -101,11 +101,11 @@ const selectedDateActivities = computed(() => {
         <div class="fixed inset-0 bg-black/50 backdrop-blur-[4px]" aria-hidden="true" />
         <div class="fixed inset-0 flex w-screen items-center justify-center p-4">
           <DialogPanel
-            class="w-full max-w-md bg-surface rounded-xl shadow-md p-6 border border-overlay max-h-[90vh] overflow-y-auto">
+            class="w-full max-w-md bg-surface0 rounded-xl shadow-md p-6 border border-overlay0 max-h-[90vh] overflow-y-auto">
             <div class="flex-between mb-4">
               <DialogTitle class="text-lg font-bold text-text"> 記録を追加・編集 </DialogTitle>
               <button
-                class="p-1 rounded-full bg-transparent border-none text-text-dim cursor-pointer transition-colors bg-overlay"
+                class="p-1 rounded-full bg-transparent border-none text-text-dim cursor-pointer transition-colors bg-overlay1"
                 @click="closeModal">
                 <XIcon class="w-5 h-5" />
               </button>
@@ -113,19 +113,19 @@ const selectedDateActivities = computed(() => {
 
             <ActivityForm :loading="loading" :initial-date="selectedDate" @submit="handleSubmit" />
 
-            <div v-if="selectedDateActivities.length > 0" class="mt-8 pt-6 border-t border-overlay">
+            <div v-if="selectedDateActivities.length > 0" class="mt-8 pt-6 border-t border-overlay0">
               <h4 class="text-sm font-bold text-text-dim mb-3">この日の記録</h4>
               <div class="flex flex-col gap-2">
                 <div
                   v-for="activity in selectedDateActivities"
                   :key="activity.id"
-                  class="flex-between p-3 bg-surface rounded-lg">
+                  class="flex-between p-3 bg-surface0 rounded-lg">
                   <div class="flex items-baseline gap-2">
                     <span class="text-lg font-bold text-text">{{ activity.period }}</span>
                     <span class="text-sub">時間</span>
                   </div>
                   <button
-                    class="p-2 text-subtext bg-transparent border-none rounded-full cursor-pointer transition-colors hover:text-red-500 bg-overlay"
+                    class="p-2 text-subtext bg-transparent border-none rounded-full cursor-pointer transition-colors hover:text-red-500 bg-overlay1"
                     title="記録を削除"
                     @click="handleDelete(activity.id)">
                     <Trash2Icon class="w-4 h-4" />
