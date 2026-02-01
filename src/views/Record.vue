@@ -2,7 +2,6 @@
 import { ref, computed } from 'vue';
 import { format, startOfMonth, endOfMonth, parseISO, isSameDay } from 'date-fns';
 import { SignedIn } from '@clerk/vue';
-import { XIcon, Trash2Icon } from 'lucide-vue-next';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue';
 import { useActivities, useAddActivity, useDeleteActivity } from '@/src/composable/useActivity';
 import ActivityList from '@/src/components/record/ActivityList.vue';
@@ -78,16 +77,16 @@ const selectedDateActivities = computed(() => {
 </script>
 
 <template>
-  <div class="container">
+  <div class="min-h-[calc(100vh-4rem)] flex flex-col max-w-7xl mx-auto px-4">
     <SignedIn>
-      <div class="content">
-        <h1 class="title">活動記録</h1>
+      <div class="flex-1 flex flex-col max-w-2xl mx-auto w-full gap-4">
+        <h1 class="heading-1 shrink-0">活動記録</h1>
 
-        <div v-if="error" class="error-banner">
+        <div v-if="error" class="bg-red-50 text-red-500 p-4 rounded-lg shrink-0 dark:bg-red-900/10">
           {{ error }}
         </div>
 
-        <div class="calendar-container">
+        <div class="flex-1 min-h-0">
           <ActivityList
             :activities="activities"
             :loading="loading"
@@ -97,29 +96,38 @@ const selectedDateActivities = computed(() => {
         </div>
       </div>
 
-      <Dialog :open="isModalOpen" class="modal" @close="closeModal">
-        <div class="backdrop" aria-hidden="true" />
-        <div class="modal-container">
-          <DialogPanel class="modal-panel">
-            <div class="modal-header">
-              <DialogTitle class="modal-title"> 記録を追加・編集 </DialogTitle>
-              <button class="close-btn" @click="closeModal">
-                <XIcon class="close-icon" />
+      <Dialog :open="isModalOpen" class="relative z-50" @close="closeModal">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-[4px]" aria-hidden="true" />
+        <div class="fixed inset-0 flex w-screen items-center justify-center p-4">
+          <DialogPanel
+            class="w-full max-w-md bg-surface0 rounded-xl shadow-md p-6 border border-overlay0 max-h-[90vh] overflow-y-auto">
+            <div class="flex-between mb-4">
+              <DialogTitle class="text-lg font-bold text-text"> 記録を追加・編集 </DialogTitle>
+              <button
+                class="p-1 rounded-full bg-transparent border-none text-subtext cursor-pointer transition-colors bg-overlay1"
+                @click="closeModal">
+                <div class="i-lucide:x" />
               </button>
             </div>
 
             <ActivityForm :loading="loading" :initial-date="selectedDate" @submit="handleSubmit" />
 
-            <div v-if="selectedDateActivities.length > 0" class="existing-records">
-              <h4 class="records-title">この日の記録</h4>
-              <div class="records-list">
-                <div v-for="activity in selectedDateActivities" :key="activity.id" class="record-item">
-                  <div class="record-info">
-                    <span class="record-value">{{ activity.period }}</span>
-                    <span class="record-unit">時間</span>
+            <div v-if="selectedDateActivities.length > 0" class="mt-8 pt-6 border-t border-overlay0">
+              <h4 class="text-sm font-bold text-subtext mb-3">この日の記録</h4>
+              <div class="flex flex-col gap-2">
+                <div
+                  v-for="activity in selectedDateActivities"
+                  :key="activity.id"
+                  class="flex-between p-3 bg-surface0 rounded-lg">
+                  <div class="flex items-baseline gap-2">
+                    <span class="text-lg font-bold text-text">{{ activity.period }}</span>
+                    <span class="text-sub">時間</span>
                   </div>
-                  <button class="delete-btn" title="記録を削除" @click="handleDelete(activity.id)">
-                    <Trash2Icon class="delete-icon" />
+                  <button
+                    class="p-2 text-subtext bg-transparent border-none rounded-full cursor-pointer transition-colors hover:text-red-500 bg-overlay1"
+                    title="記録を削除"
+                    @click="handleDelete(activity.id)">
+                    <div class="i-lucide:trash-2" />
                   </button>
                 </div>
               </div>
@@ -139,177 +147,3 @@ const selectedDateActivities = computed(() => {
     </SignedIn>
   </div>
 </template>
-
-<style scoped>
-.container {
-  min-height: calc(100vh - 4rem);
-  display: flex;
-  flex-direction: column;
-  max-width: var(--container-max);
-  margin-inline: auto;
-  padding-inline: var(--space-4);
-}
-
-.content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  max-width: 42rem;
-  margin-inline: auto;
-  width: 100%;
-  gap: var(--space-4);
-}
-
-.title {
-  font-size: var(--text-2xl);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-  flex-shrink: 0;
-}
-
-.error-banner {
-  background: var(--error-bg);
-  color: var(--red-500);
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  flex-shrink: 0;
-}
-
-.calendar-container {
-  flex: 1;
-  min-height: 0;
-}
-
-.modal {
-  position: relative;
-  z-index: var(--z-dropdown);
-}
-
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgb(0 0 0 / 50%);
-  backdrop-filter: blur(4px);
-}
-
-.modal-container {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  width: 100vw;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-4);
-}
-
-.modal-panel {
-  width: 100%;
-  max-width: 28rem;
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  padding: var(--space-6);
-  border: 1px solid var(--border-dim);
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-4);
-}
-
-.modal-title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-}
-
-.close-btn {
-  padding: var(--space-1);
-  border-radius: var(--radius-full);
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.close-btn:hover {
-  background: var(--bg-muted);
-}
-
-.close-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.existing-records {
-  margin-top: var(--space-8);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--border-dim);
-}
-
-.records-title {
-  font-size: var(--text-sm);
-  font-weight: var(--font-bold);
-  color: var(--text-secondary);
-  margin-bottom: var(--space-3);
-}
-
-.records-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.record-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-3);
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-}
-
-.record-info {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
-}
-
-.record-value {
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-}
-
-.record-unit {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.delete-btn {
-  padding: var(--space-2);
-  color: var(--border-strong);
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition:
-    color var(--transition-normal),
-    background var(--transition-normal);
-}
-
-.delete-btn:hover {
-  color: var(--red-500);
-  background: var(--bg-muted);
-}
-
-.delete-icon {
-  width: 1rem;
-  height: 1rem;
-}
-</style>

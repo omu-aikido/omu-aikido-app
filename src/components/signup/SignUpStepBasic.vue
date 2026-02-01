@@ -1,5 +1,5 @@
 <template>
-  <div class="form-container">
+  <div class="stack">
     <Input
       id="email"
       name="email"
@@ -13,7 +13,7 @@
       :error="formErrors.email"
       @update:model-value="onUpdate('email', $event)" />
 
-    <div class="field">
+    <div class="flex flex-col gap-2">
       <Input
         id="password"
         name="password"
@@ -30,7 +30,7 @@
           <button
             type="button"
             :disabled="isSignUpCreated"
-            class="icon-btn"
+            class="bg-transparent border-none text-subtext cursor-pointer transition-colors p-0 flex items-center justify-center hover:text-text disabled:opacity-50 disabled:cursor-not-allowed"
             :aria-label="showPassword ? 'パスワードを隠す' : 'パスワードを表示'"
             @click="showPassword = !showPassword">
             <svg
@@ -40,7 +40,7 @@
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="icon">
+              class="w-5 h-5">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -54,7 +54,7 @@
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="icon">
+              class="w-5 h-5">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -65,7 +65,7 @@
       </Input>
     </div>
 
-    <div class="field">
+    <div class="flex flex-col gap-2">
       <Input
         id="password-confirm"
         v-model="passwordConfirm"
@@ -82,7 +82,7 @@
           <button
             type="button"
             :disabled="isSignUpCreated"
-            class="icon-btn"
+            class="bg-transparent border-none text-subtext cursor-pointer transition-colors p-0 flex items-center justify-center hover:text-text disabled:opacity-50 disabled:cursor-not-allowed"
             :aria-label="showPasswordConfirm ? 'パスワードを隠す' : 'パスワードを表示'"
             @click="showPasswordConfirm = !showPasswordConfirm">
             <svg
@@ -92,7 +92,7 @@
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="icon">
+              class="w-5 h-5">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -106,7 +106,7 @@
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="icon">
+              class="w-5 h-5">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -117,16 +117,15 @@
       </Input>
     </div>
 
-    <div class="actions-end">
-      <Button type="button" variant="primary" :disabled="isSignUpCreated || !canProceed" @click="handleNextClick">
+    <div class="flex justify-end pt-2">
+      <button type="button" class="btn-primary" :disabled="isSignUpCreated || !canProceed" @click="handleNextClick">
         次へ
-      </Button>
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Button from '@/src/components/ui/UiButton.vue';
 import Input from '@/src/components/ui/UiInput.vue';
 import type { FormErrors, SignUpFormData } from '@/src/composable/useSignUpForm';
 import { computed, ref, watch } from 'vue';
@@ -185,50 +184,3 @@ watch(
   }
 );
 </script>
-
-<style scoped>
-.form-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.icon-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: color var(--transition-normal);
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Ensure icon-btn is properly clickable */
-.icon-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.icon-btn:hover:not(:disabled) {
-  color: var(--text-primary);
-}
-
-.icon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.actions-end {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: var(--space-2);
-}
-</style>

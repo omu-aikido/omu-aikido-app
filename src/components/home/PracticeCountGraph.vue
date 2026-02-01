@@ -76,214 +76,61 @@ const progressComment = computed(() => {
 </script>
 
 <template>
-  <div class="container" data-testid="practice-count-graph">
-    <div v-if="loading" class="card loading-skeleton" data-testid="loading-skeleton">
-      <div class="content-center">
-        <div class="title-row skeleton-text">
-          <span class="number"> &nbsp;&nbsp; </span>
+  <div class="w-full" data-testid="practice-count-graph">
+    <div v-if="loading" class="card animate-pulse rounded" data-testid="skeleton">
+      <div class="flex flex-col justify-center items-center">
+        <div class="flex justify-center bg-gray-200 dark:bg-gray-700 rounded">
+          <span class="text-transparent"> &nbsp;&nbsp; </span>
         </div>
-        <div class="progress-container">
-          <div class="progress-bar-bg">
-            <div class="progress-bar" style="width: 0" />
+        <div class="w-full max-w-96 py-4">
+          <div class="rounded-md h-2 w-full bg-overlay0">
+            <div class="h-full max-w-full rounded-md bg-text" style="width: 0" />
           </div>
         </div>
       </div>
     </div>
 
-    <div v-else-if="error" class="error-state">
-      <div class="error-text">エラー: {{ error }}</div>
+    <div v-else-if="error" class="text-center py-8">
+      <div class="text-sm text-red-500">エラー: {{ error }}</div>
     </div>
 
-    <details v-else-if="practiceData" class="card details-card">
-      <summary class="summary">
-        <div class="content-center">
-          <div class="title-row">
-            <span class="title">{{ translateGrade(targetGrade) }}{{ promotionType }}まで</span>
-            <span class="number">&ThinSpace;{{ needToNextGrade }}&ThinSpace;</span>
-            <span class="unit">日</span>
+    <details v-else-if="practiceData" class="card select-none">
+      <summary class="cursor-pointer list-none rounded-lg [&::-webkit-details-marker]:hidden">
+        <div class="w-full cursor-pointer flex flex-col justify-center items-center">
+          <div class="text-lg">
+            {{ translateGrade(targetGrade) }}{{ promotionType }}まで
+            <span class="text-text font-bold text-3xl">{{ needToNextGrade }}</span>
+            日
           </div>
 
-          <div class="progress-container">
-            <div class="progress-bar-bg">
-              <div class="progress-bar" :style="{ width: `${progressPercentage}%` }" data-testid="progress-bar" />
+          <div class="w-full max-w-96 py-4">
+            <div class="rounded-md h-2 w-full bg-surface1">
+              <div
+                class="h-full max-w-full rounded-md bg-text"
+                :style="{ width: `${progressPercentage}%` }"
+                data-testid="progress-bar" />
             </div>
           </div>
         </div>
       </summary>
 
-      <div class="details-content">
-        <div class="details-inner">
-          <p class="comment">
+      <div class="p-4 border-t border-overlay1">
+        <div class="space-y-3">
+          <p class="text-text">
             {{ progressComment }}
           </p>
           <p>
-            目標の<span class="highlight">{{ translateGrade(targetGrade) }}</span
+            目標の<span class="font-bold">{{ translateGrade(targetGrade) }}</span
             >への{{ promotionType }}まで
-            <span class="bold">{{ requiredCount }}日分</span>
+            <span class="font-bold">{{ requiredCount }}日分</span>
             の稽古が必要です。
           </p>
-          <p class="mt-1">
-            現在、<span class="success">{{ practiceData.practiceCount }}日</span>達成しています。
+          <p class="mt-2">
+            現在、<span class="text-green-500 font-medium">{{ practiceData.practiceCount }}日</span>達成しています。
           </p>
-          <p class="note">※ 1.5時間の稽古を1日分として換算</p>
+          <p class="text-xs text-subtext mt-1">※ 1.5時間の稽古を1日分として換算</p>
         </div>
       </div>
     </details>
   </div>
 </template>
-
-<style scoped>
-.container {
-  width: 100%;
-}
-
-.card {
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-dim);
-}
-
-.loading-skeleton {
-  padding: var(--space-5);
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.skeleton-text {
-  color: transparent;
-  background: var(--bg-muted-active);
-  border-radius: var(--radius-md);
-}
-
-.content-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.title-row {
-  display: flex;
-  justify-content: center;
-  align-items: baseline;
-}
-
-.title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-}
-
-.number {
-  font-size: var(--text-4xl);
-  font-weight: var(--font-bold);
-  color: var(--primary);
-  letter-spacing: -0.025em;
-}
-
-.unit {
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-}
-
-.progress-container {
-  width: 100%;
-  margin-top: var(--space-4);
-  max-width: 24rem;
-}
-
-.progress-bar-bg {
-  height: 0.5rem;
-  width: 100%;
-  border-radius: var(--radius-full);
-  background: var(--bg-muted);
-  overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  border-radius: var(--radius-full);
-  background: var(--primary);
-  transition: width 500ms ease-out;
-}
-
-.error-state {
-  text-align: center;
-  padding: var(--space-8);
-}
-
-.error-text {
-  font-size: var(--text-sm);
-  color: var(--red-500);
-}
-
-.details-card {
-  overflow: hidden;
-  transition: background var(--transition-normal);
-}
-
-.summary {
-  padding: var(--space-5);
-  cursor: pointer;
-  list-style: none;
-  transition: background var(--transition-normal);
-}
-
-.summary::-webkit-details-marker {
-  display: none;
-}
-
-.details-content {
-  padding: 0 var(--space-5) var(--space-5);
-  border-top: 1px solid var(--border-dim);
-  background: var(--bg-card);
-}
-
-.details-inner {
-  padding-top: var(--space-4);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  line-height: 1.6;
-  text-align: center;
-}
-
-.comment {
-  font-weight: var(--font-medium);
-  color: var(--primary);
-  margin-bottom: var(--space-2);
-}
-
-.highlight {
-  font-weight: var(--font-medium);
-}
-
-.bold {
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-}
-
-.mt-1 {
-  margin-top: var(--space-1);
-}
-
-.success {
-  font-weight: var(--font-bold);
-  color: var(--green-500);
-}
-
-.note {
-  margin-top: var(--space-1);
-  font-size: var(--text-sm);
-  color: var(--text-tertiary);
-}
-</style>

@@ -1,55 +1,62 @@
 <template>
-  <div class="page-container">
+  <div class="flex flex-col gap-6 px-3 py-4 md:px-6">
     <AdminMenu />
-    <div class="controls">
-      <div class="filters">
-        <div class="filter-group">
-          <button :class="['filter-btn', { active: filterStatus === 'all' }]" @click="filterStatus = 'all'">
+    <div class="stack items-start sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex flex-wrap gap-4 w-full sm:w-auto">
+        <div class="flex bg-overlay1 rounded-lg p-1">
+          <button
+            :class="['filter-btn', { 'filter-btn-active': filterStatus === 'all' }]"
+            @click="filterStatus = 'all'">
             全て
           </button>
           <button
-            :class="['filter-btn', 'filter-btn-red', { active: filterStatus === 'unmet' }]"
+            :class="['filter-btn', { 'filter-btn-active text-red-500': filterStatus === 'unmet' }]"
             @click="filterStatus = 'unmet'">
             未達成
           </button>
           <button
-            :class="['filter-btn', 'filter-btn-green', { active: filterStatus === 'met' }]"
+            :class="['filter-btn', { 'filter-btn-active text-green-500': filterStatus === 'met' }]"
             @click="filterStatus = 'met'">
             達成済
           </button>
         </div>
 
-        <div class="filter-group">
+        <div class="flex bg-overlay1 rounded-lg p-1">
           <button
             title="進捗率: 低→高"
-            :class="['filter-btn', { active: sortOrder === 'asc' }]"
+            :class="['filter-btn', { 'filter-btn-active': sortOrder === 'asc' }]"
             @click="sortOrder = 'asc'">
             昇順
           </button>
           <button
             title="進捗率: 高→低"
-            :class="['filter-btn', { active: sortOrder === 'desc' }]"
+            :class="['filter-btn', { 'filter-btn-active': sortOrder === 'desc' }]"
             @click="sortOrder = 'desc'">
             降順
           </button>
         </div>
       </div>
 
-      <div class="search-container">
-        <input v-model="searchTerm" type="text" placeholder="名前で検索..." class="search-input" />
+      <div class="w-full sm:w-72">
+        <input
+          v-model="searchTerm"
+          type="text"
+          placeholder="名前で検索..."
+          class="w-full h-fit px-3 py-2 pl-10 bg-base border border-overlay0 rounded-md text-text text-base transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
     </div>
 
     <div v-if="loading" class="loading-container">
-      <Loading />
+      <div class="loading-spinner" />
+      <p class="text-sub">Loading...</p>
     </div>
 
-    <div v-else-if="error" class="error-banner">
+    <div v-else-if="error" class="p-4 bg-red-500/10 text-red-500 rounded-md border border-red-500/20">
       {{ error }}
     </div>
 
-    <div v-else class="content">
-      <div class="cards-grid">
+    <div v-else class="w-full">
+      <div class="grid-responsive">
         <NormCard
           v-for="item in filteredUsers"
           :key="item.user.id"
@@ -58,7 +65,7 @@
           :progress="item.norm.progress" />
       </div>
 
-      <div v-if="!loading && !error && filteredUsers.length === 0" class="empty-state">
+      <div v-if="!loading && !error && filteredUsers.length === 0" class="text-center py-12 text-subtext">
         該当するユーザーが見つかりません
       </div>
     </div>
@@ -68,7 +75,6 @@
 <script setup lang="ts">
 import AdminMenu from '@/src/components/admin/AdminMenu.vue';
 import NormCard from '@/src/components/admin/NormCard.vue';
-import Loading from '@/src/components/ui/UiLoading.vue';
 import hc from '@/src/lib/honoClient';
 import { queryKeys } from '@/src/lib/queryKeys';
 import { useQuery } from '@tanstack/vue-query';
@@ -145,153 +151,3 @@ const filteredUsers = computed(() => {
   return result;
 });
 </script>
-
-<style scoped>
-.page-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  padding: var(--space-4) var(--space-3);
-}
-
-@media (width >= 768px) {
-  .page-container {
-    padding-inline: var(--space-6);
-  }
-}
-
-.controls {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  align-items: flex-start;
-}
-
-@media (width >= 640px) {
-  .controls {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-}
-
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-  width: 100%;
-}
-
-@media (width >= 640px) {
-  .filters {
-    width: auto;
-  }
-}
-
-.filter-group {
-  display: flex;
-  background: var(--bg-muted-active);
-  border-radius: var(--radius-lg);
-  padding: var(--space-1);
-}
-
-.filter-btn {
-  padding: var(--space-1-5) var(--space-3);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-}
-
-.filter-btn:hover {
-  color: var(--text-primary);
-}
-
-.filter-btn.active {
-  background: var(--bg-card);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-sm);
-}
-
-.filter-btn-red.active {
-  color: var(--red-500);
-}
-
-.filter-btn-green.active {
-  color: var(--green-500);
-}
-
-.search-container {
-  width: 100%;
-}
-
-@media (width >= 640px) {
-  .search-container {
-    width: 18rem;
-  }
-}
-
-.search-input {
-  width: -webkit-fill-available;
-  height: fit-content;
-  padding: var(--space-2) var(--space-3);
-  padding-left: 2.5rem; /* For icon if needed */
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--text-base);
-  transition: box-shadow var(--transition-normal);
-}
-
-.search-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.loading-container {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
-
-.error-banner {
-  padding: var(--space-4);
-  background: rgb(239 68 68 / 10%);
-  color: var(--red-500);
-  border-radius: var(--radius-md);
-  border: 1px solid rgb(239 68 68 / 20%);
-}
-
-.content {
-  width: 100%;
-}
-
-.cards-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-6);
-}
-
-@media (width >= 768px) {
-  .cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (width >= 1024px) {
-  .cards-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.empty-state {
-  text-align: center;
-  padding: var(--space-12) 0;
-  color: var(--text-secondary);
-}
-</style>

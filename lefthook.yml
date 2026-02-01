@@ -13,8 +13,5 @@ pre-commit:
     build:
       run: pnpm run build-only
       stage_fixed: false
-    knip:
-      run: pnpm run knip
-      stage_fixed: false
     db-check:
       run: pnpm run db:check

@@ -1,51 +1,56 @@
 <template>
-  <div class="page-container">
+  <div class="flex flex-col gap-6 px-3 py-4 md:px-6">
     <AdminMenu />
-    <div class="breadcrumb">
-      <router-link to="/admin/accounts" class="breadcrumb-link"> アカウント一覧 </router-link>
-      <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-current">ユーザー詳細</span>
+    <div class="flex items-center gap-2 text-sub">
+      <router-link to="/admin/accounts" class="hover:underline hover:text-blue-500"> アカウント一覧 </router-link>
+      <span class="text-subtext">/</span>
+      <span class="font-medium text-text">ユーザー詳細</span>
     </div>
 
     <div v-if="loading" class="loading-container">
-      <Loading />
+      <div class="loading-spinner" />
+      <p class="text-sub">Loading...</p>
     </div>
 
-    <div v-else-if="error" class="error-banner">
+    <div v-else-if="error" class="alert-error">
       {{ error }}
     </div>
 
-    <div v-else-if="user" class="content">
-      <div class="profile-section">
-        <div class="profile-header">
-          <div class="profile-info">
-            <div class="flex-row">
-              <img :src="user.imageUrl" alt="" class="avatar" />
-              <div class="info-text">
-                <div class="name-row">
-                  <h1 class="name">{{ user.lastName }} {{ user.firstName }}</h1>
-                  <div v-if="!isEditing" class="badges">
-                    <span class="badge">
+    <div v-else-if="user" class="flex flex-col gap-6">
+      <div class="flex flex-col">
+        <div class="stack">
+          <div class="flex justify-between items-start gap-4">
+            <div class="flex items-center gap-4">
+              <img :src="user.imageUrl" alt="" class="avatar-lg" />
+              <div class="flex flex-col">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h1 class="heading-2">{{ user.lastName }} {{ user.firstName }}</h1>
+                  <div v-if="!isEditing" class="flex items-center gap-1.5">
+                    <span class="badge-gray">
                       {{ roleLabels[user.profile?.role as string] || '部員' }}
                     </span>
-                    <span class="badge">
+                    <span class="badge-gray">
                       {{ gradeLabels[user.profile?.grade as number] || '無級' }}
                     </span>
                   </div>
                 </div>
-                <div class="meta-row">
+                <div class="flex items-center flex-wrap gap-2 text-sub mt-1">
                   <span>{{ user.emailAddress }}</span>
                   <template v-if="!isEditing">
-                    <span class="dot" />
+                    <span class="sq-1 rounded-full bg-subtext" />
                     <span>{{ yearLabels[user.profile?.year as string] || user.profile?.year }}</span>
-                    <span class="dot" />
+                    <span class="sq-1 rounded-full bg-subtext" />
                     <span>{{ user.profile?.joinedAt }}年度入部</span>
                   </template>
                 </div>
               </div>
             </div>
 
-            <button v-if="!isEditing" class="edit-btn" title="編集" @click="startEditing">
+            <button
+              v-if="!isEditing"
+              class="p-2 rounded-full bg-transparent text-subtext border-none cursor-pointer transition-all hover:bg-overlay1 hover:text-blue-500"
+              title="編集"
+              @click="startEditing">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -61,27 +66,27 @@
             </button>
           </div>
 
-          <form v-if="isEditing" class="edit-form" @submit.prevent="handleUpdateProfile">
-            <div class="form-grid">
-              <div class="form-group">
-                <label class="label">役職</label>
-                <select v-model="formData.role" class="select">
+          <form v-if="isEditing" class="stack card" @submit.prevent="handleUpdateProfile">
+            <div class="grid gap-4 grid-cols-1 md:grid-cols-2">
+              <div class="flex flex-col gap-1">
+                <label class="form-label">役職</label>
+                <select v-model="formData.role" class="input-base h-fit">
                   <option v-for="(label, key) in roleLabels" :key="key" :value="key">
                     {{ label }}
                   </option>
                 </select>
               </div>
-              <div class="form-group">
-                <label class="label">級段位</label>
-                <select v-model.number="formData.grade" class="select">
+              <div class="flex flex-col gap-1">
+                <label class="form-label">級段位</label>
+                <select v-model.number="formData.grade" class="input-base h-fit">
                   <option v-for="(label, key) in gradeLabels" :key="key" :value="key">
                     {{ label }}
                   </option>
                 </select>
               </div>
-              <div class="form-group">
-                <label class="label">学年</label>
-                <select v-model="formData.year" class="select">
+              <div class="flex flex-col gap-1">
+                <label class="form-label">学年</label>
+                <select v-model="formData.year" class="input-base h-fit">
                   <option v-for="(label, key) in yearLabels" :key="key" :value="key">
                     {{ label }}
                   </option>
@@ -96,124 +101,146 @@
               <Input v-model="formData.getGradeAt" type="date" label="級段位取得日" />
             </div>
 
-            <div class="form-actions">
-              <Button type="button" variant="secondary" @click="cancelEditing">キャンセル</Button>
-              <Button type="submit" :disabled="updating" variant="primary">
+            <div class="flex justify-end gap-2 mt-2">
+              <button type="button" class="btn-secondary" @click="cancelEditing">キャンセル</button>
+              <button type="submit" class="btn-primary" :disabled="updating">
                 {{ updating ? '更新中...' : '更新' }}
-              </Button>
+              </button>
             </div>
           </form>
-          <MessageDisplay :error-message="updateError" :success-message="updateSuccess" />
+          <div v-if="updateError" class="alert-error">{{ updateError }}</div>
+          <div v-if="updateSuccess" class="alert-success">{{ updateSuccess }}</div>
         </div>
       </div>
 
-      <div v-if="stats" class="stats-grid">
-        <div class="stat-card stat-left">
-          <div class="stat-item border-bottom">
-            <p class="stat-value">
+      <div v-if="stats" class="grid grid-cols-2 border border-overlay0 rounded-lg overflow-hidden">
+        <div class="flex flex-col border-r border-overlay0">
+          <div class="p-4 text-center border-b border-overlay0">
+            <p class="heading-1">
               {{ stats.trainCount }}
             </p>
-            <span class="stat-label">総稽古回数</span>
+            <span class="text-sub">総稽古回数</span>
           </div>
-          <div class="stat-item">
-            <p class="stat-value">
+          <div class="p-4 text-center">
+            <p class="heading-1">
               {{ stats.doneTrain }}
             </p>
-            <span class="stat-label">現在の級での稽古</span>
+            <span class="text-sub">現在の級での稽古</span>
           </div>
         </div>
-        <div class="stat-card stat-right">
-          <div class="stat-item border-bottom">
-            <p class="stat-value">
+        <div class="flex flex-col">
+          <div class="p-4 text-center border-b border-overlay0">
+            <p class="heading-1">
               {{ stats.totalDays }}
             </p>
-            <span class="stat-label">稽古日数</span>
+            <span class="text-sub">稽古日数</span>
           </div>
-          <div class="stat-item">
-            <p class="stat-value">
+          <div class="p-4 text-center">
+            <p class="heading-1">
               {{ stats.totalHours }}
             </p>
-            <span class="stat-label">総時間</span>
+            <span class="text-sub">総時間</span>
           </div>
         </div>
       </div>
 
-      <div class="history-section">
-        <h3 class="history-title">アクティビティ履歴</h3>
+      <div class="stack">
+        <h3 class="text-base font-medium text-text">アクティビティ履歴</h3>
 
         <div v-if="activities.length > 0">
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
+          <div class="overflow-x-auto">
+            <table class="table-base">
+              <thead class="border-b border-overlay0">
                 <tr>
-                  <th>日時</th>
-                  <th>時間 (h)</th>
+                  <th class="th-base">日時</th>
+                  <th class="th-base">時間 (h)</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="activity in activities" :key="activity.id">
-                  <td>{{ new Date(activity.date).toLocaleDateString() }}</td>
-                  <td>{{ activity.period }}</td>
+                <tr v-for="activity in activities" :key="activity.id" class="border-b border-overlay0">
+                  <td class="td-base whitespace-nowrap">{{ new Date(activity.date).toLocaleDateString() }}</td>
+                  <td class="td-base whitespace-nowrap">{{ activity.period }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div class="pagination">
-            <button :disabled="page <= 1" class="page-btn" @click="page > 1 && changePage(page - 1)">前へ</button>
-            <span class="page-info">{{ page }} ページ目</span>
-            <button :disabled="activities.length < limit" class="page-btn" @click="changePage(page + 1)">次へ</button>
+          <div class="flex justify-between items-center py-4 border-t border-overlay0">
+            <button
+              :disabled="page <= 1"
+              class="px-3 py-1 text-sm border border-overlay0 bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-overlay0 disabled:opacity-50 disabled:cursor-not-allowed"
+              @click="page > 1 && changePage(page - 1)">
+              前へ
+            </button>
+            <span class="text-sub">{{ page }} ページ目</span>
+            <button
+              :disabled="activities.length < limit"
+              class="px-3 py-1 text-sm border border-overlay0 bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-overlay1 disabled:opacity-50 disabled:cursor-not-allowed"
+              @click="changePage(page + 1)">
+              次へ
+            </button>
           </div>
         </div>
 
-        <div v-else class="empty-history">履歴はありません</div>
+        <div v-else class="text-center p-8 text-sub">履歴はありません</div>
       </div>
 
-      <div class="danger-zone">
-        <div class="danger-header">
-          <h3 class="danger-title">危険な操作</h3>
+      <div class="mt-8 border border-red-500/30 rounded-lg overflow-hidden">
+        <div class="px-4 py-3 bg-red-500/10 border-b border-red-500/20">
+          <h3 class="text-sm font-medium text-red-500">危険な操作</h3>
         </div>
-        <div class="danger-content">
-          <div class="danger-row">
-            <p class="danger-text">ユーザーを削除</p>
-            <button v-if="!showDeleteConfirm" class="btn-danger-outline" @click="showDeleteConfirm = true">削除</button>
+        <div class="p-4 stack">
+          <div class="flex justify-between items-center">
+            <p class="text-sm font-medium text-text">ユーザーを削除</p>
+            <button
+              v-if="!showDeleteConfirm"
+              class="px-4 py-1.5 text-sm font-medium text-red-500 border border-red-500 bg-transparent rounded-md cursor-pointer transition-all hover:bg-red-500/10"
+              @click="showDeleteConfirm = true">
+              削除
+            </button>
           </div>
-          <p class="danger-description">
+          <p class="text-sub">
             このユーザーとそのすべてのデータを完全に削除します。<strong>この操作は取り消せません。</strong>
           </p>
 
-          <div v-if="showDeleteConfirm && !showFinalConfirm" class="confirm-box">
-            <p class="confirm-msg">
+          <div v-if="showDeleteConfirm && !showFinalConfirm" class="p-4 bg-red-500/5 rounded-md flex flex-col gap-3">
+            <p class="text-sm text-red-500">
               削除操作を続行するには、以下に
               <strong>{{ user?.lastName }}{{ user?.firstName }}</strong>
               と入力してください：
             </p>
-            <input v-model="deleteConfirmName" type="text" placeholder="ユーザー名を入力" class="confirm-input" />
-            <div class="confirm-actions">
-              <Button
-                variant="ghost"
+            <input
+              v-model="deleteConfirmName"
+              type="text"
+              placeholder="ユーザー名を入力"
+              class="w-full px-3 py-2 border border-red-500/30 rounded-md text-base bg-base text-text focus:outline-none focus:ring-2 focus:ring-red-500" />
+            <div class="flex gap-2">
+              <button
+                class="btn bg-transparent text-subtext hover:bg-base-overlay hover:text-text"
                 @click="
                   showDeleteConfirm = false;
                   deleteConfirmName = '';
-                "
-                >キャンセル</Button
-              >
-              <Button
+                ">
+                キャンセル
+              </button>
+              <button
+                class="btn-danger"
                 :disabled="deleteConfirmName !== (user?.lastName ?? '') + (user?.firstName ?? '')"
-                variant="danger"
                 @click="showFinalConfirm = true">
                 次へ
-              </Button>
+              </button>
             </div>
           </div>
 
-          <div v-if="showFinalConfirm" class="modal-backdrop">
-            <div class="modal">
-              <div class="modal-header">
-                <div class="modal-icon">
+          <div
+            v-if="showFinalConfirm"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[4px]">
+            <div class="w-full max-w-md bg-base rounded-lg shadow-xl p-6 stack m-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="icon"
+                    class="sq-5 text-red-500"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -224,27 +251,27 @@
                       d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
-                <h3 class="modal-title">本当に削除しますか？</h3>
+                <h3 class="text-lg font-semibold text-text">本当に削除しますか？</h3>
               </div>
-              <p class="modal-text">
+              <p class="text-sub">
                 <strong>{{ user?.lastName }} {{ user?.firstName }}</strong>
                 さんのアカウントとすべての活動記録が削除されます。この操作は元に戻せません。
               </p>
-              <div class="modal-actions">
-                <Button
-                  variant="secondary"
+              <div class="flex justify-end gap-3">
+                <button
+                  class="btn-secondary"
                   @click="
                     showFinalConfirm = false;
                     showDeleteConfirm = false;
                     deleteConfirmName = '';
                   ">
                   キャンセル
-                </Button>
-                <Button :disabled="deleting" variant="danger" @click="handleDeleteUser">
+                </button>
+                <button class="btn-danger" :disabled="deleting" @click="handleDeleteUser">
                   {{ deleting ? '削除中...' : '削除する' }}
-                </Button>
+                </button>
               </div>
-              <p v-if="deleteError" class="error-text">
+              <p v-if="deleteError" class="text-sm text-red-500">
                 {{ deleteError }}
               </p>
             </div>
@@ -257,10 +284,7 @@
 
 <script setup lang="ts">
 import AdminMenu from '@/src/components/admin/AdminMenu.vue';
-import MessageDisplay from '@/src/components/common/MessageDisplay.vue';
-import Button from '@/src/components/ui/UiButton.vue';
 import Input from '@/src/components/ui/UiInput.vue';
-import Loading from '@/src/components/ui/UiLoading.vue';
 import hc from '@/src/lib/honoClient';
 import { queryKeys } from '@/src/lib/queryKeys';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
@@ -493,491 +517,3 @@ const handleDeleteUser = async () => {
   }
 };
 </script>
-
-<style scoped>
-.page-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  padding: var(--space-4) var(--space-3);
-}
-
-@media (width >= 768px) {
-  .page-container {
-    padding-inline: var(--space-6);
-  }
-}
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.breadcrumb-link:hover {
-  text-decoration: underline;
-  color: var(--primary);
-}
-
-.breadcrumb-current {
-  font-weight: var(--font-medium);
-  color: var(--text-primary);
-}
-
-.loading-container {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
-
-.error-banner {
-  padding: var(--space-4);
-  background: rgb(239 68 68 / 10%);
-  color: var(--red-500);
-  border-radius: var(--radius-md);
-  border: 1px solid rgb(239 68 68 / 20%);
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-}
-
-.profile-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.profile-header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.profile-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-4);
-}
-
-.flex-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-}
-
-.avatar {
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: var(--radius-full);
-  background: var(--bg-muted-active);
-  object-fit: cover;
-}
-
-.info-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.name-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.name {
-  font-size: var(--text-xl);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-}
-
-.badges {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1-5);
-}
-
-.badge {
-  padding: 0.125rem 0.5rem;
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  border-radius: var(--radius-sm);
-  background: var(--bg-muted-active);
-  color: var(--text-secondary);
-}
-
-.meta-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  margin-top: 0.25rem;
-}
-
-.dot {
-  width: 0.25rem;
-  height: 0.25rem;
-  border-radius: var(--radius-full);
-  background: var(--border-strong);
-}
-
-.edit-btn {
-  padding: var(--space-2);
-  border-radius: var(--radius-full);
-  background: transparent;
-  color: var(--text-secondary);
-  border: none;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-}
-
-.edit-btn:hover {
-  background: var(--bg-muted-active);
-  color: var(--primary);
-}
-
-.edit-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  background: var(--bg-muted);
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-}
-
-.form-grid {
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: 1fr;
-}
-
-@media (width >= 768px) {
-  .form-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-}
-
-.select {
-  width: -webkit-fill-available;
-  height: fit-content;
-  padding: var(--space-2) var(--space-3);
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--text-base);
-  transition: box-shadow var(--transition-normal);
-}
-
-.select:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  border: 1px solid var(--border-dim);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.stat-card {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-left {
-  border-right: 1px solid var(--border-dim);
-}
-
-.stat-item {
-  padding: var(--space-4);
-  text-align: center;
-}
-
-.border-bottom {
-  border-bottom: 1px solid var(--border-dim);
-}
-
-.stat-value {
-  font-size: var(--text-2xl);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-}
-
-.stat-label {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.history-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.history-title {
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--text-primary);
-}
-
-.table-container {
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--text-sm);
-  text-align: left;
-}
-
-.data-table thead {
-  border-bottom: 1px solid var(--border-dim);
-}
-
-.data-table th,
-.data-table td {
-  padding: var(--space-3) var(--space-6);
-  white-space: nowrap;
-}
-
-.data-table th {
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-}
-
-.data-table tr {
-  border-bottom: 1px solid var(--border-dim);
-}
-
-/* Pagination */
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-4) 0;
-  border-top: 1px solid var(--border-dim);
-}
-
-.page-btn {
-  padding: var(--space-1) var(--space-3);
-  font-size: var(--text-sm);
-  border: 1px solid var(--border-dim);
-  background: transparent;
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.page-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.page-btn:hover:not(:disabled) {
-  background: var(--bg-muted);
-}
-
-.page-info {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.empty-history {
-  text-align: center;
-  padding: var(--space-8);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.danger-zone {
-  margin-top: var(--space-8);
-  border: 1px solid rgb(239 68 68 / 30%);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.danger-header {
-  padding: var(--space-3) var(--space-4);
-  background: rgb(239 68 68 / 10%);
-  border-bottom: 1px solid rgb(239 68 68 / 20%);
-}
-
-.danger-title {
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--red-500);
-}
-
-.danger-content {
-  padding: var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.danger-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.danger-text {
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--text-primary);
-}
-
-.danger-description {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.btn-danger-outline {
-  padding: var(--space-1-5) var(--space-4);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--red-500);
-  border: 1px solid var(--red-500);
-  background: transparent;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-}
-
-.btn-danger-outline:hover {
-  background: rgb(239 68 68 / 10%);
-}
-
-.confirm-box {
-  padding: var(--space-4);
-  background: rgb(239 68 68 / 5%); /* very light red */
-  border-radius: var(--radius-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.confirm-msg {
-  font-size: var(--text-sm);
-  color: var(--red-500);
-}
-
-.confirm-input {
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid rgb(239 68 68 / 30%);
-  border-radius: var(--radius-md);
-  font-size: var(--text-base);
-  background: var(--bg-card);
-  color: var(--text-primary);
-}
-
-.confirm-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--red-500);
-}
-
-.confirm-actions {
-  display: flex;
-  gap: var(--space-2);
-}
-
-/* Modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-modal);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgb(0 0 0 / 50%);
-  backdrop-filter: blur(4px);
-}
-
-.modal {
-  width: 100%;
-  max-width: 28rem;
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl);
-  padding: var(--space-6);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  margin: var(--space-4);
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.modal-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-full);
-  background: rgb(239 68 68 / 10%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: var(--red-500);
-}
-
-.modal-title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-semibold);
-  color: var(--text-primary);
-}
-
-.modal-text {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
-}
-
-.error-text {
-  font-size: var(--text-sm);
-  color: var(--red-500);
-}
-</style>

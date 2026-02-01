@@ -11,7 +11,6 @@ import {
   subMonths,
 } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 interface Props {
@@ -79,269 +78,81 @@ const isToday = (date: Date) => {
 </script>
 
 <template>
-  <div class="header">
-    <button class="nav-btn" data-testid="prev-month-btn" @click="handlePrevMonth">
-      <ChevronLeftIcon class="nav-icon" />
+  <div class="sticky top-0 z-20 flex-between p-3 px-4 bg-surface0">
+    <button
+      class="p-1 rounded-full bg-transparent border-none text-subtext cursor-pointer transition-colors hover:bg-overlay11-active"
+      data-testid="prev-month-btn"
+      @click="handlePrevMonth">
+      <div class="i-lucide:chevron-left" />
     </button>
 
-    <h2 class="month-title" data-testid="month-header">
+    <h2 class="text-lg font-bold text-text" data-testid="month-header">
       {{ formatHeader(currentMonth) }}
     </h2>
 
-    <button class="nav-btn" data-testid="next-month-btn" @click="handleNextMonth">
-      <ChevronRightIcon class="nav-icon" />
+    <button
+      class="p-1 rounded-full bg-transparent border-none text-subtext cursor-pointer transition-colors hover:bg-overlay11-active"
+      data-testid="next-month-btn"
+      @click="handleNextMonth">
+      <div class="i-lucide:chevron-right" />
     </button>
   </div>
 
-  <div class="list-container" data-testid="activity-list">
-    <div v-if="loading && activities.length === 0" class="skeleton-container">
-      <div v-for="i in 28" :key="i" class="skeleton-row">
-        <div class="skeleton-date" />
-        <div class="skeleton-content" />
+  <div class="p-0 overflow-hidden flex flex-col h-full flex-1 overflow-y-auto" data-testid="activity-list">
+    <div v-if="loading && activities.length === 0" class="p-4 stack">
+      <div v-for="i in 28" :key="i" class="flex items-center gap-4 animate-pulse">
+        <div class="w-12 h-12 rounded-lg flex-shrink-0 bg-overlay1" />
+        <div class="h-4 w-1/3 rounded-md bg-overlay1" />
       </div>
     </div>
 
-    <div v-else class="day-list">
+    <div v-else class="flex flex-col">
       <div
         v-for="day in daysInMonth"
         :key="day.toISOString()"
-        :class="['day-row', { 'day-today': isToday(day) }]"
+        :class="[
+          'flex items-stretch min-h-16 cursor-pointer transition-colors relative border-b border-overlay0',
+          isToday(day) ? 'bg-blue-50/10' : 'hover:bg-surface0',
+        ]"
         data-testid="day-item"
         @click="handleDateClick(day)">
-        <div class="date-column">
-          <span :class="['day-number', isSunday(day) ? 'day-sunday' : isSaturday(day) ? 'day-saturday' : '']">
+        <div class="stack items-center justify-center w-12 flex-shrink-0 p-2 transition-colors">
+          <span
+            :class="[
+              'text-lg font-bold leading-none text-text',
+              isSunday(day) ? 'text-red-500' : isSaturday(day) ? 'text-blue-500' : '',
+            ]">
             {{ getDay(day) }}
           </span>
-          <span :class="['weekday', isSunday(day) ? 'day-sunday' : isSaturday(day) ? 'day-saturday' : '']">
+          <span
+            :class="[
+              'text-xs font-medium leading-none mt-1 text-subtext',
+              isSunday(day) ? 'text-red-500' : isSaturday(day) ? 'text-blue-500' : '',
+            ]">
             {{ getWeekday(day) }}
           </span>
         </div>
 
-        <div class="content-column">
-          <div v-if="getActivitiesForDay(day).length > 0" class="activity-summary">
-            <div class="summary-left">
-              <span class="summary-label">合計</span>
-              <span class="summary-value">
+        <div class="flex-1 flex flex-col justify-center p-2">
+          <div v-if="getActivitiesForDay(day).length > 0" class="flex-between">
+            <div class="flex items-baseline gap-2">
+              <span class="text-sub">合計</span>
+              <span class="text-xl font-bold text-text">
                 {{ getActivitiesForDay(day).reduce((sum, a) => sum + a.period, 0) }}
               </span>
-              <span class="summary-unit">時間</span>
+              <span class="text-sub">時間</span>
             </div>
-            <span class="record-count"> {{ getActivitiesForDay(day).length }}件の記録 </span>
+            <span class="text-sm text-subtext"> {{ getActivitiesForDay(day).length }}件の記録 </span>
           </div>
 
-          <div v-else class="empty-day">
-            <span class="add-hint"> <PlusIcon class="add-icon" /> 記録を追加 </span>
+          <div v-else class="h-full flex items-center opacity-0 hover:opacity-100">
+            <span class="inline-flex items-center gap-1 text-overlay0 transition-opacity day-row:hover:opacity-100">
+              <div class="i-lucide:plus" />
+              記録を追加
+            </span>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
-  backdrop-filter: blur(12px);
-}
-
-.nav-btn {
-  padding: var(--space-1);
-  border-radius: var(--radius-full);
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.nav-btn:hover {
-  background: var(--bg-muted-active);
-}
-
-.nav-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.month-title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-}
-
-.list-container {
-  padding: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  flex: 1;
-  overflow-y: auto;
-}
-
-.skeleton-container {
-  padding: var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.skeleton-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.skeleton-date {
-  width: 3rem;
-  height: 3rem;
-  border-radius: var(--radius-lg);
-  flex-shrink: 0;
-}
-
-.skeleton-content {
-  height: 1rem;
-  width: 33%;
-  border-radius: var(--radius-md);
-}
-
-.day-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.day-row {
-  display: flex;
-  align-items: stretch;
-  min-height: 4rem;
-  cursor: pointer;
-  transition: background var(--transition-normal);
-  position: relative;
-  border-bottom: 1px solid var(--bg-muted);
-}
-
-.day-row:hover {
-  background: var(--bg-card);
-}
-
-.day-today {
-  background: rgb(137 180 250 / 10%);
-}
-
-.date-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 3rem;
-  flex-shrink: 0;
-  padding: var(--space-2);
-  transition: border-color var(--transition-normal);
-}
-
-.day-number {
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  line-height: 1;
-  color: var(--text-primary);
-}
-
-.weekday {
-  font-size: 0.625rem;
-  font-weight: var(--font-medium);
-  line-height: 1;
-  margin-top: var(--space-1);
-  color: var(--text-secondary);
-}
-
-.day-sunday {
-  color: var(--red-500);
-}
-
-.day-saturday {
-  color: var(--blue-500);
-}
-
-.content-column {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: var(--space-2);
-}
-
-.activity-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.summary-left {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
-}
-
-.summary-label {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.summary-value {
-  font-size: var(--text-xl);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-}
-
-.summary-unit {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.record-count {
-  font-size: var(--text-sm);
-  color: var(--text-tertiary);
-}
-
-.empty-day {
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.add-hint {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-size: var(--text-sm);
-  color: var(--border-strong);
-  opacity: 0;
-  transition: opacity var(--transition-normal);
-}
-
-.day-row:hover .add-hint {
-  opacity: 1;
-}
-
-.add-icon {
-  width: 1rem;
-  height: 1rem;
-}
-</style>

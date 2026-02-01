@@ -1,18 +1,24 @@
 <template>
-  <div class="user-page">
-    <div class="card">
+  <div class="max-w-7xl mx-auto p-4 stack gap-6">
+    <div class="bg-surface0 rounded-xl shadow-sm border border-overlay0 p-6">
       <UserHeader :user="user" @updated="fetchUser" />
 
-      <hr class="divider" />
+      <hr class="my-6 border-none border-t border-overlay0" />
 
       <ProfileCard />
 
-      <MessageDisplay :error-message="errorMessage" :success-message="successMessage" />
-      <div class="footer">
-        <p class="footer-text">
+      <div v-if="errorMessage" class="alert-error">{{ errorMessage }}</div>
+      <div v-if="successMessage" class="alert-success">{{ successMessage }}</div>
+      <div class="mt-4 pt-4 border-t border-overlay0">
+        <p class="text-sub">
           メールアドレス・パスワード変更などは
-          <a class="external-link" href="https://accounts.omu-aikido.com/user" target="_blank" rel="noopener noreferrer"
-            >こちら <ArrowUpRightFromSquareIcon class="link-icon" /> </a
+          <a
+            class="text-blue-500 inline-flex items-center font-medium no-underline break-all hover:underline"
+            href="https://accounts.omu-aikido.com/user"
+            target="_blank"
+            rel="noopener noreferrer"
+            >こちら
+            <div class="i-lucide:square-arrow-out-up-right sq-3 ml-0.5 inline-block" /> </a
           >&MediumSpace;から。
         </p>
       </div>
@@ -26,10 +32,7 @@ import { useQuery } from '@tanstack/vue-query';
 import { queryKeys } from '@/src/lib/queryKeys';
 import hc from '@/src/lib/honoClient';
 import UserHeader from '@/src/components/account/UserHeader.vue';
-import MessageDisplay from '@/src/components/common/MessageDisplay.vue';
 import ProfileCard from '@/src/components/account/ProfileCard.vue';
-
-import { ArrowUpRightFromSquareIcon } from 'lucide-vue-next';
 
 // Queries
 const {
@@ -51,59 +54,3 @@ const successMessage = computed(() => '');
 
 const fetchUser = () => refetch();
 </script>
-
-<style scoped>
-.user-page {
-  max-width: var(--container-max);
-  margin-inline: auto;
-  padding: var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-}
-
-.card {
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-dim);
-  padding: var(--space-6);
-}
-
-.divider {
-  margin: var(--space-6) 0;
-  border: none;
-  border-top: 1px solid var(--border-dim);
-}
-
-.footer {
-  margin-top: var(--space-4);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border-dim);
-}
-
-.footer-text {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.external-link {
-  color: var(--accent);
-  display: inline-flex;
-  align-items: center;
-  font-weight: var(--font-medium);
-  text-decoration: none;
-  word-break: break-all;
-}
-
-.external-link:hover {
-  text-decoration: underline;
-}
-
-.link-icon {
-  width: 0.75rem;
-  height: 0.75rem;
-  margin-left: 0.125rem;
-  display: inline-block;
-}
-</style>

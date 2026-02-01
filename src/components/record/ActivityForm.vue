@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Button from '@/src/components/ui/UiButton.vue';
 import Input from '@/src/components/ui/UiInput.vue';
 import { format } from 'date-fns';
 import { ref, watch } from 'vue';
@@ -34,8 +33,8 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <div class="container">
-    <form class="form" data-testid="activity-form" @submit.prevent="handleSubmit">
+  <div class="p-2">
+    <form class="stack" data-testid="activity-form" @submit.prevent="handleSubmit">
       <Input id="date" v-model="newDate" label="日付" type="date" required data-testid="date-input" />
 
       <Input
@@ -49,21 +48,9 @@ const handleSubmit = () => {
         required
         data-testid="period-input" />
 
-      <Button type="submit" variant="primary" full-width :disabled="loading" data-testid="submit-btn">
+      <button type="submit" class="btn-primary w-full" :disabled="loading" data-testid="submit-btn">
         {{ loading ? '保存中...' : '記録を追加' }}
-      </Button>
+      </button>
     </form>
   </div>
 </template>
-
-<style scoped>
-.container {
-  padding: var(--space-2);
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-</style>

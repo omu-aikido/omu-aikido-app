@@ -1,5 +1,7 @@
 import { clerkPlugin } from '@clerk/vue';
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query';
+import '@unocss/reset/tailwind-compat.css';
+import 'virtual:uno.css';
 import { createApp } from 'vue';
 
 import App from './App.vue';

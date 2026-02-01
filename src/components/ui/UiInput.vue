@@ -28,21 +28,21 @@ defineOptions({
 </script>
 
 <template>
-  <div class="input-wrapper">
-    <label v-if="label" :for="id" class="label">
+  <div class="flex flex-col gap-1.5 w-full">
+    <label v-if="label" :for="id" class="form-label">
       {{ label }}
-      <span v-if="required" class="required">*</span>
+      <span v-if="required" class="text-red-500 ml-0.5">*</span>
     </label>
 
-    <div class="input-container">
+    <div class="relative flex items-center">
       <input
         :id="id"
         :type="type"
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
-        :class="['input', { 'input-error': error }]"
-        class="input"
+        :class="['input-base', error ? 'border-red-500/50 focus:ring-red-500/50 focus:border-red-500' : '']"
+        uno-placeholder="text-overlay1"
         v-bind="$attrs"
         @input="
           $emit(
@@ -52,86 +52,11 @@ defineOptions({
               : ($event.target as HTMLInputElement).value
           )
         " />
-      <div v-if="$slots.suffix" class="suffix">
+      <div v-if="$slots.suffix" class="absolute right-3 flex items-center text-subtext pointer-events-none">
         <slot name="suffix" />
       </div>
     </div>
 
-    <p v-if="error" class="error-text">{{ error }}</p>
+    <p v-if="error" class="text-sm text-red-500">{{ error }}</p>
   </div>
 </template>
-
-<style scoped>
-.input-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1-5);
-  width: 100%;
-}
-
-.label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-}
-
-.required {
-  color: var(--red-500);
-  margin-left: var(--space-0-5);
-}
-
-.input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input {
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-base);
-  color: var(--text-primary);
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-normal);
-}
-
-.input::placeholder {
-  color: var(--text-placeholder);
-}
-
-.input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-  border-color: var(--primary);
-}
-
-.input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: var(--bg-muted);
-}
-
-.input-error {
-  border-color: var(--red-500);
-}
-
-.input-error:focus {
-  box-shadow: 0 0 0 2px var(--red-500);
-}
-
-.error-text {
-  font-size: var(--text-sm);
-  color: var(--red-500);
-}
-
-.suffix {
-  position: absolute;
-  right: var(--space-3);
-  display: flex;
-  align-items: center;
-  color: var(--text-secondary);
-  pointer-events: none;
-}
-</style>

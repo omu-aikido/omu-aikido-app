@@ -1,6 +1,6 @@
 <template>
-  <div class="form-container">
-    <div class="grid-2">
+  <div class="stack">
+    <div class="grid grid-cols-2 gap-4">
       <Input
         id="lastName"
         name="lastName"
@@ -35,15 +35,14 @@
       :error="formErrors.username"
       @update:model-value="onUpdate('username', $event)" />
 
-    <div class="actions-between">
-      <Button type="button" variant="secondary" :disabled="isSignUpCreated" @click="prevStep"> 戻る </Button>
-      <Button type="button" variant="primary" :disabled="isSignUpCreated" @click="handleNext"> 次へ </Button>
+    <div class="flex justify-between pt-2">
+      <button type="button" class="btn-secondary" :disabled="isSignUpCreated" @click="prevStep">戻る</button>
+      <button type="button" class="btn-primary" :disabled="isSignUpCreated" @click="handleNext">次へ</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Button from '@/src/components/ui/UiButton.vue';
 import Input from '@/src/components/ui/UiInput.vue';
 import type { FormErrors, SignUpFormData } from '@/src/composable/useSignUpForm';
 
@@ -63,23 +62,3 @@ const onUpdate = (key: keyof SignUpFormData, value: string | number) => {
   emit('update:formValue', key, value);
 };
 </script>
-
-<style scoped>
-.form-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-4);
-}
-
-.actions-between {
-  display: flex;
-  justify-content: space-between;
-  padding-top: var(--space-2);
-}
-</style>
