@@ -97,7 +97,7 @@ const progressComment = computed(() => {
     <details v-else-if="practiceData" class="card select-none">
       <summary class="cursor-pointer list-none rounded-lg [&::-webkit-details-marker]:hidden">
         <div class="w-full cursor-pointer flex flex-col justify-center items-center">
-          <div class="text-md">
+          <div class="text-lg">
             {{ translateGrade(targetGrade) }}{{ promotionType }}まで
             <span class="text-fg font-bold text-3xl">{{ needToNextGrade }}</span>
             日
@@ -120,7 +120,7 @@ const progressComment = computed(() => {
             {{ progressComment }}
           </p>
           <p>
-            目標の<span class="font-bold text-bg">{{ translateGrade(targetGrade) }}</span
+            目標の<span class="font-bold">{{ translateGrade(targetGrade) }}</span
             >への{{ promotionType }}まで
             <span class="font-bold">{{ requiredCount }}日分</span>
             の稽古が必要です。
