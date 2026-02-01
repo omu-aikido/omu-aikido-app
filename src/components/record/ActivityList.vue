@@ -100,7 +100,7 @@ const isToday = (date: Date) => {
   </div>
 
   <div class="p-0 overflow-hidden flex flex-col h-full flex-1 overflow-y-auto" data-testid="activity-list">
-    <div v-if="loading && activities.length === 0" class="p-4 flex flex-col gap-4">
+    <div v-if="loading && activities.length === 0" class="p-4 stack">
       <div v-for="i in 28" :key="i" class="flex items-center gap-4 animate-pulse">
         <div class="w-12 h-12 rounded-lg flex-shrink-0 bg-bg-muted" />
         <div class="h-4 w-1/3 rounded-md bg-bg-muted" />

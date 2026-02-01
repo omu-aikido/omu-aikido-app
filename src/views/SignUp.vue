@@ -2,7 +2,7 @@
   <div class="flex items-center justify-center p-4">
     <div class="card w-full h-full mx-auto max-w-md">
       <div class="p-4 pt-2">
-        <h1 class="text-2xl font-bold text-fg">サインアップ</h1>
+        <h1 class="heading-1">サインアップ</h1>
       </div>
       <div class="p-6 pt-0">
         <ProgressIndicator :step="step" />
@@ -51,7 +51,7 @@
         </div>
 
         <hr class="my-6" />
-        <div class="mt-2 text-center text-base text-fg-dim">
+        <div class="mt-2 text-center text-base text-subtext">
           既にアカウントをお持ちですか？<br />
           <RouterLink to="/sign-in" class="text-blue-500 underline hover:text-blue-600"> こちら </RouterLink>
           からサインインしてください。

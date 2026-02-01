@@ -1,35 +1,35 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="stack">
     <div v-if="!user" class="animate-pulse flex-between gap-4">
       <div class="flex items-center gap-4 min-w-0">
-        <div class="avatar-lg bg-bg-dim" />
+        <div class="avatar-lg bg-overlay" />
         <div class="min-w-0 flex flex-col gap-1">
-          <div class="h-7 w-32 bg-bg-dim rounded-md text-lg font-bold text-transparent">User Name</div>
-          <div class="h-5 w-24 bg-bg-dim rounded-md text-base text-transparent">@username</div>
+          <div class="h-7 w-32 bg-overlay rounded-md text-lg font-bold text-transparent">User Name</div>
+          <div class="h-5 w-24 bg-overlay rounded-md text-base text-transparent">@username</div>
         </div>
       </div>
-      <div class="h-8 w-14 shrink-0 rounded-md bg-bg-dim" />
+      <div class="h-8 w-14 shrink-0 rounded-md bg-overlay" />
     </div>
 
     <div v-else-if="!isEditing" class="flex-between gap-4">
       <div class="flex items-center gap-4 min-w-0">
-        <div class="relative w-14 h-14 shrink-0 overflow-hidden rounded-full shadow-[0_0_0_2px_var(--color-bg-dim)]">
-          <img :src="safeImageUrl" :alt="user?.firstName || 'Profile'" uno-rouned-img />
+        <div class="relative w-14 h-14 shrink-0 overflow-hidden rounded-full shadow-[0_0_0_2px_var(--color-overlay)]">
+          <img :src="safeImageUrl" :alt="user?.firstName || 'Profile'" uno-rounded-img />
         </div>
         <div class="min-w-0">
-          <h2 class="text-lg font-bold text-fg truncate my-0">{{ user?.lastName }} {{ user?.firstName }}</h2>
-          <p class="text-base text-fg-dim truncate my-0">@{{ user?.username }}</p>
+          <h2 class="text-lg font-bold text-text truncate my-0">{{ user?.lastName }} {{ user?.firstName }}</h2>
+          <p class="text-base text-text-dim truncate my-0">@{{ user?.username }}</p>
         </div>
       </div>
       <button type="button" class="btn-secondary px-3 py-1.5 text-sm" @click="isEditing = true">編集</button>
     </div>
 
     <form v-else enctype="multipart/form-data" class="stack" @submit.prevent="handleSubmit">
-      <div class="flex-1 flex flex-col gap-4">
+      <div class="flex-1 stack">
         <div class="flex items-start gap-4">
           <div
-            class="relative w-14 h-14 shrink-0 overflow-hidden rounded-full shadow-[0_0_0_2px_var(--color-bg-dim)] group">
-            <img :src="safePreviewImageUrl" :alt="user?.firstName || 'Profile'" uno-rouned-img />
+            class="relative w-14 h-14 shrink-0 overflow-hidden rounded-full shadow-[0_0_0_2px_var(--color-overlay)] group">
+            <img :src="safePreviewImageUrl" :alt="user?.firstName || 'Profile'" uno-rounded-img />
             <label
               class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-60 cursor-pointer transition-opacity duration-200 group-hover:opacity-100">
               <span class="text-[0.625rem] text-white font-medium">変更</span>

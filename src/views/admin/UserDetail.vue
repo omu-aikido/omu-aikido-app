@@ -3,8 +3,8 @@
     <AdminMenu />
     <div class="flex items-center gap-2 text-sub">
       <router-link to="/admin/accounts" class="hover:underline hover:text-blue-500"> アカウント一覧 </router-link>
-      <span class="text-fg-dim">/</span>
-      <span class="font-medium text-fg">ユーザー詳細</span>
+      <span class="text-text-dim">/</span>
+      <span class="font-medium text-text">ユーザー詳細</span>
     </div>
 
     <div v-if="loading" class="loading-container">
@@ -37,9 +37,9 @@
                 <div class="flex items-center flex-wrap gap-2 text-sub mt-1">
                   <span>{{ user.emailAddress }}</span>
                   <template v-if="!isEditing">
-                    <span class="w-1 h-1 rounded-full bg-gray-400" />
+                    <span class="w-1 h-1 rounded-full bg-subtext" />
                     <span>{{ yearLabels[user.profile?.year as string] || user.profile?.year }}</span>
-                    <span class="w-1 h-1 rounded-full bg-gray-400" />
+                    <span class="w-1 h-1 rounded-full bg-subtext" />
                     <span>{{ user.profile?.joinedAt }}年度入部</span>
                   </template>
                 </div>
@@ -48,7 +48,7 @@
 
             <button
               v-if="!isEditing"
-              class="p-2 rounded-full bg-transparent text-fg-dim border-none cursor-pointer transition-all hover:bg-gray-200 hover:text-blue-500"
+              class="p-2 rounded-full bg-transparent text-text-dim border-none cursor-pointer transition-all hover:bg-overlay hover:text-blue-500"
               title="編集"
               @click="startEditing">
               <svg
@@ -66,10 +66,7 @@
             </button>
           </div>
 
-          <form
-            v-if="isEditing"
-            class="flex flex-col gap-4 bg-bg-dim p-4 rounded-lg"
-            @submit.prevent="handleUpdateProfile">
+          <form v-if="isEditing" class="stack bg-base-dim p-4 rounded-lg" @submit.prevent="handleUpdateProfile">
             <div class="grid gap-4 grid-cols-1 md:grid-cols-2">
               <div class="flex flex-col gap-1">
                 <label class="form-label">役職</label>
@@ -116,9 +113,9 @@
         </div>
       </div>
 
-      <div v-if="stats" class="grid grid-cols-2 border border-border-dim rounded-lg overflow-hidden">
-        <div class="flex flex-col border-r border-border-dim">
-          <div class="p-4 text-center border-b border-border-dim">
+      <div v-if="stats" class="grid grid-cols-2 border border-overlay rounded-lg overflow-hidden">
+        <div class="flex flex-col border-r border-overlay">
+          <div class="p-4 text-center border-b border-overlay">
             <p class="heading-1">
               {{ stats.trainCount }}
             </p>
@@ -132,7 +129,7 @@
           </div>
         </div>
         <div class="flex flex-col">
-          <div class="p-4 text-center border-b border-border-dim">
+          <div class="p-4 text-center border-b border-overlay">
             <p class="heading-1">
               {{ stats.totalDays }}
             </p>
@@ -148,19 +145,19 @@
       </div>
 
       <div class="stack">
-        <h3 class="text-base font-medium text-fg">アクティビティ履歴</h3>
+        <h3 class="text-base font-medium text-text">アクティビティ履歴</h3>
 
         <div v-if="activities.length > 0">
           <div class="overflow-x-auto">
             <table class="table-base">
-              <thead class="border-b border-border-dim">
+              <thead class="border-b border-overlay">
                 <tr>
                   <th class="th-base">日時</th>
                   <th class="th-base">時間 (h)</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="activity in activities" :key="activity.id" class="border-b border-border-dim">
+                <tr v-for="activity in activities" :key="activity.id" class="border-b border-overlay">
                   <td class="td-base whitespace-nowrap">{{ new Date(activity.date).toLocaleDateString() }}</td>
                   <td class="td-base whitespace-nowrap">{{ activity.period }}</td>
                 </tr>
@@ -168,17 +165,17 @@
             </table>
           </div>
 
-          <div class="flex justify-between items-center py-4 border-t border-border-dim">
+          <div class="flex justify-between items-center py-4 border-t border-overlay">
             <button
               :disabled="page <= 1"
-              class="px-3 py-1 text-sm border border-border-dim bg-transparent rounded-md text-fg cursor-pointer transition-colors hover:bg-bg-dim disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-1 text-sm border border-overlay bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-base-dim disabled:opacity-50 disabled:cursor-not-allowed"
               @click="page > 1 && changePage(page - 1)">
               前へ
             </button>
             <span class="text-sub">{{ page }} ページ目</span>
             <button
               :disabled="activities.length < limit"
-              class="px-3 py-1 text-sm border border-border-dim bg-transparent rounded-md text-fg cursor-pointer transition-colors hover:bg-bg-dim disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-1 text-sm border border-overlay-dim bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-overlay disabled:opacity-50 disabled:cursor-not-allowed"
               @click="changePage(page + 1)">
               次へ
             </button>
@@ -192,9 +189,9 @@
         <div class="px-4 py-3 bg-red-500/10 border-b border-red-500/20">
           <h3 class="text-sm font-medium text-red-500">危険な操作</h3>
         </div>
-        <div class="p-4 flex flex-col gap-4">
+        <div class="p-4 stack">
           <div class="flex justify-between items-center">
-            <p class="text-sm font-medium text-fg">ユーザーを削除</p>
+            <p class="text-sm font-medium text-text">ユーザーを削除</p>
             <button
               v-if="!showDeleteConfirm"
               class="px-4 py-1.5 text-sm font-medium text-red-500 border border-red-500 bg-transparent rounded-md cursor-pointer transition-all hover:bg-red-500/10"
@@ -216,10 +213,10 @@
               v-model="deleteConfirmName"
               type="text"
               placeholder="ユーザー名を入力"
-              class="w-full px-3 py-2 border border-red-500/30 rounded-md text-base bg-bg text-fg focus:outline-none focus:ring-2 focus:ring-red-500" />
+              class="w-full px-3 py-2 border border-red-500/30 rounded-md text-base bg-base text-text focus:outline-none focus:ring-2 focus:ring-red-500" />
             <div class="flex gap-2">
               <button
-                class="btn bg-transparent text-fg-dim hover:bg-bg-muted hover:text-fg"
+                class="btn bg-transparent text-subtext hover:bg-base-overlay hover:text-text"
                 @click="
                   showDeleteConfirm = false;
                   deleteConfirmName = '';
@@ -238,7 +235,7 @@
           <div
             v-if="showFinalConfirm"
             class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[4px]">
-            <div class="w-full max-w-md bg-bg rounded-lg shadow-xl p-6 flex flex-col gap-4 m-4">
+            <div class="w-full max-w-md bg-base rounded-lg shadow-xl p-6 stack m-4">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
                   <svg
@@ -254,7 +251,7 @@
                       d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-fg">本当に削除しますか？</h3>
+                <h3 class="text-lg font-semibold text-text">本当に削除しますか？</h3>
               </div>
               <p class="text-sub">
                 <strong>{{ user?.lastName }} {{ user?.firstName }}</strong>

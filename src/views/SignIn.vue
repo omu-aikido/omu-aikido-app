@@ -2,13 +2,13 @@
   <div class="flex items-center justify-center p-4">
     <SignedIn>
       <div class="card w-full h-full">
-        <h1 class="text-3xl text-center font-bold text-fg tracking-tighter">Welcome Back</h1>
-        <p class="text-base text-fg-dim opacity-80">
+        <h1 class="text-3xl text-center font-bold text-text tracking-tighter">Welcome Back</h1>
+        <p class="text-base text-subtext opacity-80">
           ログインが完了しました。<br />
           ホームへリダイレクトしています。
         </p>
         <div class="w-full mt-4 mb-2 flex justify-center">
-          <div class="w-48 h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div class="w-48 h-3 bg-overlay rounded-full overflow-hidden">
             <div
               :style="{ width: gaugePercent + '%' }"
               class="h-full bg-blue-500 transition-[width] duration-1000 ease" />
@@ -26,7 +26,7 @@
     <SignedOut>
       <div class="card w-full h-full mx-auto max-w-md">
         <div class="p-2">
-          <h1 class="text-2xl font-bold text-fg">サインイン</h1>
+          <h1 class="heading-1">サインイン</h1>
         </div>
         <div class="p-2 pt-0">
           <div class="flex flex-col gap-6">
@@ -67,7 +67,7 @@
                   <label for="password" class="form-label">パスワード</label>
                   <a
                     href="https://accounts.omu-aikido.com/sign-in/"
-                    class="ml-auto inline-block text-base text-fg-dim underline underline-offset-4 hover:underline"
+                    class="ml-auto inline-block text-base text-subtext underline underline-offset-4 hover:underline"
                     target="_blank"
                     rel="noopener noreferrer">
                     パスワードを忘れた
@@ -84,7 +84,7 @@
 
               <div v-if="error" class="mt-4 text-base text-red-500">
                 <p>{{ error }}</p>
-                <div class="mt-4 text-base text-fg-dim">
+                <div class="mt-4 text-base text-subtext">
                   サインインに失敗する場合は、
                   <a
                     href="https://accounts.omu-aikido.com"
@@ -136,7 +136,7 @@
             </button>
           </div>
           <hr class="my-6" />
-          <div class="mt-4 text-center text-base text-fg-dim">
+          <div class="mt-4 text-center text-base text-subtext">
             まだアカウントがありませんか?
             <RouterLink to="/sign-up" class="text-blue-500 underline underline-offset-4 hover:text-blue-600">
               サインアップ

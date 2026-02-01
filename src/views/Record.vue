@@ -81,7 +81,7 @@ const selectedDateActivities = computed(() => {
   <div class="min-h-[calc(100vh-4rem)] flex flex-col max-w-7xl mx-auto px-4">
     <SignedIn>
       <div class="flex-1 flex flex-col max-w-2xl mx-auto w-full gap-4">
-        <h1 class="text-2xl font-bold text-fg shrink-0">活動記録</h1>
+        <h1 class="heading-1 shrink-0">活動記録</h1>
 
         <div v-if="error" class="bg-red-50 text-red-500 p-4 rounded-lg shrink-0 dark:bg-red-900/10">
           {{ error }}
@@ -101,11 +101,11 @@ const selectedDateActivities = computed(() => {
         <div class="fixed inset-0 bg-black/50 backdrop-blur-[4px]" aria-hidden="true" />
         <div class="fixed inset-0 flex w-screen items-center justify-center p-4">
           <DialogPanel
-            class="w-full max-w-md bg-bg rounded-xl shadow-md p-6 border border-border-dim max-h-[90vh] overflow-y-auto">
+            class="w-full max-w-md bg-surface rounded-xl shadow-md p-6 border border-overlay max-h-[90vh] overflow-y-auto">
             <div class="flex-between mb-4">
-              <DialogTitle class="text-lg font-bold text-fg"> 記録を追加・編集 </DialogTitle>
+              <DialogTitle class="text-lg font-bold text-text"> 記録を追加・編集 </DialogTitle>
               <button
-                class="p-1 rounded-full bg-transparent border-none text-fg-dim cursor-pointer transition-colors hover:bg-bg-dim"
+                class="p-1 rounded-full bg-transparent border-none text-text-dim cursor-pointer transition-colors bg-overlay"
                 @click="closeModal">
                 <XIcon class="w-5 h-5" />
               </button>
@@ -113,19 +113,19 @@ const selectedDateActivities = computed(() => {
 
             <ActivityForm :loading="loading" :initial-date="selectedDate" @submit="handleSubmit" />
 
-            <div v-if="selectedDateActivities.length > 0" class="mt-8 pt-6 border-t border-border-dim">
-              <h4 class="text-sm font-bold text-fg-dim mb-3">この日の記録</h4>
+            <div v-if="selectedDateActivities.length > 0" class="mt-8 pt-6 border-t border-overlay">
+              <h4 class="text-sm font-bold text-text-dim mb-3">この日の記録</h4>
               <div class="flex flex-col gap-2">
                 <div
                   v-for="activity in selectedDateActivities"
                   :key="activity.id"
-                  class="flex-between p-3 bg-bg rounded-lg">
+                  class="flex-between p-3 bg-surface rounded-lg">
                   <div class="flex items-baseline gap-2">
-                    <span class="text-lg font-bold text-fg">{{ activity.period }}</span>
+                    <span class="text-lg font-bold text-text">{{ activity.period }}</span>
                     <span class="text-sub">時間</span>
                   </div>
                   <button
-                    class="p-2 text-gray-400 bg-transparent border-none rounded-full cursor-pointer transition-colors hover:text-red-500 hover:bg-bg-dim"
+                    class="p-2 text-subtext bg-transparent border-none rounded-full cursor-pointer transition-colors hover:text-red-500 bg-overlay"
                     title="記録を削除"
                     @click="handleDelete(activity.id)">
                     <Trash2Icon class="w-4 h-4" />

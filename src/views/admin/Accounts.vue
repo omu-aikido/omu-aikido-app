@@ -1,13 +1,13 @@
 <template>
   <div class="flex flex-col gap-6 px-3 py-4 md:px-6">
     <AdminMenu />
-    <div class="flex flex-col gap-4 items-start sm:flex-row sm:items-center sm:justify-between">
+    <div class="stack items-start sm:flex-row sm:items-center sm:justify-between">
       <div class="flex gap-2 w-full sm:w-auto sm:ml-auto">
         <input
           v-model="searchQuery"
           type="text"
           placeholder="名前・メアドで検索..."
-          class="flex-1 min-w-0 px-3 py-2 bg-bg border border-border-dim rounded-md text-fg text-base transition-shadow sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="flex-1 min-w-0 px-3 py-2 bg-base border border-overlay rounded-md text-text text-base transition-shadow sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
           @keyup.enter="handleSearch" />
         <button
           class="px-4 py-2 bg-blue-500 text-white border-none rounded-md text-base cursor-pointer transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -29,28 +29,28 @@
     <div v-else class="w-full">
       <div class="overflow-x-auto">
         <table class="table-base">
-          <thead class="border-b border-border-dim">
+          <thead class="border-b border-overlay">
             <tr>
               <th
-                class="th-base cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
+                class="th-base cursor-pointer select-none transition-colors hover:bg-base-dim md:px-6"
                 @click="toggleSort('name')">
                 名前
                 <span v-if="sortBy === 'name'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
               <th
-                class="th-base cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
+                class="th-base cursor-pointer select-none transition-colors hover:bg-base-dim md:px-6"
                 @click="toggleSort('role')">
                 役職
                 <span v-if="sortBy === 'role'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
               <th
-                class="th-base cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
+                class="th-base cursor-pointer select-none transition-colors hover:bg-base-dim md:px-6"
                 @click="toggleSort('grade')">
                 級段位
                 <span v-if="sortBy === 'grade'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
               <th
-                class="th-base cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
+                class="th-base cursor-pointer select-none transition-colors hover:bg-base-dim md:px-6"
                 @click="toggleSort('year')">
                 学年
                 <span v-if="sortBy === 'year'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
@@ -61,29 +61,29 @@
             <tr
               v-for="user in sortedUsers"
               :key="user.id"
-              class="cursor-pointer transition-colors border-b border-border-dim hover:bg-bg-dim last:border-b-0"
+              class="cursor-pointer transition-colors border-b border-overlay hover:bg-base-dim last:border-b-0"
               @click="$router.push(`/admin/users/${user.id}`)">
               <td class="td-base md:px-6">
                 <div class="flex items-center gap-2">
                   <img :src="user.imageUrl" alt="" class="avatar-sm ml-1" />
                   <div class="flex flex-col">
-                    <span class="font-medium text-fg"> {{ user.lastName }} {{ user.firstName }} </span>
+                    <span class="font-medium text-text"> {{ user.lastName }} {{ user.firstName }} </span>
                     <small class="text-sub">{{ user.emailAddress }}</small>
                   </div>
                 </div>
               </td>
               <td class="td-base md:px-6 text-center">
-                <span class="text-fg">{{ user.profile.roleLabel }}</span>
+                <span class="text-text">{{ user.profile.roleLabel }}</span>
               </td>
               <td class="td-base md:px-6 text-center">
-                <span class="text-fg">{{ user.profile.gradeLabel }}</span>
+                <span class="text-text">{{ user.profile.gradeLabel }}</span>
               </td>
               <td class="td-base md:px-6 text-center">
-                <span class="text-fg">{{ user.profile.yearLabel }}</span>
+                <span class="text-text">{{ user.profile.yearLabel }}</span>
               </td>
             </tr>
             <tr v-if="sortedUsers.length === 0">
-              <td colspan="4" class="p-12 text-center text-fg-dim">ユーザーが見つかりませんでした</td>
+              <td colspan="4" class="p-12 text-center text-text-dim">ユーザーが見つかりませんでした</td>
             </tr>
           </tbody>
         </table>

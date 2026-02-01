@@ -77,14 +77,14 @@ const progressComment = computed(() => {
 
 <template>
   <div class="w-full" data-testid="practice-count-graph">
-    <div v-if="loading" class="card animate-pulse rounded" data-testid="loading-skeleton">
+    <div v-if="loading" class="card animate-pulse rounded" data-testid="skeleton">
       <div class="flex flex-col justify-center items-center">
         <div class="flex justify-center bg-gray-200 dark:bg-gray-700 rounded">
           <span class="text-transparent"> &nbsp;&nbsp; </span>
         </div>
         <div class="w-full max-w-96 py-4">
-          <div class="rounded-md h-2 w-full bg-bg-dim">
-            <div class="h-full max-w-full rounded-md bg-fg" style="width: 0" />
+          <div class="rounded-md h-2 w-full bg-overlay">
+            <div class="h-full max-w-full rounded-md bg-text" style="width: 0" />
           </div>
         </div>
       </div>
@@ -99,14 +99,14 @@ const progressComment = computed(() => {
         <div class="w-full cursor-pointer flex flex-col justify-center items-center">
           <div class="text-lg">
             {{ translateGrade(targetGrade) }}{{ promotionType }}まで
-            <span class="text-fg font-bold text-3xl">{{ needToNextGrade }}</span>
+            <span class="text-text font-bold text-3xl">{{ needToNextGrade }}</span>
             日
           </div>
 
           <div class="w-full max-w-96 py-4">
-            <div class="rounded-md h-2 w-full bg-bg-dim">
+            <div class="rounded-md h-2 w-full bg-overlay">
               <div
-                class="h-full max-w-full rounded-md bg-fg"
+                class="h-full max-w-full rounded-md bg-text"
                 :style="{ width: `${progressPercentage}%` }"
                 data-testid="progress-bar" />
             </div>
@@ -114,9 +114,9 @@ const progressComment = computed(() => {
         </div>
       </summary>
 
-      <div class="p-4 border-t border-bg-dim">
+      <div class="p-4 border-t border-overlay">
         <div class="space-y-3">
-          <p class="text-fg">
+          <p class="text-text">
             {{ progressComment }}
           </p>
           <p>
@@ -128,7 +128,7 @@ const progressComment = computed(() => {
           <p class="mt-2">
             現在、<span class="text-green-500 font-medium">{{ practiceData.practiceCount }}日</span>達成しています。
           </p>
-          <p class="text-xs text-fg-dim mt-1">※ 1.5時間の稽古を1日分として換算</p>
+          <p class="text-xs text-subtext mt-1">※ 1.5時間の稽古を1日分として換算</p>
         </div>
       </div>
     </details>

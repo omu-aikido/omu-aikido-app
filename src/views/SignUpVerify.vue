@@ -2,8 +2,8 @@
   <div class="flex items-center justify-center p-4">
     <div class="card w-full h-full mx-auto max-w-md">
       <div class="p-6 pb-4">
-        <h1 class="text-2xl font-bold text-fg">認証コードの確認</h1>
-        <p class="mt-2 text-base text-fg-dim">メールアドレスに送信された認証コードを入力してください。</p>
+        <h1 class="heading-1">認証コードの確認</h1>
+        <p class="mt-2 text-base text-subtext">メールアドレスに送信された認証コードを入力してください。</p>
       </div>
       <div class="p-6 pt-0">
         <form class="stack" @submit.prevent="handleVerify">

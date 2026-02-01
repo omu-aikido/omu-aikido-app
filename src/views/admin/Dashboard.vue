@@ -18,19 +18,19 @@
           <span class="text-sub">{{ thresholdDate }} 以降の記録なし</span>
         </div>
 
-        <div v-if="inactiveUsers.length === 0" class="p-8 text-center text-fg-dim">
+        <div v-if="inactiveUsers.length === 0" class="p-8 text-center text-text-dim">
           該当する部員はいません。全員活動中です！
         </div>
 
-        <div v-else class="flex flex-col max-h-[500px] overflow-y-auto border-t border-b border-border-dim">
+        <div v-else class="flex flex-col max-h-[500px] overflow-y-auto border-t border-b border-overlay">
           <div
             v-for="user in inactiveUsers"
             :key="user.id"
-            class="flex items-center gap-3 p-4 cursor-pointer border-b border-border-dim transition-colors last:border-b-0 hover:bg-bg-dim"
+            class="flex items-center gap-3 p-4 cursor-pointer border-b border-overlay transition-colors last:border-b-0 hover:bg-overlay"
             @click="$router.push(`/admin/users/${user.id}`)">
             <img :src="user.imageUrl" alt="" class="avatar-md" />
             <div class="flex-1 min-w-0">
-              <div class="font-medium text-fg truncate">{{ user.lastName }} {{ user.firstName }}</div>
+              <div class="font-medium text-text truncate">{{ user.lastName }} {{ user.firstName }}</div>
               <div class="text-sub truncate">
                 {{ user.profile.roleLabel }}
               </div>

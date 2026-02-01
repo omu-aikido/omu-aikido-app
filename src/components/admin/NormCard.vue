@@ -1,8 +1,5 @@
 <template>
-  <a
-    v-bind:href="'/admin/users/' + user.id"
-    class="card flex flex-col gap-4 md:p-6 cursor-pointer"
-    data-testid="norm-card">
+  <a v-bind:href="'/admin/users/' + user.id" class="card stack md:p-6 cursor-pointer" data-testid="norm-card">
     <div class="flex items-start justify-between gap-3">
       <div class="flex items-center gap-3">
         <img :src="user.imageUrl" alt="" class="avatar-md" />

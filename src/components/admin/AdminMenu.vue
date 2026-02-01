@@ -6,33 +6,24 @@
     class="border-b border-border-dim"
     data-testid="admin-menu"
     @change="handleTabChange">
-    <TabList class="flex gap-1">
+    <TabList class="tab-list">
       <Tab v-slot="{ selected }" as="template">
         <button
-          :class="[
-            'px-4 py-2.5 text-sm font-medium bg-transparent border-none border-b-2 cursor-pointer transition-colors outline-none',
-            selected ? 'border-blue-500 text-blue-500' : 'border-transparent text-fg-dim hover:text-blue-500',
-          ]"
+          :class="['tab-item', selected ? 'border-blue-500 text-blue-500' : 'border-transparent']"
           data-testid="tab-dashboard">
           トップ
         </button>
       </Tab>
       <Tab v-slot="{ selected }" as="template">
         <button
-          :class="[
-            'px-4 py-2.5 text-sm font-medium bg-transparent border-none border-b-2 cursor-pointer transition-colors outline-none',
-            selected ? 'border-blue-500 text-blue-500' : 'border-transparent text-fg-dim hover:text-blue-500',
-          ]"
+          :class="['tab-item', selected ? 'border-blue-500 text-blue-500' : 'border-transparent']"
           data-testid="tab-accounts">
           アカウント
         </button>
       </Tab>
       <Tab v-slot="{ selected }" as="template">
         <button
-          :class="[
-            'px-4 py-2.5 text-sm font-medium bg-transparent border-none border-b-2 cursor-pointer transition-colors outline-none',
-            selected ? 'border-blue-500 text-blue-500' : 'border-transparent text-fg-dim hover:text-blue-500',
-          ]"
+          :class="['tab-item', selected ? 'border-blue-500 text-blue-500' : 'border-transparent']"
           data-testid="tab-norms">
           審査
         </button>

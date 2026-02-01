@@ -19,7 +19,7 @@ const getRankClass = (rank: number) => {
 
 <template>
   <div class="w-full" data-testid="practice-ranking">
-    <div v-if="loading" class="card loading-skeleton" data-testid="loading-state">
+    <div v-if="loading" class="card skeleton" data-testid="loading-state">
       <div class="flex-between">
         <div class="flex flex-col">
           <div class="text-xs font-medium text-fg-dim mb-1 text-transparent bg-gray-200 dark:bg-gray-700 rounded-md">

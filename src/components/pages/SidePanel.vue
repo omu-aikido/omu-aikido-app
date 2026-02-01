@@ -123,7 +123,7 @@ watch(isOpen, (value) => {
   width: 100%;
   max-width: 20rem;
   z-index: 101;
-  --at-apply: top-0 right-0 bg-bg opacity-90;
+  --at-apply: top-0 right-0 bg-base opacity-90;
 }
 
 .drawer-enter {

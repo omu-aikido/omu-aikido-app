@@ -108,14 +108,14 @@ const getNavIconClass = (theme: string) => {
   if (theme === 'blue') return 'bg-blue-500/10 text-blue-500 stroke-blue-500';
   if (theme === 'indigo') return 'bg-indigo-500/10 text-indigo-500 stroke-indigo-500';
   if (theme === 'green') return 'bg-green-500/10 text-teal-400 stroke-teal-400';
-  return 'bg-bg-dim text-fg-dim';
+  return 'bg-surface-dim text-text-dim';
 };
 
 const getNavLabelClass = (theme: string) => {
   if (theme === 'blue') return 'group-hover:text-blue-500';
   if (theme === 'indigo') return 'group-hover:text-indigo-500';
   if (theme === 'green') return 'group-hover:text-teal-400';
-  return 'group-hover:text-fg';
+  return 'group-hover:text-text';
 };
 </script>
 
@@ -137,7 +137,7 @@ const getNavLabelClass = (theme: string) => {
 
         <ActivityForm :loading="activityLoading" @submit="handleAddActivity" />
 
-        <hr class="pb-2 border-border-dim opacity-60" />
+        <hr class="pb-2 border-overlay opacity-60" />
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <component
@@ -147,7 +147,7 @@ const getNavLabelClass = (theme: string) => {
             :to="item.href.startsWith('http') ? undefined : item.href"
             :href="item.href.startsWith('http') ? item.href : undefined"
             :class="[
-              'group flex flex-col items-center justify-center gap-3 rounded-xl bg-bg border border-border-dim p-6 shadow-sm cursor-pointer no-underline transition-shadow transition-colors hover:shadow-md',
+              'group flex flex-col items-center justify-center gap-3 rounded-xl bg-surface border border-overlay p-6 shadow-sm cursor-pointer no-underline transition-shadow transition-colors hover:shadow-md',
               getNavItemClass(item.theme),
             ]">
             <div
@@ -157,7 +157,7 @@ const getNavLabelClass = (theme: string) => {
               ]">
               <component :is="iconMap[item.icon as keyof typeof iconMap]" class="w-6 h-6" />
             </div>
-            <span :class="['font-bold text-fg-dim transition-colors', getNavLabelClass(item.theme)]">{{
+            <span :class="['font-bold text-text-dim transition-colors', getNavLabelClass(item.theme)]">{{
               item.title
             }}</span>
           </component>
