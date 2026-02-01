@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-6 px-3 py-4 md:px-6">
     <AdminMenu />
-    <div class="flex items-center gap-2 text-sm text-fg-dim">
+    <div class="flex items-center gap-2 text-sub">
       <router-link to="/admin/accounts" class="hover:underline hover:text-blue-500"> アカウント一覧 </router-link>
       <span class="text-fg-dim">/</span>
       <span class="font-medium text-fg">ユーザー詳細</span>
@@ -9,7 +9,7 @@
 
     <div v-if="loading" class="loading-container">
       <div class="loading-spinner" />
-      <p class="text-sm text-fg-dim">Loading...</p>
+      <p class="text-sub">Loading...</p>
     </div>
 
     <div v-else-if="error" class="p-4 bg-red-500/10 text-red-500 rounded-md border border-red-500/20">
@@ -18,26 +18,23 @@
 
     <div v-else-if="user" class="flex flex-col gap-6">
       <div class="flex flex-col">
-        <div class="flex flex-col gap-4">
+        <div class="stack">
           <div class="flex justify-between items-start gap-4">
             <div class="flex items-center gap-4">
-              <img
-                :src="user.imageUrl"
-                alt=""
-                class="w-14 h-14 rounded-full bg-gray-200 object-cover dark:bg-gray-700" />
+              <img :src="user.imageUrl" alt="" class="avatar-lg" />
               <div class="flex flex-col">
                 <div class="flex items-center gap-2 flex-wrap">
                   <h1 class="text-xl font-bold text-fg">{{ user.lastName }} {{ user.firstName }}</h1>
                   <div v-if="!isEditing" class="flex items-center gap-1.5">
-                    <span class="px-2 py-0.5 text-sm font-medium rounded-sm bg-gray-200 text-fg-dim">
+                    <span class="badge-gray">
                       {{ roleLabels[user.profile?.role as string] || '部員' }}
                     </span>
-                    <span class="px-2 py-0.5 text-sm font-medium rounded-sm bg-gray-200 text-fg-dim">
+                    <span class="badge-gray">
                       {{ gradeLabels[user.profile?.grade as number] || '無級' }}
                     </span>
                   </div>
                 </div>
-                <div class="flex items-center flex-wrap gap-2 text-sm text-fg-dim mt-1">
+                <div class="flex items-center flex-wrap gap-2 text-sub mt-1">
                   <span>{{ user.emailAddress }}</span>
                   <template v-if="!isEditing">
                     <span class="w-1 h-1 rounded-full bg-gray-400" />
@@ -75,30 +72,24 @@
             @submit.prevent="handleUpdateProfile">
             <div class="grid gap-4 grid-cols-1 md:grid-cols-2">
               <div class="flex flex-col gap-1">
-                <label class="text-sm font-medium text-fg-dim">役職</label>
-                <select
-                  v-model="formData.role"
-                  class="w-full h-fit px-3 py-2 bg-bg border border-border-dim rounded-md text-fg text-base transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label class="form-label">役職</label>
+                <select v-model="formData.role" class="input-base h-fit">
                   <option v-for="(label, key) in roleLabels" :key="key" :value="key">
                     {{ label }}
                   </option>
                 </select>
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-sm font-medium text-fg-dim">級段位</label>
-                <select
-                  v-model.number="formData.grade"
-                  class="w-full h-fit px-3 py-2 bg-bg border border-border-dim rounded-md text-fg text-base transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label class="form-label">級段位</label>
+                <select v-model.number="formData.grade" class="input-base h-fit">
                   <option v-for="(label, key) in gradeLabels" :key="key" :value="key">
                     {{ label }}
                   </option>
                 </select>
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-sm font-medium text-fg-dim">学年</label>
-                <select
-                  v-model="formData.year"
-                  class="w-full h-fit px-3 py-2 bg-bg border border-border-dim rounded-md text-fg text-base transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label class="form-label">学年</label>
+                <select v-model="formData.year" class="input-base h-fit">
                   <option v-for="(label, key) in yearLabels" :key="key" :value="key">
                     {{ label }}
                   </option>
@@ -114,16 +105,8 @@
             </div>
 
             <div class="flex justify-end gap-2">
-              <button
-                type="button"
-                class="btn bg-bg-card text-fg-dim border border-bg-dim hover:bg-bg-muted"
-                @click="cancelEditing">
-                キャンセル
-              </button>
-              <button
-                type="submit"
-                class="btn bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500)"
-                :disabled="updating">
+              <button type="button" class="btn-secondary" @click="cancelEditing">キャンセル</button>
+              <button type="submit" class="btn-primary" :disabled="updating">
                 {{ updating ? '更新中...' : '更新' }}
               </button>
             </div>
@@ -139,13 +122,13 @@
             <p class="text-2xl font-bold text-fg">
               {{ stats.trainCount }}
             </p>
-            <span class="text-sm text-fg-dim">総稽古回数</span>
+            <span class="text-sub">総稽古回数</span>
           </div>
           <div class="p-4 text-center">
             <p class="text-2xl font-bold text-fg">
               {{ stats.doneTrain }}
             </p>
-            <span class="text-sm text-fg-dim">現在の級での稽古</span>
+            <span class="text-sub">現在の級での稽古</span>
           </div>
         </div>
         <div class="flex flex-col">
@@ -153,18 +136,18 @@
             <p class="text-2xl font-bold text-fg">
               {{ stats.totalDays }}
             </p>
-            <span class="text-sm text-fg-dim">稽古日数</span>
+            <span class="text-sub">稽古日数</span>
           </div>
           <div class="p-4 text-center">
             <p class="text-2xl font-bold text-fg">
               {{ stats.totalHours }}
             </p>
-            <span class="text-sm text-fg-dim">総時間</span>
+            <span class="text-sub">総時間</span>
           </div>
         </div>
       </div>
 
-      <div class="flex flex-col gap-4">
+      <div class="stack">
         <h3 class="text-base font-medium text-fg">アクティビティ履歴</h3>
 
         <div v-if="activities.length > 0">
@@ -192,7 +175,7 @@
               @click="page > 1 && changePage(page - 1)">
               前へ
             </button>
-            <span class="text-sm text-fg-dim">{{ page }} ページ目</span>
+            <span class="text-sub">{{ page }} ページ目</span>
             <button
               :disabled="activities.length < limit"
               class="px-3 py-1 text-sm border border-border-dim bg-transparent rounded-md text-fg cursor-pointer transition-colors hover:bg-bg-dim disabled:opacity-50 disabled:cursor-not-allowed"
@@ -202,7 +185,7 @@
           </div>
         </div>
 
-        <div v-else class="text-center p-8 text-sm text-fg-dim">履歴はありません</div>
+        <div v-else class="text-center p-8 text-sub">履歴はありません</div>
       </div>
 
       <div class="mt-8 border border-red-500/30 rounded-lg overflow-hidden">
@@ -219,7 +202,7 @@
               削除
             </button>
           </div>
-          <p class="text-sm text-fg-dim">
+          <p class="text-sub">
             このユーザーとそのすべてのデータを完全に削除します。<strong>この操作は取り消せません。</strong>
           </p>
 
@@ -244,7 +227,7 @@
                 キャンセル
               </button>
               <button
-                class="btn bg-red-500 text-white hover:bg-red-600"
+                class="btn-danger"
                 :disabled="deleteConfirmName !== (user?.lastName ?? '') + (user?.firstName ?? '')"
                 @click="showFinalConfirm = true">
                 次へ
@@ -273,13 +256,13 @@
                 </div>
                 <h3 class="text-lg font-semibold text-fg">本当に削除しますか？</h3>
               </div>
-              <p class="text-sm text-fg-dim">
+              <p class="text-sub">
                 <strong>{{ user?.lastName }} {{ user?.firstName }}</strong>
                 さんのアカウントとすべての活動記録が削除されます。この操作は元に戻せません。
               </p>
               <div class="flex justify-end gap-3">
                 <button
-                  class="btn bg-bg-card text-fg-dim border border-bg-dim hover:bg-bg-muted"
+                  class="btn-secondary"
                   @click="
                     showFinalConfirm = false;
                     showDeleteConfirm = false;
@@ -287,10 +270,7 @@
                   ">
                   キャンセル
                 </button>
-                <button
-                  class="btn bg-red-500 text-white hover:bg-red-600"
-                  :disabled="deleting"
-                  @click="handleDeleteUser">
+                <button class="btn-danger" :disabled="deleting" @click="handleDeleteUser">
                   {{ deleting ? '削除中...' : '削除する' }}
                 </button>
               </div>

@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-6 px-3 py-4 md:px-6">
     <AdminMenu />
-    <div class="flex flex-col gap-4 items-start sm:flex-row sm:items-center sm:justify-between">
+    <div class="stack items-start sm:flex-row sm:items-center sm:justify-between">
       <div class="flex flex-wrap gap-4 w-full sm:w-auto">
         <div class="flex bg-gray-200 dark:bg-gray-700 rounded-lg p-1">
           <button
@@ -63,7 +63,7 @@
 
     <div v-if="loading" class="loading-container">
       <div class="loading-spinner" />
-      <p class="text-sm text-fg-dim">Loading...</p>
+      <p class="text-sub">Loading...</p>
     </div>
 
     <div v-else-if="error" class="p-4 bg-red-500/10 text-red-500 rounded-md border border-red-500/20">

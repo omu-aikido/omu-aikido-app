@@ -10,7 +10,7 @@
       <div v-if="errorMessage" class="alert-error">{{ errorMessage }}</div>
       <div v-if="successMessage" class="alert-success">{{ successMessage }}</div>
       <div class="mt-4 pt-4 border-t border-border-dim">
-        <p class="text-sm text-fg-dim">
+        <p class="text-sub">
           メールアドレス・パスワード変更などは
           <a
             class="text-blue-500 inline-flex items-center font-medium no-underline break-all hover:underline"

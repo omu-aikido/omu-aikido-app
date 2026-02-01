@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col gap-4">
-    <div v-if="!user" class="animate-pulse flex items-center justify-between gap-4">
+    <div v-if="!user" class="animate-pulse flex-between gap-4">
       <div class="flex items-center gap-4 min-w-0">
-        <div class="w-14 h-14 shrink-0 rounded-full bg-bg-dim" />
+        <div class="avatar-lg bg-bg-dim" />
         <div class="min-w-0 flex flex-col gap-1">
           <div class="h-7 w-32 bg-bg-dim rounded-md text-lg font-bold text-transparent">User Name</div>
           <div class="h-5 w-24 bg-bg-dim rounded-md text-base text-transparent">@username</div>
@@ -11,7 +11,7 @@
       <div class="h-8 w-14 shrink-0 rounded-md bg-bg-dim" />
     </div>
 
-    <div v-else-if="!isEditing" class="flex items-center justify-between gap-4">
+    <div v-else-if="!isEditing" class="flex-between gap-4">
       <div class="flex items-center gap-4 min-w-0">
         <div class="relative w-14 h-14 shrink-0 overflow-hidden rounded-full shadow-[0_0_0_2px_var(--color-bg-dim)]">
           <img :src="safeImageUrl" :alt="user?.firstName || 'Profile'" uno-rouned-img />
@@ -21,15 +21,10 @@
           <p class="text-base text-fg-dim truncate my-0">@{{ user?.username }}</p>
         </div>
       </div>
-      <button
-        type="button"
-        class="btn bg-bg-card text-fg-dim border border-border hover:bg-bg-muted px-3 py-1.5 text-sm"
-        @click="isEditing = true">
-        編集
-      </button>
+      <button type="button" class="btn-secondary px-3 py-1.5 text-sm" @click="isEditing = true">編集</button>
     </div>
 
-    <form v-else enctype="multipart/form-data" class="flex flex-col gap-4" @submit.prevent="handleSubmit">
+    <form v-else enctype="multipart/form-data" class="stack" @submit.prevent="handleSubmit">
       <div class="flex-1 flex flex-col gap-4">
         <div class="flex items-start gap-4">
           <div
@@ -59,18 +54,10 @@
       </p>
 
       <div class="flex gap-3 pt-2">
-        <button
-          type="submit"
-          class="btn bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500) w-full"
-          :disabled="isSubmitting">
+        <button type="submit" class="btn-primary w-full" :disabled="isSubmitting">
           {{ isSubmitting ? '保存中...' : '保存' }}
         </button>
-        <button
-          type="button"
-          class="btn bg-bg-card text-fg-dim border border-border hover:bg-bg-muted w-full"
-          @click="cancelEdit">
-          キャンセル
-        </button>
+        <button type="button" class="btn-secondary w-full" @click="cancelEdit">キャンセル</button>
       </div>
     </form>
   </div>

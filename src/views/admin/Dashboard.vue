@@ -4,7 +4,7 @@
 
     <div v-if="loading" class="loading-container">
       <div class="loading-spinner" />
-      <p class="text-sm text-fg-dim">Loading...</p>
+      <p class="text-sub">Loading...</p>
     </div>
 
     <div v-else-if="error" class="bg-red-500/10 text-red-500 p-4 rounded-md border border-red-500/20">
@@ -15,7 +15,7 @@
       <section class="section">
         <div class="px-3 pb-4 flex flex-col items-center justify-between">
           <h2 class="text-lg font-bold text-red-500 flex items-center gap-2">直近3週間活動のない部員</h2>
-          <span class="text-sm text-fg-dim">{{ thresholdDate }} 以降の記録なし</span>
+          <span class="text-sub">{{ thresholdDate }} 以降の記録なし</span>
         </div>
 
         <div v-if="inactiveUsers.length === 0" class="p-8 text-center text-fg-dim">
@@ -28,10 +28,10 @@
             :key="user.id"
             class="flex items-center gap-3 p-4 cursor-pointer border-b border-border-dim transition-colors last:border-b-0 hover:bg-bg-dim"
             @click="$router.push(`/admin/users/${user.id}`)">
-            <img :src="user.imageUrl" alt="" class="w-10 h-10 rounded-full bg-gray-200 object-cover dark:bg-gray-700" />
+            <img :src="user.imageUrl" alt="" class="avatar-md" />
             <div class="flex-1 min-w-0">
               <div class="font-medium text-fg truncate">{{ user.lastName }} {{ user.firstName }}</div>
-              <div class="text-sm text-fg-dim truncate">
+              <div class="text-sub truncate">
                 {{ user.profile.roleLabel }}
               </div>
             </div>

@@ -1,7 +1,7 @@
 <template>
   <div class="py-2">
     <div v-if="!profile" class="flex flex-col gap-4 animate-pulse" data-testid="loading-skeleton">
-      <div class="flex items-center justify-between">
+      <div class="flex-between">
         <h3 class="text-lg font-bold text-fg">プロフィール</h3>
         <div class="h-8 w-12 rounded-md bg-bg-muted-active" />
       </div>
@@ -25,8 +25,8 @@
       </div>
     </div>
 
-    <div v-else-if="!isEditing" class="flex flex-col gap-4">
-      <div class="flex items-center justify-between">
+    <div v-else-if="!isEditing" class="stack">
+      <div class="flex-between">
         <h3 class="text-lg font-bold text-fg">プロフィール</h3>
         <button
           type="button"
@@ -57,9 +57,9 @@
       </div>
     </div>
 
-    <form v-else class="flex flex-col gap-4" @submit.prevent="handleSubmit">
+    <form v-else class="stack" @submit.prevent="handleSubmit">
       <div class="flex flex-col gap-1.5">
-        <label class="block text-sm font-medium text-fg-dim">級段位</label>
+        <label class="block form-label">級段位</label>
         <Listbox v-model="formData.grade">
           <div class="relative mt-1">
             <ListboxButton
@@ -155,10 +155,7 @@
       </p>
 
       <div class="flex gap-3 pt-2">
-        <button
-          type="submit"
-          class="btn bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500) w-full"
-          :disabled="isSubmitting">
+        <button type="submit" class="btn-primary w-full" :disabled="isSubmitting">
           {{ isSubmitting ? '保存中...' : '保存' }}
         </button>
         <button

@@ -38,23 +38,17 @@ const emit = defineEmits<Emits>();
             <DialogTitle class="text-lg font-bold text-fg" data-testid="confirm-title">
               {{ title }}
             </DialogTitle>
-            <DialogDescription class="mt-2 text-sm text-fg-dim">
+            <DialogDescription class="mt-2 text-sub">
               {{ description }}
             </DialogDescription>
           </div>
         </div>
 
         <div class="mt-6 flex justify-end gap-3">
-          <button
-            class="btn bg-bg-card text-fg-dim border border-border hover:bg-bg-muted"
-            data-testid="cancel-btn"
-            @click="$emit('cancel')">
+          <button class="btn-secondary" data-testid="cancel-btn" @click="$emit('cancel')">
             {{ cancelText }}
           </button>
-          <button
-            class="btn bg-red-500 text-white hover:bg-rose-600 border-none"
-            data-testid="confirm-btn"
-            @click="$emit('confirm')">
+          <button class="btn-danger" data-testid="confirm-btn" @click="$emit('confirm')">
             {{ confirmText }}
           </button>
         </div>

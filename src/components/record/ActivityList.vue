@@ -79,7 +79,7 @@ const isToday = (date: Date) => {
 </script>
 
 <template>
-  <div class="sticky top-0 z-20 flex items-center justify-between p-3 px-4 backdrop-blur-md">
+  <div class="sticky top-0 z-20 flex-between p-3 px-4 backdrop-blur-md">
     <button
       class="p-1 rounded-full bg-transparent border-none text-fg-dim cursor-pointer transition-colors hover:bg-bg-muted-active"
       data-testid="prev-month-btn"
@@ -117,7 +117,7 @@ const isToday = (date: Date) => {
         ]"
         data-testid="day-item"
         @click="handleDateClick(day)">
-        <div class="flex flex-col items-center justify-center w-12 flex-shrink-0 p-2 transition-colors">
+        <div class="stack items-center justify-center w-12 flex-shrink-0 p-2 transition-colors">
           <span
             :class="[
               'text-lg font-bold leading-none text-fg',
@@ -135,20 +135,20 @@ const isToday = (date: Date) => {
         </div>
 
         <div class="flex-1 flex flex-col justify-center p-2">
-          <div v-if="getActivitiesForDay(day).length > 0" class="flex items-center justify-between">
+          <div v-if="getActivitiesForDay(day).length > 0" class="flex-between">
             <div class="flex items-baseline gap-2">
-              <span class="text-sm text-fg-dim">合計</span>
+              <span class="text-sub">合計</span>
               <span class="text-xl font-bold text-fg">
                 {{ getActivitiesForDay(day).reduce((sum, a) => sum + a.period, 0) }}
               </span>
-              <span class="text-sm text-fg-dim">時間</span>
+              <span class="text-sub">時間</span>
             </div>
             <span class="text-sm text-fg-light"> {{ getActivitiesForDay(day).length }}件の記録 </span>
           </div>
 
           <div v-else class="h-full flex items-center">
             <span
-              class="inline-flex items-center gap-1 text-sm text-fg-dim opacity-0 transition-opacity day-row:hover:opacity-100">
+              class="inline-flex items-center gap-1 text-sub opacity-0 transition-opacity day-row:hover:opacity-100">
               <PlusIcon class="w-4 h-4" /> 記録を追加
             </span>
           </div>

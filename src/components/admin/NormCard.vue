@@ -5,10 +5,10 @@
     data-testid="norm-card">
     <div class="flex items-start justify-between gap-3">
       <div class="flex items-center gap-3">
-        <img :src="user.imageUrl" alt="" class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700" />
+        <img :src="user.imageUrl" alt="" class="avatar-md" />
         <div>
           <div class="font-medium text-fg">{{ user.lastName }} {{ user.firstName }}</div>
-          <div class="text-sm text-fg-dim flex flex-wrap gap-x-2 gap-y-0">
+          <div class="text-sub flex flex-wrap gap-x-2 gap-y-0">
             <span>{{ norm.gradeLabel }}</span>
             <span v-if="norm.lastPromotionDate" class="text-gray-400">•</span>
             <span v-if="norm.lastPromotionDate">昇級: {{ norm.lastPromotionDate }}</span>
@@ -16,12 +16,7 @@
         </div>
       </div>
       <div class="shrink-0">
-        <span
-          :class="[
-            'px-2 py-0.5 text-sm font-medium rounded-full',
-            progress >= 100 ? 'bg-green-500/10 text-green-500' : 'bg-yellow-400/10 text-yellow-400',
-          ]"
-          data-testid="norm-status">
+        <span :class="progress >= 100 ? 'badge-green' : 'badge-yellow'" data-testid="norm-status">
           {{ progress >= 100 ? '達成' : '未達成' }}
         </span>
       </div>
@@ -29,7 +24,7 @@
 
     <div class="flex-1 flex flex-col justify-end gap-2">
       <div class="flex flex-col gap-1">
-        <div class="flex justify-between text-sm text-fg-dim">
+        <div class="flex justify-between text-sub">
           <span>進捗率 {{ Math.min(100, Math.round(progress)) }}%</span>
           <span class="font-medium text-fg-dim">{{ norm.current }} / {{ norm.required }} 回</span>
         </div>

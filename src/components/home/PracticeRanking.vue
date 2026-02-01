@@ -20,7 +20,7 @@ const getRankClass = (rank: number) => {
 <template>
   <div class="w-full" data-testid="practice-ranking">
     <div v-if="loading" class="card loading-skeleton" data-testid="loading-state">
-      <div class="flex items-center justify-between">
+      <div class="flex-between">
         <div class="flex flex-col">
           <div class="text-xs font-medium text-fg-dim mb-1 text-transparent bg-gray-200 dark:bg-gray-700 rounded-md">
             月間ランキング (&nbsp;&nbsp;&nbsp;&nbsp;年&nbsp;月)
@@ -30,7 +30,7 @@ const getRankClass = (rank: number) => {
               class="text-4xl font-bold tracking-tight text-fg text-transparent bg-gray-200 dark:bg-gray-700 rounded-md"
               >&nbsp;</span
             >
-            <span class="text-sm font-medium text-fg-dim text-transparent bg-gray-200 dark:bg-gray-700 rounded-md"
+            <span class="form-label text-transparent bg-gray-200 dark:bg-gray-700 rounded-md"
               >/ &nbsp;&nbsp;&nbsp;&nbsp;</span
             >
           </div>
@@ -38,17 +38,13 @@ const getRankClass = (rank: number) => {
         <div class="flex flex-col items-end">
           <div class="text-sm text-fg flex gap-0.5">
             <span class="text-lg font-bold text-transparent bg-gray-200 dark:bg-gray-700 rounded-md">&nbsp;</span>
-            <span class="text-sm text-fg-dim text-transparent bg-gray-200 dark:bg-gray-700 rounded-md"
-              >&nbsp;&nbsp;</span
-            >
+            <span class="text-sub text-transparent bg-gray-200 dark:bg-gray-700 rounded-md">&nbsp;&nbsp;</span>
           </div>
           <div class="text-sm text-fg flex gap-0.5">
             <span class="text-lg font-bold text-transparent bg-gray-200 dark:bg-gray-700 rounded-md"
               >&nbsp;&nbsp;&nbsp;&nbsp;</span
             >
-            <span class="text-sm text-fg-dim text-transparent bg-gray-200 dark:bg-gray-700 rounded-md"
-              >&nbsp;&nbsp;</span
-            >
+            <span class="text-sub text-transparent bg-gray-200 dark:bg-gray-700 rounded-md">&nbsp;&nbsp;</span>
           </div>
         </div>
       </div>
@@ -59,7 +55,7 @@ const getRankClass = (rank: number) => {
     </div>
 
     <div v-else-if="rankingData?.currentUserRanking" class="card">
-      <div class="flex items-center justify-between">
+      <div class="flex-between">
         <div class="flex flex-col">
           <div class="text-xs font-medium text-fg-dim mb-1">月間ランキング ({{ rankingData.period }})</div>
           <div class="flex items-baseline gap-1.5" data-testid="rank-display">
@@ -67,24 +63,24 @@ const getRankClass = (rank: number) => {
               :class="['text-4xl font-bold tracking-tight text-fg', getRankClass(rankingData.currentUserRanking.rank)]">
               {{ rankingData.currentUserRanking.rank }}
             </span>
-            <span class="text-sm font-medium text-fg-dim">/ {{ rankingData.totalUsers }}</span>
+            <span class="form-label">/ {{ rankingData.totalUsers }}</span>
           </div>
         </div>
         <div class="flex flex-col items-end" data-testid="stats-display">
           <div class="text-sm text-fg flex gap-0.5 items-baseline">
             <span class="text-lg font-bold">{{ rankingData.currentUserRanking.practiceCount }}</span>
-            <span class="text-sm text-fg-dim">回</span>
+            <span class="text-sub">回</span>
           </div>
           <div class="text-sm text-fg flex gap-0.5 items-baseline">
             <span class="text-lg font-bold">{{ rankingData.currentUserRanking.totalPeriod }}</span>
-            <span class="text-sm text-fg-dim">時間</span>
+            <span class="text-sub">時間</span>
           </div>
         </div>
       </div>
     </div>
 
     <div v-else-if="rankingData" class="text-center py-8">
-      <div class="text-sm text-fg-dim">この期間の稽古記録がありません</div>
+      <div class="text-sub">この期間の稽古記録がありません</div>
     </div>
   </div>
 </template>

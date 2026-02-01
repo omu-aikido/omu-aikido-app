@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="stack">
     <div class="grid grid-cols-2 gap-4">
       <Input
         id="lastName"
@@ -36,20 +36,8 @@
       @update:model-value="onUpdate('username', $event)" />
 
     <div class="flex justify-between pt-2">
-      <button
-        type="button"
-        class="btn bg-bg-card text-fg-dim border border-bg-dim hover:bg-bg-muted"
-        :disabled="isSignUpCreated"
-        @click="prevStep">
-        戻る
-      </button>
-      <button
-        type="button"
-        class="btn bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500)"
-        :disabled="isSignUpCreated"
-        @click="handleNext">
-        次へ
-      </button>
+      <button type="button" class="btn-secondary" :disabled="isSignUpCreated" @click="prevStep">戻る</button>
+      <button type="button" class="btn-primary" :disabled="isSignUpCreated" @click="handleNext">次へ</button>
     </div>
   </div>
 </template>

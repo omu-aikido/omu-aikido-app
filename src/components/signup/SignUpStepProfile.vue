@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="stack">
     <div class="grid grid-cols-2 gap-4">
       <div class="flex flex-col gap-2">
         <label for="year" class="text-base font-medium text-fg-dim">学年</label>
@@ -61,24 +61,15 @@
         :disabled="isSignUpCreated"
         class="w-4 h-4 rounded-sm border border-border-dim accent-blue-500"
         @change="onUpdate('legalAccepted', ($event.target as HTMLInputElement).checked)" />
-      <label for="legalAccepted" class="text-sm text-fg-dim"> 利用規約とプライバシーポリシーに同意します。 </label>
+      <label for="legalAccepted" class="text-sub"> 利用規約とプライバシーポリシーに同意します。 </label>
     </div>
     <p v-if="formErrors.legalAccepted" class="text-sm text-red-500">
       {{ formErrors.legalAccepted }}
     </p>
 
     <div class="flex justify-between pt-2">
-      <button
-        type="button"
-        class="btn bg-bg-card text-fg-dim border border-bg-dim hover:bg-bg-muted"
-        :disabled="isSignUpCreated"
-        @click="prevStep">
-        戻る
-      </button>
-      <button
-        type="submit"
-        class="btn bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500)"
-        :disabled="!canSubmit">
+      <button type="button" class="btn-secondary" :disabled="isSignUpCreated" @click="prevStep">戻る</button>
+      <button type="submit" class="btn-primary" :disabled="!canSubmit">
         {{ isSignUpCreated ? '登録中...' : '登録' }}
       </button>
     </div>

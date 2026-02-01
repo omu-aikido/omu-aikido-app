@@ -19,7 +19,7 @@
 
     <div v-if="loading" class="loading-container">
       <div class="loading-spinner" />
-      <p class="text-sm text-fg-dim">Loading...</p>
+      <p class="text-sub">Loading...</p>
     </div>
 
     <div v-else-if="error" class="p-4 bg-red-500/10 text-red-500 rounded-md border border-red-500/20">
@@ -65,13 +65,10 @@
               @click="$router.push(`/admin/users/${user.id}`)">
               <td class="p-4 md:px-6">
                 <div class="flex items-center gap-2">
-                  <img
-                    :src="user.imageUrl"
-                    alt=""
-                    class="w-6 h-6 rounded-full bg-gray-200 object-cover ml-1 dark:bg-gray-700" />
+                  <img :src="user.imageUrl" alt="" class="avatar-sm ml-1" />
                   <div class="flex flex-col">
                     <span class="font-medium text-fg"> {{ user.lastName }} {{ user.firstName }} </span>
-                    <small class="text-sm text-fg-dim">{{ user.emailAddress }}</small>
+                    <small class="text-sub">{{ user.emailAddress }}</small>
                   </div>
                 </div>
               </td>

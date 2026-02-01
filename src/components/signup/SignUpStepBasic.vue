@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="stack">
     <Input
       id="email"
       name="email"
@@ -118,11 +118,7 @@
     </div>
 
     <div class="flex justify-end pt-2">
-      <button
-        type="button"
-        class="btn bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500)"
-        :disabled="isSignUpCreated || !canProceed"
-        @click="handleNextClick">
+      <button type="button" class="btn-primary" :disabled="isSignUpCreated || !canProceed" @click="handleNextClick">
         次へ
       </button>
     </div>

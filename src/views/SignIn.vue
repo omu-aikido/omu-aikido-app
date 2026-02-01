@@ -14,7 +14,7 @@
               class="h-full bg-blue-500 transition-[width] duration-1000 ease" />
           </div>
         </div>
-        <p class="text-sm text-fg-dim">
+        <p class="text-sub">
           画面が切り替わらない場合は
           <RouterLink :to="redirectUrl" class="text-blue-500 underline underline-offset-4 hover:text-blue-600">
             こちら
@@ -32,15 +32,12 @@
           <div class="flex flex-col gap-6">
             <form v-if="needsVerification" @submit.prevent="handleVerifyCode">
               <Input id="code" v-model="code" label="認証コード" name="code" required placeholder="認証コードを入力" />
-              <p class="text-sm text-fg-dim mt-2">{{ email }} に認証コードを送信しました</p>
+              <p class="text-sub mt-2">{{ email }} に認証コードを送信しました</p>
 
               <div v-if="error" class="mt-4 text-base text-red-500">
                 <p>{{ error }}</p>
               </div>
-              <button
-                type="submit"
-                class="btn bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500) w-full mt-4"
-                :disabled="isLoading">
+              <button type="submit" class="btn-primary w-full mt-4" :disabled="isLoading">
                 {{ isLoading ? '認証中...' : '認証' }}
               </button>
             </form>
@@ -67,7 +64,7 @@
                       Workaround: Don't use 'label' prop on Input, render label manually above it.
                  -->
                 <div class="flex items-center mb-1.5">
-                  <label for="password" class="text-sm font-medium text-fg-dim">パスワード</label>
+                  <label for="password" class="form-label">パスワード</label>
                   <a
                     href="https://accounts.omu-aikido.com/sign-in/"
                     class="ml-auto inline-block text-base text-fg-dim underline underline-offset-4 hover:underline"
@@ -100,10 +97,7 @@
                 </div>
               </div>
 
-              <button
-                type="submit"
-                class="btn bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500) w-full mt-6"
-                :disabled="isLoading">
+              <button type="submit" class="btn-primary w-full mt-6" :disabled="isLoading">
                 {{ isLoading ? 'サインイン中...' : 'サインイン' }}
               </button>
             </form>

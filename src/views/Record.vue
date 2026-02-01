@@ -102,7 +102,7 @@ const selectedDateActivities = computed(() => {
         <div class="fixed inset-0 flex w-screen items-center justify-center p-4">
           <DialogPanel
             class="w-full max-w-md bg-bg rounded-xl shadow-md p-6 border border-border-dim max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex-between mb-4">
               <DialogTitle class="text-lg font-bold text-fg"> 記録を追加・編集 </DialogTitle>
               <button
                 class="p-1 rounded-full bg-transparent border-none text-fg-dim cursor-pointer transition-colors hover:bg-bg-dim"
@@ -119,10 +119,10 @@ const selectedDateActivities = computed(() => {
                 <div
                   v-for="activity in selectedDateActivities"
                   :key="activity.id"
-                  class="flex items-center justify-between p-3 bg-bg rounded-lg">
+                  class="flex-between p-3 bg-bg rounded-lg">
                   <div class="flex items-baseline gap-2">
                     <span class="text-lg font-bold text-fg">{{ activity.period }}</span>
-                    <span class="text-sm text-fg-dim">時間</span>
+                    <span class="text-sub">時間</span>
                   </div>
                   <button
                     class="p-2 text-gray-400 bg-transparent border-none rounded-full cursor-pointer transition-colors hover:text-red-500 hover:bg-bg-dim"

@@ -6,7 +6,7 @@
         <p class="mt-2 text-base text-fg-dim">メールアドレスに送信された認証コードを入力してください。</p>
       </div>
       <div class="p-6 pt-0">
-        <form class="flex flex-col gap-4" @submit.prevent="handleVerify">
+        <form class="stack" @submit.prevent="handleVerify">
           <Input
             id="code"
             v-model="code"
@@ -20,10 +20,7 @@
             {{ error }}
           </div>
 
-          <button
-            type="submit"
-            class="btn bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500) w-full"
-            :disabled="isLoading">
+          <button type="submit" class="btn-primary w-full" :disabled="isLoading">
             {{ isLoading ? '確認中...' : '確認する' }}
           </button>
         </form>
