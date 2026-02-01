@@ -74,7 +74,7 @@ export default defineConfig({
     // --- Form Controls ---
     {
       'input-base':
-        'w-full px-3 py-2 bg-surface0 border border-overlay0 rounded-md text-text transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-overlay',
+        'w-full px-3 py-2 bg-surface0 border border-overlay0 rounded-md text-text transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-overlay1',
       'form-label': 'text-sm font-medium text-subtext',
     },
 
@@ -129,7 +129,7 @@ export default defineConfig({
         const base = 'btn';
         if (c === 'primary')
           return `${base} bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500)`;
-        if (c === 'secondary') return `${base} bg-surface0 text-subtext border border-overlay1 hover:bg-overlay`;
+        if (c === 'secondary') return `${base} bg-surface0 text-subtext border border-overlay1 hover:bg-overlay0`;
         if (c === 'danger') return `${base} bg-red-500 text-white hover:bg-red-600 border-none`;
         return '';
       },
