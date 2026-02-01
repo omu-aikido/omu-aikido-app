@@ -1,81 +1,98 @@
 <template>
-  <div class="container">
-    <div v-if="!profile" class="skeleton" data-testid="loading-skeleton">
-      <div class="header-row">
-        <h3 class="title">プロフィール</h3>
-        <div class="skeleton-btn" />
+  <div class="py-2">
+    <div v-if="!profile" class="flex flex-col gap-4 animate-pulse" data-testid="loading-skeleton">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-fg">プロフィール</h3>
+        <div class="h-8 w-12 rounded-md bg-bg-muted-active" />
       </div>
-      <div class="info-list">
-        <div class="info-row">
-          <span class="info-label">級段位</span>
-          <span class="skeleton-text">五段</span>
+      <div class="flex flex-col gap-3">
+        <div class="flex justify-between items-center py-1">
+          <span class="text-base text-fg-dim">級段位</span>
+          <span class="text-base font-medium text-transparent bg-bg-muted-active rounded-md">五段</span>
         </div>
-        <div class="info-row">
-          <span class="info-label">取得日</span>
-          <span class="skeleton-text">2024/01/01</span>
+        <div class="flex justify-between items-center py-1">
+          <span class="text-base text-fg-dim">取得日</span>
+          <span class="text-base font-medium text-transparent bg-bg-muted-active rounded-md">2024/01/01</span>
         </div>
-        <div class="info-row">
-          <span class="info-label">入部年</span>
-          <span class="skeleton-text">2024</span>
+        <div class="flex justify-between items-center py-1">
+          <span class="text-base text-fg-dim">入部年</span>
+          <span class="text-base font-medium text-transparent bg-bg-muted-active rounded-md">2024</span>
         </div>
-        <div class="info-row">
-          <span class="info-label">学年</span>
-          <span class="skeleton-text">学部4年</span>
+        <div class="flex justify-between items-center py-1">
+          <span class="text-base text-fg-dim">学年</span>
+          <span class="text-base font-medium text-transparent bg-bg-muted-active rounded-md">学部4年</span>
         </div>
       </div>
     </div>
 
-    <div v-else-if="!isEditing" class="display-mode">
-      <div class="header-row">
-        <h3 class="title">プロフィール</h3>
-        <Button variant="secondary" size="sm" @click="isEditing = true">編集</Button>
+    <div v-else-if="!isEditing" class="flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-fg">プロフィール</h3>
+        <button
+          type="button"
+          class="btn bg-bg-card text-fg-dim border border-border hover:bg-bg-muted px-3 py-1.5 text-sm"
+          @click="isEditing = true">
+          編集
+        </button>
       </div>
-      <div class="info-list">
-        <div class="info-row">
-          <span class="info-label">級段位</span>
-          <span class="info-value">{{ translateGrade(profile?.grade ?? '') || '-' }}</span>
+      <div class="flex flex-col gap-3">
+        <div class="flex justify-between items-center py-1">
+          <span class="text-base text-fg-dim">級段位</span>
+          <span class="text-base font-medium text-fg">{{ translateGrade(profile?.grade ?? '') || '-' }}</span>
         </div>
-        <div class="info-row">
-          <span class="info-label">取得日</span>
-          <span class="info-value">
+        <div class="flex justify-between items-center py-1">
+          <span class="text-base text-fg-dim">取得日</span>
+          <span class="text-base font-medium text-fg">
             {{ profile?.getGradeAt ? new Date(profile.getGradeAt).toLocaleDateString() : '-' }}
           </span>
         </div>
-        <div class="info-row">
-          <span class="info-label">入部年</span>
-          <span class="info-value">{{ profile?.joinedAt || '-' }}</span>
+        <div class="flex justify-between items-center py-1">
+          <span class="text-base text-fg-dim">入部年</span>
+          <span class="text-base font-medium text-fg">{{ profile?.joinedAt || '-' }}</span>
         </div>
-        <div class="info-row">
-          <span class="info-label">学年</span>
-          <span class="info-value">{{ translateYear(profile?.year ?? '') || '-' }}</span>
+        <div class="flex justify-between items-center py-1">
+          <span class="text-base text-fg-dim">学年</span>
+          <span class="text-base font-medium text-fg">{{ translateYear(profile?.year ?? '') || '-' }}</span>
         </div>
       </div>
     </div>
 
-    <form v-else class="edit-form" @submit.prevent="handleSubmit">
-      <div class="field">
-        <label class="label">級段位</label>
+    <form v-else class="flex flex-col gap-4" @submit.prevent="handleSubmit">
+      <div class="flex flex-col gap-1.5">
+        <label class="block text-sm font-medium text-fg-dim">級段位</label>
         <Listbox v-model="formData.grade">
-          <div class="listbox-container">
-            <ListboxButton class="listbox-btn">
-              <span class="listbox-value">{{ translateGrade(formData.grade) }}</span>
-              <span class="listbox-icon">
-                <ChevronsUpDownIcon class="icon-sm" aria-hidden="true" />
+          <div class="relative mt-1">
+            <ListboxButton
+              class="relative w-full cursor-default rounded-md bg-bg-card border border-border px-3 py-2 pr-10 text-left text-base text-fg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <span class="block overflow-hidden text-ellipsis whitespace-nowrap">{{
+                translateGrade(formData.grade)
+              }}</span>
+              <span class="pointer-events-none absolute inset-0 right-0 flex items-center pr-2 justify-end">
+                <ChevronsUpDownIcon class="w-4 h-4 text-fg-dim" aria-hidden="true" />
               </span>
             </ListboxButton>
-            <transition leave-active-class="leave-active" leave-from-class="leave-from" leave-to-class="leave-to">
-              <ListboxOptions class="listbox-options">
+            <transition
+              leave-active-class="transition-opacity duration-100 ease-in"
+              leave-from-class="opacity-100"
+              leave-to-class="opacity-0">
+              <ListboxOptions
+                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-bg-card p-1 shadow-md border border-border">
                 <ListboxOption
                   v-for="gradeOption in gradeOptions"
                   :key="gradeOption.grade"
                   v-slot="{ active, selected }"
                   :value="gradeOption.grade">
-                  <li :class="['listbox-option', { 'option-active': active }]">
-                    <span :class="['option-text', { 'option-selected': selected }]">
+                  <li
+                    :class="[
+                      'relative cursor-default select-none py-2 px-4 pr-10 text-fg',
+                      active ? 'bg-bg-muted' : '',
+                    ]">
+                    <span
+                      :class="['block overflow-hidden text-ellipsis whitespace-nowrap', selected ? 'font-medium' : '']">
                       {{ gradeOption.name }}
                     </span>
-                    <span v-if="selected" class="option-check">
-                      <CheckIcon class="icon-sm" aria-hidden="true" />
+                    <span v-if="selected" class="absolute inset-0 left-0 flex items-center pl-3 text-blue-500">
+                      <CheckIcon class="w-4 h-4" aria-hidden="true" />
                     </span>
                   </li>
                 </ListboxOption>
@@ -89,29 +106,41 @@
 
       <Input v-model="formData.joinedAt" type="number" label="入部年" min="2020" max="9999" />
 
-      <div class="field">
-        <label class="label">学年</label>
+      <div class="flex flex-col gap-1.5">
+        <label class="block text-sm font-medium text-fg-dim">学年</label>
         <Listbox v-model="formData.year">
-          <div class="listbox-container">
-            <ListboxButton class="listbox-btn">
-              <span class="listbox-value">{{ translateYear(formData.year) }}</span>
-              <span class="listbox-icon">
-                <ChevronsUpDownIcon class="icon-sm" aria-hidden="true" />
+          <div class="relative mt-1">
+            <ListboxButton
+              class="relative w-full cursor-default rounded-md bg-bg-card border border-border px-3 py-2 pr-10 text-left text-base text-fg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <span class="block overflow-hidden text-ellipsis whitespace-nowrap">{{
+                translateYear(formData.year)
+              }}</span>
+              <span class="pointer-events-none absolute inset-0 right-0 flex items-center pr-2 justify-end">
+                <ChevronsUpDownIcon class="w-4 h-4 text-fg-dim" aria-hidden="true" />
               </span>
             </ListboxButton>
-            <transition leave-active-class="leave-active" leave-from-class="leave-from" leave-to-class="leave-to">
-              <ListboxOptions class="listbox-options">
+            <transition
+              leave-active-class="transition-opacity duration-100 ease-in"
+              leave-from-class="opacity-100"
+              leave-to-class="opacity-0">
+              <ListboxOptions
+                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-bg-card p-1 shadow-md border border-border">
                 <ListboxOption
                   v-for="yearOption in yearOptions"
                   :key="yearOption.year"
                   v-slot="{ active, selected }"
                   :value="yearOption.year">
-                  <li :class="['listbox-option', { 'option-active': active }]">
-                    <span :class="['option-text', { 'option-selected': selected }]">
+                  <li
+                    :class="[
+                      'relative cursor-default select-none py-2 px-4 pr-10 text-fg',
+                      active ? 'bg-bg-muted' : '',
+                    ]">
+                    <span
+                      :class="['block overflow-hidden text-ellipsis whitespace-nowrap', selected ? 'font-medium' : '']">
                       {{ yearOption.name }}
                     </span>
-                    <span v-if="selected" class="option-check">
-                      <CheckIcon class="icon-sm" aria-hidden="true" />
+                    <span v-if="selected" class="absolute inset-0 left-0 flex items-center pl-3 text-blue-500">
+                      <CheckIcon class="w-4 h-4" aria-hidden="true" />
                     </span>
                   </li>
                 </ListboxOption>
@@ -121,15 +150,23 @@
         </Listbox>
       </div>
 
-      <p v-if="message" :class="['message', isError ? 'message-error' : 'message-success']">
+      <p v-if="message" :class="['text-sm font-medium', isError ? 'text-red-500' : 'text-green-500']">
         {{ message }}
       </p>
 
-      <div class="actions">
-        <Button type="submit" variant="primary" :disabled="isSubmitting" full-width>
+      <div class="flex gap-3 pt-2">
+        <button
+          type="submit"
+          class="btn bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500) w-full"
+          :disabled="isSubmitting">
           {{ isSubmitting ? '保存中...' : '保存' }}
-        </Button>
-        <Button type="button" variant="secondary" full-width @click="cancelEdit"> キャンセル </Button>
+        </button>
+        <button
+          type="button"
+          class="btn bg-bg-card text-fg-dim border border-border hover:bg-bg-muted w-full"
+          @click="cancelEdit">
+          キャンセル
+        </button>
       </div>
     </form>
   </div>
@@ -139,7 +176,6 @@
 import { grade, translateGrade } from '@/share/lib/grade';
 import { translateYear, year } from '@/share/lib/year';
 import { AccountMetadata } from '@/share/types/account';
-import Button from '@/src/components/ui/UiButton.vue';
 import Input from '@/src/components/ui/UiInput.vue';
 import hc from '@/src/lib/honoClient';
 import { queryKeys } from '@/src/lib/queryKeys';
@@ -280,225 +316,3 @@ function cancelEdit() {
   message.value = '';
 }
 </script>
-
-<style scoped>
-.container {
-  padding: var(--space-2) 0;
-}
-
-.skeleton {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-}
-
-.skeleton-btn {
-  height: 2rem;
-  width: 3rem;
-  border-radius: var(--radius-md);
-  background: var(--bg-muted-active);
-}
-
-.skeleton-text {
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: transparent;
-  background: var(--bg-muted-active);
-  border-radius: var(--radius-md);
-}
-
-.display-mode,
-.edit-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.info-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-1) 0;
-}
-
-.info-label {
-  font-size: var(--text-base);
-  color: var(--text-secondary);
-}
-
-.info-value {
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--text-primary);
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1-5);
-}
-
-.label {
-  display: block;
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-}
-
-.listbox-container {
-  position: relative;
-  margin-top: var(--space-1);
-}
-
-.listbox-btn {
-  position: relative;
-  width: 100%;
-  cursor: default;
-  border-radius: var(--radius-md);
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  padding: var(--space-2) var(--space-3);
-  padding-right: 2.5rem;
-  text-align: left;
-  font-size: var(--text-base);
-  color: var(--text-primary);
-}
-
-.listbox-btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.listbox-value {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.listbox-icon {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
-  padding-right: var(--space-2);
-  justify-content: flex-end;
-}
-
-.icon-sm {
-  width: 1rem;
-  height: 1rem;
-  color: var(--border-strong);
-}
-
-.listbox-options {
-  position: absolute;
-  z-index: 10;
-  margin-top: var(--space-1);
-  max-height: 15rem;
-  width: 100%;
-  overflow: auto;
-  border-radius: var(--radius-md);
-  background: var(--bg-card);
-  padding: var(--space-1) 0;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-dim);
-}
-
-.listbox-option {
-  position: relative;
-  cursor: default;
-  user-select: none;
-  padding: var(--space-2) var(--space-4);
-  padding-left: 2.5rem;
-  color: var(--text-primary);
-}
-
-.option-active {
-  background: var(--bg-muted);
-  color: var(--text-primary);
-}
-
-.option-text {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.option-selected {
-  font-weight: var(--font-medium);
-}
-
-.option-check {
-  position: absolute;
-  inset: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  padding-left: var(--space-3);
-  color: var(--primary);
-}
-
-.leave-active {
-  transition: opacity 100ms ease-in;
-}
-
-.leave-from {
-  opacity: 1;
-}
-
-.leave-to {
-  opacity: 0;
-}
-
-.message {
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-}
-
-.message-error {
-  color: var(--red-500);
-}
-
-.message-success {
-  color: var(--green-500);
-}
-
-.actions {
-  display: flex;
-  gap: var(--space-3);
-  padding-top: var(--space-2);
-}
-</style>

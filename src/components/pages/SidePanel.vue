@@ -40,7 +40,7 @@
                 活動記録
               </RouterLink>
               <RouterLink to="/account" class="flex-inline items-center gap-2" @click="close">
-                <UserAvatar alt="User Avatar" />
+                <UserAvatar alt="User Avatar" rounded />
                 アカウント設定
               </RouterLink>
             </nav>

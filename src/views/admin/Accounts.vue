@@ -1,46 +1,59 @@
 <template>
-  <div class="page-container">
+  <div class="flex flex-col gap-6 px-3 py-4 md:px-6">
     <AdminMenu />
-    <div class="controls">
-      <div class="search-group">
+    <div class="flex flex-col gap-4 items-start sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex gap-2 w-full sm:w-auto sm:ml-auto">
         <input
           v-model="searchQuery"
           type="text"
           placeholder="名前・メアドで検索..."
-          class="search-input"
+          class="flex-1 min-w-0 px-3 py-2 bg-bg border border-border-dim rounded-md text-fg text-base transition-shadow sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
           @keyup.enter="handleSearch" />
-        <button class="search-btn" @click="handleSearch">検索</button>
+        <button
+          class="px-4 py-2 bg-blue-500 text-white border-none rounded-md text-base cursor-pointer transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          @click="handleSearch">
+          検索
+        </button>
       </div>
     </div>
 
     <div v-if="loading" class="loading-container">
-      <Loading />
+      <div class="loading-spinner" />
+      <p class="text-sm text-fg-dim">Loading...</p>
     </div>
 
-    <div v-else-if="error" class="error-banner">
+    <div v-else-if="error" class="p-4 bg-red-500/10 text-red-500 rounded-md border border-red-500/20">
       {{ error }}
     </div>
 
-    <div v-else class="table-container">
-      <div class="table-scroll">
-        <table class="data-table">
-          <thead>
+    <div v-else class="w-full">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-base">
+          <thead class="border-b border-border-dim">
             <tr>
-              <th class="sortable" @click="toggleSort('name')">
+              <th
+                class="p-3 font-medium text-fg-dim cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
+                @click="toggleSort('name')">
                 名前
-                <span v-if="sortBy === 'name'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                <span v-if="sortBy === 'name'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
-              <th class="sortable" @click="toggleSort('role')">
+              <th
+                class="p-3 font-medium text-fg-dim cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
+                @click="toggleSort('role')">
                 役職
-                <span v-if="sortBy === 'role'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                <span v-if="sortBy === 'role'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
-              <th class="sortable" @click="toggleSort('grade')">
+              <th
+                class="p-3 font-medium text-fg-dim cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
+                @click="toggleSort('grade')">
                 級段位
-                <span v-if="sortBy === 'grade'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                <span v-if="sortBy === 'grade'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
-              <th class="sortable" @click="toggleSort('year')">
+              <th
+                class="p-3 font-medium text-fg-dim cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
+                @click="toggleSort('year')">
                 学年
-                <span v-if="sortBy === 'year'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                <span v-if="sortBy === 'year'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
             </tr>
           </thead>
@@ -48,29 +61,32 @@
             <tr
               v-for="user in sortedUsers"
               :key="user.id"
-              class="table-row"
+              class="cursor-pointer transition-colors border-b border-border-dim hover:bg-bg-dim last:border-b-0"
               @click="$router.push(`/admin/users/${user.id}`)">
-              <td>
-                <div class="user-cell">
-                  <img :src="user.imageUrl" alt="" class="avatar" />
-                  <div class="user-details">
-                    <span class="user-name"> {{ user.lastName }} {{ user.firstName }} </span>
-                    <small class="user-email">{{ user.emailAddress }}</small>
+              <td class="p-4 md:px-6">
+                <div class="flex items-center gap-2">
+                  <img
+                    :src="user.imageUrl"
+                    alt=""
+                    class="w-6 h-6 rounded-full bg-gray-200 object-cover ml-1 dark:bg-gray-700" />
+                  <div class="flex flex-col">
+                    <span class="font-medium text-fg"> {{ user.lastName }} {{ user.firstName }} </span>
+                    <small class="text-sm text-fg-dim">{{ user.emailAddress }}</small>
                   </div>
                 </div>
               </td>
-              <td class="cell-center">
-                <span class="cell-text">{{ user.profile.roleLabel }}</span>
+              <td class="p-4 md:px-6 text-center">
+                <span class="text-fg">{{ user.profile.roleLabel }}</span>
               </td>
-              <td class="cell-center">
-                <span class="cell-text">{{ user.profile.gradeLabel }}</span>
+              <td class="p-4 md:px-6 text-center">
+                <span class="text-fg">{{ user.profile.gradeLabel }}</span>
               </td>
-              <td class="cell-center">
-                <span class="cell-text">{{ user.profile.yearLabel }}</span>
+              <td class="p-4 md:px-6 text-center">
+                <span class="text-fg">{{ user.profile.yearLabel }}</span>
               </td>
             </tr>
             <tr v-if="sortedUsers.length === 0">
-              <td colspan="4" class="empty-cell">ユーザーが見つかりませんでした</td>
+              <td colspan="4" class="p-12 text-center text-fg-dim">ユーザーが見つかりませんでした</td>
             </tr>
           </tbody>
         </table>
@@ -84,7 +100,6 @@ import { ref, computed } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
 import { queryKeys } from '@/src/lib/queryKeys';
 import hc from '@/src/lib/honoClient';
-import Loading from '@/src/components/ui/UiLoading.vue';
 import AdminMenu from '@/src/components/admin/AdminMenu.vue';
 
 const searchQuery = ref('');
@@ -154,214 +169,3 @@ const sortedUsers = computed(() => {
   });
 });
 </script>
-
-<style scoped>
-.page-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  padding: var(--space-4) var(--space-3);
-}
-
-@media (width >= 768px) {
-  .page-container {
-    gap: var(--space-6);
-    padding-inline: var(--space-6);
-  }
-}
-
-.controls {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  align-items: flex-start;
-}
-
-@media (width >= 640px) {
-  .controls {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-}
-
-.search-group {
-  display: flex;
-  gap: var(--space-2);
-  width: 100%;
-}
-
-@media (width >= 640px) {
-  .search-group {
-    width: auto;
-    margin-left: auto;
-  }
-}
-
-.search-input {
-  flex: 1;
-  min-width: 0;
-  padding: var(--space-2) var(--space-3);
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--text-base);
-  transition: box-shadow var(--transition-normal);
-}
-
-@media (width >= 640px) {
-  .search-input {
-    width: 16rem;
-  }
-}
-
-.search-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.search-btn {
-  padding: var(--space-2) var(--space-4);
-  background: var(--primary);
-  color: var(--on-primary);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--text-base);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.search-btn:hover {
-  background: var(--primary-hover);
-}
-
-.search-btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-.loading-container {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
-
-.error-banner {
-  padding: var(--space-4);
-  background: rgb(239 68 68 / 10%);
-  color: var(--red-500);
-  border-radius: var(--radius-md);
-  border: 1px solid rgb(239 68 68 / 20%);
-}
-
-.table-container {
-  width: 100%;
-}
-
-.table-scroll {
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-  text-align: left;
-  border-collapse: collapse;
-  font-size: var(--text-base);
-}
-
-.data-table thead {
-  border-bottom: 1px solid var(--border-dim);
-}
-
-.sortable {
-  padding: var(--space-3);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-  cursor: pointer;
-  user-select: none;
-  transition: background var(--transition-normal);
-}
-
-@media (width >= 768px) {
-  .sortable {
-    padding-inline: var(--space-6);
-  }
-}
-
-.sortable:hover {
-  background: var(--bg-muted);
-}
-
-.sort-icon {
-  margin-left: var(--space-1);
-}
-
-.table-row {
-  cursor: pointer;
-  transition: background var(--transition-normal);
-  border-bottom: 1px solid var(--border-dim);
-}
-
-.table-row:last-child {
-  border-bottom: none;
-}
-
-.table-row:hover {
-  background: var(--bg-muted);
-}
-
-.table-row td {
-  padding: var(--space-4);
-}
-
-@media (width >= 768px) {
-  .table-row td {
-    padding-inline: var(--space-6);
-  }
-}
-
-.user-cell {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.avatar {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: var(--radius-full);
-  background: var(--bg-muted-active);
-  object-fit: cover;
-  margin-left: 0.25rem;
-}
-
-.user-details {
-  display: flex;
-  flex-direction: column;
-}
-
-.user-name {
-  font-weight: var(--font-medium);
-  color: var(--text-primary);
-}
-
-.user-email {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.cell-center {
-  text-align: center;
-}
-
-.cell-text {
-  color: var(--text-primary);
-}
-
-.empty-cell {
-  padding: var(--space-12);
-  text-align: center;
-  color: var(--text-secondary);
-}
-</style>

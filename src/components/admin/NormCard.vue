@@ -1,36 +1,47 @@
 <template>
-  <div class="card" data-testid="norm-card">
-    <div class="header">
-      <div class="user-info">
-        <img :src="user.imageUrl" alt="" class="avatar" />
+  <a
+    v-bind:href="'/admin/users/' + user.id"
+    class="bg-bg-light border border-border-dim rounded-xl shadow-sm p-4 flex flex-col gap-4 md:p-6 cursor-pointer"
+    data-testid="norm-card">
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <img :src="user.imageUrl" alt="" class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700" />
         <div>
-          <div class="user-name">{{ user.lastName }} {{ user.firstName }}</div>
-          <div class="user-meta">
+          <div class="font-medium text-fg">{{ user.lastName }} {{ user.firstName }}</div>
+          <div class="text-sm text-fg-dim flex flex-wrap gap-x-2 gap-y-0">
             <span>{{ norm.gradeLabel }}</span>
-            <span v-if="norm.lastPromotionDate" class="separator">•</span>
+            <span v-if="norm.lastPromotionDate" class="text-gray-400">•</span>
             <span v-if="norm.lastPromotionDate">昇級: {{ norm.lastPromotionDate }}</span>
           </div>
         </div>
       </div>
-      <div class="status-container">
-        <span :class="['status', progress >= 100 ? 'status-complete' : 'status-pending']" data-testid="norm-status">
+      <div class="shrink-0">
+        <span
+          :class="[
+            'px-2 py-0.5 text-sm font-medium rounded-full',
+            progress >= 100 ? 'bg-green-500/10 text-green-500' : 'bg-yellow-400/10 text-yellow-400',
+          ]"
+          data-testid="norm-status">
           {{ progress >= 100 ? '達成' : '未達成' }}
         </span>
       </div>
     </div>
 
-    <div class="progress-section">
-      <div class="progress-info">
-        <div class="progress-header">
+    <div class="flex-1 flex flex-col justify-end gap-2">
+      <div class="flex flex-col gap-1">
+        <div class="flex justify-between text-sm text-fg-dim">
           <span>進捗率 {{ Math.min(100, Math.round(progress)) }}%</span>
-          <span class="progress-count">{{ norm.current }} / {{ norm.required }} 回</span>
+          <span class="font-medium text-fg-dim">{{ norm.current }} / {{ norm.required }} 回</span>
         </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar" :style="{ width: `${Math.min(100, progress)}%` }" data-testid="norm-progress" />
+        <div class="h-1.5 w-full bg-bg-dim rounded-full overflow-hidden">
+          <div
+            class="h-full bg-blue-500 rounded-full transition-[width] duration-500 ease-out"
+            :style="{ width: `${Math.min(100, progress)}%` }"
+            data-testid="norm-progress" />
         </div>
       </div>
     </div>
-  </div>
+  </a>
 </template>
 
 <script setup lang="ts">
@@ -49,121 +60,3 @@ interface NormData {
 
 defineProps<{ user: AdminUserType; norm: NormData; progress: number }>();
 </script>
-
-<style scoped>
-.card {
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-dim);
-  padding: var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-@media (width >= 768px) {
-  .card {
-    padding: var(--space-6);
-  }
-}
-
-.header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-full);
-  background: var(--bg-muted-active);
-}
-
-.user-name {
-  font-weight: var(--font-medium);
-  color: var(--text-primary);
-}
-
-.user-meta {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 var(--space-2);
-}
-
-.separator {
-  color: var(--border-strong);
-}
-
-.status-container {
-  flex-shrink: 0;
-}
-
-.status {
-  padding: var(--space-0-5) var(--space-2);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  border-radius: var(--radius-full);
-}
-
-.status-complete {
-  background: rgb(34 197 94 / 10%);
-  color: var(--green-500);
-}
-
-.status-pending {
-  background: rgb(234 179 8 / 10%);
-  color: var(--yellow-400);
-}
-
-.progress-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: var(--space-2);
-}
-
-.progress-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.progress-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.progress-count {
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-}
-
-.progress-bar-bg {
-  height: 0.375rem;
-  width: 100%;
-  background: var(--bg-muted);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  background: var(--primary);
-  border-radius: var(--radius-full);
-  transition: width 500ms ease-out;
-}
-</style>

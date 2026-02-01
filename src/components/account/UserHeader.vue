@@ -1,64 +1,82 @@
 <template>
-  <div class="container">
-    <div v-if="!user" class="skeleton header-row">
-      <div class="left">
-        <div class="avatar-skeleton" />
-        <div class="text-skeleton">
-          <div class="name-skeleton">User Name</div>
-          <div class="username-skeleton">@username</div>
+  <div class="flex flex-col gap-4">
+    <div v-if="!user" class="animate-pulse flex items-center justify-between gap-4">
+      <div class="flex items-center gap-4 min-w-0">
+        <div class="w-14 h-14 shrink-0 rounded-full bg-bg-dim" />
+        <div class="min-w-0 flex flex-col gap-1">
+          <div class="h-7 w-32 bg-bg-dim rounded-md text-lg font-bold text-transparent">User Name</div>
+          <div class="h-5 w-24 bg-bg-dim rounded-md text-base text-transparent">@username</div>
         </div>
       </div>
-      <div class="btn-skeleton" />
+      <div class="h-8 w-14 shrink-0 rounded-md bg-bg-dim" />
     </div>
 
-    <div v-else-if="!isEditing" class="header-row">
-      <div class="left">
-        <div class="avatar">
-          <img :src="safeImageUrl" :alt="user?.firstName || 'Profile'" class="avatar-img" />
+    <div v-else-if="!isEditing" class="flex items-center justify-between gap-4">
+      <div class="flex items-center gap-4 min-w-0">
+        <div class="relative w-14 h-14 shrink-0 overflow-hidden rounded-full shadow-[0_0_0_2px_var(--color-bg-dim)]">
+          <img :src="safeImageUrl" :alt="user?.firstName || 'Profile'" uno-rouned-img />
         </div>
-        <div class="text-content">
-          <h2 class="name">{{ user?.lastName }} {{ user?.firstName }}</h2>
-          <p class="username">@{{ user?.username }}</p>
+        <div class="min-w-0">
+          <h2 class="text-lg font-bold text-fg truncate my-0">{{ user?.lastName }} {{ user?.firstName }}</h2>
+          <p class="text-base text-fg-dim truncate my-0">@{{ user?.username }}</p>
         </div>
       </div>
-      <Button variant="secondary" size="sm" @click="isEditing = true">編集</Button>
+      <button
+        type="button"
+        class="btn bg-bg-card text-fg-dim border border-border hover:bg-bg-muted px-3 py-1.5 text-sm"
+        @click="isEditing = true">
+        編集
+      </button>
     </div>
 
-    <form v-else enctype="multipart/form-data" class="edit-form" @submit.prevent="handleSubmit">
-      <div class="fields">
-        <div class="edit-row">
-          <div class="avatar-edit">
-            <img :src="safePreviewImageUrl" :alt="user?.firstName || 'Profile'" class="avatar-img" />
-            <label class="avatar-overlay">
-              <span class="change-text">変更</span>
-              <input type="file" accept="image/*" class="file-input" @change="handleImageChange" />
+    <form v-else enctype="multipart/form-data" class="flex flex-col gap-4" @submit.prevent="handleSubmit">
+      <div class="flex-1 flex flex-col gap-4">
+        <div class="flex items-start gap-4">
+          <div
+            class="relative w-14 h-14 shrink-0 overflow-hidden rounded-full shadow-[0_0_0_2px_var(--color-bg-dim)] group">
+            <img :src="safePreviewImageUrl" :alt="user?.firstName || 'Profile'" uno-rouned-img />
+            <label
+              class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-60 cursor-pointer transition-opacity duration-200 group-hover:opacity-100">
+              <span class="text-[0.625rem] text-white font-medium">変更</span>
+              <input
+                type="file"
+                accept="image/*"
+                class="absolute inset-0 w-full h-full cursor-pointer opacity-0"
+                @change="handleImageChange" />
             </label>
           </div>
           <Input v-model="formData.username" label="ユーザー名" />
         </div>
 
-        <div class="grid-2">
+        <div class="grid grid-cols-2 gap-3">
           <Input v-model="formData.lastName" label="姓" />
           <Input v-model="formData.firstName" label="名" />
         </div>
       </div>
 
-      <p v-if="message" :class="['message', isError ? 'message-error' : 'message-success']">
+      <p v-if="message" :class="['text-sm font-medium', isError ? 'text-red-500' : 'text-green-500']">
         {{ message }}
       </p>
 
-      <div class="actions">
-        <Button type="submit" variant="primary" :disabled="isSubmitting" full-width>
+      <div class="flex gap-3 pt-2">
+        <button
+          type="submit"
+          class="btn bg-blue-500 text-white hover:bg-blue-600 focus-visible:(outline-none ring-2 ring-blue-500) w-full"
+          :disabled="isSubmitting">
           {{ isSubmitting ? '保存中...' : '保存' }}
-        </Button>
-        <Button type="button" variant="secondary" full-width @click="cancelEdit"> キャンセル </Button>
+        </button>
+        <button
+          type="button"
+          class="btn bg-bg-card text-fg-dim border border-border hover:bg-bg-muted w-full"
+          @click="cancelEdit">
+          キャンセル
+        </button>
       </div>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import Button from '@/src/components/ui/UiButton.vue';
 import Input from '@/src/components/ui/UiInput.vue';
 import hc from '@/src/lib/honoClient';
 import { computed, reactive, ref, watch } from 'vue';
@@ -187,199 +205,3 @@ function cancelEdit() {
   isEditing.value = false;
 }
 </script>
-
-<style scoped>
-.container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.skeleton {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  min-width: 0;
-}
-
-.avatar,
-.avatar-edit {
-  position: relative;
-  width: 3.5rem;
-  height: 3.5rem;
-  flex-shrink: 0;
-  overflow: hidden;
-  border-radius: var(--radius-full);
-  box-shadow: 0 0 0 2px var(--bg-muted);
-}
-
-.avatar-skeleton {
-  width: 3.5rem;
-  height: 3.5rem;
-  flex-shrink: 0;
-  border-radius: var(--radius-full);
-  background: var(--bg-muted-active);
-}
-
-.avatar-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgb(0 0 0 / 60%);
-  opacity: 0.6;
-  cursor: pointer;
-  transition: opacity var(--transition-normal);
-}
-
-.avatar-edit:hover .avatar-overlay {
-  opacity: 1;
-}
-
-.change-text {
-  font-size: 0.625rem;
-  color: var(--white);
-  font-weight: var(--font-medium);
-}
-
-.file-input {
-  position: absolute;
-  inset: 0;
-  width: -webkit-fill-available;
-  height: fit-content;
-  cursor: pointer;
-  opacity: 0;
-}
-
-.text-content {
-  min-width: 0;
-}
-
-.text-skeleton {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.name {
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-top: var(--space-0);
-  margin-bottom: var(--space-0);
-}
-
-.name-skeleton {
-  height: 1.75rem;
-  width: 8rem;
-  background: var(--bg-muted-active);
-  border-radius: var(--radius-md);
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  color: transparent;
-}
-
-.username {
-  font-size: var(--text-base);
-  color: var(--text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-top: var(--space-0);
-  margin-bottom: var(--space-0);
-}
-
-.username-skeleton {
-  height: 1.25rem;
-  width: 6rem;
-  background: var(--bg-muted-active);
-  border-radius: var(--radius-md);
-  font-size: var(--text-base);
-  color: transparent;
-}
-
-.btn-skeleton {
-  height: 2rem;
-  width: 3.5rem;
-  flex-shrink: 0;
-  border-radius: var(--radius-md);
-  background: var(--bg-muted-active);
-}
-
-.edit-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.edit-row {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-4);
-}
-
-.fields {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-3);
-}
-
-.message {
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-}
-
-.message-error {
-  color: var(--red-500);
-}
-
-.message-success {
-  color: var(--green-500);
-}
-
-.actions {
-  display: flex;
-  gap: var(--space-3);
-  padding-top: var(--space-2);
-}
-</style>

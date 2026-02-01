@@ -97,19 +97,33 @@ const handleAddActivity = async (date: string, period: number) => {
   }
 };
 
-const getThemeClass = (theme: string) => {
-  if (theme === 'blue') return 'theme-blue';
-  if (theme === 'indigo') return 'theme-indigo';
-  if (theme === 'green') return 'theme-green';
+const getNavItemClass = (theme: string) => {
+  if (theme === 'blue') return 'hover:border-blue-500';
+  if (theme === 'indigo') return 'hover:border-indigo-500';
+  if (theme === 'green') return 'hover:border-teal-400';
   return '';
+};
+
+const getNavIconClass = (theme: string) => {
+  if (theme === 'blue') return 'bg-blue-500/10 text-blue-500 stroke-blue-500';
+  if (theme === 'indigo') return 'bg-indigo-500/10 text-indigo-500 stroke-indigo-500';
+  if (theme === 'green') return 'bg-green-500/10 text-teal-400 stroke-teal-400';
+  return 'bg-bg-dim text-fg-dim';
+};
+
+const getNavLabelClass = (theme: string) => {
+  if (theme === 'blue') return 'group-hover:text-blue-500';
+  if (theme === 'indigo') return 'group-hover:text-indigo-500';
+  if (theme === 'green') return 'group-hover:text-teal-400';
+  return 'group-hover:text-fg';
 };
 </script>
 
 <template>
-  <div class="container">
+  <div class="max-w-7xl mx-auto px-4">
     <SignedIn>
-      <div class="content">
-        <div v-if="error" class="error-banner">
+      <div class="max-w-3xl mx-auto flex flex-col gap-6">
+        <div v-if="error" class="bg-red-50 text-red-500 p-4 rounded-lg text-sm text-center dark:bg-red-900/10">
           {{ error }}
         </div>
 
@@ -123,159 +137,32 @@ const getThemeClass = (theme: string) => {
 
         <ActivityForm :loading="activityLoading" @submit="handleAddActivity" />
 
-        <hr class="divider" />
+        <hr class="pb-2 border-border-dim opacity-60" />
 
-        <div class="nav-grid">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <component
             :is="item.href.startsWith('http') ? 'a' : 'RouterLink'"
             v-for="item in menuItems"
             :key="item.id"
             :to="item.href.startsWith('http') ? undefined : item.href"
             :href="item.href.startsWith('http') ? item.href : undefined"
-            :class="['nav-item', getThemeClass(item.theme)]">
-            <div :class="['nav-icon', getThemeClass(item.theme)]">
-              <component :is="iconMap[item.icon as keyof typeof iconMap]" class="icon" />
+            :class="[
+              'group flex flex-col items-center justify-center gap-3 rounded-xl bg-bg border border-border-dim p-6 shadow-sm cursor-pointer no-underline transition-shadow transition-colors hover:shadow-md',
+              getNavItemClass(item.theme),
+            ]">
+            <div
+              :class="[
+                'h-12 w-12 rounded-full p-3 transition-transform group-hover:scale-110',
+                getNavIconClass(item.theme),
+              ]">
+              <component :is="iconMap[item.icon as keyof typeof iconMap]" class="w-6 h-6" />
             </div>
-            <span class="nav-label">{{ item.title }}</span>
+            <span :class="['font-bold text-fg-dim transition-colors', getNavLabelClass(item.theme)]">{{
+              item.title
+            }}</span>
           </component>
         </div>
       </div>
     </SignedIn>
   </div>
 </template>
-
-<style scoped>
-.container {
-  max-width: var(--container-max);
-  margin-inline: auto;
-  padding-inline: var(--space-4);
-}
-
-.content {
-  max-width: 48rem;
-  margin-inline: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-}
-
-.error-banner {
-  background: var(--error-bg);
-  color: var(--red-500);
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  font-size: var(--text-sm);
-  text-align: center;
-}
-
-.divider {
-  padding-bottom: var(--space-2);
-  border-color: var(--border-strong);
-  opacity: 0.6;
-}
-
-.nav-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-4);
-}
-
-@media (width >= 640px) {
-  .nav-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  border-radius: var(--radius-xl);
-  background: var(--bg-card);
-  padding: var(--space-6);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-dim);
-  cursor: pointer;
-  text-decoration: none;
-  transition:
-    box-shadow var(--transition-normal),
-    border-color var(--transition-normal);
-}
-
-.nav-item:hover {
-  box-shadow: var(--shadow-md);
-}
-
-.nav-item.theme-blue:hover {
-  border-color: var(--blue-500);
-}
-
-.nav-item.theme-indigo:hover {
-  border-color: var(--indigo-500);
-}
-
-.nav-item.theme-green:hover {
-  border-color: var(--teal-400);
-}
-
-.nav-icon {
-  height: 48px;
-  width: 48px;
-  border-radius: var(--radius-full);
-  padding: var(--space-3);
-  background: var(--bg-muted);
-  color: var(--text-secondary);
-  transition: transform var(--transition-normal);
-}
-
-.nav-item:hover .nav-icon {
-  transform: scale(1.1);
-}
-
-.nav-icon.theme-blue {
-  background: rgb(59 130 246 / 10%);
-  color: var(--blue-500);
-  stroke: var(--blue-500);
-}
-
-.nav-icon.theme-indigo {
-  background: rgb(99 102 241 / 10%);
-  color: var(--indigo-500);
-  stroke: var(--indigo-500);
-}
-
-.nav-icon.theme-green {
-  background: rgb(34 197 94 / 10%);
-  color: var(--teal-400);
-  stroke: var(--teal-400);
-}
-
-.icon {
-  width: 1.5rem;
-  height: 1.5rem;
-}
-
-.nav-label {
-  font-weight: var(--font-bold);
-  color: var(--text-secondary);
-  transition: color var(--transition-normal);
-}
-
-.nav-item:hover .nav-label {
-  color: var(--text-primary);
-}
-
-.nav-item.theme-blue:hover .nav-label {
-  color: var(--blue-500);
-}
-
-.nav-item.theme-indigo:hover .nav-label {
-  color: var(--indigo-500);
-}
-
-.nav-item.theme-green:hover .nav-label {
-  color: var(--teal-400);
-}
-</style>

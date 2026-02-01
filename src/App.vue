@@ -7,25 +7,9 @@ import ErrorBoundary from './components/common/ErrorBoundary.vue';
 <template>
   <ErrorBoundary>
     <AppHeader />
-    <main>
+    <main class="flex-grow w-full max-w-7xl min-h-[calc(100dvh-150px)] mx-auto md:px-4 md:py-8">
       <RouterView />
     </main>
     <AppFooter />
   </ErrorBoundary>
 </template>
-
-<style scoped>
-main {
-  flex-grow: 1;
-  width: 100%;
-  max-width: var(--container-max);
-  min-height: calc(100dvh - 150px);
-  margin-inline: auto;
-}
-
-@media (width >= 768px) {
-  main {
-    padding: var(--space-8) var(--space-4);
-  }
-}
-</style>

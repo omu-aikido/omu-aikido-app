@@ -10,7 +10,4 @@ type-check = "pnpm run type-check"
 build = "pnpm run build"
 deploy = "pnpm run deploy"
 db-setup = "docker-compose up -d libsql-server && pnpm run db:migrate"
-
-[tasks.dev]
-run = "pnpm run dev"
-depends = "db-setup"
+dev = "docker compose up -d"

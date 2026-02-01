@@ -1,17 +1,30 @@
 <template>
-  <div v-if="hasError" class="error-container" data-testid="error-boundary">
-    <div class="error-content">
-      <img src="/500%20InternalServerError.png" alt="500 Internal Server Error" class="error-image" />
-      <p class="error-text">予期せぬエラーが発生しました。しばらく時間を置いてから再度お試しください。</p>
-      <div v-if="errorMessage" class="error-details" data-testid="error-content">
-        <p class="error-message">
+  <div v-if="hasError" class="min-h-screen flex items-center justify-center bg-bg p-4" data-testid="error-boundary">
+    <div class="text-center w-full max-w-lg">
+      <img src="/500%20InternalServerError.png" alt="500 Internal Server Error" class="w-full h-auto mb-8 mx-auto" />
+      <p class="text-fg-dim mb-8">予期せぬエラーが発生しました。しばらく時間を置いてから再度お試しください。</p>
+      <div
+        v-if="errorMessage"
+        class="mb-6 p-4 bg-red-50 border border-red-500 rounded-lg dark:bg-red-900/10"
+        data-testid="error-content">
+        <p class="text-sm text-red-500 font-mono text-left break-words">
           {{ errorMessage }}
         </p>
       </div>
 
-      <div class="error-actions">
-        <button class="btn-primary" data-testid="reload-btn" @click="handleReload">ページを再読み込み</button>
-        <button class="btn-secondary" data-testid="home-btn" @click="handleGoHome">ホームに戻る</button>
+      <div class="flex flex-col gap-3">
+        <button
+          class="w-full px-6 py-3 bg-blue-500 text-white font-medium border-none rounded-lg cursor-pointer transition-colors hover:bg-blue-600"
+          data-testid="reload-btn"
+          @click="handleReload">
+          ページを再読み込み
+        </button>
+        <button
+          class="w-full px-6 py-3 bg-gray-200 text-fg font-medium border-none rounded-lg cursor-pointer transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
+          data-testid="home-btn"
+          @click="handleGoHome">
+          ホームに戻る
+        </button>
       </div>
     </div>
   </div>
@@ -74,86 +87,3 @@ onUnmounted(() => {
   window.removeEventListener('unhandledrejection', handleUnhandledRejection);
 });
 </script>
-
-<style scoped>
-.error-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-card);
-  padding: var(--space-4);
-}
-
-.error-content {
-  text-align: center;
-  width: 100%;
-  max-width: 32rem;
-}
-
-.error-image {
-  width: 100%;
-  height: auto;
-  margin-bottom: var(--space-8);
-  margin-inline: auto;
-}
-
-.error-text {
-  color: var(--text-secondary);
-  margin-bottom: var(--space-8);
-}
-
-.error-details {
-  margin-bottom: var(--space-6);
-  padding: var(--space-4);
-  background: var(--error-bg);
-  border: 1px solid var(--red-500);
-  border-radius: var(--radius-lg);
-}
-
-.error-message {
-  font-size: var(--text-sm);
-  color: var(--red-500);
-  font-family: monospace;
-  text-align: left;
-  overflow-wrap: break-word;
-}
-
-.error-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.btn-primary {
-  width: 100%;
-  padding: var(--space-3) var(--space-6);
-  background: var(--accent);
-  color: var(--on-primary);
-  font-weight: var(--font-medium);
-  border: none;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-primary:hover {
-  background: var(--accent-hover);
-}
-
-.btn-secondary {
-  width: 100%;
-  padding: var(--space-3) var(--space-6);
-  background: var(--bg-muted-active);
-  color: var(--text-primary);
-  font-weight: var(--font-medium);
-  border: none;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-secondary:hover {
-  background: var(--border-strong);
-}
-</style>

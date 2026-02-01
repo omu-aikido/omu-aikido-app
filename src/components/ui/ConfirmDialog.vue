@@ -25,30 +25,36 @@ const emit = defineEmits<Emits>();
 </script>
 
 <template>
-  <Dialog :open="open" class="dialog" data-testid="confirm-dialog" @close="$emit('cancel')">
-    <div class="backdrop" aria-hidden="true" />
+  <Dialog :open="open" class="relative z-50" data-testid="confirm-dialog" @close="$emit('cancel')">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" />
 
-    <div class="dialog-container">
-      <DialogPanel class="panel">
-        <div class="content">
-          <div class="icon-wrapper">
-            <AlertTriangleIcon class="icon" />
+    <div class="fixed inset-0 flex items-center justify-center p-4">
+      <DialogPanel class="w-full max-w-96 rounded-2xl bg-bg-card p-6 shadow-xl border border-border">
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-500">
+            <AlertTriangleIcon class="w-5 h-5" />
           </div>
-          <div class="text-content">
-            <DialogTitle class="title" data-testid="confirm-title">
+          <div class="flex-1">
+            <DialogTitle class="text-lg font-bold text-fg" data-testid="confirm-title">
               {{ title }}
             </DialogTitle>
-            <DialogDescription class="description">
+            <DialogDescription class="mt-2 text-sm text-fg-dim">
               {{ description }}
             </DialogDescription>
           </div>
         </div>
 
-        <div class="actions">
-          <button class="btn-cancel" data-testid="cancel-btn" @click="$emit('cancel')">
+        <div class="mt-6 flex justify-end gap-3">
+          <button
+            class="btn bg-bg-card text-fg-dim border border-border hover:bg-bg-muted"
+            data-testid="cancel-btn"
+            @click="$emit('cancel')">
             {{ cancelText }}
           </button>
-          <button class="btn-confirm" data-testid="confirm-btn" @click="$emit('confirm')">
+          <button
+            class="btn bg-red-500 text-white hover:bg-rose-600 border-none"
+            data-testid="confirm-btn"
+            @click="$emit('confirm')">
             {{ confirmText }}
           </button>
         </div>
@@ -56,126 +62,3 @@ const emit = defineEmits<Emits>();
     </div>
   </Dialog>
 </template>
-
-<style scoped>
-.dialog {
-  position: relative;
-  z-index: 60;
-}
-
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgb(0 0 0 / 50%);
-  backdrop-filter: blur(4px);
-}
-
-.dialog-container {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-4);
-}
-
-.panel {
-  width: 100%;
-  max-width: 24rem;
-  border-radius: var(--radius-xl);
-  background: var(--bg-card);
-  padding: var(--space-6);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-dim);
-}
-
-.content {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-4);
-}
-
-.icon-wrapper {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-full);
-  background: var(--error-bg);
-  color: var(--red-500);
-}
-
-.icon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.text-content {
-  flex: 1;
-}
-
-.title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-}
-
-.description {
-  margin-top: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.actions {
-  margin-top: var(--space-6);
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
-}
-
-.btn-cancel {
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--text-secondary);
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-cancel:hover {
-  background: var(--bg-muted);
-}
-
-.btn-cancel:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--text-placeholder);
-}
-
-.btn-confirm {
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--on-primary);
-  background: var(--red-500);
-  border: none;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-}
-
-.btn-confirm:hover {
-  background: var(--rose-600);
-}
-
-.btn-confirm:focus {
-  outline: none;
-  box-shadow:
-    0 0 0 2px var(--red-500),
-    0 0 0 4px var(--bg-card);
-}
-</style>

@@ -1,38 +1,41 @@
 <template>
-  <div class="dashboard-page">
+  <div class="flex flex-col gap-6 px-3 py-4 pb-12 md:px-6">
     <AdminMenu />
 
     <div v-if="loading" class="loading-container">
-      <Loading />
+      <div class="loading-spinner" />
+      <p class="text-sm text-fg-dim">Loading...</p>
     </div>
 
-    <div v-else-if="error" class="error-banner">
+    <div v-else-if="error" class="bg-red-500/10 text-red-500 p-4 rounded-md border border-red-500/20">
       {{ error }}
     </div>
 
-    <div v-else class="content">
+    <div v-else class="flex flex-col gap-8">
       <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">直近3週間活動のない部員</h2>
-          <span class="section-subtitle">{{ thresholdDate }} 以降の記録なし</span>
+        <div class="px-3 pb-4 flex flex-col items-center justify-between">
+          <h2 class="text-lg font-bold text-red-500 flex items-center gap-2">直近3週間活動のない部員</h2>
+          <span class="text-sm text-fg-dim">{{ thresholdDate }} 以降の記録なし</span>
         </div>
 
-        <div v-if="inactiveUsers.length === 0" class="empty-state">該当する部員はいません。全員活動中です！</div>
+        <div v-if="inactiveUsers.length === 0" class="p-8 text-center text-fg-dim">
+          該当する部員はいません。全員活動中です！
+        </div>
 
-        <div v-else class="user-list">
+        <div v-else class="flex flex-col max-h-[500px] overflow-y-auto border-t border-b border-border-dim">
           <div
             v-for="user in inactiveUsers"
             :key="user.id"
-            class="user-item"
+            class="flex items-center gap-3 p-4 cursor-pointer border-b border-border-dim transition-colors last:border-b-0 hover:bg-bg-dim"
             @click="$router.push(`/admin/users/${user.id}`)">
-            <img :src="user.imageUrl" alt="" class="avatar" />
-            <div class="user-info">
-              <div class="user-name">{{ user.lastName }} {{ user.firstName }}</div>
-              <div class="user-role">
+            <img :src="user.imageUrl" alt="" class="w-10 h-10 rounded-full bg-gray-200 object-cover dark:bg-gray-700" />
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-fg truncate">{{ user.lastName }} {{ user.firstName }}</div>
+              <div class="text-sm text-fg-dim truncate">
                 {{ user.profile.roleLabel }}
               </div>
             </div>
-            <div class="status-badge">注意</div>
+            <div class="text-sm font-medium px-2 py-1 rounded-md bg-red-500/10 text-red-500 ml-auto">注意</div>
           </div>
         </div>
       </section>
@@ -42,7 +45,6 @@
 
 <script setup lang="ts">
 import AdminMenu from '@/src/components/admin/AdminMenu.vue';
-import Loading from '@/src/components/ui/UiLoading.vue';
 import hc from '@/src/lib/honoClient';
 import { queryKeys } from '@/src/lib/queryKeys';
 import { useQuery } from '@tanstack/vue-query';
@@ -66,133 +68,3 @@ const inactiveUsers = computed(() => data.value?.inactiveUsers ?? []);
 const thresholdDate = computed(() => data.value?.thresholdDate ?? '');
 const error = computed(() => (queryError.value ? 'ダッシュボード情報の取得に失敗しました' : ''));
 </script>
-
-<style scoped>
-.dashboard-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  padding: var(--space-4) var(--space-3);
-  padding-bottom: var(--space-12);
-}
-
-@media (width >= 768px) {
-  .dashboard-page {
-    padding-inline: var(--space-6);
-  }
-}
-
-.loading-container {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
-
-.error-banner {
-  background: rgb(var(--red-500) / 10%);
-  color: var(--red-500);
-  padding: var(--space-4);
-  border-radius: var(--radius-md);
-  border: 1px solid rgb(239 68 68 / 20%);
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-}
-
-.section-header {
-  padding: 0 var(--space-3) var(--space-4);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.section-title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  color: var(--red-500);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.section-subtitle {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.empty-state {
-  padding: var(--space-8);
-  text-align: center;
-  color: var(--text-secondary);
-}
-
-.user-list {
-  display: flex;
-  flex-direction: column;
-  max-height: 31.25rem; /* 500px */
-  overflow-y: auto;
-  border-top: 1px solid var(--border-dim);
-  border-bottom: 1px solid var(--border-dim);
-}
-
-.user-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  cursor: pointer;
-  transition: background var(--transition-normal);
-  border-bottom: 1px solid var(--border-dim);
-}
-
-.user-item:last-child {
-  border-bottom: none;
-}
-
-.user-item:hover {
-  background: var(--bg-muted);
-}
-
-.avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-full);
-  background: var(--bg-muted-active);
-  object-fit: cover;
-}
-
-.user-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.user-name {
-  font-weight: var(--font-medium);
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.user-role {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.status-badge {
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-md);
-  background: rgb(239 68 68 / 10%);
-  color: var(--red-500);
-  margin-left: auto;
-}
-</style>
