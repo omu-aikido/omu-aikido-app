@@ -1,7 +1,7 @@
 <template>
   <a
     v-bind:href="'/admin/users/' + user.id"
-    class="bg-bg-light border border-border-dim rounded-xl shadow-sm p-4 flex flex-col gap-4 md:p-6 cursor-pointer"
+    class="card flex flex-col gap-4 md:p-6 cursor-pointer"
     data-testid="norm-card">
     <div class="flex items-start justify-between gap-3">
       <div class="flex items-center gap-3">

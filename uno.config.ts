@@ -64,6 +64,12 @@ export default defineConfig({
       'input-base':
         'w-full px-3 py-2 bg-bg border border-border rounded-md text-base transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-bg-muted',
       'form-label': 'text-sm font-medium text-fg-dim',
+      'table-base': 'w-full text-left border-collapse text-sm',
+      'th-base': 'px-4 py-3 font-medium text-fg-dim border-b border-border-dim text-nowrap',
+      'td-base': 'px-4 py-3 border-b border-border-dim',
+      'heading-1': 'text-2xl font-bold text-fg',
+      'heading-2': 'text-xl font-bold text-fg',
+      'grid-responsive': 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6',
     },
     [
       /^avatar-(.*)$/,

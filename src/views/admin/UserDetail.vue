@@ -12,7 +12,7 @@
       <p class="text-sub">Loading...</p>
     </div>
 
-    <div v-else-if="error" class="p-4 bg-red-500/10 text-red-500 rounded-md border border-red-500/20">
+    <div v-else-if="error" class="alert-error">
       {{ error }}
     </div>
 
@@ -24,7 +24,7 @@
               <img :src="user.imageUrl" alt="" class="avatar-lg" />
               <div class="flex flex-col">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <h1 class="text-xl font-bold text-fg">{{ user.lastName }} {{ user.firstName }}</h1>
+                  <h1 class="heading-2">{{ user.lastName }} {{ user.firstName }}</h1>
                   <div v-if="!isEditing" class="flex items-center gap-1.5">
                     <span class="badge-gray">
                       {{ roleLabels[user.profile?.role as string] || '部員' }}
@@ -119,13 +119,13 @@
       <div v-if="stats" class="grid grid-cols-2 border border-border-dim rounded-lg overflow-hidden">
         <div class="flex flex-col border-r border-border-dim">
           <div class="p-4 text-center border-b border-border-dim">
-            <p class="text-2xl font-bold text-fg">
+            <p class="heading-1">
               {{ stats.trainCount }}
             </p>
             <span class="text-sub">総稽古回数</span>
           </div>
           <div class="p-4 text-center">
-            <p class="text-2xl font-bold text-fg">
+            <p class="heading-1">
               {{ stats.doneTrain }}
             </p>
             <span class="text-sub">現在の級での稽古</span>
@@ -133,13 +133,13 @@
         </div>
         <div class="flex flex-col">
           <div class="p-4 text-center border-b border-border-dim">
-            <p class="text-2xl font-bold text-fg">
+            <p class="heading-1">
               {{ stats.totalDays }}
             </p>
             <span class="text-sub">稽古日数</span>
           </div>
           <div class="p-4 text-center">
-            <p class="text-2xl font-bold text-fg">
+            <p class="heading-1">
               {{ stats.totalHours }}
             </p>
             <span class="text-sub">総時間</span>
@@ -152,17 +152,17 @@
 
         <div v-if="activities.length > 0">
           <div class="overflow-x-auto">
-            <table class="w-full border-collapse text-sm text-left">
+            <table class="table-base">
               <thead class="border-b border-border-dim">
                 <tr>
-                  <th class="px-6 py-3 whitespace-nowrap font-medium text-fg-dim">日時</th>
-                  <th class="px-6 py-3 whitespace-nowrap font-medium text-fg-dim">時間 (h)</th>
+                  <th class="th-base">日時</th>
+                  <th class="th-base">時間 (h)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="activity in activities" :key="activity.id" class="border-b border-border-dim">
-                  <td class="px-6 py-3 whitespace-nowrap">{{ new Date(activity.date).toLocaleDateString() }}</td>
-                  <td class="px-6 py-3 whitespace-nowrap">{{ activity.period }}</td>
+                  <td class="td-base whitespace-nowrap">{{ new Date(activity.date).toLocaleDateString() }}</td>
+                  <td class="td-base whitespace-nowrap">{{ activity.period }}</td>
                 </tr>
               </tbody>
             </table>

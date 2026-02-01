@@ -71,7 +71,7 @@
     </div>
 
     <div v-else class="w-full">
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div class="grid-responsive">
         <NormCard
           v-for="item in filteredUsers"
           :key="item.user.id"

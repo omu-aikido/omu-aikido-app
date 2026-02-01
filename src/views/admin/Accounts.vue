@@ -28,29 +28,29 @@
 
     <div v-else class="w-full">
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-base">
+        <table class="table-base">
           <thead class="border-b border-border-dim">
             <tr>
               <th
-                class="p-3 font-medium text-fg-dim cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
+                class="th-base cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
                 @click="toggleSort('name')">
                 名前
                 <span v-if="sortBy === 'name'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
               <th
-                class="p-3 font-medium text-fg-dim cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
+                class="th-base cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
                 @click="toggleSort('role')">
                 役職
                 <span v-if="sortBy === 'role'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
               <th
-                class="p-3 font-medium text-fg-dim cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
+                class="th-base cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
                 @click="toggleSort('grade')">
                 級段位
                 <span v-if="sortBy === 'grade'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
               <th
-                class="p-3 font-medium text-fg-dim cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
+                class="th-base cursor-pointer select-none transition-colors hover:bg-bg-dim md:px-6"
                 @click="toggleSort('year')">
                 学年
                 <span v-if="sortBy === 'year'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
@@ -63,7 +63,7 @@
               :key="user.id"
               class="cursor-pointer transition-colors border-b border-border-dim hover:bg-bg-dim last:border-b-0"
               @click="$router.push(`/admin/users/${user.id}`)">
-              <td class="p-4 md:px-6">
+              <td class="td-base md:px-6">
                 <div class="flex items-center gap-2">
                   <img :src="user.imageUrl" alt="" class="avatar-sm ml-1" />
                   <div class="flex flex-col">
@@ -72,13 +72,13 @@
                   </div>
                 </div>
               </td>
-              <td class="p-4 md:px-6 text-center">
+              <td class="td-base md:px-6 text-center">
                 <span class="text-fg">{{ user.profile.roleLabel }}</span>
               </td>
-              <td class="p-4 md:px-6 text-center">
+              <td class="td-base md:px-6 text-center">
                 <span class="text-fg">{{ user.profile.gradeLabel }}</span>
               </td>
-              <td class="p-4 md:px-6 text-center">
+              <td class="td-base md:px-6 text-center">
                 <span class="text-fg">{{ user.profile.yearLabel }}</span>
               </td>
             </tr>

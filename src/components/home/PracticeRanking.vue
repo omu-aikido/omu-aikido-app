@@ -72,7 +72,7 @@ const getRankClass = (rank: number) => {
             <span class="text-sub">回</span>
           </div>
           <div class="text-sm text-fg flex gap-0.5 items-baseline">
-            <span class="text-lg font-bold">{{ rankingData.currentUserRanking.totalPeriod }}</span>
+            <span class="heading-2">{{ rankingData.currentUserRanking.totalPeriod }}</span>
             <span class="text-sub">時間</span>
           </div>
         </div>
