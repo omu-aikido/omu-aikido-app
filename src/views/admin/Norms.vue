@@ -38,9 +38,11 @@
       </div>
 
       <div class="w-full sm:w-72">
-        v-model="searchTerm" type="text" placeholder="名前で検索..." class="w-full h-fit px-3 py-2 pl-10 bg-base border
-        border-overlay0 rounded-md text-text text-base transition-shadow focus:outline-none focus:ring-2
-        focus:ring-blue-500" />
+        <input
+          v-model="searchTerm"
+          type="text"
+          placeholder="名前で検索..."
+          class="w-full h-fit px-3 py-2 pl-10 bg-base border border-overlay0 rounded-md text-text text-base transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
     </div>
 

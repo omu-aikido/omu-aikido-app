@@ -7,7 +7,7 @@
           id="year"
           :value="formValues.year"
           :disabled="isSignUpCreated"
-          class="w-full h-fit rounded-md border border-border-dim bg-base px-3 py-2 text-base text-text transition-shadow duration-200 outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full h-fit rounded-md border border-overlay1 bg-base px-3 py-2 text-base text-text transition-shadow duration-200 outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           @change="onUpdate('year', ($event.target as HTMLSelectElement).value)">
           <option v-for="y in yearOptions" :key="y.year" :value="y.year">
             {{ y.name }}
@@ -23,7 +23,7 @@
           id="grade"
           :value="formValues.grade"
           :disabled="isSignUpCreated"
-          class="w-full h-fit rounded-md border border-border-dim bg-base px-3 py-2 text-base text-text transition-shadow duration-200 outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full h-fit rounded-md border border-overlay1 bg-base px-3 py-2 text-base text-text transition-shadow duration-200 outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           @change="onUpdate('grade', Number(($event.target as HTMLSelectElement).value))">
           <option v-for="g in gradeOptions" :key="g.grade" :value="g.grade">
             {{ g.name }}
@@ -59,7 +59,7 @@
         type="checkbox"
         :checked="formValues.legalAccepted"
         :disabled="isSignUpCreated"
-        class="w-4 h-4 rounded-sm border border-border-dim accent-blue-500"
+        class="w-4 h-4 rounded-sm border border-overlay1 accent-blue-500"
         @change="onUpdate('legalAccepted', ($event.target as HTMLInputElement).checked)" />
       <label for="legalAccepted" class="text-sub"> 利用規約とプライバシーポリシーに同意します。 </label>
     </div>

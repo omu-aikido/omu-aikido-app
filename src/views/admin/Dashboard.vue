@@ -18,11 +18,11 @@
           <span class="text-sub">{{ thresholdDate }} 以降の記録なし</span>
         </div>
 
-        <div v-if="inactiveUsers.length === 0" class="p-8 text-center text-text-dim">
+        <div v-if="inactiveUsers.length === 0" class="p-8 text-center text-subtext">
           該当する部員はいません。全員活動中です！
         </div>
 
-        <div v-else class="flex flex-col max-h-[500px] overflow-y-auto border-t border-b border-overlay0">
+        <div v-else class="flex flex-col overflow-y-auto border-t border-b border-overlay0">
           <div
             v-for="user in inactiveUsers"
             :key="user.id"

@@ -1,6 +1,6 @@
 <template>
   <button class="w-8 h-8 m-4" aria-label="メニューを開く" @click="open">
-    <div class="i-material-symbols:menu" />
+    <div class="i-lucide:menu" />
   </button>
 
   <Teleport to="body">
@@ -24,7 +24,7 @@
       <div v-if="isOpen" class="drawer" role="dialog" aria-modal="true" aria-label="サイドメニュー">
         <div class="drawer-header flex justify-end mt-4 mr-4">
           <button class="close-btn" aria-label="メニューを閉じる" @click="close">
-            <div class="i-material-symbols:right-panel-close-sharp" />
+            <div class="i-lucide:panel-right-close" />
           </button>
         </div>
 
@@ -32,11 +32,11 @@
           <SignedIn>
             <nav class="mt-6 flex flex-col gap-5">
               <RouterLink to="/" class="flex-inline items-center gap-2" @click="close">
-                <div class="i-material-symbols:dashboard-customize-rounded" />
+                <div class="i-lucide:layout-dashboard" />
                 トップ
               </RouterLink>
               <RouterLink to="/record" class="flex-inline items-center gap-2" @click="close">
-                <div class="i-material-symbols:list-alt-add" />
+                <div class="i-lucide:clipboard-list" />
                 活動記録
               </RouterLink>
               <RouterLink to="/account" class="flex-inline items-center gap-2" @click="close">
@@ -51,7 +51,7 @@
           <hr class="my-5 mx-2" />
           <SignOutButton>
             <button class="flex gap-2 mx-5 items-center w-full">
-              <div class="i-material-symbols:logout" />
+              <div class="i-lucide:log-out" />
               ログアウト
             </button>
           </SignOutButton>

@@ -32,25 +32,25 @@
           <thead class="border-b border-overlay0">
             <tr>
               <th
-                class="th-base cursor-pointer select-none transition-colors hover:bg-base-dim md:px-6"
+                class="th-base cursor-pointer select-none transition-colors hover:bg-overlay0 md:px-6"
                 @click="toggleSort('name')">
                 名前
                 <span v-if="sortBy === 'name'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
               <th
-                class="th-base cursor-pointer select-none transition-colors hover:bg-base-dim md:px-6"
+                class="th-base cursor-pointer select-none transition-colors hover:bg-overlay0 md:px-6"
                 @click="toggleSort('role')">
                 役職
                 <span v-if="sortBy === 'role'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
               <th
-                class="th-base cursor-pointer select-none transition-colors hover:bg-base-dim md:px-6"
+                class="th-base cursor-pointer select-none transition-colors hover:bg-overlay0 md:px-6"
                 @click="toggleSort('grade')">
                 級段位
                 <span v-if="sortBy === 'grade'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
               <th
-                class="th-base cursor-pointer select-none transition-colors hover:bg-base-dim md:px-6"
+                class="th-base cursor-pointer select-none transition-colors hover:bg-overlay0 md:px-6"
                 @click="toggleSort('year')">
                 学年
                 <span v-if="sortBy === 'year'" class="ml-1">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
@@ -61,7 +61,7 @@
             <tr
               v-for="user in sortedUsers"
               :key="user.id"
-              class="cursor-pointer transition-colors border-b border-overlay0 hover:bg-base-dim last:border-b-0"
+              class="cursor-pointer transition-colors border-b border-overlay0 hover:bg-overlay0 last:border-b-0"
               @click="$router.push(`/admin/users/${user.id}`)">
               <td class="td-base md:px-6">
                 <div class="flex items-center gap-2">
@@ -83,7 +83,7 @@
               </td>
             </tr>
             <tr v-if="sortedUsers.length === 0">
-              <td colspan="4" class="p-12 text-center text-text-dim">ユーザーが見つかりませんでした</td>
+              <td colspan="4" class="p-12 text-center text-subtext">ユーザーが見つかりませんでした</td>
             </tr>
           </tbody>
         </table>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Dialog, DialogPanel, DialogTitle, DialogDescription } from '@headlessui/vue';
-import { AlertTriangleIcon } from 'lucide-vue-next';
 
 interface Props {
   open: boolean;
@@ -30,18 +29,14 @@ const emit = defineEmits<Emits>();
 
     <div class="fixed inset-0 flex items-center justify-center p-4">
       <DialogPanel class="w-full max-w-96 rounded-2xl bg-surface0 p-6 shadow-xl border border-border">
-        <div class="flex items-start gap-4">
-          <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-500">
-            <AlertTriangleIcon class="w-5 h-5" />
-          </div>
-          <div class="flex-1">
-            <DialogTitle class="text-lg font-bold text-text" data-testid="confirm-title">
-              {{ title }}
-            </DialogTitle>
-            <DialogDescription class="mt-2 text-sub">
-              {{ description }}
-            </DialogDescription>
-          </div>
+        <div class="flex-1">
+          <DialogTitle class="text-lg font-bold text-text gap-2 flex-inline items-center" data-testid="confirm-title">
+            <div class="i-lucide:triangle-alert sq-6" />
+            {{ title }}
+          </DialogTitle>
+          <DialogDescription class="mt-2 text-sub">
+            {{ description }}
+          </DialogDescription>
         </div>
 
         <div class="mt-6 flex justify-end gap-3">

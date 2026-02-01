@@ -3,28 +3,22 @@
   <TabGroup
     :selected-index="selectedIndex"
     as="div"
-    class="border-b border-border-dim"
+    class="border-b border-overlay1"
     data-testid="admin-menu"
     @change="handleTabChange">
     <TabList class="tab-list">
       <Tab v-slot="{ selected }" as="template">
-        <button
-          :class="['tab-item', selected ? 'border-blue-500 text-blue-500' : 'border-transparent']"
-          data-testid="tab-dashboard">
+        <button :class="['tab-item', selected ? ' text-blue-500' : 'border-transparent']" data-testid="tab-dashboard">
           トップ
         </button>
       </Tab>
       <Tab v-slot="{ selected }" as="template">
-        <button
-          :class="['tab-item', selected ? 'border-blue-500 text-blue-500' : 'border-transparent']"
-          data-testid="tab-accounts">
+        <button :class="['tab-item', selected ? ' text-blue-500' : 'border-transparent']" data-testid="tab-accounts">
           アカウント
         </button>
       </Tab>
       <Tab v-slot="{ selected }" as="template">
-        <button
-          :class="['tab-item', selected ? 'border-blue-500 text-blue-500' : 'border-transparent']"
-          data-testid="tab-norms">
+        <button :class="['tab-item', selected ? ' text-blue-500' : 'border-transparent']" data-testid="tab-norms">
           審査
         </button>
       </Tab>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { SignedIn } from '@clerk/vue';
-import { ClipboardListIcon, SettingsIcon, UserIcon } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 import PracticeCountGraph from '@/src/components/home/PracticeCountGraph.vue';
@@ -25,9 +24,9 @@ const queryClient = useQueryClient();
 const activityLoading = ref(false);
 
 const iconMap = {
-  'clipboard-list': ClipboardListIcon,
-  user: UserIcon,
-  settings: SettingsIcon,
+  'clipboard-list': 'i-lucide:clipboard-list',
+  user: 'i-lucide:user',
+  settings: 'i-lucide:settings',
 };
 
 // Queries
@@ -108,7 +107,7 @@ const getNavIconClass = (theme: string) => {
   if (theme === 'blue') return 'bg-blue-500/10 text-blue-500 stroke-blue-500';
   if (theme === 'indigo') return 'bg-indigo-500/10 text-indigo-500 stroke-indigo-500';
   if (theme === 'green') return 'bg-green-500/10 text-teal-400 stroke-teal-400';
-  return 'bg-surface-dim text-text-dim';
+  return 'bg-surface1 text-subtext';
 };
 
 const getNavLabelClass = (theme: string) => {
@@ -155,9 +154,9 @@ const getNavLabelClass = (theme: string) => {
                 'h-12 w-12 rounded-full p-3 transition-transform group-hover:scale-110',
                 getNavIconClass(item.theme),
               ]">
-              <component :is="iconMap[item.icon as keyof typeof iconMap]" class="w-6 h-6" />
+              <div :class="iconMap[item.icon as keyof typeof iconMap]" class="sq-6" />
             </div>
-            <span :class="['font-bold text-text-dim transition-colors', getNavLabelClass(item.theme)]">{{
+            <span :class="['font-bold text-subtext transition-colors', getNavLabelClass(item.theme)]">{{
               item.title
             }}</span>
           </component>

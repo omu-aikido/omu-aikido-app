@@ -11,7 +11,6 @@ import {
   subMonths,
 } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 interface Props {
@@ -84,7 +83,7 @@ const isToday = (date: Date) => {
       class="p-1 rounded-full bg-transparent border-none text-subtext cursor-pointer transition-colors hover:bg-overlay11-active"
       data-testid="prev-month-btn"
       @click="handlePrevMonth">
-      <ChevronLeftIcon class="w-5 h-5" />
+      <div class="i-lucide:chevron-left" />
     </button>
 
     <h2 class="text-lg font-bold text-text" data-testid="month-header">
@@ -95,7 +94,7 @@ const isToday = (date: Date) => {
       class="p-1 rounded-full bg-transparent border-none text-subtext cursor-pointer transition-colors hover:bg-overlay11-active"
       data-testid="next-month-btn"
       @click="handleNextMonth">
-      <ChevronRightIcon class="w-5 h-5" />
+      <div class="i-lucide:chevron-right" />
     </button>
   </div>
 
@@ -146,10 +145,10 @@ const isToday = (date: Date) => {
             <span class="text-sm text-subtext"> {{ getActivitiesForDay(day).length }}件の記録 </span>
           </div>
 
-          <div v-else class="h-full flex items-center">
-            <span
-              class="inline-flex items-center gap-1 text-sub opacity-0 transition-opacity day-row:hover:opacity-100">
-              <PlusIcon class="w-4 h-4" /> 記録を追加
+          <div v-else class="h-full flex items-center opacity-0 hover:opacity-100">
+            <span class="inline-flex items-center gap-1 text-overlay0 transition-opacity day-row:hover:opacity-100">
+              <div class="i-lucide:plus" />
+              記録を追加
             </span>
           </div>
         </div>

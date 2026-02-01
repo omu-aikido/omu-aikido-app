@@ -17,7 +17,8 @@
             href="https://accounts.omu-aikido.com/user"
             target="_blank"
             rel="noopener noreferrer"
-            >こちら <ArrowUpRightFromSquareIcon class="w-3 h-3 ml-0.5 inline-block" /> </a
+            >こちら
+            <div class="i-lucide:square-arrow-out-up-right sq-3 ml-0.5 inline-block" /> </a
           >&MediumSpace;から。
         </p>
       </div>
@@ -32,8 +33,6 @@ import { queryKeys } from '@/src/lib/queryKeys';
 import hc from '@/src/lib/honoClient';
 import UserHeader from '@/src/components/account/UserHeader.vue';
 import ProfileCard from '@/src/components/account/ProfileCard.vue';
-
-import { ArrowUpRightFromSquareIcon } from 'lucide-vue-next';
 
 // Queries
 const {

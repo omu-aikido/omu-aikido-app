@@ -18,7 +18,7 @@
         </div>
         <div class="min-w-0">
           <h2 class="text-lg font-bold text-text truncate my-0">{{ user?.lastName }} {{ user?.firstName }}</h2>
-          <p class="text-base text-text-dim truncate my-0">@{{ user?.username }}</p>
+          <p class="text-base text-subtext truncate my-0">@{{ user?.username }}</p>
         </div>
       </div>
       <button type="button" class="btn-secondary px-3 py-1.5 text-sm" @click="isEditing = true">編集</button>

@@ -108,7 +108,7 @@
               :disabled="isLoading"
               @click="handleSignInWithDiscord">
               <svg
-                class="w-5 h-5 mr-2"
+                class="sq-5 mr-2"
                 aria-hidden="true"
                 focusable="false"
                 xmlns="http://www.w3.org/2000/svg"

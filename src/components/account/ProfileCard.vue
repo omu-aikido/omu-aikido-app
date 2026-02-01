@@ -7,19 +7,19 @@
       </div>
       <div class="flex flex-col gap-3">
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-text-dim">級段位</span>
+          <span class="text-base text-subtext">級段位</span>
           <span class="text-base font-medium text-transparent bg-overlay-active rounded-md">五段</span>
         </div>
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-text-dim">取得日</span>
+          <span class="text-base text-subtext">取得日</span>
           <span class="text-base font-medium text-transparent bg-overlay-active rounded-md">2024/01/01</span>
         </div>
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-text-dim">入部年</span>
+          <span class="text-base text-subtext">入部年</span>
           <span class="text-base font-medium text-transparent bg-overlay-active rounded-md">2024</span>
         </div>
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-text-dim">学年</span>
+          <span class="text-base text-subtext">学年</span>
           <span class="text-base font-medium text-transparent bg-overlay-active rounded-md">学部4年</span>
         </div>
       </div>
@@ -28,30 +28,25 @@
     <div v-else-if="!isEditing" class="stack">
       <div class="flex-between">
         <h3 class="text-lg font-bold text-text">プロフィール</h3>
-        <button
-          type="button"
-          class="btn bg-surface0 text-text-dim border border-overlay0 hover:bg-overlay11 px-3 py-1.5 text-sm"
-          @click="isEditing = true">
-          編集
-        </button>
+        <button type="button" class="btn-secondary px-3 py-1.5 text-sm" @click="isEditing = true">編集</button>
       </div>
       <div class="flex flex-col gap-3">
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-text-dim">級段位</span>
+          <span class="text-base text-subtext">級段位</span>
           <span class="text-base font-medium text-text">{{ translateGrade(profile?.grade ?? '') || '-' }}</span>
         </div>
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-text-dim">取得日</span>
+          <span class="text-base text-subtext">取得日</span>
           <span class="text-base font-medium text-text">
             {{ profile?.getGradeAt ? new Date(profile.getGradeAt).toLocaleDateString() : '-' }}
           </span>
         </div>
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-text-dim">入部年</span>
+          <span class="text-base text-subtext">入部年</span>
           <span class="text-base font-medium text-text">{{ profile?.joinedAt || '-' }}</span>
         </div>
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-text-dim">学年</span>
+          <span class="text-base text-subtext">学年</span>
           <span class="text-base font-medium text-text">{{ translateYear(profile?.year ?? '') || '-' }}</span>
         </div>
       </div>
@@ -68,7 +63,7 @@
                 translateGrade(formData.grade)
               }}</span>
               <span class="pointer-events-none absolute inset-0 right-0 flex items-center pr-2 justify-end">
-                <ChevronsUpDownIcon class="w-4 h-4 text-text-dim" aria-hidden="true" />
+                <ChevronsUpDownIcon class="w-4 h-4 text-subtext" aria-hidden="true" />
               </span>
             </ListboxButton>
             <transition
@@ -107,7 +102,7 @@
       <Input v-model="formData.joinedAt" type="number" label="入部年" min="2020" max="9999" />
 
       <div class="flex flex-col gap-1.5">
-        <label class="block text-sm font-medium text-text-dim">学年</label>
+        <label class="block text-sm font-medium text-subtext">学年</label>
         <Listbox v-model="formData.year">
           <div class="relative mt-1">
             <ListboxButton
@@ -116,7 +111,7 @@
                 translateYear(formData.year)
               }}</span>
               <span class="pointer-events-none absolute inset-0 right-0 flex items-center pr-2 justify-end">
-                <ChevronsUpDownIcon class="w-4 h-4 text-text-dim" aria-hidden="true" />
+                <ChevronsUpDownIcon class="w-4 h-4 text-subtext" aria-hidden="true" />
               </span>
             </ListboxButton>
             <transition
@@ -174,7 +169,6 @@ import { queryKeys } from '@/src/lib/queryKeys';
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/vue';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { ArkErrors } from 'arktype';
-import { CheckIcon, ChevronsUpDownIcon } from 'lucide-vue-next';
 import { computed, reactive, ref, watch } from 'vue';
 
 interface FormData {

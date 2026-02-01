@@ -2,7 +2,6 @@
 import { ref, computed } from 'vue';
 import { format, startOfMonth, endOfMonth, parseISO, isSameDay } from 'date-fns';
 import { SignedIn } from '@clerk/vue';
-import { XIcon, Trash2Icon } from 'lucide-vue-next';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue';
 import { useActivities, useAddActivity, useDeleteActivity } from '@/src/composable/useActivity';
 import ActivityList from '@/src/components/record/ActivityList.vue';
@@ -105,16 +104,16 @@ const selectedDateActivities = computed(() => {
             <div class="flex-between mb-4">
               <DialogTitle class="text-lg font-bold text-text"> 記録を追加・編集 </DialogTitle>
               <button
-                class="p-1 rounded-full bg-transparent border-none text-text-dim cursor-pointer transition-colors bg-overlay1"
+                class="p-1 rounded-full bg-transparent border-none text-subtext cursor-pointer transition-colors bg-overlay1"
                 @click="closeModal">
-                <XIcon class="w-5 h-5" />
+                <div class="i-lucide:x" />
               </button>
             </div>
 
             <ActivityForm :loading="loading" :initial-date="selectedDate" @submit="handleSubmit" />
 
             <div v-if="selectedDateActivities.length > 0" class="mt-8 pt-6 border-t border-overlay0">
-              <h4 class="text-sm font-bold text-text-dim mb-3">この日の記録</h4>
+              <h4 class="text-sm font-bold text-subtext mb-3">この日の記録</h4>
               <div class="flex flex-col gap-2">
                 <div
                   v-for="activity in selectedDateActivities"
@@ -128,7 +127,7 @@ const selectedDateActivities = computed(() => {
                     class="p-2 text-subtext bg-transparent border-none rounded-full cursor-pointer transition-colors hover:text-red-500 bg-overlay1"
                     title="記録を削除"
                     @click="handleDelete(activity.id)">
-                    <Trash2Icon class="w-4 h-4" />
+                    <div class="i-lucide:trash-2" />
                   </button>
                 </div>
               </div>

@@ -3,7 +3,7 @@
     <AdminMenu />
     <div class="flex items-center gap-2 text-sub">
       <router-link to="/admin/accounts" class="hover:underline hover:text-blue-500"> アカウント一覧 </router-link>
-      <span class="text-text-dim">/</span>
+      <span class="text-subtext">/</span>
       <span class="font-medium text-text">ユーザー詳細</span>
     </div>
 
@@ -37,9 +37,9 @@
                 <div class="flex items-center flex-wrap gap-2 text-sub mt-1">
                   <span>{{ user.emailAddress }}</span>
                   <template v-if="!isEditing">
-                    <span class="w-1 h-1 rounded-full bg-subtext" />
+                    <span class="sq-1 rounded-full bg-subtext" />
                     <span>{{ yearLabels[user.profile?.year as string] || user.profile?.year }}</span>
-                    <span class="w-1 h-1 rounded-full bg-subtext" />
+                    <span class="sq-1 rounded-full bg-subtext" />
                     <span>{{ user.profile?.joinedAt }}年度入部</span>
                   </template>
                 </div>
@@ -48,7 +48,7 @@
 
             <button
               v-if="!isEditing"
-              class="p-2 rounded-full bg-transparent text-text-dim border-none cursor-pointer transition-all hover:bg-overlay1 hover:text-blue-500"
+              class="p-2 rounded-full bg-transparent text-subtext border-none cursor-pointer transition-all hover:bg-overlay1 hover:text-blue-500"
               title="編集"
               @click="startEditing">
               <svg
@@ -66,7 +66,7 @@
             </button>
           </div>
 
-          <form v-if="isEditing" class="stack bg-base-dim p-4 rounded-lg" @submit.prevent="handleUpdateProfile">
+          <form v-if="isEditing" class="stack card" @submit.prevent="handleUpdateProfile">
             <div class="grid gap-4 grid-cols-1 md:grid-cols-2">
               <div class="flex flex-col gap-1">
                 <label class="form-label">役職</label>
@@ -101,7 +101,7 @@
               <Input v-model="formData.getGradeAt" type="date" label="級段位取得日" />
             </div>
 
-            <div class="flex justify-end gap-2">
+            <div class="flex justify-end gap-2 mt-2">
               <button type="button" class="btn-secondary" @click="cancelEditing">キャンセル</button>
               <button type="submit" class="btn-primary" :disabled="updating">
                 {{ updating ? '更新中...' : '更新' }}
@@ -168,14 +168,14 @@
           <div class="flex justify-between items-center py-4 border-t border-overlay0">
             <button
               :disabled="page <= 1"
-              class="px-3 py-1 text-sm border border-overlay0 bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-base-dim disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-1 text-sm border border-overlay0 bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-overlay0 disabled:opacity-50 disabled:cursor-not-allowed"
               @click="page > 1 && changePage(page - 1)">
               前へ
             </button>
             <span class="text-sub">{{ page }} ページ目</span>
             <button
               :disabled="activities.length < limit"
-              class="px-3 py-1 text-sm border border-overlay-dim bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-overlay1 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-1 text-sm border border-overlay0 bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-overlay1 disabled:opacity-50 disabled:cursor-not-allowed"
               @click="changePage(page + 1)">
               次へ
             </button>
@@ -240,7 +240,7 @@
                 <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="w-5 h-5 text-red-500"
+                    class="sq-5 text-red-500"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
