@@ -49,7 +49,7 @@ describe('NormCard.vue', () => {
 
     const status = wrapper.find('[data-testid="norm-status"]');
     expect(status.text()).toBe('未達成');
-    expect(status.classes()).toContain('status-pending');
+    expect(status.classes()).toContain('badge-yellow');
   });
 
   it('renders met status correctly', () => {
@@ -63,6 +63,6 @@ describe('NormCard.vue', () => {
 
     const status = wrapper.find('[data-testid="norm-status"]');
     expect(status.text()).toBe('達成');
-    expect(status.classes()).toContain('status-complete');
+    expect(status.classes()).toContain('badge-green');
   });
 });
