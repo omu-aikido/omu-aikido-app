@@ -1,4 +1,3 @@
-import { setupClerkTestingToken } from '@clerk/testing/playwright';
 import { test, expect } from '@playwright/test';
 
 import { login } from './auth-helper';
@@ -34,10 +33,9 @@ test.describe('Security Headers & Access Control', () => {
   test('rejects unauthorized access to other user data', async ({ page }) => {
     // まず認証トークンを取得するためにログイン状態を作る必要があるが、
     // APIテスト(request fixture)では認証情報の共有が難しい場合がある。
-    // setupClerkTestingTokenはBrowserContextに作用するが、request fixtureは別コンテキストの可能性がある。
+    // 認証はBrowserContextに作用するため、request fixtureは別コンテキストの可能性がある。
     // ここでは page.request を使用して、ログイン済みブラウザコンテキストからのリクエストを行う。
 
-    await setupClerkTestingToken({ page });
     await login(page);
 
     // 他人のUserIDを指定してリクエスト（バリデーションを通る形式: user_ + 27 chars）

@@ -1,4 +1,3 @@
-import { setupClerkTestingToken } from '@clerk/testing/playwright';
 import { test, expect } from '@playwright/test';
 
 import { login } from './auth-helper';
@@ -16,7 +15,6 @@ test.describe('Navigation & Route Guards', () => {
   });
 
   test('redirects authenticated user away from auth pages', async ({ page }) => {
-    await setupClerkTestingToken({ page });
     await login(page);
 
     // サインインページにアクセス
@@ -30,7 +28,6 @@ test.describe('Navigation & Route Guards', () => {
   });
 
   test('allows admin user to access admin routes', async ({ page }) => {
-    await setupClerkTestingToken({ page });
     await login(page);
 
     // 管理者ページにアクセス

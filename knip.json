@@ -2,5 +2,6 @@
   "$schema": "https://unpkg.com/knip@latest/schema.json",
   "entry": ["src/main.ts", "server/index.ts"],
   "project": ["src/**/*.{ts,vue}", "server/**/*.ts", "share/**/*.ts", "scripts/**/*.ts"],
-  "ignore": ["**/*.d.ts", "worker-configuration.d.ts"]
+  "ignore": ["**/*.d.ts", "worker-configuration.d.ts"],
+  "ignoreDependencies": ["@clerk/testing", "@iconify-json/lucide"]
 }
