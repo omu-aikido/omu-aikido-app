@@ -27,12 +27,12 @@ describe('PracticeCountGraph.vue', () => {
     const wrapper = mount(PracticeCountGraph, {
       props: {
         practiceData: null,
-        currentGrade: 0,
+        currentGrade: 3,
         loading: true,
       },
     });
 
-    expect(wrapper.find('[data-testid="loading-skeleton"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="skeleton"]').exists()).toBe(true);
   });
 
   it('renders error message', () => {

@@ -27,7 +27,7 @@ describe('AdminMenu.vue', () => {
     const wrapper = mount(AdminMenu);
 
     const accountTab = wrapper.find('[data-testid="tab-accounts"]');
-    expect(accountTab.classes()).toContain('tab-selected');
+    expect(accountTab.classes()).toContain('text-blue-500');
   });
 
   it('navigates on tab click', async () => {
