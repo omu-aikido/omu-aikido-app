@@ -2,7 +2,7 @@
   <div class="py-2">
     <div v-if="!profile" class="stack animate-pulse" data-testid="skeleton">
       <div class="flex-between">
-        <h3 class="text-lg font-bold text-text">プロフィール</h3>
+        <h3 class="text-lg font-bold text">プロフィール</h3>
         <div class="h-8 w-12 rounded-md bg-overlay-active" />
       </div>
       <div class="flex flex-col gap-3">
@@ -27,27 +27,27 @@
 
     <div v-else-if="!isEditing" class="stack">
       <div class="flex-between">
-        <h3 class="text-lg font-bold text-text">プロフィール</h3>
+        <h3 class="text-lg font-bold text">プロフィール</h3>
         <button type="button" class="btn-secondary px-3 py-1.5 text-sm" @click="isEditing = true">編集</button>
       </div>
       <div class="flex flex-col gap-3">
         <div class="flex justify-between items-center py-1">
           <span class="text-base text-subtext">級段位</span>
-          <span class="text-base font-medium text-text">{{ translateGrade(profile?.grade ?? '') || '-' }}</span>
+          <span class="text-base font-medium text">{{ translateGrade(profile?.grade ?? '') || '-' }}</span>
         </div>
         <div class="flex justify-between items-center py-1">
           <span class="text-base text-subtext">取得日</span>
-          <span class="text-base font-medium text-text">
+          <span class="text-base font-medium text">
             {{ profile?.getGradeAt ? new Date(profile.getGradeAt).toLocaleDateString() : '-' }}
           </span>
         </div>
         <div class="flex justify-between items-center py-1">
           <span class="text-base text-subtext">入部年</span>
-          <span class="text-base font-medium text-text">{{ profile?.joinedAt || '-' }}</span>
+          <span class="text-base font-medium text">{{ profile?.joinedAt || '-' }}</span>
         </div>
         <div class="flex justify-between items-center py-1">
           <span class="text-base text-subtext">学年</span>
-          <span class="text-base font-medium text-text">{{ translateYear(profile?.year ?? '') || '-' }}</span>
+          <span class="text-base font-medium text">{{ translateYear(profile?.year ?? '') || '-' }}</span>
         </div>
       </div>
     </div>
@@ -58,7 +58,7 @@
         <Listbox v-model="formData.grade">
           <div class="relative mt-1">
             <ListboxButton
-              class="relative w-full cursor-default rounded-md bg-surface0 border border-overlay0 px-3 py-2 pr-10 text-left text-base text-text focus:outline-none focus:ring-2 focus:ring-blue-500">
+              class="relative w-full cursor-default rounded-md bg-surface0 border border-overlay0 px-3 py-2 pr-10 text-left text-base text focus:outline-none focus:ring-2 focus:ring-blue-500">
               <span class="block overflow-hidden text-ellipsis whitespace-nowrap">{{
                 translateGrade(formData.grade)
               }}</span>
@@ -77,11 +77,7 @@
                   :key="gradeOption.grade"
                   v-slot="{ active, selected }"
                   :value="gradeOption.grade">
-                  <li
-                    :class="[
-                      'relative cursor-default select-none py-2 px-4 pr-10 text-text',
-                      active ? 'bg-overlay' : '',
-                    ]">
+                  <li :class="['relative cursor-default select-none py-2 px-4 pr-10 text', active ? 'bg-overlay' : '']">
                     <span
                       :class="['block overflow-hidden text-ellipsis whitespace-nowrap', selected ? 'font-medium' : '']">
                       {{ gradeOption.name }}
@@ -106,7 +102,7 @@
         <Listbox v-model="formData.year">
           <div class="relative mt-1">
             <ListboxButton
-              class="relative w-full cursor-default rounded-md bg-surface0 border border-overlay0 px-3 py-2 pr-10 text-left text-base text-text focus:outline-none focus:ring-2 focus:ring-blue-500">
+              class="relative w-full cursor-default rounded-md bg-surface0 border border-overlay0 px-3 py-2 pr-10 text-left text-base text focus:outline-none focus:ring-2 focus:ring-blue-500">
               <span class="block overflow-hidden text-ellipsis whitespace-nowrap">{{
                 translateYear(formData.year)
               }}</span>
@@ -125,11 +121,7 @@
                   :key="yearOption.year"
                   v-slot="{ active, selected }"
                   :value="yearOption.year">
-                  <li
-                    :class="[
-                      'relative cursor-default select-none py-2 px-4 pr-10 text-text',
-                      active ? 'bg-overlay' : '',
-                    ]">
+                  <li :class="['relative cursor-default select-none py-2 px-4 pr-10 text', active ? 'bg-overlay' : '']">
                     <span
                       :class="['block overflow-hidden text-ellipsis whitespace-nowrap', selected ? 'font-medium' : '']">
                       {{ yearOption.name }}

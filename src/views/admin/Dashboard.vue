@@ -30,7 +30,7 @@
             @click="$router.push(`/admin/users/${user.id}`)">
             <img :src="user.imageUrl" alt="" class="avatar-md" />
             <div class="flex-1 min-w-0">
-              <div class="font-medium text-text truncate">{{ user.lastName }} {{ user.firstName }}</div>
+              <div class="font-medium text truncate">{{ user.lastName }} {{ user.firstName }}</div>
               <div class="text-sub truncate">
                 {{ user.profile.roleLabel }}
               </div>

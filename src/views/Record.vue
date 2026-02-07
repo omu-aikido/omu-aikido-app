@@ -82,7 +82,7 @@ const selectedDateActivities = computed(() => {
       <div class="flex-1 flex flex-col max-w-2xl mx-auto w-full gap-4">
         <h1 class="heading-1 shrink-0">活動記録</h1>
 
-        <div v-if="error" class="bg-red-50 text-red-500 p-4 rounded-lg shrink-0 dark:bg-red-900/10">
+        <div v-if="error" class="bg-red-500/10 text-red-500 p-4 rounded-lg shrink-0">
           {{ error }}
         </div>
 
@@ -102,7 +102,7 @@ const selectedDateActivities = computed(() => {
           <DialogPanel
             class="w-full max-w-md bg-surface0 rounded-xl shadow-md p-6 border border-overlay0 max-h-[90vh] overflow-y-auto">
             <div class="flex-between mb-4">
-              <DialogTitle class="text-lg font-bold text-text"> 記録を追加・編集 </DialogTitle>
+              <DialogTitle class="text-lg font-bold text"> 記録を追加・編集 </DialogTitle>
               <button
                 class="p-1 rounded-full bg-transparent border-none text-subtext cursor-pointer transition-colors bg-overlay1"
                 @click="closeModal">
@@ -120,7 +120,7 @@ const selectedDateActivities = computed(() => {
                   :key="activity.id"
                   class="flex-between p-3 bg-surface0 rounded-lg">
                   <div class="flex items-baseline gap-2">
-                    <span class="text-lg font-bold text-text">{{ activity.period }}</span>
+                    <span class="text-lg font-bold text">{{ activity.period }}</span>
                     <span class="text-sub">時間</span>
                   </div>
                   <button

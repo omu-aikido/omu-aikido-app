@@ -17,7 +17,7 @@
           <img :src="safeImageUrl" :alt="user?.firstName || 'Profile'" uno-rounded-img />
         </div>
         <div class="min-w-0">
-          <h2 class="text-lg font-bold text-text truncate my-0">{{ user?.lastName }} {{ user?.firstName }}</h2>
+          <h2 class="text-lg font-bold text truncate my-0">{{ user?.lastName }} {{ user?.firstName }}</h2>
           <p class="text-base text-subtext truncate my-0">@{{ user?.username }}</p>
         </div>
       </div>

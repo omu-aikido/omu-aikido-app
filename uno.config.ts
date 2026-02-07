@@ -17,6 +17,12 @@ export default defineConfig({
     presetIcons({
       scale: 1.8,
       warn: true,
+      collections: {
+        lucide: () => import('@iconify-json/lucide/icons.json').then((i) => i.default),
+      },
+      extraProperties: {
+        color: 'var(--color-subtext)',
+      },
     }),
   ],
   transformers: [
@@ -64,8 +70,8 @@ export default defineConfig({
       btn: 'inline-flex items-center justify-center font-medium rounded-md px-4 py-2 text-base cursor-pointer transition-all disabled:(opacity-50 cursor-not-allowed)',
       'nav-button': 'p-2 rounded-lg hover:bg-overlay1 transition-colors',
       'filter-btn':
-        'px-3 py-1.5 text-sm font-medium rounded-md text-subtext border-none cursor-pointer transition-all hover:text-text',
-      'filter-btn-active': 'bg-surface1 text-text shadow-sm',
+        'px-3 py-1.5 text-sm font-medium rounded-md text-subtext border-none cursor-pointer transition-all hover:text',
+      'filter-btn-active': 'bg-surface1 text shadow-sm',
       'tab-list': 'flex gap-1 border-b border-overlay1',
       'tab-item':
         'px-4 py-2.5 text-sm font-medium bg-transparent border-none border-b-2 cursor-pointer transition-colors outline-none text-subtext hover:text-blue-500 border-transparent aria-selected:(border-blue-500 text-blue-500)',
@@ -74,17 +80,17 @@ export default defineConfig({
     // --- Form Controls ---
     {
       'input-base':
-        'w-full px-3 py-2 bg-surface0 border border-overlay0 rounded-md text-text transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-overlay1',
+        'w-full px-3 py-2 bg-surface0 border border-overlay0 rounded-md text transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-overlay1',
       'form-label': 'text-sm font-medium text-subtext',
     },
 
     // --- Typography & Data Display ---
     {
-      'heading-1': 'text-2xl font-bold text-text',
-      'heading-2': 'text-xl font-bold text-text',
+      'heading-1': 'text-2xl font-bold text',
+      'heading-2': 'text-xl font-bold text',
       'text-sub': 'text-sm text-subtext',
       'rounded-img': 'w-full h-full object-cover rounded',
-      'table-base': 'w-full text-left border-collapse text-sm',
+      'table-base': 'w-full text-left border-collapse text-sm text-text',
       'th-base': 'px-4 py-3 font-medium text-subtext border-b border-overlay1 text-nowrap',
       'td-base': 'px-4 py-3 border-b border-overlay1',
       subtext: 'text-subtext text-opacity-100',

@@ -2,7 +2,7 @@
   <div class="flex items-center justify-center p-4">
     <SignedIn>
       <div class="card w-full h-full">
-        <h1 class="text-3xl text-center font-bold text-text tracking-tighter">Welcome Back</h1>
+        <h1 class="text-3xl text-center font-bold text tracking-tighter">Welcome Back</h1>
         <p class="text-base text-subtext opacity-80">
           ログインが完了しました。<br />
           ホームへリダイレクトしています。

@@ -7,7 +7,7 @@
           v-model="searchQuery"
           type="text"
           placeholder="名前・メアドで検索..."
-          class="flex-1 min-w-0 px-3 py-2 bg-base border border-overlay0 rounded-md text-text text-base transition-shadow sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="flex-1 min-w-0 px-3 py-2 bg-base border border-overlay0 rounded-md text text-base transition-shadow sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
           @keyup.enter="handleSearch" />
         <button
           class="px-4 py-2 bg-blue-500 text-white border-none rounded-md text-base cursor-pointer transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -67,19 +67,19 @@
                 <div class="flex items-center gap-2">
                   <img :src="user.imageUrl" alt="" class="avatar-sm ml-1" />
                   <div class="flex flex-col">
-                    <span class="font-medium text-text"> {{ user.lastName }} {{ user.firstName }} </span>
+                    <span class="font-medium text"> {{ user.lastName }} {{ user.firstName }} </span>
                     <small class="text-sub">{{ user.emailAddress }}</small>
                   </div>
                 </div>
               </td>
               <td class="td-base md:px-6 text-center">
-                <span class="text-text">{{ user.profile.roleLabel }}</span>
+                <span class="text">{{ user.profile.roleLabel }}</span>
               </td>
               <td class="td-base md:px-6 text-center">
-                <span class="text-text">{{ user.profile.gradeLabel }}</span>
+                <span class="text">{{ user.profile.gradeLabel }}</span>
               </td>
               <td class="td-base md:px-6 text-center">
-                <span class="text-text">{{ user.profile.yearLabel }}</span>
+                <span class="text">{{ user.profile.yearLabel }}</span>
               </td>
             </tr>
             <tr v-if="sortedUsers.length === 0">

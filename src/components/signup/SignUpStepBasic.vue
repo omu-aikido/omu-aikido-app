@@ -30,7 +30,7 @@
           <button
             type="button"
             :disabled="isSignUpCreated"
-            class="bg-transparent border-none text-subtext cursor-pointer transition-colors p-0 flex items-center justify-center hover:text-text disabled:opacity-50 disabled:cursor-not-allowed"
+            class="bg-transparent border-none text-subtext cursor-pointer transition-colors p-0 flex items-center justify-center hover:text disabled:opacity-50 disabled:cursor-not-allowed"
             :aria-label="showPassword ? 'パスワードを隠す' : 'パスワードを表示'"
             @click="showPassword = !showPassword">
             <svg
@@ -82,7 +82,7 @@
           <button
             type="button"
             :disabled="isSignUpCreated"
-            class="bg-transparent border-none text-subtext cursor-pointer transition-colors p-0 flex items-center justify-center hover:text-text disabled:opacity-50 disabled:cursor-not-allowed"
+            class="bg-transparent border-none text-subtext cursor-pointer transition-colors p-0 flex items-center justify-center hover:text disabled:opacity-50 disabled:cursor-not-allowed"
             :aria-label="showPasswordConfirm ? 'パスワードを隠す' : 'パスワードを表示'"
             @click="showPasswordConfirm = !showPasswordConfirm">
             <svg

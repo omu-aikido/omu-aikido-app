@@ -4,10 +4,10 @@
       <div class="flex items-center gap-3">
         <img :src="user.imageUrl" alt="" class="avatar-md" />
         <div>
-          <div class="font-medium text-text">{{ user.lastName }} {{ user.firstName }}</div>
+          <div class="font-medium text">{{ user.lastName }} {{ user.firstName }}</div>
           <div class="text-sub flex flex-wrap gap-x-2 gap-y-0">
             <span>{{ norm.gradeLabel }}</span>
-            <span v-if="norm.lastPromotionDate" class="text-gray-400">•</span>
+            <span v-if="norm.lastPromotionDate" class="text-subtext">•</span>
             <span v-if="norm.lastPromotionDate">昇級: {{ norm.lastPromotionDate }}</span>
           </div>
         </div>

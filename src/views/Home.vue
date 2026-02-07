@@ -114,7 +114,7 @@ const getNavLabelClass = (theme: string) => {
   if (theme === 'blue') return 'group-hover:text-blue-500';
   if (theme === 'indigo') return 'group-hover:text-indigo-500';
   if (theme === 'green') return 'group-hover:text-teal-400';
-  return 'group-hover:text-text';
+  return 'group-hover:text';
 };
 </script>
 
@@ -146,7 +146,7 @@ const getNavLabelClass = (theme: string) => {
             :to="item.href.startsWith('http') ? undefined : item.href"
             :href="item.href.startsWith('http') ? item.href : undefined"
             :class="[
-              'group flex flex-col items-center justify-center gap-3 card text-text cursor-pointer no-underline transition-shadow transition-colors hover:shadow-md',
+              'group flex flex-col items-center justify-center gap-3 card text cursor-pointer no-underline transition-shadow transition-colors hover:shadow-md',
               getNavItemClass(item.theme),
             ]">
             <div

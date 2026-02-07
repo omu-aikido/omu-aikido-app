@@ -5,7 +5,7 @@
       <p class="text-subtext mb-8">予期せぬエラーが発生しました。しばらく時間を置いてから再度お試しください。</p>
       <div
         v-if="errorMessage"
-        class="mb-6 p-4 bg-red-50 border border-red-500 rounded-lg dark:bg-red-900/10"
+        class="mb-6 p-4 bg-red-500/10 border border-red-500 rounded-lg"
         data-testid="error-content">
         <p class="text-sm text-red-500 font-mono text-left break-words">
           {{ errorMessage }}
@@ -20,7 +20,7 @@
           ページを再読み込み
         </button>
         <button
-          class="w-full px-6 py-3 bg-gray-200 text-text font-medium border-none rounded-lg cursor-pointer transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
+          class="w-full px-6 py-3 bg-overlay1 text font-medium border-none rounded-lg cursor-pointer transition-colors hover:bg-overlay0"
           data-testid="home-btn"
           @click="handleGoHome">
           ホームに戻る
