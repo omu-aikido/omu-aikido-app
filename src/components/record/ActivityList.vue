@@ -78,7 +78,7 @@ const isToday = (date: Date) => {
 </script>
 
 <template>
-  <div class="sticky top-0 z-20 flex-between p-3 px-4 bg-surface0">
+  <div class="sticky top-0 z-20 flex-between p-3 px-4 bg-base">
     <button
       class="p-1 rounded-full bg-transparent border-none text-subtext cursor-pointer transition-colors hover:bg-overlay11-active"
       data-testid="prev-month-btn"

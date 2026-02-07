@@ -135,4 +135,15 @@ export default defineConfig({
       },
     ],
   ],
+  rules: [
+    [
+      /^sq-(\d+)$/,
+      ([, d]: RegExpMatchArray) => {
+        return {
+          height: `calc(var(--spacing) * ${d})`,
+          width: `calc(var(--spacing) * ${d})px`,
+        };
+      },
+    ],
+  ],
 });
