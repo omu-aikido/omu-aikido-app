@@ -98,6 +98,7 @@ import { useQuery } from '@tanstack/vue-query';
 import { queryKeys } from '@/src/lib/queryKeys';
 import hc from '@/src/lib/honoClient';
 import AdminMenu from '@/src/components/admin/AdminMenu.vue';
+import { Role } from '@/share/types/role';
 
 const searchQuery = ref('');
 const sortBy = ref<string>('role');
@@ -138,31 +139,36 @@ const sortedUsers = computed(() => {
   if (!users.value) return [];
 
   return [...users.value].toSorted((a, b) => {
-    let valA: string | number = '';
-    let valB: string | number = '';
-
     switch (sortBy.value) {
       case 'role':
-        valA = a.profile.role || 'z';
-        valB = b.profile.role || 'z';
-        break;
-      case 'grade':
-        valA = a.profile.grade ?? 99;
-        valB = b.profile.grade ?? 99;
-        break;
-      case 'year':
-        valA = a.profile.year || '';
-        valB = b.profile.year || '';
-        break;
-      case 'name':
-        valA = `${a.lastName} ${a.firstName}`;
-        valB = `${b.lastName} ${b.firstName}`;
-        break;
-    }
+        // Use the Role.compare method for proper role sorting
+        const roleComparison = Role.compare(a.profile.role || 'member', b.profile.role || 'member');
+        return sortOrder.value === 'asc' ? roleComparison : -roleComparison;
 
-    if (valA < valB) return sortOrder.value === 'asc' ? -1 : 1;
-    if (valA > valB) return sortOrder.value === 'asc' ? 1 : -1;
-    return 0;
+      case 'grade':
+        // Sort by grade number (lower grades first)
+        const gradeA = a.profile.grade ?? 99;
+        const gradeB = b.profile.grade ?? 99;
+        const gradeComparison = gradeA - gradeB;
+        return sortOrder.value === 'asc' ? gradeComparison : -gradeComparison;
+
+      case 'year':
+        // Sort by year string
+        const yearA = a.profile.year || '';
+        const yearB = b.profile.year || '';
+        const yearComparison = yearA.localeCompare(yearB);
+        return sortOrder.value === 'asc' ? yearComparison : -yearComparison;
+
+      case 'name':
+        // Sort by full name
+        const nameA = `${a.lastName} ${a.firstName}`;
+        const nameB = `${b.lastName} ${b.firstName}`;
+        const nameComparison = nameA.localeCompare(nameB, 'ja');
+        return sortOrder.value === 'asc' ? nameComparison : -nameComparison;
+
+      default:
+        return 0;
+    }
   });
 });
 </script>

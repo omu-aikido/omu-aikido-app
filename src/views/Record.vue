@@ -127,7 +127,7 @@ const selectedDateActivities = computed(() => {
                     class="p-2 text-subtext bg-transparent border-none rounded-full cursor-pointer transition-colors hover:text-red-500 bg-overlay1"
                     title="記録を削除"
                     @click="handleDelete(activity.id)">
-                    <div class="i-lucide:trash-2" />
+                    <div class="i-lucide:trash-2 sq-5" />
                   </button>
                 </div>
               </div>
