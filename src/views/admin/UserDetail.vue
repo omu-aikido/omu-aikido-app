@@ -4,7 +4,7 @@
     <div class="flex items-center gap-2 text-sub">
       <router-link to="/admin/accounts" class="hover:underline hover:text-blue-500"> アカウント一覧 </router-link>
       <span class="text-subtext">/</span>
-      <span class="font-medium text-text">ユーザー詳細</span>
+      <span class="font-medium text">ユーザー詳細</span>
     </div>
 
     <div v-if="loading" class="loading-container">
@@ -145,7 +145,7 @@
       </div>
 
       <div class="stack">
-        <h3 class="text-base font-medium text-text">アクティビティ履歴</h3>
+        <h3 class="text-base font-medium text">アクティビティ履歴</h3>
 
         <div v-if="activities.length > 0">
           <div class="overflow-x-auto">
@@ -168,14 +168,14 @@
           <div class="flex justify-between items-center py-4 border-t border-overlay0">
             <button
               :disabled="page <= 1"
-              class="px-3 py-1 text-sm border border-overlay0 bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-overlay0 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-1 text-sm border border-overlay0 bg-transparent rounded-md text cursor-pointer transition-colors hover:bg-overlay0 disabled:opacity-50 disabled:cursor-not-allowed"
               @click="page > 1 && changePage(page - 1)">
               前へ
             </button>
             <span class="text-sub">{{ page }} ページ目</span>
             <button
               :disabled="activities.length < limit"
-              class="px-3 py-1 text-sm border border-overlay0 bg-transparent rounded-md text-text cursor-pointer transition-colors hover:bg-overlay1 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-1 text-sm border border-overlay0 bg-transparent rounded-md text cursor-pointer transition-colors hover:bg-overlay1 disabled:opacity-50 disabled:cursor-not-allowed"
               @click="changePage(page + 1)">
               次へ
             </button>
@@ -191,7 +191,7 @@
         </div>
         <div class="p-4 stack">
           <div class="flex justify-between items-center">
-            <p class="text-sm font-medium text-text">ユーザーを削除</p>
+            <p class="text-sm font-medium text">ユーザーを削除</p>
             <button
               v-if="!showDeleteConfirm"
               class="px-4 py-1.5 text-sm font-medium text-red-500 border border-red-500 bg-transparent rounded-md cursor-pointer transition-all hover:bg-red-500/10"
@@ -213,10 +213,10 @@
               v-model="deleteConfirmName"
               type="text"
               placeholder="ユーザー名を入力"
-              class="w-full px-3 py-2 border border-red-500/30 rounded-md text-base bg-base text-text focus:outline-none focus:ring-2 focus:ring-red-500" />
+              class="w-full px-3 py-2 border border-red-500/30 rounded-md text-base bg-base text focus:outline-none focus:ring-2 focus:ring-red-500" />
             <div class="flex gap-2">
               <button
-                class="btn bg-transparent text-subtext hover:bg-base-overlay hover:text-text"
+                class="btn bg-transparent text-subtext hover:bg-base-overlay hover:text"
                 @click="
                   showDeleteConfirm = false;
                   deleteConfirmName = '';
@@ -251,7 +251,7 @@
                       d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-text">本当に削除しますか？</h3>
+                <h3 class="text-lg font-semibold text">本当に削除しますか？</h3>
               </div>
               <p class="text-sub">
                 <strong>{{ user?.lastName }} {{ user?.firstName }}</strong>

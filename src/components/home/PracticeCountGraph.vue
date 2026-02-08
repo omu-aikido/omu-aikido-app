@@ -79,7 +79,7 @@ const progressComment = computed(() => {
   <div class="w-full" data-testid="practice-count-graph">
     <div v-if="loading" class="card animate-pulse rounded" data-testid="skeleton">
       <div class="flex flex-col justify-center items-center">
-        <div class="flex justify-center bg-gray-200 dark:bg-gray-700 rounded">
+        <div class="flex justify-center bg-overlay1 rounded">
           <span class="text-transparent"> &nbsp;&nbsp; </span>
         </div>
         <div class="w-full max-w-96 py-4">
@@ -99,7 +99,7 @@ const progressComment = computed(() => {
         <div class="w-full cursor-pointer flex flex-col justify-center items-center">
           <div class="text-lg">
             {{ translateGrade(targetGrade) }}{{ promotionType }}まで
-            <span class="text-text font-bold text-3xl">{{ needToNextGrade }}</span>
+            <span class="text font-bold text-3xl">{{ needToNextGrade }}</span>
             日
           </div>
 
@@ -116,7 +116,7 @@ const progressComment = computed(() => {
 
       <div class="p-4 border-t border-overlay1">
         <div class="space-y-3">
-          <p class="text-text">
+          <p class="text">
             {{ progressComment }}
           </p>
           <p>

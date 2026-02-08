@@ -31,15 +31,15 @@
         <div class="mx-5">
           <SignedIn>
             <nav class="mt-6 flex flex-col gap-5">
-              <RouterLink to="/" class="flex-inline items-center gap-2" @click="close">
+              <RouterLink to="/" class="flex-inline items-center gap-2 text" @click="close">
                 <div class="i-lucide:layout-dashboard" />
                 トップ
               </RouterLink>
-              <RouterLink to="/record" class="flex-inline items-center gap-2" @click="close">
+              <RouterLink to="/record" class="flex-inline items-center gap-2 text" @click="close">
                 <div class="i-lucide:clipboard-list" />
                 活動記録
               </RouterLink>
-              <RouterLink to="/account" class="flex-inline items-center gap-2" @click="close">
+              <RouterLink to="/account" class="flex-inline items-center gap-2 text" @click="close">
                 <UserAvatar alt="User Avatar" rounded />
                 アカウント設定
               </RouterLink>
@@ -50,7 +50,7 @@
         <SignedIn>
           <hr class="my-5 mx-2" />
           <SignOutButton>
-            <button class="flex gap-2 mx-5 items-center w-full">
+            <button class="flex gap-2 mx-5 items-center w-full text">
               <div class="i-lucide:log-out" />
               ログアウト
             </button>

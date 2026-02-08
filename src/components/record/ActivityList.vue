@@ -86,7 +86,7 @@ const isToday = (date: Date) => {
       <div class="i-lucide:chevron-left" />
     </button>
 
-    <h2 class="text-lg font-bold text-text" data-testid="month-header">
+    <h2 class="text-lg font-bold text" data-testid="month-header">
       {{ formatHeader(currentMonth) }}
     </h2>
 
@@ -119,7 +119,7 @@ const isToday = (date: Date) => {
         <div class="stack items-center justify-center w-12 flex-shrink-0 p-2 transition-colors">
           <span
             :class="[
-              'text-lg font-bold leading-none text-text',
+              'text-lg font-bold leading-none text',
               isSunday(day) ? 'text-red-500' : isSaturday(day) ? 'text-blue-500' : '',
             ]">
             {{ getDay(day) }}
@@ -137,7 +137,7 @@ const isToday = (date: Date) => {
           <div v-if="getActivitiesForDay(day).length > 0" class="flex-between">
             <div class="flex items-baseline gap-2">
               <span class="text-sub">合計</span>
-              <span class="text-xl font-bold text-text">
+              <span class="text-xl font-bold text">
                 {{ getActivitiesForDay(day).reduce((sum, a) => sum + a.period, 0) }}
               </span>
               <span class="text-sub">時間</span>

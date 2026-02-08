@@ -30,7 +30,7 @@ const emit = defineEmits<Emits>();
     <div class="fixed inset-0 flex items-center justify-center p-4">
       <DialogPanel class="w-full max-w-96 rounded-2xl bg-surface0 p-6 shadow-xl border border-border">
         <div class="flex-1">
-          <DialogTitle class="text-lg font-bold text-text gap-2 flex-inline items-center" data-testid="confirm-title">
+          <DialogTitle class="text-lg font-bold text gap-2 flex-inline items-center" data-testid="confirm-title">
             <div class="i-lucide:triangle-alert sq-6" />
             {{ title }}
           </DialogTitle>
