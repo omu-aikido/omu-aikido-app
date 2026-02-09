@@ -147,7 +147,7 @@ export default defineConfig({
       ([, d]: RegExpMatchArray) => {
         return {
           height: `calc(var(--spacing) * ${d})`,
-          width: `calc(var(--spacing) * ${d})px`,
+          width: `calc(var(--spacing) * ${d})`,
         };
       },
     ],

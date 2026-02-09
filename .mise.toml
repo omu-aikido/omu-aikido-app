@@ -1,7 +1,7 @@
 [tools]
 lefthook = "latest"
 node = "lts"
-pnpm = "10.28.2"
+pnpm = "latest"
 
 [tasks]
 format = "pnpm run format"

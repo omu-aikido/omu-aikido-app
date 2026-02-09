@@ -7,20 +7,20 @@
       </div>
       <div class="flex flex-col gap-3">
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-subtext">級段位</span>
-          <span class="text-base font-medium text-transparent bg-overlay-active rounded-md">五段</span>
+          <span class="text text-subtext">級段位</span>
+          <span class="text font-medium text-transparent bg-overlay-active rounded-md">五段</span>
         </div>
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-subtext">取得日</span>
-          <span class="text-base font-medium text-transparent bg-overlay-active rounded-md">2024/01/01</span>
+          <span class="text text-subtext">取得日</span>
+          <span class="text font-medium text-transparent bg-overlay-active rounded-md">2024/01/01</span>
         </div>
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-subtext">入部年</span>
-          <span class="text-base font-medium text-transparent bg-overlay-active rounded-md">2024</span>
+          <span class="text text-subtext">入部年</span>
+          <span class="text font-medium text-transparent bg-overlay-active rounded-md">2024</span>
         </div>
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-subtext">学年</span>
-          <span class="text-base font-medium text-transparent bg-overlay-active rounded-md">学部4年</span>
+          <span class="text text-subtext">学年</span>
+          <span class="text font-medium text-transparent bg-overlay-active rounded-md">学部4年</span>
         </div>
       </div>
     </div>
@@ -30,24 +30,24 @@
         <h3 class="text-lg font-bold text">プロフィール</h3>
         <button type="button" class="btn-secondary px-3 py-1.5 text-sm" @click="isEditing = true">編集</button>
       </div>
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-3 text-subtext">
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-subtext">級段位</span>
-          <span class="text-base font-medium text">{{ translateGrade(profile?.grade ?? '') || '-' }}</span>
+          <span class="text-subtext">級段位</span>
+          <span class="font-medium text">{{ translateGrade(profile?.grade ?? '') || '-' }}</span>
         </div>
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-subtext">取得日</span>
-          <span class="text-base font-medium text">
+          <span class="text-subtext">取得日</span>
+          <span class="font-medium text">
             {{ profile?.getGradeAt ? new Date(profile.getGradeAt).toLocaleDateString() : '-' }}
           </span>
         </div>
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-subtext">入部年</span>
-          <span class="text-base font-medium text">{{ profile?.joinedAt || '-' }}</span>
+          <span class="text-subtext">入部年</span>
+          <span class="font-medium text">{{ profile?.joinedAt || '-' }}</span>
         </div>
         <div class="flex justify-between items-center py-1">
-          <span class="text-base text-subtext">学年</span>
-          <span class="text-base font-medium text">{{ translateYear(profile?.year ?? '') || '-' }}</span>
+          <span class="text-subtext">学年</span>
+          <span class="font-medium text">{{ translateYear(profile?.year ?? '') || '-' }}</span>
         </div>
       </div>
     </div>
@@ -58,7 +58,7 @@
         <Listbox v-model="formData.grade">
           <div class="relative mt-1">
             <ListboxButton
-              class="relative w-full cursor-default rounded-md bg-surface0 border border-overlay0 px-3 py-2 pr-10 text-left text-base text focus:outline-none focus:ring-2 focus:ring-blue-500">
+              class="relative w-full cursor-default rounded-md bg-surface0 border border-overlay0 px-3 py-2 pr-10 text-left text text focus:outline-none focus:ring-2 focus:ring-blue-500">
               <span class="block overflow-hidden text-ellipsis whitespace-nowrap">{{
                 translateGrade(formData.grade)
               }}</span>
@@ -102,7 +102,7 @@
         <Listbox v-model="formData.year">
           <div class="relative mt-1">
             <ListboxButton
-              class="relative w-full cursor-default rounded-md bg-surface0 border border-overlay0 px-3 py-2 pr-10 text-left text-base text focus:outline-none focus:ring-2 focus:ring-blue-500">
+              class="relative w-full cursor-default rounded-md bg-surface0 border border-overlay0 px-3 py-2 pr-10 text-left text text focus:outline-none focus:ring-2 focus:ring-blue-500">
               <span class="block overflow-hidden text-ellipsis whitespace-nowrap">{{
                 translateYear(formData.year)
               }}</span>
