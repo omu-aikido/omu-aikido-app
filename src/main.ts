@@ -1,13 +1,14 @@
 import { clerkPlugin } from '@clerk/vue';
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query';
-import '@unocss/reset/tailwind-compat.css';
-import 'virtual:uno.css';
 import { createApp } from 'vue';
 
 import App from './App.vue';
-import './assets/main.css';
 import { initAuthState } from './composable/useAuth';
 import router from './router';
+
+import './assets/main.css';
+import '@unocss/reset/tailwind-compat.css';
+import 'virtual:uno.css';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 if (!PUBLISHABLE_KEY) {

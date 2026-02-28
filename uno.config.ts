@@ -95,7 +95,6 @@ export default defineConfig({
       'td-base': 'px-4 py-3 border-b border-overlay1',
       subtext: 'text-subtext text-opacity-100',
       text: 'text-text',
-      base: 'bg-page',
       surface: 'bg-surface',
       overlay: 'bg-overlay',
       'placeholder-subtext': 'placeholder:text-subtext placeholder:opacity-100',

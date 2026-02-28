@@ -9,6 +9,19 @@
 - **Database**: Drizzle ORM + libSQL (Turso)
 - **Authentication**: Clerk
 - **Validation**: Arktype
+- **Observability**: Cloudflare Workers Observability
+
+## Observability & Error Monitoring
+
+### ログの確認方法
+
+```sh
+# ローカル開発時のログ
+pnpm dev
+
+# 本番環境のリアルタイムログ
+wrangler tail
+```
 
 ## Prerequisites
 

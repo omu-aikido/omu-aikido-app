@@ -1,5 +1,4 @@
 import type { ClerkAPIError } from '@clerk/types';
-
 import { useClerk } from '@clerk/vue';
 import { ref } from 'vue';
 

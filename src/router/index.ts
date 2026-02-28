@@ -1,5 +1,4 @@
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
-
 import { createRouter, createWebHistory } from 'vue-router';
 
 // HomeView remains eager for FCP
