@@ -40,6 +40,8 @@ export const edgeCacheMiddleware = async (c: Context, next: Next): Promise<Respo
   if (!response.ok) return;
   if (response.headers.has('Set-Cookie')) return;
 
-  response.headers.set('Cache-Control', cacheControl);
-  c.executionCtx.waitUntil(cache.put(cacheKey, response.clone()));
+  const newResponse = new Response(response.body, response);
+  newResponse.headers.set('Cache-Control', cacheControl);
+  c.executionCtx.waitUntil(cache.put(cacheKey, newResponse.clone()));
+  return newResponse;
 };
