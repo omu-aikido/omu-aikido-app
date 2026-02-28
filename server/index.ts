@@ -1,16 +1,20 @@
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
 import { Hono } from 'hono';
-import { logger } from 'hono/logger';
 import { secureHeaders } from 'hono/secure-headers';
 
 import adminApp from './app/admin';
 import userApp from './app/user';
 import { webhooks } from './app/webhooks/clerk';
 import { edgeCacheMiddleware } from './middleware/cache';
+import { errorHandler } from './middleware/errorHandler';
+import { requestLogger } from './middleware/requestLogger';
 
 const app = new Hono<{ Bindings: Env }>();
 
-app.use(logger());
+// エラーハンドリングを最初に適用
+app.use('*', errorHandler);
+// リクエストロギング
+app.use('*', requestLogger);
 app.use((c, next) => {
   return secureHeaders({
     contentSecurityPolicy: {
