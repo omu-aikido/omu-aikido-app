@@ -7,7 +7,7 @@ import tseslint from 'typescript-eslint';
 import vueParser from 'vue-eslint-parser';
 
 export default [
-  globalIgnores(['**/dist/**', '**/tests/**', '**/coverage/**']),
+  globalIgnores(['**/dist/**', '**/tests/**', '**/coverage/**', 'worker-configuration.d.ts']),
   { languageOptions: { globals: globals.browser } },
   ...eslintPluginVueScopedCSS.configs['flat/recommended'],
   ...tseslint.configs.recommended,
