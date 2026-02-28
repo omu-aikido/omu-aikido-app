@@ -66,10 +66,6 @@ export const webhooks = new Hono<{ Bindings: Env }>().post('/clerk', async (c) =
       const db = dbClient(c.env);
       await db.delete(activity).where(eq(activity.userId, userId));
       console.log(`Deleted activities for user ${userId}`);
-
-      // Delete profile cache
-      await c.env.KV.delete(`profile:${userId}`);
-      console.log(`Deleted cache for user ${userId}`);
     } catch (err) {
       console.error(`Failed to cleanup data for user ${userId}:`, err);
       return c.json({ error: 'Failed to cleanup user data' }, 500);

@@ -1,15 +1,7 @@
 import type { Context, Next } from 'hono';
 
 // [pathPattern, cacheControl, isPrefix]
-export const CACHED_ROUTES: Array<[string, string, boolean]> = [
-  // Admin routes (public cache - all admin users see same data)
-  ['/api/admin/dashboard', 'public, max-age=60', false],
-  ['/api/admin/norms', 'public, max-age=60', false],
-  ['/api/admin/accounts', 'public, max-age=30', false],
-  ['/api/admin/users', 'public, max-age=30', false],
-  ['/api/admin/accounts/', 'public, max-age=30', true],
-  ['/api/admin/users/', 'public, max-age=30', true],
-];
+export const CACHED_ROUTES: Array<[string, string, boolean]> = [];
 
 const getCacheControlForPath = (path: string): string | null => {
   for (const [pattern, cacheControl, isPrefix] of CACHED_ROUTES) {

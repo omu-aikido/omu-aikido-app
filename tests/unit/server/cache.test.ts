@@ -10,7 +10,7 @@ const KNOWN_API_ROUTES = [
   ['/api/admin/accounts', true], // has /:userId
   ['/api/admin/users', true], // has /:userId
 
-  // User routes (not cached at edge, uses KV or uncached)
+  // User routes (not cached at edge)
   ['/api/user/record', true],
   ['/api/user/clerk/account', false],
   ['/api/user/clerk/profile', false],
