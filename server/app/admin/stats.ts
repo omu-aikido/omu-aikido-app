@@ -74,10 +74,7 @@ async function getUsersNorm(env: Env, clerkUsers: User[]) {
   const conditions = validProfiles.map((profile) => {
     // Use getGradeAt if available, otherwise fallback to joinedAt
     const gradeDate = profile.getGradeAt ?? String(profile.joinedAt ?? new Date().getFullYear());
-    return drizzleOrm.and(
-      drizzleOrm.eq(activity.userId, profile.id),
-      drizzleOrm.gt(activity.date, gradeDate)
-    );
+    return drizzleOrm.and(drizzleOrm.eq(activity.userId, profile.id), drizzleOrm.gt(activity.date, gradeDate));
   });
 
   const activityData = await db

@@ -1,10 +1,8 @@
-import type { InferRequestType } from 'hono/client';
-
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import type { InferRequestType } from 'hono/client';
 import { computed, type Ref } from 'vue';
 
 import type { Activity } from '@/share/types/records';
-
 import hc from '@/src/lib/honoClient';
 import { queryKeys } from '@/src/lib/queryKeys';
 

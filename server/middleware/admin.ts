@@ -1,6 +1,5 @@
-import type { Context, Next } from 'hono';
-
 import { getAuth } from '@hono/clerk-auth';
+import type { Context, Next } from 'hono';
 
 import { getProfile } from '@/server/clerk/profile';
 import { Role } from '@/share/types/role';

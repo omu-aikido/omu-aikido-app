@@ -1,8 +1,7 @@
-import type { Context } from 'hono';
-
 import { createClerkClient } from '@clerk/backend';
 import { getAuth } from '@hono/clerk-auth';
 import { ArkErrors } from 'arktype';
+import type { Context } from 'hono';
 
 import { AccountMetadata } from '@/share/types/account';
 

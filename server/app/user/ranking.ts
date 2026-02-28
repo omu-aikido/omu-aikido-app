@@ -1,11 +1,9 @@
-import type { Context } from 'hono';
-
 import * as drizzleOrm from 'drizzle-orm';
-
-import type { RankingEntry } from '@/share/types/records';
+import type { Context } from 'hono';
 
 import { dbClient } from '@/server/db/drizzle';
 import { activity } from '@/server/db/schema';
+import type { RankingEntry } from '@/share/types/records';
 
 const CACHE_TTL = 300; // 5 minutes
 

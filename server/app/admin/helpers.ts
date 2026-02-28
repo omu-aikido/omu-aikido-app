@@ -1,5 +1,4 @@
 import type { User } from '@clerk/backend';
-
 import { ArkErrors, type } from 'arktype';
 
 import { translateGrade } from '@/share/lib/grade';
