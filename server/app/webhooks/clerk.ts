@@ -4,6 +4,7 @@ import { Webhook } from 'svix';
 
 import { dbClient } from '@/server/db/drizzle';
 import { activity } from '@/server/db/schema';
+import { notify } from '@/server/lib/observability';
 
 type ClerkWebhookEvent = {
   type: string;
@@ -13,7 +14,8 @@ type ClerkWebhookEvent = {
 export const webhooks = new Hono<{ Bindings: Env }>().post('/clerk', async (c) => {
   const webhookSecret = c.env.CLERK_WEBHOOK_SECRET;
   if (!webhookSecret) {
-    console.error('CLERK_WEBHOOK_SECRET is not set');
+    const error = new Error('CLERK_WEBHOOK_SECRET is not set');
+    notify(c, error, { statusCode: 500 });
     return c.json({ error: 'Webhook secret not configured' }, 500);
   }
 
@@ -29,7 +31,8 @@ export const webhooks = new Hono<{ Bindings: Env }>().post('/clerk', async (c) =
   try {
     event = svix.verify(payload, headers) as ClerkWebhookEvent;
   } catch (err) {
-    console.error('Webhook verification failed:', err);
+    const error = err instanceof Error ? err : new Error(String(err));
+    notify(c, error, { statusCode: 400 });
     return c.json({ error: 'Invalid signature' }, 400);
   }
 
@@ -53,7 +56,8 @@ export const webhooks = new Hono<{ Bindings: Env }>().post('/clerk', async (c) =
         });
         console.log(`Migrated metadata for user ${event.data.id}`);
       } catch (err) {
-        console.error(`Failed to migrate metadata for user ${event.data.id}:`, err);
+        const error = err instanceof Error ? err : new Error(String(err));
+        notify(c, error, { statusCode: 500, userId: event.data.id });
         return c.json({ error: 'Failed to update user' }, 500);
       }
     }
@@ -67,7 +71,8 @@ export const webhooks = new Hono<{ Bindings: Env }>().post('/clerk', async (c) =
       await db.delete(activity).where(eq(activity.userId, userId));
       console.log(`Deleted activities for user ${userId}`);
     } catch (err) {
-      console.error(`Failed to cleanup data for user ${userId}:`, err);
+      const error = err instanceof Error ? err : new Error(String(err));
+      notify(c, error, { statusCode: 500, userId });
       return c.json({ error: 'Failed to cleanup user data' }, 500);
     }
   }

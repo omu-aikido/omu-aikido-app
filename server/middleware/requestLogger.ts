@@ -1,9 +1,6 @@
 import type { Context, Next } from 'hono';
 
-export async function requestLogger(
-  c: Context,
-  next: Next,
-): Promise<void | Response> {
+export async function requestLogger(c: Context, next: Next): Promise<void | Response> {
   const start = Date.now();
 
   await next();

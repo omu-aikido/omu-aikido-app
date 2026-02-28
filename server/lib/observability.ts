@@ -4,11 +4,7 @@ import type { Context } from 'hono';
  * Cloudflare Workers Observabilityに対応したエラー通知
  * console.errorで出力されたログはCloudflare Dashboardで確認可能
  */
-export function notifyError(
-  c: Context,
-  error: Error,
-  metadata?: Record<string, unknown>,
-) {
+export function notify(c: Context, error: Error, metadata?: Record<string, unknown>) {
   const errorLog = {
     level: 'error',
     message: `${c.req.method} ${c.req.url}`,
@@ -31,28 +27,11 @@ export function notifyError(
     timestamp: new Date().toISOString(),
   };
 
-  console.error(JSON.stringify(errorLog));
-}
-
-/**
- * 警告レベルのログ出力
- */
-export function notifyWarning(
-  c: Context,
-  message: string,
-  metadata?: Record<string, unknown>,
-) {
-  const warningLog = {
-    level: 'warn',
-    message: `${c.req.method} ${c.req.url} - ${message}`,
-    request: {
-      method: c.req.method,
-      url: c.req.url,
-      path: c.req.path,
-    },
-    metadata,
-    timestamp: new Date().toISOString(),
-  };
-
-  console.warn(JSON.stringify(warningLog));
+  const status = metadata && (metadata as Record<string, any>).statusCode;
+  if (!metadata) return;
+  if (typeof status !== 'number') {
+    console.error(JSON.stringify(errorLog));
+  } else {
+    (status >= 500 ? console.error : console.warn)(JSON.stringify(errorLog));
+  }
 }

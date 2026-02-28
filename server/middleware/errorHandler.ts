@@ -1,6 +1,7 @@
 import type { Context, Next } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { notifyError } from '../lib/observability';
+
+import { notify } from '@/server/lib/observability';
 
 export async function errorHandler(c: Context, next: Next): Promise<Response> {
   try {
@@ -15,7 +16,7 @@ export async function errorHandler(c: Context, next: Next): Promise<Response> {
     }
 
     // Cloudflare Workers Observabilityにエラーを通知
-    notifyError(c, error, {
+    notify(c, error, {
       statusCode: 500,
       errorType: error.constructor.name,
     });
@@ -26,7 +27,7 @@ export async function errorHandler(c: Context, next: Next): Promise<Response> {
         error: 'Internal Server Error',
         message: error.message,
       },
-      500,
+      500
     );
   }
 }

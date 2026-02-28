@@ -4,6 +4,7 @@ import { ArkErrors } from 'arktype';
 import type { Context } from 'hono';
 
 import { AccountMetadata } from '@/share/types/account';
+import { notify } from '../lib/observability';
 
 export const getProfile = async (c: Context) => {
   const auth = getAuth(c);
@@ -43,6 +44,7 @@ export const patchProfile = async (c: Context, data: typeof AccountMetadata.infe
 
     return updatedUser;
   } catch {
+    notify(c, new Error('Failed to update user profile'), { statusCode: 500, userId: auth.userId });
     throw new Error('Failed to update user');
   }
 };

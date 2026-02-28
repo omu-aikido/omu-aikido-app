@@ -7,6 +7,7 @@ import { Hono } from 'hono';
 
 import { dbClient } from '@/server/db/drizzle';
 import { activity } from '@/server/db/schema';
+import { notify } from '@/server/lib/observability';
 import { Role } from '@/share/types/role';
 
 import * as helpers from './helpers';
@@ -124,7 +125,8 @@ const app = new Hono<{ Bindings: Env }>()
         totalHours,
       });
     } catch (e) {
-      console.error(e);
+      const error = e instanceof Error ? e : new Error(String(e));
+      notify(c, error, { statusCode: 404, userId });
       return c.json({ error: 'User not found' }, 404);
     }
   })
@@ -246,7 +248,8 @@ const app = new Hono<{ Bindings: Env }>()
       await clerkClient.users.deleteUser(targetUserId);
       return c.json({ success: true }, 200);
     } catch (e) {
-      console.error('Failed to delete user:', e);
+      const error = e instanceof Error ? e : new Error(String(e));
+      notify(c, error, { statusCode: 500, targetUserId });
       return c.json({ error: 'ユーザーの削除に失敗しました' }, 500);
     }
   });
