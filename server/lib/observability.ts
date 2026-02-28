@@ -27,11 +27,17 @@ export function notify(c: Context, error: Error, metadata?: Record<string, unkno
     timestamp: new Date().toISOString(),
   };
 
-  const status = metadata && (metadata as Record<string, any>).statusCode;
-  if (!metadata) return;
-  if (typeof status !== 'number') {
-    console.error(JSON.stringify(errorLog));
-  } else {
-    (status >= 500 ? console.error : console.warn)(JSON.stringify(errorLog));
+  if (!metadata) {
+    console.warn(JSON.stringify(errorLog));
+    return;
   }
+
+  const rawStatus = (metadata as { statusCode?: unknown }).statusCode;
+  if (typeof rawStatus !== 'number') {
+    console.error(JSON.stringify(errorLog));
+    return;
+  }
+
+  const logFn = rawStatus >= 500 ? console.error : console.warn;
+  logFn(JSON.stringify(errorLog));
 }

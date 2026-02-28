@@ -4,6 +4,7 @@ import { ArkErrors } from 'arktype';
 import type { Context } from 'hono';
 
 import { AccountMetadata } from '@/share/types/account';
+
 import { notify } from '../lib/observability';
 
 export const getProfile = async (c: Context) => {
