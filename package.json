@@ -91,7 +91,7 @@
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   },
-  "packageManager": "pnpm@10.29.2",
+  "packageManager": "pnpm@10.30.3",
   "pnpm": {
     "overrides": {
       "esbuild": "^0.27.1",
