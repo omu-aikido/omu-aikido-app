@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SidePanel from './SidePanel.vue';
-import { SignedIn } from '@clerk/vue';
+import { Show } from '@clerk/vue';
 </script>
 
 <template>
@@ -8,9 +8,9 @@ import { SignedIn } from '@clerk/vue';
     <RouterLink to="/" data-testid="header-logo-link">
       <img src="/favicon.svg" alt="Logo" data-testid="header-logo" />
     </RouterLink>
-    <SignedIn>
+    <Show when="signed-in">
       <SidePanel />
-    </SignedIn>
+    </Show>
   </header>
 </template>
 

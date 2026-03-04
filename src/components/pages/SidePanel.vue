@@ -29,7 +29,7 @@
         </div>
 
         <div class="mx-5">
-          <SignedIn>
+          <Show when="signed-in">
             <nav class="mt-6 flex flex-col gap-5">
               <RouterLink to="/" class="flex-inline items-center gap-2 text" @click="close">
                 <div class="i-lucide:layout-dashboard" />
@@ -44,10 +44,10 @@
                 アカウント設定
               </RouterLink>
             </nav>
-          </SignedIn>
+          </Show>
         </div>
 
-        <SignedIn>
+        <Show when="signed-in">
           <hr class="my-5 mx-2" />
           <SignOutButton>
             <button class="flex gap-2 mx-5 items-center w-full text">
@@ -55,14 +55,14 @@
               ログアウト
             </button>
           </SignOutButton>
-        </SignedIn>
+        </Show>
       </div>
     </Transition>
   </Teleport>
 </template>
 
 <script setup lang="ts">
-import { SignedIn, SignOutButton, UserAvatar } from '@clerk/vue';
+import { Show, SignOutButton, UserAvatar } from '@clerk/vue';
 import { ref, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 

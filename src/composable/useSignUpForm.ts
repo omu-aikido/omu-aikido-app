@@ -1,4 +1,4 @@
-import type { ClerkAPIError } from '@clerk/types';
+import type { ClerkAPIError } from "@clerk/shared/types";
 import { useClerk } from '@clerk/vue';
 import { ArkErrors, type } from 'arktype';
 import { reactive, readonly, ref } from 'vue';

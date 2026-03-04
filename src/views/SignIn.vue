@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center justify-center p-4">
-    <SignedIn>
+    <Show when="signed-in">
       <div class="card w-full h-full">
         <h1 class="text-3xl text-center font-bold text tracking-tighter">Welcome Back</h1>
         <p class="text-base text-subtext opacity-80">
@@ -21,9 +21,9 @@
           </RouterLink>
         </p>
       </div>
-    </SignedIn>
+    </Show>
 
-    <SignedOut>
+    <Show when="signed-out">
       <div class="card w-full h-full mx-auto max-w-md">
         <div class="p-2">
           <h1 class="heading-1">サインイン</h1>
@@ -144,13 +144,13 @@
           </div>
         </div>
       </div>
-    </SignedOut>
+    </Show>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router';
-import { SignedOut, SignedIn } from '@clerk/vue';
+import { Show } from '@clerk/vue';
 import { useAuth } from '@/src/composable/useAuth';
 import { useSignIn } from '@/src/composable/useSignIn';
 import Input from '@/src/components/ui/UiInput.vue';
