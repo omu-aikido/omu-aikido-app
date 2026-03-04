@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:js-app"],
+  "extends": ["config:js-app", ":disableDependencyDashboard"],
   "schedule": ["* * * * 0"],
   "packageRules": [
     {
@@ -16,6 +16,5 @@
       "groupName": "devDependency updates"
     }
   ],
-  "timezone": "Asia/Tokyo",
-  "dashboard": false
+  "timezone": "Asia/Tokyo"
 }
