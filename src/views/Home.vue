@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SignedIn } from '@clerk/vue';
+import { Show } from '@clerk/vue';
 import { computed, ref } from 'vue';
 
 import PracticeCountGraph from '@/src/components/home/PracticeCountGraph.vue';
@@ -120,7 +120,7 @@ const getNavLabelClass = (theme: string) => {
 
 <template>
   <div class="max-w-7xl mx-auto px-4">
-    <SignedIn>
+    <Show when="signed-in">
       <div class="max-w-3xl mx-auto flex flex-col gap-6">
         <div v-if="error" class="bg-red-50 text-red-500 p-4 rounded-lg text-sm text-center dark:bg-red-900/10">
           {{ error }}
@@ -162,6 +162,6 @@ const getNavLabelClass = (theme: string) => {
           </component>
         </div>
       </div>
-    </SignedIn>
+    </Show>
   </div>
 </template>

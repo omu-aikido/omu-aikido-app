@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { format, startOfMonth, endOfMonth, parseISO, isSameDay } from 'date-fns';
-import { SignedIn } from '@clerk/vue';
+import { Show } from '@clerk/vue';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue';
 import { useActivities, useAddActivity, useDeleteActivity } from '@/src/composable/useActivity';
 import ActivityList from '@/src/components/record/ActivityList.vue';
@@ -78,7 +78,7 @@ const selectedDateActivities = computed(() => {
 
 <template>
   <div class="min-h-[calc(100vh-4rem)] flex flex-col max-w-7xl mx-auto px-4">
-    <SignedIn>
+    <Show when="signed-in">
       <div class="flex-1 flex flex-col max-w-2xl mx-auto w-full gap-4">
         <h1 class="heading-1 shrink-0">活動記録</h1>
 
@@ -144,6 +144,6 @@ const selectedDateActivities = computed(() => {
         cancel-text="キャンセル"
         @confirm="handleConfirmDelete"
         @cancel="confirmDialogOpen = false" />
-    </SignedIn>
+    </Show>
   </div>
 </template>
