@@ -1,17 +1,19 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:js-app"],
-  "schedule": ["every 3 days"],
+  "schedule": ["* * * * 0"],
   "packageRules": [
     {
       "matchUpdateTypes": ["patch", "pin", "digest"],
       "minimumReleaseAge": "3 days",
-      "automerge": true
+      "automerge": true,
+      "groupName": "patch updates"
     },
     {
       "matchDepTypes": ["devDependencies"],
       "minimumReleaseAge": "3 days",
-      "automerge": true
+      "automerge": true,
+      "groupName": "devDependency updates"
     }
   ],
   "timezone": "Asia/Tokyo",
