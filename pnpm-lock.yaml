@@ -23,10 +23,10 @@ importers:
         version: 1.7.23(vue@3.5.29(typescript@5.9.3))
       '@hono/arktype-validator':
         specifier: ^2.0.1
-        version: 2.0.1(arktype@2.2.0)(hono@4.12.5)
+        version: 2.0.1(arktype@2.2.0)(hono@4.12.7)
       '@hono/clerk-auth':
         specifier: ^3.1.0
-        version: 3.1.0(hono@4.12.5)(react@19.2.3)
+        version: 3.1.0(hono@4.12.7)(react@19.2.3)
       '@tanstack/vue-query':
         specifier: ^5.92.9
         version: 5.92.9(vue@3.5.29(typescript@5.9.3))
@@ -44,7 +44,7 @@ importers:
         version: 0.45.1(@libsql/client@0.15.15)
       hono:
         specifier: ^4.12.5
-        version: 4.12.5
+        version: 4.12.7
       svix:
         specifier: ^1.86.0
         version: 1.86.0
@@ -2668,8 +2668,8 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hono@4.12.5:
-    resolution: {integrity: sha512-3qq+FUBtlTHhtYxbxheZgY8NIFnkkC/MR8u5TTsr7YZ3wixryQ3cCwn3iZbg8p8B88iDBBAYSfZDS75t8MN7Vg==}
+  hono@4.12.7:
+    resolution: {integrity: sha512-jq9l1DM0zVIvsm3lv9Nw9nlJnMNPOcAtsbsgiUhWcFzPE99Gvo6yRTlszSLLYacMeQ6quHD6hMfId8crVHvexw==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -4356,16 +4356,16 @@ snapshots:
       '@tanstack/vue-virtual': 3.13.19(vue@3.5.29(typescript@5.9.3))
       vue: 3.5.29(typescript@5.9.3)
 
-  '@hono/arktype-validator@2.0.1(arktype@2.2.0)(hono@4.12.5)':
+  '@hono/arktype-validator@2.0.1(arktype@2.2.0)(hono@4.12.7)':
     dependencies:
       arktype: 2.2.0
-      hono: 4.12.5
+      hono: 4.12.7
 
-  '@hono/clerk-auth@3.1.0(hono@4.12.5)(react@19.2.3)':
+  '@hono/clerk-auth@3.1.0(hono@4.12.7)(react@19.2.3)':
     dependencies:
       '@clerk/backend': 2.33.0(react@19.2.3)
       '@clerk/shared': 3.47.2(react@19.2.3)
-      hono: 4.12.5
+      hono: 4.12.7
     transitivePeerDependencies:
       - react
       - react-dom
@@ -6146,7 +6146,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono@4.12.5: {}
+  hono@4.12.7: {}
 
   hookable@5.5.3: {}
 
