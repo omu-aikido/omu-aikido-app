@@ -34,7 +34,7 @@
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
-    "@clerk/backend": "^3.0.1",
+    "@clerk/backend": "^3.2.0",
     "@clerk/vue": "^2.0.1",
     "@headlessui/vue": "^1.7.23",
     "@hono/arktype-validator": "^2.0.1",
