@@ -4,12 +4,25 @@ multi-ecosystem-groups:
   bun-updates:
     schedule:
       interval: 'daily'
+    commit-message:
+      prefix: 'chore'
+    open-pull-requests-limit: 10
+    labels:
+      - 'dependencies'
   actions-updates:
     schedule:
       interval: 'daily'
+    commit-message:
+      prefix: 'chore'
+    labels:
+      - 'dependencies'
   nix-updates:
     schedule:
       interval: 'daily'
+    commit-message:
+      prefix: 'chore'
+    labels:
+      - 'dependencies'
 
 updates:
   - package-ecosystem: 'bun'
@@ -21,11 +34,6 @@ updates:
     multi-ecosystem-group: 'bun-updates'
     schedule:
       interval: 'daily'
-    commit-message:
-      prefix: 'chore'
-    labels:
-      - 'dependencies'
-    open-pull-requests-limit: 10
 
   - package-ecosystem: 'github-actions'
     directory: '/'
@@ -34,10 +42,6 @@ updates:
     multi-ecosystem-group: 'actions-updates'
     schedule:
       interval: 'daily'
-    commit-message:
-      prefix: 'chore'
-    labels:
-      - 'dependencies'
 
   - package-ecosystem: 'nix'
     directory: '/'
@@ -46,7 +50,3 @@ updates:
     multi-ecosystem-group: 'nix-updates'
     schedule:
       interval: 'daily'
-    commit-message:
-      prefix: 'chore'
-    labels:
-      - 'dependencies'
