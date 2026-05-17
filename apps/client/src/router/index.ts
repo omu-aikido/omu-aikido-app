@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import { Role } from 'share';
+import { isAdminRole } from './adminGuard';
 
 import HomeView from '@/pages/Home.vue';
 import NotFoundView from '@/pages/NotFound.vue';
@@ -127,8 +127,7 @@ router.beforeEach(async (to, _from) => {
       }
 
       const roleValue = (clerk.user?.publicMetadata as { role?: string })?.role;
-      const role = Role.fromString(`${roleValue}`);
-      const isAdmin = role ? role.isManagement : false;
+      const isAdmin = isAdminRole(roleValue);
 
       if (!isAdmin) {
         return { name: 'home' };
