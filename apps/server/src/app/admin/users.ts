@@ -97,12 +97,10 @@ const app = new Hono<{ Bindings: Env }>()
       const totalHours = allActivities.reduce((sum, a) => sum + (a.period || 0), 0);
       const totalDays = new Set(allActivities.map((a) => a.date)).size;
 
-      const getGradeAtDate = profile?.getGradeAt
-        ? new Date(profile.getGradeAt)
-        : helpers.getJST(new Date(profile?.joinedAt ?? new Date().getFullYear()));
+      const getGradeAtDate = helpers.resolveTrainBaselineDate(profile);
 
       const trainsAfterGrade = allActivities
-        .filter((a) => new Date(a.date) > getGradeAtDate)
+        .filter((a) => helpers.isDoneTrainTargetDate(a.date, getGradeAtDate))
         .map((a) => a.period)
         .reduce((sum, period) => sum + period, 0);
 
