@@ -244,6 +244,20 @@ const app = new Hono<{ Bindings: Env }>()
       }
 
       await clerkClient.users.deleteUser(targetUserId);
+      try {
+        const db = dbClient(c.env);
+        await db.delete(activity).where(drizzleOrm.eq(activity.userId, targetUserId));
+      } catch (activityDeleteError) {
+        const error =
+          activityDeleteError instanceof Error ? activityDeleteError : new Error(String(activityDeleteError));
+        notify(c, error, {
+          statusCode: 500,
+          targetUserId,
+          clerkDeleted: true,
+          activityDeleteFailed: true,
+        });
+        return c.json({ error: 'ユーザーは削除されましたが活動記録の削除に失敗しました' }, 500);
+      }
       return c.json({ success: true }, 200);
     } catch (e) {
       const error = e instanceof Error ? e : new Error(String(e));
