@@ -7,7 +7,7 @@ export const recordQuerySchema = type({
 });
 
 export const createActivitySchema = type({
-  date: 'string',
+  date: /^\d{4}-\d{2}-\d{2}$/,
   period: 'number > 0',
 });
 

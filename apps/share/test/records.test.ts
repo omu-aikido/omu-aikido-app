@@ -211,6 +211,11 @@ describe('createActivitySchema', () => {
     expect(isValid(result)).toBe(true);
   });
 
+  test('should accept YYYY-MM-DD date format only', () => {
+    const result = createActivitySchema({ date: '1999-12-31', period: 2 });
+    expect(isValid(result)).toBe(true);
+  });
+
   test('should reject missing date', () => {
     const result = createActivitySchema({ period: 1.5 });
     expect(isValid(result)).toBe(false);
@@ -229,5 +234,20 @@ describe('createActivitySchema', () => {
   test('should accept valid date string', () => {
     const result = createActivitySchema({ date: '2024-01-01', period: 1.5 });
     expect(isValid(result)).toBe(true);
+  });
+
+  test('should reject date without zero padding', () => {
+    const result = createActivitySchema({ date: '2024-1-1', period: 1.5 });
+    expect(isValid(result)).toBe(false);
+  });
+
+  test('should reject date with slash separator', () => {
+    const result = createActivitySchema({ date: '2024/01/01', period: 1.5 });
+    expect(isValid(result)).toBe(false);
+  });
+
+  test('should reject non-date string', () => {
+    const result = createActivitySchema({ date: 'hello', period: 1.5 });
+    expect(isValid(result)).toBe(false);
   });
 });
