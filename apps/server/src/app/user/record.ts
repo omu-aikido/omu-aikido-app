@@ -8,7 +8,7 @@ import * as records from 'share';
 
 import { activity } from '@/src/db/schema';
 import { dbClient } from '@/src/db/drizzle';
-import { calculatePeriodRange, getRankingData, maskRankingData } from './ranking';
+import { calculatePeriodRange, getCurrentUserRanking, getRankingData, maskRankingData } from './ranking';
 
 export const record = new Hono<{ Bindings: Env }>()
   // GET /api/user/record - 活動記録一覧取得
@@ -203,7 +203,7 @@ export const record = new Hono<{ Bindings: Env }>()
 
       // ユーザーIDでマスク処理
       const ranking = maskRankingData(rawRankingData, auth.userId);
-      const currentUserRanking = ranking.find((entry) => entry.isCurrentUser) ?? null;
+      const currentUserRanking = await getCurrentUserRanking(c, startDate, endDate, auth.userId, rawRankingData);
 
       return c.json(
         {
