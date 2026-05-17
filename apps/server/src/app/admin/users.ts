@@ -243,6 +243,19 @@ const app = new Hono<{ Bindings: Env }>()
         return c.json({ error: '自分以上の権限を持つユーザーは削除できません' }, 403);
       }
 
+      try {
+        const db = dbClient(c.env);
+        await db.delete(activity).where(drizzleOrm.eq(activity.userId, targetUserId));
+      } catch (activityDeleteError) {
+        const error =
+          activityDeleteError instanceof Error ? activityDeleteError : new Error(String(activityDeleteError));
+        notify(c, error, {
+          statusCode: 500,
+          targetUserId,
+          activityDeleteFailed: true,
+        });
+        return c.json({ error: '活動記録の削除に失敗しました' }, 500);
+      }
       await clerkClient.users.deleteUser(targetUserId);
       return c.json({ success: true }, 200);
     } catch (e) {
