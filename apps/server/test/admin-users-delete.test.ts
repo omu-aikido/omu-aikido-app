@@ -75,7 +75,7 @@ describe('DELETE /:userId', () => {
     expect(deleteWhereMock).toHaveBeenCalledTimes(1);
   });
 
-  test('returns 500 when clerk deletion succeeds but activity deletion fails', async () => {
+  test('returns 500 and does not delete clerk user when activity deletion fails', async () => {
     deleteWhereMock.mockImplementationOnce(async () => {
       throw new Error('db failure');
     });
@@ -93,8 +93,8 @@ describe('DELETE /:userId', () => {
     const json = await res.json();
 
     expect(res.status).toBe(500);
-    expect(json).toEqual({ error: 'ユーザーは削除されましたが活動記録の削除に失敗しました' });
-    expect(clerkUsers.deleteUser).toHaveBeenCalledWith('target-user');
+    expect(json).toEqual({ error: '活動記録の削除に失敗しました' });
+    expect(clerkUsers.deleteUser).not.toHaveBeenCalled();
     expect(notifyMock).toHaveBeenCalledTimes(1);
   });
 });
