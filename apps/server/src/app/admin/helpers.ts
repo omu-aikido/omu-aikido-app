@@ -97,3 +97,21 @@ export function formatDateToJSTString(date: Date): string {
   const jstDate = getJST(date);
   return jstDate.toISOString().split('T')[0]!;
 }
+
+type GradeDateProfile = {
+  getGradeAt?: string | null;
+  joinedAt?: number | null;
+};
+
+export function resolveTrainBaselineDate(profile: GradeDateProfile | null | undefined, now = new Date()): Date {
+  if (profile?.getGradeAt) {
+    return new Date(`${profile.getGradeAt}T00:00:00.000Z`);
+  }
+
+  const joinedYear = profile?.joinedAt ?? now.getFullYear();
+  return new Date(Date.UTC(joinedYear, 3, 1));
+}
+
+export function isDoneTrainTargetDate(activityDate: string, baselineDate: Date): boolean {
+  return new Date(`${activityDate}T00:00:00.000Z`) >= baselineDate;
+}
