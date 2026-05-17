@@ -250,4 +250,24 @@ describe('createActivitySchema', () => {
     const result = createActivitySchema({ date: 'hello', period: 1.5 });
     expect(isValid(result)).toBe(false);
   });
+
+  test('should reject impossible calendar date', () => {
+    const result = createActivitySchema({ date: '2024-02-31', period: 1.5 });
+    expect(isValid(result)).toBe(false);
+  });
+
+  test('should reject month out of range', () => {
+    const result = createActivitySchema({ date: '2024-13-01', period: 1.5 });
+    expect(isValid(result)).toBe(false);
+  });
+
+  test('should accept leap day on leap year', () => {
+    const result = createActivitySchema({ date: '2024-02-29', period: 1.5 });
+    expect(isValid(result)).toBe(true);
+  });
+
+  test('should reject leap day on non-leap year', () => {
+    const result = createActivitySchema({ date: '2023-02-29', period: 1.5 });
+    expect(isValid(result)).toBe(false);
+  });
 });

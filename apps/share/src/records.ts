@@ -1,5 +1,23 @@
 import { type } from 'arktype';
 
+function isStrictIsoDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+
+  const [yearText, monthText, dayText] = value.split('-');
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() + 1 === month &&
+    date.getUTCDate() === day
+  );
+}
+
 export const recordQuerySchema = type({
   'userId?': /^user_[\w]{27}$/,
   'startDate?': /^\d{4}-\d{2}-\d{2}$/,
@@ -9,7 +27,7 @@ export const recordQuerySchema = type({
 export const createActivitySchema = type({
   date: /^\d{4}-\d{2}-\d{2}$/,
   period: 'number > 0',
-});
+}).narrow((input) => isStrictIsoDate(input.date));
 
 export const deleteActivitiesSchema = type({ ids: 'string[]' });
 
